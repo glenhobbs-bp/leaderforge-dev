@@ -25,7 +25,7 @@ This addendum provides complete, ready-to-use module configurations for all 5 Le
   "description": "Relational learning and identity in Christ",
   "theme": {
     "primary": "#3E5E17",
-    "secondary": "#74A78E", 
+    "secondary": "#74A78E",
     "accent": "#DD8D00",
     "background": "#F8F4F1",
     "neutral": "#E3DDC9",
@@ -435,10 +435,10 @@ Each module's theme automatically generates CSS variables:
 ### Dynamic Theme Switching
 ```typescript
 // Module theme application
-export function applyModuleTheme(moduleConfig: ModuleConfig) {
+export function applyModuleTheme(contextConfig: ModuleConfig) {
   const root = document.documentElement;
-  
-  Object.entries(moduleConfig.theme).forEach(([key, value]) => {
+
+  Object.entries(contextConfig.theme).forEach(([key, value]) => {
     if (typeof value === 'string') {
       root.style.setProperty(`--module-${key}`, value);
     } else if (typeof value === 'object') {
@@ -448,8 +448,8 @@ export function applyModuleTheme(moduleConfig: ModuleConfig) {
       });
     }
   });
-  
-  root.setAttribute('data-module', moduleConfig.contextKey);
+
+  root.setAttribute('data-module', contextConfig.contextKey);
 }
 ```
 
@@ -474,7 +474,7 @@ interface AgentPromptTemplate {
 
 // Example: LeaderCoach base template
 const leaderCoachTemplate: AgentPromptTemplate = {
-  systemPrompt: `You are the LeaderCoach, a warm and encouraging guide who helps users discover and practice their identity in Christ. 
+  systemPrompt: `You are the LeaderCoach, a warm and encouraging guide who helps users discover and practice their identity in Christ.
 
 Core Beliefs:
 - The old has gone, the new has come (2 Cor 5:17)
@@ -612,7 +612,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export class ModuleLoaderService {
-  private moduleConfigs = new Map<string, ModuleConfig>();
+  private contextConfigs = new Map<string, ModuleConfig>();
 
   async loadAllModules(): Promise<void> {
     const configDir = path.join(process.cwd(), 'modules/configs');
@@ -622,17 +622,17 @@ export class ModuleLoaderService {
       const configPath = path.join(configDir, file);
       const configData = await fs.readFile(configPath, 'utf-8');
       const config = validateModuleConfig(JSON.parse(configData));
-      
-      this.moduleConfigs.set(config.id, config);
+
+      this.contextConfigs.set(config.id, config);
     }
   }
 
   getModule(moduleId: string): ModuleConfig | null {
-    return this.moduleConfigs.get(moduleId) || null;
+    return this.contextConfigs.get(moduleId) || null;
   }
 
   getAllModules(): ModuleConfig[] {
-    return Array.from(this.moduleConfigs.values());
+    return Array.from(this.contextConfigs.values());
   }
 }
 ```

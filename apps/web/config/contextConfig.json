@@ -1,0 +1,51 @@
+{
+  "context_id": "brilliant",
+  "context_title": "Brilliant Movement",
+  "context_subtitle": "Kingdom Activation",
+  "logo": {
+    "src": "/logos/brilliant-logo.png",
+    "alt": "Brilliant Logo",
+    "width": 120,
+    "height": 40
+  },
+  "icon": {
+    "src": "/logos/brilliant-icon.png",
+    "alt": "Brilliant Icon",
+    "size": 32
+  },
+  "theme": {
+    "nav": {
+      "panelBg": "bg-gradient-to-b from-white to-gray-50",
+      "panelText": "text-gray-500",
+      "activeBg": "bg-white",
+      "activeText": "text-gray-900",
+      "inactiveBg": "bg-white",
+      "inactiveText": "text-gray-700",
+      "inactiveBorder": "border border-gray-200"
+    }
+  },
+  "nav": [
+    {
+      "label": "Dashboard",
+      "href": "/dashboard",
+      "icon": "/icons/dashboard.svg",
+      "description": "Overview of activity"
+    },
+    {
+      "label": "Library",
+      "href": "/library",
+      "icon": "/icons/library.svg",
+      "description": "Explore training content"
+    },
+    {
+      "label": "Settings",
+      "href": "/settings",
+      "icon": "/icons/settings.svg",
+      "description": "Manage preferences"
+    }
+  ],
+  "chat": {
+    "heading": "AI Assistant",
+    "message": "I'm here to help you navigate and learn."
+  }
+}

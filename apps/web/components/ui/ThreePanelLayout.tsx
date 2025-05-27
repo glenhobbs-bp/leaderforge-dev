@@ -1,29 +1,43 @@
-// ThreePanelLayout.tsx
+// File: components/ui/ThreePanelLayout.tsx
+"use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface ThreePanelLayoutProps {
-  nav: React.ReactNode;
-  content: React.ReactNode;
-  chat: React.ReactNode;
+  nav: ReactNode;
+  content: ReactNode;
+  chat?: ReactNode;
+  isCollapsed?: boolean;
 }
 
 export default function ThreePanelLayout({
   nav,
   content,
   chat,
+  isCollapsed = false,
 }: ThreePanelLayoutProps) {
   return (
-    <div className="grid grid-cols-12 h-screen">
-      <aside className="col-span-2 bg-white border-r border-gray-200 overflow-auto">
+    <div className="flex h-screen w-full overflow-hidden">
+      {/* Navigation Panel */}
+      <div
+        className={`transition-all duration-300 ease-in-out flex-shrink-0 ${
+          isCollapsed ? "w-[80px]" : "w-[250px]"
+        }`}
+      >
         {nav}
-      </aside>
-      <main className="col-span-8 bg-gray-50 overflow-auto">
+      </div>
+
+      {/* Main Content Area */}
+      <main className="flex-grow min-w-0 overflow-y-auto bg-gray-50">
         {content}
       </main>
-      <aside className="col-span-2 bg-white border-l border-gray-200 overflow-auto">
-        {chat}
-      </aside>
+
+      {/* Optional Chat Panel */}
+      {chat && (
+        <aside className="w-[300px] flex-shrink-0 border-l border-gray-200 overflow-y-auto">
+          {chat}
+        </aside>
+      )}
     </div>
   );
 }

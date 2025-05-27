@@ -123,15 +123,15 @@ export function JournalEntry() {
 ```typescript
 // Module configuration drives UI
 export function ModuleLayout() {
-  const { moduleConfig, loading } = useModuleConfig();
+  const { contextConfig, loading } = useModuleConfig();
 
   if (loading) return <ModuleSkeleton />;
 
   return (
-    <div style={moduleConfig.theme}>
-      <Navigation items={moduleConfig.navigation} />
-      <AgentList agents={moduleConfig.agents} />
-      <DynamicContent config={moduleConfig.content} />
+    <div style={contextConfig.theme}>
+      <Navigation items={contextConfig.navigation} />
+      <AgentList agents={contextConfig.agents} />
+      <DynamicContent config={contextConfig.content} />
     </div>
   );
 }
@@ -159,8 +159,8 @@ export function ThemedComponent() {
 // Set variables at module root
 <ModuleProvider
   style={{
-    '--module-primary': moduleConfig.theme.primary,
-    '--module-text': moduleConfig.theme.text,
+    '--module-primary': contextConfig.theme.primary,
+    '--module-text': contextConfig.theme.text,
   }}
 >
 ```
@@ -405,8 +405,8 @@ describe('useModuleConfig', () => {
     const { result } = renderHook(() => useModuleConfig('movement'));
 
     await waitFor(() => {
-      expect(result.current.moduleConfig).toBeDefined();
-      expect(result.current.moduleConfig.id).toBe('movement');
+      expect(result.current.contextConfig).toBeDefined();
+      expect(result.current.contextConfig.id).toBe('movement');
     });
   });
 });

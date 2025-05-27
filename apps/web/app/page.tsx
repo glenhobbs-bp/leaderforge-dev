@@ -1,9 +1,9 @@
 // File: apps/web/app/page.tsx
 
-import { loadModuleConfig } from "@lib/server/loadModuleConfig";
-import DynamicModulePage from "@/components/DynamicModulePage";
+import { loadContextConfig } from "@lib/server/loadContextConfig";
+import DynamicContextPage from "@/components/DynamicContextPage";
 
 export default async function Page() {
-  const config = await loadModuleConfig();
-  return <DynamicModulePage config={config} />;
+  const config = await loadContextConfig();
+  return <DynamicContextPage config={config} />;
 }
