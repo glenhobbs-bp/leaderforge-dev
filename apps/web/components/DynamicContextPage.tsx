@@ -6,6 +6,8 @@ import ThreePanelLayout from "@/components/ui/ThreePanelLayout";
 import NavPanel from "@/components/ui/NavPanel";
 import ContentPanel from "@/components/ui/ContentPanel";
 import ChatPanel from "@/components/ui/ChatPanel";
+import contextConfigBrilliant from "@/config/contextConfig.json";
+import contextConfigLeaderforge from "@/config/contextConfig-leaderforge.json";
 
 interface NavItem {
   label: string;
@@ -57,7 +59,28 @@ interface ContextConfig {
   };
 }
 
-export default function DynamicContextPage({ config }: { config: ContextConfig }) {
+const CONTEXTS = [
+  {
+    id: contextConfigBrilliant.context_id,
+    title: contextConfigBrilliant.context_title,
+    subtitle: contextConfigBrilliant.context_subtitle,
+    icon: "🌟"
+  },
+  {
+    id: contextConfigLeaderforge.context_id,
+    title: contextConfigLeaderforge.context_title,
+    subtitle: contextConfigLeaderforge.context_subtitle,
+    icon: "🏢"
+  }
+];
+const CONTEXT_MAP = {
+  [contextConfigBrilliant.context_id]: contextConfigBrilliant,
+  [contextConfigLeaderforge.context_id]: contextConfigLeaderforge
+};
+
+export default function DynamicContextPage() {
+  const [contextId, setContextId] = useState(CONTEXTS[0].id);
+  const config = CONTEXT_MAP[contextId];
   const [selectedItem, setSelectedItem] = useState<NavItem>(config.nav[0]);
 
   const renderContent = () => {
@@ -100,11 +123,9 @@ export default function DynamicContextPage({ config }: { config: ContextConfig }
           items={config.nav}
           onSelect={setSelectedItem}
           selected={selectedItem}
-          theme={config.theme.nav}
-          logo={config.logo}
-          icon={config.icon}
-          contextTitle={config.context_title}
-          contextSubtitle={config.context_subtitle}
+          contextOptions={CONTEXTS}
+          contextValue={contextId}
+          onContextChange={setContextId}
         />
       }
       content={renderContent()}
@@ -121,6 +142,7 @@ export default function DynamicContextPage({ config }: { config: ContextConfig }
           />
         )
       }
+      contextConfig={config}
     />
   );
 }

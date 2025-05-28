@@ -1,43 +1,66 @@
 // File: components/ui/ThreePanelLayout.tsx
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
+import { ThemeProvider } from "@/components/ui/ThemeContext";
 
 interface ThreePanelLayoutProps {
   nav: ReactNode;
   content: ReactNode;
   chat?: ReactNode;
-  isCollapsed?: boolean;
+  contextConfig: any;
 }
 
 export default function ThreePanelLayout({
   nav,
   content,
   chat,
-  isCollapsed = false,
+  contextConfig,
 }: ThreePanelLayoutProps) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const expanded = !isCollapsed || isHovered;
   return (
-    <div className="flex h-screen w-full overflow-hidden">
-      {/* Navigation Panel */}
+    <ThemeProvider value={contextConfig.theme}>
       <div
-        className={`transition-all duration-300 ease-in-out flex-shrink-0 ${
-          isCollapsed ? "w-[80px]" : "w-[250px]"
-        }`}
+        style={{
+          '--primary': contextConfig.theme.primary,
+          '--secondary': contextConfig.theme.secondary,
+          '--accent': contextConfig.theme.accent,
+          '--bg-light': contextConfig.theme.bg_light,
+          '--bg-neutral': contextConfig.theme.bg_neutral,
+          '--text-primary': contextConfig.theme.text_primary,
+          '--bg-gradient': contextConfig.theme.bg_gradient,
+          background: 'var(--bg-light)',
+        } as React.CSSProperties}
+        className="h-screen w-full"
       >
-        {nav}
+        <div className="flex h-screen w-full overflow-hidden">
+          {/* NavPanel: only as wide as needed, no parent background */}
+          <div
+            className="flex-shrink-0 transition-all duration-300 ease-in-out"
+            style={{ width: expanded ? 280 : 80 }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {React.isValidElement(nav)
+              ? React.cloneElement(nav, {
+                  isCollapsed: !expanded,
+                  onToggleCollapse: () => setIsCollapsed((prev) => !prev),
+                })
+              : nav}
+          </div>
+          {/* ContentPanel: always fills available space */}
+          <main className="flex-grow min-w-0 overflow-y-auto">
+            {content}
+          </main>
+          {chat && (
+            <aside className="w-[300px] flex-shrink-0 border-l border-gray-200 overflow-y-auto">
+              {chat}
+            </aside>
+          )}
+        </div>
       </div>
-
-      {/* Main Content Area */}
-      <main className="flex-grow min-w-0 overflow-y-auto bg-gray-50">
-        {content}
-      </main>
-
-      {/* Optional Chat Panel */}
-      {chat && (
-        <aside className="w-[300px] flex-shrink-0 border-l border-gray-200 overflow-y-auto">
-          {chat}
-        </aside>
-      )}
-    </div>
+    </ThemeProvider>
   );
 }

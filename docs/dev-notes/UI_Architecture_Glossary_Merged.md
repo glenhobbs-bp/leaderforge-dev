@@ -1,0 +1,192 @@
+# UI Glossary and Styling Principles
+
+This document establishes a shared language and structural foundation for developing UI elements within the 3-panel architecture of our platform. It ensures clarity for all contributors by defining responsibilities, configuration boundaries, and how styling and branding are applied and maintained.
+
+---
+
+## Glossary of UI Concepts
+
+| Term               | Definition |
+|--------------------|------------|
+| **Layout** or **UI Architecture** | The fixed structural pattern of the app interface: Nav Panel (left), Content Panel (center), Chat Panel (right). It's core to the platform and rarely changed. |
+| **Panel**          | One of the three main sections in the layout. Each panel is a functional and stylistic unit (e.g. `NavPanel.tsx`). |
+| **Styling**        | Structural and aesthetic rules applied to a panel — including padding, border radius, hover behavior, shadows, spacing, text alignment, etc. These are defined directly in the `.tsx` files and apply globally across all contexts. |
+| **Branding** (aka **Theme**) | The specific colors, logo, and gradients used for a given context. Controlled by configuration (JSON or Supabase) and dynamically loaded at runtime. |
+| **Context**        | A configuration bundle that defines a themed experience, including layout options, nav options, logo, colors, etc. Example: "Brilliant", "Rockstar Ventures". |
+| **Theme Palette**  | A context-specific map of named values (`primary`, `accent`, etc.) to hex codes or gradients, passed as CSS variables and injected at runtime. |
+| **Nav Section** or **Nav Option** | A single clickable entry in the Nav Panel. These are dynamically defined per context. |
+| **Content**        | The live, dynamic content generated and rendered in the central Content Panel based on system prompts and user interaction. |
+
+---
+
+## Separation of Concerns
+
+| Concern              | Config Location          | Modifiability      | Notes |
+|----------------------|--------------------------|--------------------|-------|
+| **Layout / Architecture** | Code (`ThreePanelLayout.tsx`) | Hard-coded | Rarely changed |
+| **Styling** (panel spacing, radius, etc.) | Code (`NavPanel.tsx`) | Hard-coded | Refined via Tailwind in component files |
+| **Branding** (colors, logo) | JSON or Supabase context config | Dynamic | Can be changed per context |
+| **Nav Options**      | JSON or Supabase context config | Frequently updated | Labels, descriptions, icons |
+| **Content**          | Live, dynamic | Generated via prompt | Contextually and interactively generated |
+
+---
+
+## Theme Palette Structure
+
+A context config provides a `theme` section like:
+
+```json
+{
+  "context_id": "brilliant",
+  "theme": {
+    "primary": "#3E5E17",
+    "secondary": "#74A78E",
+    "accent": "#DD8D00",
+    "bg_light": "#F8F4F1",
+    "bg_neutral": "#E3DDC9",
+    "text_primary": "#222222",
+    "bg_gradient": "linear-gradient(135deg, #74A78E 0%, #DD8D00 50%, #3E5E17 100%)"
+  }
+}
+```
+
+This palette is injected as CSS variables at the root or layout wrapper. All color and branding in the UI is derived from these variables.
+
+---
+
+## CSS Variables vs. Tailwind: Theming Decision & Rationale
+
+### Decision
+- **All color and theming is handled via CSS variables, set from the context's theme palette.**
+- **Tailwind is used for layout, spacing, typography, and non-color utility classes.**
+- **No Tailwind color classes are used for theming or branding.**
+
+### Rationale
+- **Dynamic Theming:** CSS variables allow runtime switching of themes/contexts without rebuilding or redeploying the app.
+- **Single Source of Truth:** All branding is defined in a single JSON config per context, making it easy to add or update brands.
+- **No Hardcoding:** No colors are hardcoded in code or Tailwind classes; all are referenced via `var(--...)`.
+- **Extensibility:** New contexts can be added by simply providing a new JSON config.
+- **Integration:** Third-party components can access theme variables via CSS, ensuring a consistent look.
+- **Tailwind for Structure:** Tailwind remains the tool of choice for layout, spacing, and typography, ensuring rapid, consistent UI development.
+
+### When to Use Each
+- **Use CSS variables** for any color, gradient, or branding-related property (background, border, text color, shadows, etc.).
+- **Use Tailwind** for flex/grid, padding, margin, border-radius, font-size, font-weight, and other non-color utilities.
+- **Never use Tailwind color classes** for anything that should be themeable or context-driven.
+
+---
+
+## Appendix A — Canonical Color Definitions
+
+An optional global map of named canonical values:
+
+```json
+{
+  "brilliant_moss": "#3E5E17",
+  "brilliant_ochre": "#DD8D00",
+  "brilliant_celadon": "#74A78E",
+  "brilliant_bone": "#F8F4F1",
+  "brilliant_sand": "#E3DDC9",
+  "brilliant_charcoal": "#222222"
+}
+```
+
+Contexts may choose to reference these by name to allow runtime color replacement across all elements that reference the canonical name.
+
+---
+
+## Appendix B — Responsive Design
+
+- Panels should collapse vertically on smaller viewports.
+- NavPanel should become a drawer or slide-out menu on mobile.
+- ChatPanel may become a toggleable bottom drawer or modal.
+- Tailwind's `sm:`, `md:`, `lg:`, and `xl:` prefixes should be used in each panel's layout.
+- NavPanel should anticipate mobile-first design using a `collapsed` state with icon-only view.
+
+---
+
+## Appendix C — Localization & Multilingual Support
+
+To support UI localization:
+
+### JSON-Based Translation Map
+
+Each `contextConfig` may include a language key:
+
+```json
+{
+  "language": "en",
+  "i18n": {
+    "nav": {
+      "dashboard": {
+        "label": "Dashboard",
+        "description": "Your central view"
+      },
+      "library": {
+        "label": "Library",
+        "description": "Browse videos"
+      }
+    },
+    "sections": {
+      "title": "Sections"
+    }
+  }
+}
+```
+
+### Design Implications
+
+- Panel components (`NavPanel.tsx`) should reference `i18n.nav.dashboard.label`, etc., instead of hardcoded strings.
+- Default fallback: English
+- Text direction (LTR/RTL) can be added at context level: `"direction": "ltr"`
+
+---
+
+Let me know if you'd like to break this into its own internal developer wiki entry.
+---
+
+### Appendix: Context-Based Variable Propagation
+
+#### Decision
+We use **React Context** to propagate global variables such as theme, configuration, and context metadata across the application.
+
+#### Rationale
+- **Global Theming**: Enables consistent styling across all panels and third-party components.
+- **Avoid Prop Drilling**: Clean separation of concerns without needing to manually pass props.
+- **Extensibility**: Easier to update and scale configuration handling over time.
+- **Integration-Friendly**: Required for seamless integration with third-party component libraries that need access to global theming.
+
+#### Example Implementation
+
+```tsx
+// components/ui/ThemeContext.tsx
+import { createContext, useContext } from 'react';
+
+const ThemeContext = createContext(null);
+export const useTheme = () => useContext(ThemeContext);
+```
+
+```tsx
+// pages/_app.tsx
+import { ThemeContext } from '@/components/ui/ThemeContext';
+
+function MyApp({ Component, pageProps }) {
+  const theme = loadTheme(); // pulled from Supabase or local JSON
+
+  return (
+    <ThemeContext.Provider value={theme}>
+      <Component {...pageProps} />
+    </ThemeContext.Provider>
+  );
+}
+```
+
+```tsx
+// Example usage in a component
+import { useTheme } from "@/components/ui/ThemeContext";
+
+const NavPanel = () => {
+  const theme = useTheme();
+  return <div style={{ background: theme.bg_light }}>...</div>;
+};
+```

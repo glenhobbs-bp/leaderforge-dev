@@ -14,38 +14,52 @@
     "size": 32
   },
   "theme": {
-    "nav": {
-      "panelBg": "bg-gradient-to-b from-white to-gray-50",
-      "panelText": "text-gray-500",
-      "activeBg": "bg-white",
-      "activeText": "text-gray-900",
-      "inactiveBg": "bg-white",
-      "inactiveText": "text-gray-700",
-      "inactiveBorder": "border border-gray-200"
-    }
+    "primary": "#3E5E17",
+    "secondary": "#74A78E",
+    "accent": "#DD8D00",
+    "bg_light": "#F8F4F1",
+    "bg_neutral": "#E3DDC9",
+    "text_primary": "#222222",
+    "bg_gradient": "linear-gradient(135deg, #74A78E 0%, #DD8D00 50%, #3E5E17 100%)"
   },
   "nav": [
     {
-      "label": "Dashboard",
-      "href": "/dashboard",
-      "icon": "/icons/dashboard.svg",
-      "description": "Overview of activity"
+      "label": "Your LeaderCoach",
+      "href": "/leadercoach",
+      "icon": "/icons/target.svg",
+      "description": "Ready to guide your journey"
     },
     {
-      "label": "Library",
+      "label": "Brilliant+ Library",
       "href": "/library",
-      "icon": "/icons/library.svg",
-      "description": "Explore training content"
+      "icon": "/icons/books.svg",
+      "description": "600+ videos available"
     },
     {
-      "label": "Settings",
-      "href": "/settings",
-      "icon": "/icons/settings.svg",
-      "description": "Manage preferences"
+      "label": "Ambassador Dashboard",
+      "href": "/dashboard",
+      "icon": "/icons/diamond.svg",
+      "description": "Track your success"
+    },
+    {
+      "label": "Community",
+      "href": "/community",
+      "icon": "/icons/users.svg",
+      "description": "Connect with others"
+    },
+    {
+      "label": "Customer Support",
+      "href": "/support",
+      "icon": "/icons/support.svg",
+      "description": "Here to help 24/7"
     }
   ],
   "chat": {
     "heading": "AI Assistant",
     "message": "I'm here to help you navigate and learn."
+  },
+  "content": {
+    "heading": "Welcome to Brilliant Movement",
+    "description": "Select a section to get started."
   }
 }
