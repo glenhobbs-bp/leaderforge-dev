@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeaderForge - 3-Panel Agent Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Brilliant Brand Colors */
+            --brilliant-moss: #3E5E17;
+            --brilliant-ochre: #DD8D00;
+            --brilliant-celadon: #74A78E;
+            --brilliant-bone: #F8F4F1;
+            --brilliant-sand: #E3DDC9;
+            --brilliant-charcoal: #222222;
+
+            /* LeaderForge Brand Colors */
+            --leader-primary: #667eea;
+            --leader-secondary: #764ba2;
+            --leader-accent: #4ecdc4;
+            --leader-light: #f8f9ff;
+            --leader-neutral: #e8f4f8;
+
+            /* Wealth With God Brand Colors */
+            --wealth-primary: #1a237e;
+            --wealth-secondary: #3949ab;
+            --wealth-accent: #ff5722;
+            --wealth-light: #f5f5f5;
+            --wealth-neutral: #e3f2fd;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient, linear-gradient(135deg, #74A78E 0%, #DD8D00 50%, #3E5E17 100%));
+            height: 100vh;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Dynamic branding classes */
+        .theme-brilliant {
+            --primary: var(--brilliant-moss);
+            --secondary: var(--brilliant-celadon);
+            --accent: var(--brilliant-ochre);
+            --bg-light: var(--brilliant-bone);
+            --bg-neutral: var(--brilliant-sand);
+            --text-primary: var(--brilliant-charcoal);
+            --bg-gradient: linear-gradient(135deg, #74A78E 0%, #DD8D00 50%, #3E5E17 100%);
+        }
+
+        .theme-leaderforge {
+            --primary: var(--leader-primary);
+            --secondary: var(--leader-secondary);
+            --accent: var(--leader-accent);
+            --bg-light: var(--leader-light);
+            --bg-neutral: var(--leader-neutral);
+            --text-primary: #333333;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-wealth {
+            --primary: var(--wealth-primary);
+            --secondary: var(--wealth-secondary);
+            --accent: var(--wealth-accent);
+            --bg-light: var(--wealth-light);
+            --bg-neutral: var(--wealth-neutral);
+            --text-primary: #1a1a1a;
+            --bg-gradient: linear-gradient(135deg, #1a237e 0%, #3949ab 50%, #ff5722 100%);
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            background: var(--bg-light);
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        /* Left Panel - Agent Navigation */
+        .agent-panel {
+            width: 280px;
+            background: linear-gradient(180deg, var(--bg-neutral) 0%, var(--bg-light) 100%);
+            color: var(--text-primary);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Collapsed state */
+        .agent-panel.collapsed {
+            width: 80px;
+            padding: 20px 10px;
+        }
+
+        .agent-panel.collapsed .agent-name,
+        .agent-panel.collapsed .agent-role,
+        .agent-panel.collapsed .context-switcher,
+        .agent-panel.collapsed h3,
+        .agent-panel.collapsed .status {
+            display: none;
+        }
+
+        .agent-panel.collapsed .agent-header {
+            margin-bottom: 20px;
+        }
+
+        .agent-panel.collapsed .agent-item {
+            padding: 8px;
+            justify-content: center;
+        }
+
+        .agent-panel.collapsed .agent-content {
+            justify-content: center;
+        }
+
+        .agent-panel.collapsed .agent-details {
+            display: none;
+        }
+
+        .agent-panel.collapsed .agent-icon {
+            margin: 0;
+        }
+
+        /* Hover expand for collapsed state */
+        .agent-panel.collapsed:hover {
+            width: 280px;
+            padding: 20px;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .agent-panel.collapsed:hover .agent-name,
+        .agent-panel.collapsed:hover .agent-role,
+        .agent-panel.collapsed:hover .context-switcher,
+        .agent-panel.collapsed:hover h3,
+        .agent-panel.collapsed:hover .status,
+        .agent-panel.collapsed:hover .agent-details {
+            display: block;
+        }
+
+        .agent-panel.collapsed:hover .agent-item {
+            padding: 12px 16px;
+            justify-content: flex-start;
+        }
+
+        .agent-panel.collapsed:hover .agent-content {
+            justify-content: flex-start;
+        }
+
+        .agent-panel.collapsed:hover .agent-icon {
+            margin-right: 12px;
+        }
+
+        .nav-toggle {
+            position: absolute;
+            top: 15px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .nav-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .agent-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .agent-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .agent-name {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .agent-role {
+            font-size: 12px;
+            opacity: 0.7;
+            color: var(--primary);
+        }
+
+        .context-switcher {
+            margin-bottom: 20px;
+        }
+
+        .context-select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--primary);
+            background: rgba(255,255,255,0.5);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .agent-list {
+            list-style: none;
+        }
+
+        .agent-item {
+            padding: 12px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.3);
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .agent-item:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .agent-item.active {
+            background: rgba(255,255,255,0.7);
+            border-left-color: var(--primary);
+        }
+
+        .agent-content {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .agent-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .agent-details {
+            flex: 1;
+        }
+
+        .agent-item .name {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .agent-item .status {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 2px;
+            color: var(--primary);
+        }
+
+        .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .indicator.online { background: var(--secondary); }
+        .indicator.thinking { background: var(--accent); animation: pulse 1.5s infinite; }
+        .indicator.waiting { background: var(--primary); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Tooltip for collapsed state */
+        .agent-panel.collapsed .agent-item[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-left: 10px;
+            background: var(--text-primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            animation: tooltipFadeIn 0.2s ease forwards;
+        }
+
+        @keyframes tooltipFadeIn {
+            to { opacity: 0.9; }
+        }
+
+        /* Center Panel - Main Content */
+        .main-content {
+            flex: 1;
+            background: var(--bg-light);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .content-header {
+            background: var(--bg-light);
+            padding: 20px;
+            border-bottom: 1px solid var(--bg-neutral);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .content-title {
+            font-family: 'Fraunces', serif;
+            font-size: 24px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .content-subtitle {
+            color: var(--primary);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .content-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Content Library Styles */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            border: 1px solid var(--bg-neutral);
+        }
+
+        .content-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .card-thumbnail {
+            height: 160px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .card-description {
+            color: var(--text-primary);
+            opacity: 0.7;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        .card-duration {
+            background: var(--bg-neutral);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        /* Category Tabs */
+        .category-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--bg-neutral);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .category-tab:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .category-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Featured Card */
+        .content-card.featured {
+            grid-column: span 2;
+        }
+
+        .content-card.featured .card-thumbnail {
+            height: 200px;
+        }
+
+        .content-card.featured .card-title {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .content-card.featured .card-description {
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        /* Right Panel - Chat */
+        .chat-panel {
+            width: 400px;
+            background: var(--bg-light);
+            border-left: 1px solid var(--bg-neutral);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-title {
+            font-family: 'Fraunces', serif;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .chat-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .user .message-avatar {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+        }
+
+        .agent .message-avatar {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            line-height: 1.4;
+            max-width: 280px;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .user .message-content {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        /* AI Thinking Process */
+        .thinking-process {
+            background: var(--bg-neutral);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 3px solid var(--accent);
+        }
+
+        .thinking-step {
+            font-size: 12px;
+            color: var(--primary);
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .thinking-step::before {
+            content: "→";
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .chat-input {
+            padding: 16px;
+            border-top: 1px solid var(--bg-neutral);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 8px;
+            align-items: end;
+        }
+
+        .input-field {
+            flex: 1;
+            border: 1px solid var(--bg-neutral);
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            min-height: 40px;
+            max-height: 100px;
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Welcome screen for when no content is selected */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .welcome-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .welcome-title {
+            font-family: 'Fraunces', serif;
+            font-size: 32px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .welcome-subtitle {
+            color: var(--primary);
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 32px;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .quick-action {
+            background: white;
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--primary);
+        }
+
+        .quick-action:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .content-card.featured {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-panel {
+                display: none;
+            }
+
+            .agent-panel {
+                width: 60px;
+                padding: 20px 5px;
+            }
+
+            .agent-panel:not(.collapsed) {
+                width: 240px;
+            }
+        }
+    </style>
+</head>
+<body class="theme-brilliant">
+    <div class="app-container">
+        <!-- Left Panel - Agent Navigation -->
+        <div class="agent-panel" id="agent-panel">
+            <button class="nav-toggle" id="nav-toggle">‹</button>
+
+            <div class="agent-header">
+                <div class="agent-avatar">⚡</div>
+                <div class="agent-name" id="platform-name">LeaderForge</div>
+                <div class="agent-role" id="platform-tagline">Turning Potential into Performance</div>
+            </div>
+
+            <div class="context-switcher">
+                <select class="context-select" id="context-select">
+                    <option value="movement" data-theme="theme-brilliant">🌟 Brilliant Movement</option>
+                    <option value="leaderforge" data-theme="theme-leaderforge">🏢 LeaderForge (Business)</option>
+                    <option value="brilliant" data-theme="theme-brilliant">✨ Brilliant School of Leadership</option>
+                    <option value="wealth" data-theme="theme-wealth">💰 Wealth With God</option>
+                    <option value="smallgroup" data-theme="theme-brilliant">👥 Small Group</option>
+                </select>
+            </div>
+
+            <div class="active-agents">
+                <h3 style="font-size: 14px; margin-bottom: 15px; opacity: 0.8;">Your Support Team</h3>
+                <ul class="agent-list" id="agent-list">
+                    <li class="agent-item active" data-tooltip="Your LeaderCoach - Ready to guide your journey">
+                        <div class="indicator online"></div>
+                        <div class="agent-content">
+                            <div class="agent-icon">🎯</div>
+                            <div class="agent-details">
+                                <div class="name">Your LeaderCoach</div>
+                                <div class="status">Ready to guide your journey</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="agent-item" data-tooltip="Brilliant+ Library - 600+ videos available">
+                        <div class="indicator online"></div>
+                        <div class="agent-content">
+                            <div class="agent-icon">📚</div>
+                            <div class="agent-details">
+                                <div class="name">Brilliant+ Library</div>
+                                <div class="status">600+ videos available</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="agent-item" data-tooltip="Ambassador Dashboard - Track your success">
+                        <div class="indicator online"></div>
+                        <div class="agent-content">
+                            <div class="agent-icon">💎</div>
+                            <div class="agent-details">
+                                <div class="name">Ambassador Dashboard</div>
+                                <div class="status">Track your success</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="agent-item" data-tooltip="Community - Connect with others">
+                        <div class="indicator online"></div>
+                        <div class="agent-content">
+                            <div class="agent-icon">👥</div>
+                            <div class="agent-details">
+                                <div class="name">Community</div>
+                                <div class="status">Connect with others</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Center Panel - Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div class="content-title" id="content-title">Brilliant+ Library</div>
+                <div class="content-subtitle" id="content-subtitle">Routines, Courses, Challenges & More</div>
+            </div>
+
+            <div class="content-body" id="main-content">
+                <!-- Category Navigation -->
+                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div class="category-tab active" data-category="all">All Content</div>
+                    <div class="category-tab" data-category="routines">Routines</div>
+                    <div class="category-tab" data-category="courses">Courses</div>
+                    <div class="category-tab" data-category="challenges">Challenges</div>
+                    <div class="category-tab" data-category="sleep">Sleep</div>
+                    <div class="category-tab" data-category="meditation">Meditation</div>
+                    <div class="category-tab" data-category="conferences">Conferences</div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="content-card featured">
+                        <div class="card-thumbnail" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600;">
+                            Brilliant for Sleep
+                        </div>
+                        <div class="card-content">
+                            <div class="card-title">NEW: Grace That Overcomes Pt.2</div>
+                            <div class="card-description">Sleep brilliantly with crafted prayers and soaking tracks set to calming music. Discover the peace, joy and rest that comes from falling asleep to the words...</div>
+                            <div class="card-meta">
+                                <span style="color: var(--accent); font-weight: 600;">FEATURED</span>
+                                <span class="card-duration">45 min</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-thumbnail" style="background: linear-gradient(45deg, #74A78E, #3E5E17);">🎯</div>
+                        <div class="card-content">
+                            <div class="card-title">3 Day Challenge - The Secret Place</div>
+                            <div class="card-description">Learning to Live From His Presence. Join this transformative challenge to discover your identity in Christ.</div>
+                            <div class="card-meta">
+                                <span>3 Videos</span>
+                                <span class="card-duration">Challenge</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-thumbnail" style="background: linear-gradient(45deg, #DD8D00, #74A78E);">🌅</div>
+                        <div class="card-content">
+                            <div class="card-title">Daily Reflection with God</div>
+                            <div class="card-description">Start your day with guided reflection and prayer. Connect with God's heart for you each morning.</div>
+                            <div class="card-meta">
+                                <span>Daily Routine</span>
+                                <span class="card-duration">7 min</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-thumbnail" style="background: linear-gradient(45deg, #3E5E17, #74A78E);">📚</div>
+                        <div class="card-content">
+                            <div class="card-title">REGENERATE Volume 5</div>
+                            <div class="card-description">A Lifestyle of Joy - Discover how to live in the joy that Jesus offers as your permanent state of being.</div>
+                            <div class="card-meta">
+                                <span>Series • 4 Videos</span>
+                                <span class="card-duration">2.5 hrs</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-thumbnail" style="background: linear-gradient(45deg, #74A78E, #DD8D00);">🙏</div>
+                        <div class="card-content">
+                            <div class="card-title">Praying with God: 5 Day Challenge</div>
+                            <div class="card-description">Prayer is one of the great benefits of life as a New Creation. Learn to pray WITH God, not just TO God.</div>
+                            <div class="card-meta">
+                                <span>5 Day Challenge</span>
+                                <span class="card-duration">Challenge</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <div class="card-thumbnail" style="background: linear-gradient(45deg, #3E5E17, #DD8D00);">✨</div>
+                        <div class="card-content">
+                            <div class="card-title">Enter Your Place of Rest</div>
+                            <div class="card-description">Guided meditation to help you discover the rest that Jesus offers. Find peace in His presence.</div>
+                            <div class="card-meta">
+                                <span>Guided Session</span>
+                                <span class="card-duration">10 min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Chat -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div class="chat-title">AI Learning Assistant</div>
+                <div class="chat-subtitle">Here to guide your journey</div>
+            </div>
+
+            <div class="chat-messages">
+                <div class="message agent">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        Welcome to the Brilliant Movement! I can help you explore our 600+ video library, track your ambassador progress, or connect with the community. What would you like to explore?
+                    </div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-avatar">👤</div>
+                    <div class="message-content">
+                        Show me the sleep content and any new challenges
+                    </div>
+                </div>
+
+                <div class="message agent">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <div class="thinking-process">
+                            <div class="thinking-step">Searching Brilliant+ library for sleep content</div>
+                            <div class="thinking-step">Filtering for new challenges and routines</div>
+                            <div class="thinking-step">Personalizing based on your preferences</div>
+                            <div class="thinking-step">Organizing by categories and relevance</div>
+                        </div>
+
+                        Perfect! I've found some great content for you. In the library → you can see "Brilliant for Sleep" which has new episodes like "Grace That Overcomes Pt.2"
+
+                        For challenges, there's the "3 Day Challenge - The Secret Place" and "Praying with God: 5 Day Challenge" that many ambassadors are loving right now.
+                    </div>
+                </div>
+
+                <div class="message user">
+                    <div class="message-avatar">👤</div>
+                    <div class="message-content">
+                        How's my ambassador performance this month?
+                    </div>
+                </div>
+
+                <div class="message agent">
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        Great question! Let me pull up your Ambassador Dashboard...
+
+                        🎉 **This Month's Highlights:**
+                        • 3 new members signed up
+                        • $127.50 in commissions earned
+                        • You're ranked #23 in your region
+                        • 2 of your downline members are active
+
+                        Would you like me to show your full dashboard or share tips from top performers?
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <div class="input-container">
+                    <textarea class="input-field" placeholder="Ask about content, set goals, or get coaching..."></textarea>
+                    <button class="send-button">→</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store state in memory instead of localStorage
+            let appState = {
+                isCollapsed: false,
+                currentContext: 'movement',
+                selectedCategory: 'all'
+            };
+
+            const contextSelect = document.getElementById('context-select');
+            const body = document.body;
+            const platformName = document.getElementById('platform-name');
+            const platformTagline = document.getElementById('platform-tagline');
+            const contentTitle = document.getElementById('content-title');
+            const contentSubtitle = document.getElementById('content-subtitle');
+            const teamRole = document.getElementById('team-role');
+            const navToggle = document.getElementById('nav-toggle');
+            const agentPanel = document.getElementById('agent-panel');
+
+            // Navigation collapse/expand functionality
+            navToggle.addEventListener('click', function() {
+                appState.isCollapsed = !appState.isCollapsed;
+
+                if (appState.isCollapsed) {
+                    agentPanel.classList.add('collapsed');
+                    navToggle.textContent = '›';
+                } else {
+                    agentPanel.classList.remove('collapsed');
+                    navToggle.textContent = '‹';
+                }
+            });
+
+            const platformConfig = {
+                'movement': {
+                    name: 'Brilliant Movement',
+                    tagline: 'Relational Learning',
+                    contentTitle: 'Brilliant+ Library',
+                    contentSubtitle: 'Routines, Courses, Challenges & More',
+                    agents: [
+                        { icon: '🎯', name: 'Your LeaderCoach', status: 'Ready to guide your journey', indicator: 'online' },
+                        { icon: '📚', name: 'Brilliant+ Library', status: '600+ videos available', indicator: 'online' },
+                        { icon: '💎', name: 'Ambassador Dashboard', status: 'Track your success', indicator: 'online' },
+                        { icon: '👥', name: 'Community', status: 'Connect with others', indicator: 'online' },
+                        { icon: '🛟', name: 'Customer Support', status: 'Here to help 24/7', indicator: 'online' }
+                    ]
+                },
+                'leaderforge': {
+                    name: 'LeaderForge',
+                    tagline: 'Turning Potential into Performance',
+                    contentTitle: 'Business Leadership Library',
+                    contentSubtitle: 'Executive Training & Development',
+                    agents: [
+                        { icon: '🎯', name: 'Your LeaderCoach', status: 'Analyzing your request', indicator: 'thinking' },
+                        { icon: '📚', name: 'Content Library', status: 'Ready to help', indicator: 'online' },
+                        { icon: '📊', name: 'Progress Tracker', status: 'Monitoring goals', indicator: 'online' },
+                        { icon: '👥', name: 'Team Insights', status: 'Waiting for team data', indicator: 'waiting' },
+                        { icon: '🤝', name: 'Team Leader', status: 'Next check-in: Tomorrow', indicator: 'online' },
+                        { icon: '🛟', name: 'Customer Support', status: 'Here to help 24/7', indicator: 'online' }
+                    ]
+                },
+                'brilliant': {
+                    name: 'Brilliant Perspectives',
+                    tagline: 'Relational Learning',
+                    contentTitle: 'Kingdom Leadership Library',
+                    contentSubtitle: 'Spiritual Growth & Identity in Christ',
+                    agents: [
+                        { icon: '🎯', name: 'Your LeaderCoach', status: 'Analyzing your request', indicator: 'thinking' },
+                        { icon: '📚', name: 'Content Library', status: 'Ready to help', indicator: 'online' },
+                        { icon: '📊', name: 'Progress Tracker', status: 'Monitoring goals', indicator: 'online' },
+                        { icon: '👥', name: 'Team Insights', status: 'Waiting for team data', indicator: 'waiting' },
+                        { icon: '🤝', name: 'Coach', status: 'Next check-in: Tomorrow', indicator: 'online' },
+                        { icon: '🛟', name: 'Customer Support', status: 'Here to help 24/7', indicator: 'online' }
+                    ]
+                },
+                'wealth': {
+                    name: 'Wealth With God',
+                    tagline: 'Biblical Financial Stewardship',
+                    contentTitle: 'Financial Wisdom Library',
+                    contentSubtitle: 'Kingdom Wealth Building',
+                    agents: [
+                        { icon: '🎯', name: 'Your LeaderCoach', status: 'Analyzing your request', indicator: 'thinking' },
+                        { icon: '📚', name: 'Content Library', status: 'Ready to help', indicator: 'online' },
+                        { icon: '📊', name: 'Progress Tracker', status: 'Monitoring goals', indicator: 'online' },
+                        { icon: '👥', name: 'Team Insights', status: 'Waiting for team data', indicator: 'waiting' },
+                        { icon: '🤝', name: 'Financial Coach', status: 'Next check-in: Tomorrow', indicator: 'online' },
+                        { icon: '🛟', name: 'Customer Support', status: 'Here to help 24/7', indicator: 'online' }
+                    ]
+                },
+                'smallgroup': {
+                    name: 'Small Group Hub',
+                    tagline: 'Community Learning',
+                    contentTitle: 'Group Study Library',
+                    contentSubtitle: 'Facilitator Resources & Training',
+                    agents: [
+                        { icon: '🎯', name: 'Your LeaderCoach', status: 'Analyzing your request', indicator: 'thinking' },
+                        { icon: '📚', name: 'Content Library', status: 'Ready to help', indicator: 'online' },
+                        { icon: '📊', name: 'Progress Tracker', status: 'Monitoring goals', indicator: 'online' },
+                        { icon: '👥', name: 'Team Insights', status: 'Waiting for team data', indicator: 'waiting' },
+                        { icon: '🤝', name: 'Facilitator', status: 'Next check-in: Tomorrow', indicator: 'online' },
+                        { icon: '🛟', name: 'Customer Support', status: 'Here to help 24/7', indicator: 'online' }
+                    ]
+                }
+            };
+
+            function updateAgentList(contextKey) {
+                const config = platformConfig[contextKey];
+                const agentList = document.getElementById('agent-list');
+
+                if (config && config.agents) {
+                    agentList.innerHTML = config.agents.map((agent, index) => `
+                        <li class="agent-item ${index === 0 ? 'active' : ''}" data-tooltip="${agent.name} - ${agent.status}">
+                            <div class="indicator ${agent.indicator}"></div>
+                            <div class="agent-content">
+                                <div class="agent-icon">${agent.icon}</div>
+                                <div class="agent-details">
+                                    <div class="name">${agent.name}</div>
+                                    <div class="status">${agent.status}</div>
+                                </div>
+                            </div>
+                        </li>
+                    `).join('');
+
+                    // Re-attach event listeners
+                    document.querySelectorAll('.agent-item').forEach(item => {
+                        item.addEventListener('click', function() {
+                            document.querySelectorAll('.agent-item').forEach(i => i.classList.remove('active'));
+                            this.classList.add('active');
+                        });
+                    });
+                }
+            }
+
+            contextSelect.addEventListener('change', function() {
+                const selectedValue = this.value;
+                const selectedOption = this.options[this.selectedIndex];
+                const theme = selectedOption.getAttribute('data-theme');
+                const config = platformConfig[selectedValue];
+
+                // Update state
+                appState.currentContext = selectedValue;
+
+                // Change theme
+                body.className = theme;
+
+                // Update platform branding
+                if (config) {
+                    platformName.textContent = config.name;
+                    platformTagline.textContent = config.tagline;
+                    contentTitle.textContent = config.contentTitle;
+                    contentSubtitle.textContent = config.contentSubtitle;
+                }
+
+                // Update agent list for the selected context
+                updateAgentList(selectedValue);
+
+                // Update background gradient
+                document.body.style.background = body.style.getPropertyValue('--bg-gradient');
+            });
+
+            // Initialize with default Brilliant Movement configuration
+            const defaultConfig = platformConfig['movement'];
+            if (defaultConfig) {
+                platformName.textContent = defaultConfig.name;
+                platformTagline.textContent = defaultConfig.tagline;
+                contentTitle.textContent = defaultConfig.contentTitle;
+                contentSubtitle.textContent = defaultConfig.contentSubtitle;
+            }
+            updateAgentList('movement');
+
+            // Category tab switching
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const category = this.getAttribute('data-category');
+                    appState.selectedCategory = category;
+                    console.log('Switching to category:', category);
+                    // Here you would filter content based on category
+                });
+            });
+
+            // Content card interactions
+            document.querySelectorAll('.content-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Simulate content selection
+                    console.log('Selected content:', this.querySelector('.card-title').textContent);
+
+                    // Add selection visual feedback
+                    document.querySelectorAll('.content-card').forEach(c => c.style.border = '1px solid var(--bg-neutral)');
+                    this.style.border = '2px solid var(--primary)';
+                });
+            });
+
+            // Chat input functionality
+            const sendButton = document.querySelector('.send-button');
+            const inputField = document.querySelector('.input-field');
+
+            sendButton.addEventListener('click', function() {
+                if (inputField.value.trim()) {
+                    console.log('Sending message:', inputField.value);
+                    // Here you would handle sending the message
+                    inputField.value = '';
+                }
+            });
+
+            // Handle Enter key in chat input
+            inputField.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendButton.click();
+                }
+            });
+
+            // Auto-resize textarea
+            inputField.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+        });
+    </script>
+</body>
+</html>

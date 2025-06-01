@@ -1,0 +1,832 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# LeaderForge Backend Cursor Rules
+
+## 🏛️ Modular Monolith Architecture
+
+### Core Principles
+1. **Keep LangGraph pure** - No modifications to core library
+2. **Domain boundaries** - Each module owns its data and logic
+3. **Event-driven communication** - Modules communicate via events
+4. **Job queue for heavy tasks** - Don't block the main thread
+5. **Configuration-driven** - New modules via config, not code
+
+## 📁 Module Structure
+
+```typescript
+// Each module follows this structure
+src/modules/[module-name]/
+  ├── domain/           // Business logic
+  │   ├── entities/     // Domain models
+  │   ├── services/     // Business services
+  │   └── events/       // Domain events
+  ├── infrastructure/   // External integrations
+  │   ├── repositories/ // Data access
+  │   └── adapters/     // External services
+  ├── application/      // Use cases
+  │   ├── commands/     // Write operations
+  │   └── queries/      // Read operations
+  ├── api/             // API endpoints
+  │   ├── routes.ts    // tRPC/REST routes
+  │   └── validators.ts // Input validation
+  └── index.ts         // Module registration
+```
+
+## 🤖 LangGraph Integration (Pure)
+
+### Agent Implementation
+```typescript
+// ALWAYS keep LangGraph agents pure
+import { StateGraph, StateGraphArgs } from "@langchain/langgraph";
+
+// Define state interface
+interface AgentState {
+  messages: Message[];
+  context: ModuleContext;
+  userIntent: string | null;
+  nextAction: string | null;
+}
+
+// Create pure LangGraph agent
+export function createContentAgent() {
+  const workflow = new StateGraph<AgentState>({
+    channels: {
+      messages: {
+        value: (x: Message[], y: Message[]) => [...x, ...y],
+        default: () => [],
+      },
+      context: {
+        value: (x: ModuleContext) => x,
+        default: () => ({ module: 'movement' }),
+      },
+      userIntent: {
+        value: (x: string | null) => x,
+        default: () => null,
+      },
+      nextAction: {
+        value: (x: string | null) => x,
+        default: () => null,
+      },
+    },
+  });
+
+  // Add nodes (pure functions)
+  workflow.addNode("parseIntent", parseIntent);
+  workflow.addNode("searchContent", searchContent);
+  workflow.addNode("generateResponse", generateResponse);
+
+  // Add edges
+  workflow.setEntryPoint("parseIntent");
+  workflow.addEdge("parseIntent", "searchContent");
+  workflow.addEdge("searchContent", "generateResponse");
+
+  return workflow.compile();
+}
+
+// Node functions are pure
+async function parseIntent(state: AgentState): Promise<Partial<AgentState>> {
+  const lastMessage = state.messages[state.messages.length - 1];
+  const intent = await detectIntent(lastMessage.content);
+  
+  return {
+    userIntent: intent,
+  };
+}
+
+// NEVER modify LangGraph internals
+// ALWAYS use the public API
+```
+
+### Agent Registration
+```typescript
+// Central agent registry
+export class AgentRegistry {
+  private agents = new Map<string, CompiledGraph>();
+  
+  registerAgent(moduleId: string, agentId: string, agent: CompiledGraph) {
+    const key = `${moduleId}:${agentId}`;
+    this.agents.set(key, agent);
+  }
+  
+  async routeMessage(message: Message, context: ModuleContext) {
+    const agent = this.selectAgent(message, context);
+    if (!agent) throw new Error('No suitable agent found');
+    
+    // Invoke pure LangGraph agent
+    const result = await agent.invoke({
+      messages: [message],
+      context,
+    });
+    
+    return result;
+  }
+}
+```
+
+## 📦 Module Pattern
+
+### Module Definition
+```typescript
+// Each module exports this interface
+export interface Module {
+  id: string;
+  name: string;
+  
+  // Lifecycle hooks
+  onInit(): Promise<void>;
+  onStart(): Promise<void>;
+  onStop(): Promise<void>;
+  
+  // Module capabilities
+  agents: AgentDefinition[];
+  routes: Router;
+  jobs: JobDefinition[];
+  events: EventDefinition[];
+  
+  // Dependencies
+  requires: string[]; // Other module IDs
+}
+
+// Module implementation
+export class ContentModule implements Module {
+  id = 'content';
+  name = 'Content Management';
+  requires = ['auth', 'storage'];
+  
+  async onInit() {
+    // Initialize repositories, services
+    await this.contentRepo.createIndexes();
+  }
+  
+  async onStart() {
+    // Register agents, start jobs
+    agentRegistry.registerAgent(this.id, 'search', createSearchAgent());
+    jobQueue.register(this.id, 'index-content', this.indexContent);
+  }
+  
+  get routes() {
+    return createContentRoutes(this.contentService);
+  }
+}
+```
+
+### Module Communication
+```typescript
+// ALWAYS use events for cross-module communication
+import { EventBus } from '@/core/events';
+
+// Define events with proper types
+export const ContentEvents = {
+  ContentCreated: z.object({
+    contentId: z.string(),
+    moduleId: z.string(),
+    userId: z.string(),
+  }),
+  
+  ContentViewed: z.object({
+    contentId: z.string(),
+    userId: z.string(),
+    duration: z.number(),
+  }),
+};
+
+// Publish events
+export class ContentService {
+  constructor(private eventBus: EventBus) {}
+  
+  async createContent(data: CreateContentDto) {
+    const content = await this.repo.create(data);
+    
+    // Publish event for other modules
+    await this.eventBus.publish('content.created', {
+      contentId: content.id,
+      moduleId: content.moduleId,
+      userId: data.createdBy,
+    });
+    
+    return content;
+  }
+}
+// Subscribe to events in other modules
+export class AnalyticsModule {
+  async onStart() {
+    this.eventBus.subscribe('content.viewed', async (event) => {
+      await this.trackContentView(event);
+    });
+  }
+}
+```
+
+## 🗄️ Data Access Patterns
+
+### Repository Pattern
+```typescript
+// ALWAYS use repositories for data access
+export interface Repository<T> {
+  findById(id: string): Promise<T | null>;
+  findMany(filter: Filter<T>): Promise<T[]>;
+  create(data: CreateDto<T>): Promise<T>;
+  update(id: string, data: UpdateDto<T>): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+// Module-specific repository
+export class ContentRepository implements Repository<Content> {
+  constructor(
+    private db: SupabaseClient,
+    private cache: RedisClient
+  ) {}
+  
+  async findById(id: string): Promise<Content | null> {
+    // Check cache first
+    const cached = await this.cache.get(`content:${id}`);
+    if (cached) return JSON.parse(cached);
+    
+    // Fetch from database
+    const { data, error } = await this.db
+      .from('content')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) throw error;
+    
+    // Cache for next time
+    await this.cache.setex(`content:${id}`, 300, JSON.stringify(data));
+    
+    return data;
+  }
+  
+  // ALWAYS handle module context
+  async findByModule(moduleId: string): Promise<Content[]> {
+    const { data, error } = await this.db
+      .from('content')
+      .select('*')
+      .contains('modules', [moduleId])
+      .order('created_at', { ascending: false });
+      
+    if (error) throw error;
+    return data;
+  }
+}
+```
+
+### Transaction Support
+```typescript
+// Use transactions for consistency
+export class EnrollmentService {
+  async enrollUser(userId: string, courseId: string) {
+    return this.db.transaction(async (trx) => {
+      // Create enrollment
+      const enrollment = await trx
+        .insert({ userId, courseId })
+        .into('enrollments')
+        .returning('*');
+      
+      // Update user progress
+      await trx
+        .insert({ userId, courseId, progress: 0 })
+        .into('user_progress');
+      
+      // Emit event
+      await this.eventBus.publish('user.enrolled', {
+        userId,
+        courseId,
+        enrollmentId: enrollment.id,
+      });
+      
+      return enrollment;
+    });
+  }
+}
+```
+
+## 🔄 Job Queue Patterns
+
+### Background Jobs
+```typescript
+// ALWAYS use job queue for heavy operations
+import { Queue, Worker } from 'bullmq';
+
+export class VideoProcessingModule {
+  private queue: Queue;
+  private worker: Worker;
+  
+  async onStart() {
+    this.queue = new Queue('video-processing', {
+      connection: redisConnection,
+    });
+    
+    this.worker = new Worker(
+      'video-processing',
+      async (job) => {
+        switch (job.name) {
+          case 'transcode':
+            return this.transcodeVideo(job.data);
+          case 'generate-thumbnail':
+            return this.generateThumbnail(job.data);
+          case 'extract-captions':
+            return this.extractCaptions(job.data);
+        }
+      },
+      {
+        connection: redisConnection,
+        concurrency: 2, // Process 2 videos at a time
+      }
+    );
+  }
+  
+  async queueVideoProcessing(videoId: string) {
+    // Add multiple jobs
+    await this.queue.addBulk([
+      { name: 'transcode', data: { videoId } },
+      { name: 'generate-thumbnail', data: { videoId } },
+      { name: 'extract-captions', data: { videoId } },
+    ]);
+  }
+}
+```
+
+### Scheduled Jobs
+```typescript
+// Recurring jobs for maintenance
+export class MaintenanceModule {
+  async onStart() {
+    // Clean up old sessions daily
+    await this.queue.add(
+      'cleanup-sessions',
+      {},
+      {
+        repeat: {
+          pattern: '0 2 * * *', // 2 AM daily
+        },
+      }
+    );
+    
+    // Calculate MLM commissions weekly
+    await this.queue.add(
+      'calculate-commissions',
+      {},
+      {
+        repeat: {
+          pattern: '0 0 * * 0', // Sunday midnight
+        },
+      }
+    );
+  }
+}
+```
+
+## 🔐 Security Patterns
+
+### Input Validation
+```typescript
+// ALWAYS validate input at API boundary
+import { z } from 'zod';
+import { initTRPC } from '@trpc/server';
+
+const t = initTRPC.context<Context>().create();
+
+// Define validators
+const CreateContentInput = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().max(1000),
+  moduleId: z.string(),
+  videoUrl: z.string().url(),
+  duration: z.number().positive(),
+});
+
+// Use in routes
+export const contentRouter = t.router({
+  create: t.procedure
+    .use(requireAuth)
+    .use(requireEntitlement('content.create'))
+    .input(CreateContentInput)
+    .mutation(async ({ input, ctx }) => {
+      // Input is now fully typed and validated
+      return ctx.modules.content.create(input);
+    }),
+});
+```
+
+### Authorization Middleware
+```typescript
+// Module-level authorization
+export const requireModuleAccess = (moduleId: string) => {
+  return t.middleware(async ({ ctx, next }) => {
+    const hasAccess = await ctx.entitlements.canAccessModule(
+      ctx.user.id,
+      moduleId
+    );
+    
+    if (!hasAccess) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'No access to this module',
+      });
+    }
+    
+    return next();
+  });
+};
+
+// Organization-level authorization
+export const requireOrgRole = (role: 'owner' | 'admin' | 'member') => {
+  return t.middleware(async ({ ctx, next }) => {
+    const orgId = ctx.req.headers['x-organization-id'];
+    if (!orgId) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Organization context required',
+      });
+    }
+    
+    const membership = await ctx.orgs.getUserMembership(ctx.user.id, orgId);
+    if (!membership || !hasRole(membership.role, role)) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Insufficient organization permissions',
+      });
+    }
+    
+    ctx.organization = { id: orgId, membership };
+    return next();
+  });
+};
+
+// Feature-level authorization
+export const requireEntitlement = (entitlement: string) => {
+  return t.middleware(async ({ ctx, next }) => {
+    const hasEntitlement = await ctx.entitlements.check(
+      ctx.user.id,
+      entitlement
+    );
+    
+    if (!hasEntitlement) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Missing required entitlement',
+      });
+    }
+    
+    return next();
+  });
+};
+```
+
+### Organization & Provisioning Services
+```typescript
+// Organization service with flexible hierarchy
+export class OrganizationService {
+  async createOrganization(data: CreateOrgDto) {
+    // Validate based on module's provisioning model
+    const model = await this.getProvisioningModel(data.moduleId);
+    
+    if (model.type === 'org_hierarchy' && data.parentId) {
+      // Validate hierarchy rules
+      await this.validateHierarchy(data);
+    }
+    
+    // Create organization with path
+    const parent = data.parentId ? 
+      await this.orgRepo.findById(data.parentId) : null;
+    
+    const org = await this.orgRepo.create({
+      ...data,
+      level: parent ? parent.level + 1 : 0,
+      path: parent ? [...parent.path, parent.id] : []
+    });
+    
+    // Emit event
+    await this.eventBus.publish('organization.created', {
+      orgId: org.id,
+      moduleId: org.moduleId,
+      parentId: org.parentId
+    });
+    
+    return org;
+  }
+  
+  async inviteUserToOrg(inviteData: InviteUserDto) {
+    // Check permissions
+    const canInvite = await this.checkInvitePermission(
+      inviteData.invitedBy,
+      inviteData.orgId
+    );
+    
+    if (!canInvite) throw new ForbiddenError();
+    
+    // Create email validation
+    const validation = await this.emailValidation.initiateValidation(
+      inviteData.email,
+      'org_invite',
+      {
+        orgId: inviteData.orgId,
+        role: inviteData.role,
+        invitedBy: inviteData.invitedBy
+      }
+    );
+    
+    return validation;
+  }
+}
+
+// Provisioning strategies for different models
+export class ProvisioningService {
+  private strategies = new Map<string, ProvisioningStrategy>();
+  
+  constructor() {
+    this.strategies.set('org_hierarchy', new HierarchicalProvisioning());
+    this.strategies.set('direct_user', new DirectProvisioning());
+    this.strategies.set('delegated_admin', new DelegatedAdminProvisioning());
+  }
+  
+  async provision(params: ProvisioningParams) {
+    const model = await this.getProvisioningModel(params.moduleId);
+    const strategy = this.strategies.get(model.type);
+    
+    if (!strategy) throw new Error(`Unknown provisioning model: ${model.type}`);
+    
+    // Execute provisioning with audit trail
+    const result = await this.db.transaction(async (trx) => {
+      const provisionResult = await strategy.provision(params);
+      
+      // Audit log
+      await this.auditLog.record({
+        action: 'provision_entitlement',
+        actor: params.provisionedBy,
+        target: params.targetUser || params.targetOrg,
+        details: provisionResult
+      });
+      
+      return provisionResult;
+    });
+    
+    // Send confirmation email
+    await this.sendProvisioningConfirmation(result);
+    
+    return result;
+  }
+}
+
+// Email validation service
+export class EmailValidationService {
+  async validateToken(token: string): Promise<ValidationResult> {
+    const validation = await this.db.emailValidations.findByToken(token);
+    
+    // Validate token
+    if (!validation) throw new InvalidTokenError();
+    if (validation.validated_at) throw new AlreadyValidatedError();
+    if (validation.expires_at < new Date()) throw new ExpiredTokenError();
+    
+    // Mark as validated
+    await this.db.emailValidations.update(validation.id, {
+      validated_at: new Date()
+    });
+    
+    // Execute action based on type
+    switch (validation.validation_type) {
+      case 'org_invite':
+        return this.completeOrgInvite(validation);
+      case 'magic_link':
+        return this.completeMagicLink(validation);
+      default:
+        throw new Error(`Unknown validation type: ${validation.validation_type}`);
+    }
+  }
+}
+
+## 📊 Monitoring & Logging
+
+### Structured Logging
+```typescript
+// ALWAYS use structured logging
+import { logger } from '@/core/logger';
+
+export class AgentService {
+  async processMessage(message: Message) {
+    const requestId = generateRequestId();
+    
+    logger.info('Processing message', {
+      requestId,
+      userId: message.userId,
+      moduleId: message.moduleId,
+      messageLength: message.content.length,
+    });
+    
+    try {
+      const result = await this.agent.invoke(message);
+      
+      logger.info('Message processed successfully', {
+        requestId,
+        responseTime: Date.now() - startTime,
+        tokensUsed: result.usage?.totalTokens,
+      });
+      
+      return result;
+    } catch (error) {
+      logger.error('Failed to process message', {
+        requestId,
+        error: error.message,
+        stack: error.stack,
+      });
+      throw error;
+    }
+  }
+}
+```
+
+### Performance Monitoring
+```typescript
+// Track key metrics
+export function trackPerformance() {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const start = Date.now();
+    
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      
+      metrics.histogram('http_request_duration', duration, {
+        method: req.method,
+        route: req.route?.path,
+        status: res.statusCode,
+      });
+    });
+    
+    next();
+  };
+}
+```
+
+## 🧪 Testing Patterns
+
+### Module Testing
+```typescript
+// Test modules in isolation
+describe('ContentModule', () => {
+  let module: ContentModule;
+  let eventBus: MockEventBus;
+  
+  beforeEach(() => {
+    eventBus = new MockEventBus();
+    module = new ContentModule({ eventBus });
+  });
+  
+  it('should publish event when content created', async () => {
+    const content = await module.createContent({
+      title: 'Test Content',
+      moduleId: 'test',
+    });
+    
+    expect(eventBus.published).toContainEqual({
+      event: 'content.created',
+      data: expect.objectContaining({
+        contentId: content.id,
+      }),
+    });
+  });
+});
+```
+
+### Agent Testing
+```typescript
+// Test LangGraph agents
+describe('ContentSearchAgent', () => {
+  it('should find relevant content', async () => {
+    const agent = createContentSearchAgent();
+    
+    const result = await agent.invoke({
+      messages: [{ content: 'leadership videos' }],
+      context: { module: 'leaderforge' },
+    });
+    
+    expect(result.messages).toContainEqual(
+      expect.objectContaining({
+        content: expect.stringContaining('leadership'),
+      })
+    );
+  });
+});
+```
+
+### Content Service with Tribe Integration
+```typescript
+// ALWAYS sync content with Tribe CMS
+export class ContentService {
+  constructor(
+    private contentRepo: ContentRepository,
+    private tribeService: TribeService,
+    private cache: CacheService
+  ) {}
+  
+  async searchContent(query: string, moduleId: string) {
+    // Check cache first
+    const cacheKey = `search:${moduleId}:${query}`;
+    const cached = await this.cache.get(cacheKey);
+    if (cached) return cached;
+    
+    // Search Tribe content
+    const tribeResults = await this.tribeService.searchContent(
+      query,
+      moduleId
+    );
+    
+    // Enhance with our data
+    const enhanced = await this.enhanceResults(tribeResults);
+    
+    // Cache results
+    await this.cache.set(cacheKey, enhanced, 300);
+    
+    return enhanced;
+  }
+  
+  // ALWAYS sync video progress to both systems
+  async trackVideoProgress(data: VideoProgressDto) {
+    // Track in Tribe for analytics
+    await this.tribeService.trackVideoAnalytics({
+      videoId: data.tribeContentId,
+      watchedDuration: data.duration,
+      currentTime: data.position
+    });
+    
+    // Track in our system for agent context
+    await this.contentRepo.updateProgress({
+      userId: data.userId,
+      contentId: data.contentId,
+      progress: data.percentage
+    });
+    
+    // Emit event for agents
+    await this.eventBus.publish('content.progress', {
+      userId: data.userId,
+      contentId: data.contentId,
+      progress: data.percentage,
+      milestone: this.getMilestone(data.percentage)
+    });
+  }
+}
+```
+
+### User Synchronization
+```typescript
+// ALWAYS keep users in sync with Tribe
+export class UserSyncMiddleware {
+  async onUserCreated(user: User) {
+    try {
+      const tribeUser = await this.tribeService.createUser({
+        email: user.email,
+        name: user.full_name,
+        platformId: this.getPlatformId(user.current_module)
+      });
+      
+      await this.userRepo.update(user.id, {
+        tribe_user_id: tribeUser.id
+      });
+    } catch (error) {
+      // Log but don't fail user creation
+      logger.error('Failed to sync user to Tribe', { error, userId: user.id });
+    }
+  }
+  
+  async onModuleSwitch(userId: string, newModule: string) {
+    // Update user's platform in Tribe
+    const tribeUserId = await this.getTribeUserId(userId);
+    const platformId = this.getPlatformId(newModule);
+    
+    await this.tribeService.updateUser(tribeUserId, {
+      platformId
+    });
+  }
+}
+```
+
+## 🚨 Common Pitfalls to Avoid
+
+1. **DON'T modify LangGraph core** - Use composition
+2. **DON'T cross module boundaries** - Use events
+3. **DON'T block with heavy operations** - Use job queue
+4. **DON'T skip validation** - Validate at boundaries
+5. **DON'T access other module's data** - Use service interfaces
+6. **DON'T hardcode module logic** - Use configuration
+7. **DON'T skip error handling** - Every operation can fail
+8. **DON'T forget about transactions** - Maintain consistency
+9. **DON'T log sensitive data** - Sanitize logs
+10. **DON'T bypass authorization** - Check every request
+11. **DON'T forget Tribe sync** - Keep users and progress in sync
+12. **DON'T bypass Tribe for videos** - Always use Tribe for video content
+
+## 📝 Checklist for New Modules
+
+- [ ] Follows module structure
+- [ ] Defines clear boundaries
+- [ ] Uses event communication
+- [ ] Implements repositories
+- [ ] Validates all inputs
+- [ ] Handles authorization
+- [ ] Includes error handling
+- [ ] Adds structured logging
+- [ ] Has comprehensive tests
+- [ ] Documents API endpoints

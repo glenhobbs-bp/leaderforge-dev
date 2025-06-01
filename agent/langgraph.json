@@ -1,0 +1,7 @@
+{
+  "graphs": {
+    "default": "./src/index.ts:default"
+  },
+  "port": 8000,
+  "host": "localhost"
+}

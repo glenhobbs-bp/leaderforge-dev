@@ -1,0 +1,65 @@
+{
+  "context_id": "brilliant",
+  "context_title": "Brilliant Movement",
+  "context_subtitle": "Kingdom Activation",
+  "logo": {
+    "src": "/logos/brilliant-logo.png",
+    "alt": "Brilliant Logo",
+    "width": 120,
+    "height": 40
+  },
+  "icon": {
+    "src": "/logos/brilliant-icon.png",
+    "alt": "Brilliant Icon",
+    "size": 32
+  },
+  "theme": {
+    "primary": "#3E5E17",
+    "secondary": "#74A78E",
+    "accent": "#DD8D00",
+    "bg_light": "#F8F4F1",
+    "bg_neutral": "#E3DDC9",
+    "text_primary": "#222222",
+    "bg_gradient": "linear-gradient(135deg, #74A78E 0%, #DD8D00 50%, #3E5E17 100%)"
+  },
+  "nav": [
+    {
+      "label": "Your LeaderCoach",
+      "href": "/leadercoach",
+      "icon": "/icons/target.svg",
+      "description": "Ready to guide your journey"
+    },
+    {
+      "label": "Brilliant+ Library",
+      "href": "/library",
+      "icon": "/icons/books.svg",
+      "description": "600+ videos available"
+    },
+    {
+      "label": "Ambassador Dashboard",
+      "href": "/dashboard",
+      "icon": "/icons/diamond.svg",
+      "description": "Track your success"
+    },
+    {
+      "label": "Community",
+      "href": "/community",
+      "icon": "/icons/users.svg",
+      "description": "Connect with others"
+    },
+    {
+      "label": "Customer Support",
+      "href": "/support",
+      "icon": "/icons/support.svg",
+      "description": "Here to help 24/7"
+    }
+  ],
+  "chat": {
+    "heading": "AI Assistant",
+    "message": "I'm here to help you navigate and learn."
+  },
+  "content": {
+    "heading": "Welcome to Brilliant Movement",
+    "description": "Select a section to get started."
+  }
+}

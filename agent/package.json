@@ -1,0 +1,24 @@
+{
+  "name": "agent",
+  "version": "0.1.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx src/index.ts"
+  },
+  "keywords": [],
+  "author": "Glen Hobbs <glen@rockstar-ventures.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "@langchain/core": "^0.3.57",
+    "@langchain/langgraph": "^0.2.74",
+    "openai": "^5.0.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.2"
+  }
+}
