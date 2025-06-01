@@ -2,11 +2,12 @@
 "use client";
 
 import { useState } from "react";
-import ThreePanelLayout from "@/components/ui/ThreePanelLayout";
-import NavPanel from "@/components/ui/NavPanel";
-import ContentPanel from "@/components/ui/ContentPanel";
-import contextConfigBrilliant from "@/config/contextConfig.json";
-import contextConfigLeaderforge from "@/config/contextConfig-leaderforge.json";
+import ThreePanelLayout from "./ui/ThreePanelLayout";
+import NavPanel from "./ui/NavPanel";
+import { ContentSchema } from "../../packages/agent-core/types/contentSchema";
+import { ContentSchemaRenderer } from "./ai/ContentSchemaRenderer";
+import contextConfigBrilliant from "../config/contextConfig.json";
+import contextConfigLeaderforge from "../config/contextConfig-leaderforge.json";
 
 interface NavItem {
   label: string;
@@ -80,54 +81,30 @@ const CONTEXT_MAP = {
 export default function DynamicContextPage() {
   const [contextId, setContextId] = useState(CONTEXTS[0].id);
   const config = CONTEXT_MAP[contextId];
-  const [selectedItem, setSelectedItem] = useState<NavItem>(config.nav[0]);
+  const [schema, setSchema] = useState<ContentSchema | null>(null);
 
-  const renderContent = () => {
-    switch (selectedItem.href) {
-      case "/dashboard":
-        return (
-          <ContentPanel
-            heading="Dashboard"
-            description="Welcome to your dashboard."
-          />
-        );
-      case "/library":
-        return (
-          <ContentPanel
-            heading="Library"
-            description="Explore the Brilliant+ Library."
-          />
-        );
-      case "/settings":
-        return (
-          <ContentPanel
-            heading="Settings"
-            description="Manage your preferences."
-          />
-        );
-      default:
-        return (
-          <ContentPanel
-            heading={config.content.heading}
-            description={config.content.description}
-          />
-        );
-    }
+  const handleNavSelect = async (navOptionId: string) => {
+    const res = await fetch("/api/agent/content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ navOptionId }),
+    });
+    const data = await res.json();
+    setSchema(data);
   };
 
   return (
     <ThreePanelLayout
       nav={
         <NavPanel
-          items={config.nav}
-          onSelect={setSelectedItem}
-          selected={selectedItem}
+          navOptions={config.nav}
           contextOptions={CONTEXTS}
           contextValue={contextId}
           onContextChange={setContextId}
+          onNavSelect={handleNavSelect}
         />
       }
-      content={renderContent()}
+      content={schema ? <ContentSchemaRenderer schema={schema} /> : null}
       contextConfig={config}
     />
   );

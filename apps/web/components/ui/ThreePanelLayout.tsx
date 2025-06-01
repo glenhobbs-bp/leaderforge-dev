@@ -19,8 +19,6 @@ export default function ThreePanelLayout({
   contextConfig,
 }: ThreePanelLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const expanded = !isCollapsed || isHovered;
   return (
     <ThemeProvider value={contextConfig.theme}>
       <div
@@ -42,13 +40,11 @@ export default function ThreePanelLayout({
           {/* NavPanel: only as wide as needed, no parent background */}
           <div
             className="flex-shrink-0 transition-all duration-300 ease-in-out"
-            style={{ width: expanded ? 280 : 80 }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            style={{ width: isCollapsed ? 80 : 280 }}
           >
             {React.isValidElement(nav)
               ? React.cloneElement(nav, {
-                  isCollapsed: !expanded,
+                  isCollapsed,
                   onToggleCollapse: () => setIsCollapsed((prev) => !prev),
                 })
               : nav}

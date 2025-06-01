@@ -24,10 +24,10 @@
     },
     "nav": [
       {
-        "label": "Your LeaderCoach",
-        "href": "/leadercoach",
+        "label": "My Dashboard",
+        "href": "/lf_dashboard",
         "icon": "/icons/target.svg",
-        "description": "Analyzing your request"
+        "description": "At a glance.."
       },
       {
         "label": "Content Library",

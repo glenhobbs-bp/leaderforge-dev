@@ -4,8 +4,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useTheme } from "@/components/ui/ThemeContext";
-import ContextSelector from "@/components/ui/ContextSelector";
+import { useTheme } from "./ThemeContext";
+import ContextSelector from "./ContextSelector";
+import { ContentSchemaRenderer } from "../ai/ContentSchemaRenderer";
+import { ContentSchema } from "../../../../packages/agent-core/types/contentSchema";
 
 interface NavItem {
   label: string;
@@ -38,11 +40,7 @@ interface Icon {
 }
 
 interface NavPanelProps {
-  items: NavItem[];
-  selected?: NavItem;
-  onSelect?: (item: NavItem) => void;
-  isCollapsed?: boolean;
-  onToggleCollapse?: () => void;
+  navOptions?: NavItem[];
   contextOptions?: {
     id: string;
     title: string;
@@ -51,58 +49,87 @@ interface NavPanelProps {
   }[];
   contextValue?: string;
   onContextChange?: (id: string) => void;
+  onNavSelect?: (navOptionId: string) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 // Toggle for demo: set to 'solid' or 'translucent'
 const UNSELECTED_BG_MODE: "solid" | "translucent" = "solid"; // change to 'translucent' to demo
 
 export default function NavPanel({
-  items,
-  selected,
-  onSelect,
-  isCollapsed = false,
-  onToggleCollapse,
+  navOptions = [],
   contextOptions = [],
   contextValue,
   onContextChange,
+  onNavSelect,
+  isCollapsed = false,
+  onToggleCollapse,
 }: NavPanelProps) {
   const theme = useTheme().nav;
+  const [selectedNav, setSelectedNav] = useState<string | null>(null);
+
+  const handleNavClick = (navOptionId: string) => {
+    setSelectedNav(navOptionId);
+    if (onNavSelect) {
+      onNavSelect(navOptionId);
+    }
+  };
+
+  // Helper to get logo src, title, and subtitle for current context
+  const getContextMeta = () => {
+    if (!contextValue) return {};
+    if (contextValue === "brilliant-movement") {
+      return {
+        logo: "/logos/brilliant-icon.png",
+        title: "Brilliant Movement",
+        subtitle: "Kingdom Activation",
+      };
+    }
+    if (contextValue === "leaderforge-business") {
+      return {
+        logo: "/logos/leaderforge-icon.png",
+        title: "LeaderForge",
+        subtitle: "Turning Potential into Performance",
+      };
+    }
+    return {};
+  };
+  const { logo, title, subtitle } = getContextMeta();
 
   return (
-    <aside
-      className="h-full flex flex-col transition-all duration-300 relative shadow-lg"
-      style={{
-        background:
-          "linear-gradient(135deg, var(--bg-light) 60%, var(--bg-gradient) 100%)",
-        boxShadow: "0 4px 24px 0 rgba(60, 60, 60, 0.04)",
-      }}
-    >
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Context selector and chevron button */}
-        <div className="flex items-center justify-between px-0 pt-2 pb-2">
-          <div className="flex-1">
-            <ContextSelector
-              contexts={contextOptions}
-              value={contextValue || ""}
-              onChange={onContextChange || (() => {})}
-              collapsed={isCollapsed}
-            />
-          </div>
-          <button
-            onClick={onToggleCollapse}
-            className="ml-2 rounded-full p-1 hover:bg-gray-200 transition"
-            aria-label={
-              isCollapsed ? "Expand navigation" : "Collapse navigation"
-            }
-          >
-            {isCollapsed ? (
-              <ChevronRight size={20} />
-            ) : (
-              <ChevronLeft size={20} />
-            )}
-          </button>
+    <div className="flex h-full flex-col">
+      <aside
+        className="h-full flex flex-col transition-all duration-300 relative shadow-lg"
+        style={{
+          background:
+            "linear-gradient(135deg, var(--bg-light) 60%, var(--bg-gradient) 100%)",
+          boxShadow: "0 4px 24px 0 rgba(60, 60, 60, 0.04)",
+        }}
+      >
+        {/* Top row: collapse/expand button right-aligned */}
+        <div className="flex items-center justify-end px-2 pt-2 pb-0">
+          {onToggleCollapse && (
+            <button
+              type="button"
+              onClick={onToggleCollapse}
+              className="rounded-full p-2 bg-[var(--bg-neutral)] hover:bg-[var(--accent)] transition"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </button>
+          )}
         </div>
-        <div className="px-4 py-2 space-y-6">
+        {/* ContextSelector always below button, handles collapsed/expanded rendering */}
+        <div className="px-2 pb-2">
+          <ContextSelector
+            contexts={contextOptions}
+            value={contextValue || ""}
+            onChange={onContextChange || (() => {})}
+            collapsed={isCollapsed}
+          />
+        </div>
+        <div className="px-4 py-2 space-y-6 flex-1 flex flex-col">
           {/* Section title */}
           {!isCollapsed && (
             <div className="text-xs font-semibold uppercase tracking-widest text-[var(--primary)]">
@@ -111,76 +138,65 @@ export default function NavPanel({
           )}
           {/* Navigation Items */}
           <nav className="flex flex-col gap-4 mt-2">
-            {items.map((item) => {
-              console.log("NavPanel iconSrc:", item.icon);
-              const isActive = selected?.href === item.href;
+            {navOptions.map((item) => {
+              const isActive = selectedNav === item.href.slice(1);
               const iconSrc = item.icon || "/icons/default.svg";
+              const tooltip = isCollapsed
+                ? item.label + (item.description ? ` — ${item.description}` : "")
+                : undefined;
               return (
-                <button
-                  key={item.href}
-                  onClick={() => onSelect?.(item)}
-                  className={[
-                    "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-150 border-l-4",
-                    isActive ? "shadow-md font-semibold" : "font-medium",
-                  ].join(" ")}
-                  style={{
-                    fontSize: 15,
-                    justifyContent: isCollapsed ? "center" : "flex-start",
-                    boxShadow: isActive
-                      ? "0 4px 16px 0 rgba(60,60,60,0.06)"
-                      : undefined,
-                    borderLeftColor: isActive ? "var(--accent)" : "transparent",
-                    background: isActive
-                      ? "var(--bg-neutral)"
-                      : UNSELECTED_BG_MODE === "solid"
+                <div key={item.href} {...(isCollapsed ? { title: tooltip } : {})}>
+                  <button
+                    type="button"
+                    onClick={() => handleNavClick(item.href.slice(1))}
+                    className={[
+                      "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-150 border-l-4 w-full min-w-0",
+                      isActive ? "shadow-md font-semibold" : "font-medium",
+                      isCollapsed ? "justify-center" : "",
+                    ].join(" ")}
+                    style={{
+                      fontSize: 15,
+                      justifyContent: isCollapsed ? "center" : "flex-start",
+                      boxShadow: isActive
+                        ? "0 4px 16px 0 rgba(60,60,60,0.06)"
+                        : undefined,
+                      borderLeftColor: isActive ? "var(--accent)" : "transparent",
+                      background: isActive
                         ? "var(--bg-neutral)"
-                        : "rgba(232, 244, 248, 0.5)", // translucent leaderforge neutral (e8f4f8)
-                    color: isActive ? "var(--primary)" : "var(--text-primary)",
-                    borderRadius: "16px",
-                    marginBottom: "4px",
-                    transition:
-                      "background 0.2s, border-color 0.2s, box-shadow 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background =
-                        UNSELECTED_BG_MODE === "solid"
-                          ? "var(--bg-neutral)"
-                          : "rgba(232, 244, 248, 0.8)";
-                      e.currentTarget.style.borderLeftColor =
-                        "var(--secondary)";
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 8px 0 rgba(60,60,60,0.04)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.background =
-                        UNSELECTED_BG_MODE === "solid"
-                          ? "var(--bg-neutral)"
-                          : "rgba(232, 244, 248, 0.5)";
-                      e.currentTarget.style.borderLeftColor = "transparent";
-                      e.currentTarget.style.boxShadow = "none";
-                    }
-                  }}
-                >
-                  <img src={iconSrc} alt={item.label} width={20} height={20} />
-                  {!isCollapsed && (
-                    <div className="flex flex-col items-start">
-                      <span className="text-sm">{item.label}</span>
-                      {item.description && (
-                        <span className="text-xs opacity-70">
-                          {item.description}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </button>
+                        : UNSELECTED_BG_MODE === "solid"
+                        ? "var(--bg-neutral)"
+                        : "rgba(232, 244, 248, 0.5)",
+                      color: isActive ? "var(--primary)" : "var(--text-primary)",
+                      borderRadius: "16px",
+                      marginBottom: "4px",
+                      transition:
+                        "background 0.2s, border-color 0.2s, box-shadow 0.2s",
+                    }}
+                  >
+                    <img
+                      src={iconSrc}
+                      alt={item.label}
+                      width={20}
+                      height={20}
+                      onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
+                    />
+                    {!isCollapsed && (
+                      <div className="flex flex-col items-start">
+                        <span className="text-sm">{item.label}</span>
+                        {item.description && (
+                          <span className="text-xs opacity-70">
+                            {item.description}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </button>
+                </div>
               );
             })}
           </nav>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </div>
   );
 }

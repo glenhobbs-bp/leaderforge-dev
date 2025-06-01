@@ -190,3 +190,20 @@ const NavPanel = () => {
   return <div style={{ background: theme.bg_light }}>...</div>;
 };
 ```
+
+---
+
+## Pre-Deployment Checklist
+
+- [ ] **API Proxying:** Ensure that all `/api/*` requests from the web app are correctly proxied to the API app in local development. This is configured in `apps/web/next.config.js` using a rewrite rule:
+  ```js
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:3001/api/:path*', // Proxy to API app
+      },
+    ];
+  },
+  ```
+  In production, verify that API endpoints are routed correctly (e.g., via environment variables or a reverse proxy) so that the web app can reach the API service.
