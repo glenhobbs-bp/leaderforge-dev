@@ -1,4 +1,5 @@
 import { ContentSchema, CardAction } from "../../../../packages/agent-core/types/contentSchema";
+import Image from "next/image";
 
 export function ContentSchemaRenderer({ schema }: { schema: ContentSchema }) {
   switch (schema.type) {
@@ -56,43 +57,68 @@ export function ContentSchemaRenderer({ schema }: { schema: ContentSchema }) {
       );
     case "Grid":
       return (
-        <div className="max-w-7xl mx-auto p-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="max-w-screen-2xl mx-auto p-6">
+          <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
             {schema.props.items.map((item, i) => (
               <ContentSchemaRenderer key={i} schema={item} />
             ))}
           </div>
         </div>
       );
-    case "Card":
+    case "Card": {
+      const {
+        image,
+        title,
+        subtitle,
+        description,
+        videoWatched,
+        worksheetSubmitted,
+        progress,
+        actions,
+      } = schema.props;
       return (
-        <div className="bg-white rounded-lg shadow flex flex-col h-full min-h-[340px]">
-          {schema.props.image && (
-            <img
-              src={schema.props.image}
-              alt={schema.props.title}
-              className="w-full h-40 object-cover rounded-t-lg"
-              onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
+          <div className="relative w-full aspect-video rounded-t-lg overflow-hidden px-0 lg:px-4">
+            <Image
+              src={image}
+              alt={title}
+              fill
+              className="object-cover rounded-t-lg"
+              sizes="(max-width: 768px) 100vw, 400px"
+              priority={false}
             />
-          )}
-          <div className="flex-1 flex flex-col p-4">
-            <h4 className="font-semibold text-lg mb-1">{schema.props.title}</h4>
-            {schema.props.subtitle && <div className="text-sm text-gray-500 mb-1">{schema.props.subtitle}</div>}
-            {schema.props.description && <p className="text-sm text-gray-700 mb-2 flex-1">{schema.props.description}</p>}
-            {typeof schema.props.progress === "number" && (
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+            {/* Pill indicators */}
+            <div className="absolute top-2 right-4 flex flex-row flex-wrap gap-1 z-10 items-end sm:items-center">
+              {videoWatched === false && (
+                <span className="bg-gray-100 text-gray-600 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-gray-200 shadow-sm whitespace-nowrap line-clamp-1">Video Not Watched</span>
+              )}
+              {worksheetSubmitted === false && (
+                <span className="bg-yellow-50 text-yellow-700 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-yellow-100 shadow-sm whitespace-nowrap line-clamp-1">Worksheet Not Submitted</span>
+              )}
+            </div>
+          </div>
+          <div className="flex-1 flex flex-col p-3 sm:p-4">
+            <h4 className="font-medium text-[15px] mb-0.5 text-gray-900">{title}</h4>
+            {subtitle && <div className="text-xs text-gray-400 mb-0.5">{subtitle}</div>}
+            {description && (
+              <p className="text-xs text-gray-500 mb-1 leading-snug line-clamp-3">{description}</p>
+            )}
+            {/* Progress bar */}
+            {typeof progress === "number" && (
+              <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2 mt-auto">
                 <div
-                  className="bg-[var(--primary)] h-2 rounded-full"
-                  style={{ width: `${schema.props.progress}%` }}
+                  className="bg-[var(--primary)] h-1.5 rounded-full transition-all"
+                  style={{ width: `${progress}%` }}
                 />
               </div>
             )}
-            {schema.props.actions && schema.props.actions.length > 0 && (
-              <div className="flex gap-2 mt-auto">
-                {schema.props.actions.map((action: CardAction, i: number) => (
+            {/* Actions */}
+            {actions && actions.length > 0 && (
+              <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                {actions.map((action: CardAction, i: number) => (
                   <button
                     key={i}
-                    className="px-3 py-1 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition"
+                    className="px-2 py-1 rounded bg-[var(--primary)] text-white text-[11px] hover:bg-[var(--accent)] transition font-normal w-full sm:w-auto"
                   >
                     {action.label}
                   </button>
@@ -102,6 +128,7 @@ export function ContentSchemaRenderer({ schema }: { schema: ContentSchema }) {
           </div>
         </div>
       );
+    }
     default:
       return <div>Unknown schema type: {(schema as any).type}</div>;
   }

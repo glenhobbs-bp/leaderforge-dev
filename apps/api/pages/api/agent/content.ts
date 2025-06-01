@@ -43,8 +43,11 @@ const mockAgent = (navOptionId: string): ContentSchema => {
                 image: "/thumb1.png",
                 title: "Video One",
                 subtitle: "Module 1",
-                description: "Moving From Success to Prime",
-                progress: 0.7,
+                description: "Creating a new paradigm of leadership with a team of leaders not just a team with a leader.",
+                longDescription: "Creating a new paradigm of leadership with a team of leaders not just a team with a leader.",
+                videoWatched: false,
+                worksheetSubmitted: false,
+                progress: 70,
                 actions: [
                   { label: "Rewatch", action: "rewatch" },
                   { label: "Complete", action: "complete" }
@@ -57,8 +60,11 @@ const mockAgent = (navOptionId: string): ContentSchema => {
                 image: "/thumb2.png",
                 title: "Video Two",
                 subtitle: "Module 1",
-                description: "The Power of Reframing",
-                progress: 0.2,
+                description: "Use this power tool to convert every challenge into a powerful possibility. This technique involves viewing a problem from different perspectives to generate a wider range of potential solutions. When leaders come across challenges, instead of approaching them with a fixed mindset, they can encourage their teams to look at them from various angles. This can lead to...",
+                longDescription: "Use this power tool to convert every challenge into a powerful possibility. This technique involves viewing a problem from different perspectives to generate a wider range of potential solutions. When leaders come across challenges, instead of approaching them with a fixed mindset, they can encourage their teams to look at them from various angles. This can lead to breakthrough solutions and foster a culture of innovation.",
+                videoWatched: true,
+                worksheetSubmitted: false,
+                progress: 20,
                 actions: [
                   { label: "Watch", action: "watch" },
                   { label: "Complete", action: "complete" }
@@ -71,7 +77,10 @@ const mockAgent = (navOptionId: string): ContentSchema => {
                 image: "/thumb1.png",
                 title: "Video Three",
                 subtitle: "Module 1",
-                description: "Leading 3 Types of People",
+                description: "This video presents an effective approach to leading team members with diverse personalities and responses to feedback. Learn a practical framework for identifying and managing three distinct types of people in your team, based on how they handle constructive criticism. In this video, you'll learn: A key factor in effective leadership and management How to...",
+                longDescription: "This video presents an effective approach to leading team members with diverse personalities and responses to feedback. Learn a practical framework for identifying and managing three distinct types of people in your team, based on how they handle constructive criticism. In this video, you'll learn: A key factor in effective leadership and management How to adapt your approach for each type Practical tips for building a high-trust, high-performance team.",
+                videoWatched: false,
+                worksheetSubmitted: true,
                 progress: 0,
                 actions: [
                   { label: "Watch", action: "watch" },

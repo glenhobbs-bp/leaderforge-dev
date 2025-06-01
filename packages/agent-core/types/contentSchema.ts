@@ -48,7 +48,10 @@ export type ContentSchema =
         title: string;
         subtitle?: string;
         description?: string;
+        longDescription?: string;
+        videoWatched?: boolean;
+        worksheetSubmitted?: boolean;
+        progress?: number; // 0-100
         actions?: CardAction[];
-        progress?: number; // 0-1
       };
     };
