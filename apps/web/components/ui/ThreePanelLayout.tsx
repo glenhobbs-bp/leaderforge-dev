@@ -24,16 +24,18 @@ export default function ThreePanelLayout({
   return (
     <ThemeProvider value={contextConfig.theme}>
       <div
-        style={{
-          '--primary': contextConfig.theme.primary,
-          '--secondary': contextConfig.theme.secondary,
-          '--accent': contextConfig.theme.accent,
-          '--bg-light': contextConfig.theme.bg_light,
-          '--bg-neutral': contextConfig.theme.bg_neutral,
-          '--text-primary': contextConfig.theme.text_primary,
-          '--bg-gradient': contextConfig.theme.bg_gradient,
-          background: 'var(--bg-light)',
-        } as React.CSSProperties}
+        style={
+          {
+            "--primary": contextConfig.theme.primary,
+            "--secondary": contextConfig.theme.secondary,
+            "--accent": contextConfig.theme.accent,
+            "--bg-light": contextConfig.theme.bg_light,
+            "--bg-neutral": contextConfig.theme.bg_neutral,
+            "--text-primary": contextConfig.theme.text_primary,
+            "--bg-gradient": contextConfig.theme.bg_gradient,
+            background: "var(--bg-light)",
+          } as React.CSSProperties
+        }
         className="h-screen w-full"
       >
         <div className="flex h-screen w-full overflow-hidden">
@@ -52,9 +54,7 @@ export default function ThreePanelLayout({
               : nav}
           </div>
           {/* ContentPanel: always fills available space */}
-          <main className="flex-grow min-w-0 overflow-y-auto">
-            {content}
-          </main>
+          <main className="flex-grow min-w-0 overflow-y-auto">{content}</main>
           {chat && (
             <aside className="w-[300px] flex-shrink-0 border-l border-gray-200 overflow-y-auto">
               {chat}

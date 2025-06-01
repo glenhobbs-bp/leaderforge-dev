@@ -1,6 +1,6 @@
-import http from 'http';
-import 'dotenv/config';
-import { Anthropic } from '@anthropic-ai/sdk';
+import http from "http";
+import "dotenv/config";
+import { Anthropic } from "@anthropic-ai/sdk";
 import { StateGraph, END, START, Annotation } from "@langchain/langgraph";
 import { AIMessage, HumanMessage, BaseMessage } from "@langchain/core/messages";
 
@@ -11,22 +11,26 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
 const PORT = process.env.PORT || 4000;
 
 const server = http.createServer(async (req, res) => {
-  if (req.method === 'POST' && req.url === '/api/agent') {
-    let body = '';
-    req.on('data', chunk => { body += chunk; });
-    req.on('end', async () => {
+  if (req.method === "POST" && req.url === "/api/agent") {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+    });
+    req.on("end", async () => {
       // TODO: Wire up LangGraph agent logic here using CopilotKit request format
       // For now, just echo the request body and a Claude placeholder
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        message: 'LangGraph agent operational',
-        request: JSON.parse(body),
-        llm: 'Anthropic Claude (placeholder)'
-      }));
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(
+        JSON.stringify({
+          message: "LangGraph agent operational",
+          request: JSON.parse(body),
+          llm: "Anthropic Claude (placeholder)",
+        }),
+      );
     });
   } else {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('LangGraph agent is running!\n');
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("LangGraph agent is running!\n");
   }
 });
 
@@ -53,7 +57,9 @@ const AgentStateAnnotation = Annotation.Root({
 
 type AgentState = typeof AgentStateAnnotation.State;
 
-function toClaudeMessages(messages: BaseMessage[]): { role: "user" | "assistant"; content: string }[] {
+function toClaudeMessages(
+  messages: BaseMessage[],
+): { role: "user" | "assistant"; content: string }[] {
   return messages.map((msg) => {
     let content: string = "";
     if (msg._getType() === "human") {
@@ -65,7 +71,13 @@ function toClaudeMessages(messages: BaseMessage[]): { role: "user" | "assistant"
         content = raw
           .map((b) => {
             if (typeof b === "string") return b;
-            if (typeof b === "object" && b !== null && b.type === "text" && typeof b.text === "string") return b.text;
+            if (
+              typeof b === "object" &&
+              b !== null &&
+              b.type === "text" &&
+              typeof b.text === "string"
+            )
+              return b.text;
             return "";
           })
           .join(" ");
@@ -82,7 +94,13 @@ function toClaudeMessages(messages: BaseMessage[]): { role: "user" | "assistant"
         content = raw
           .map((b) => {
             if (typeof b === "string") return b;
-            if (typeof b === "object" && b !== null && b.type === "text" && typeof b.text === "string") return b.text;
+            if (
+              typeof b === "object" &&
+              b !== null &&
+              b.type === "text" &&
+              typeof b.text === "string"
+            )
+              return b.text;
             return "";
           })
           .join(" ");
@@ -104,15 +122,13 @@ const graph = new StateGraph(AgentStateAnnotation)
       max_tokens: 256,
       messages: claudeMessages,
     });
-    const text = Array.isArray(response.content) && response.content[0]?.type === "text"
-      ? response.content[0].text
-      : "[No response]";
+    const text =
+      Array.isArray(response.content) && response.content[0]?.type === "text"
+        ? response.content[0].text
+        : "[No response]";
     return {
       ...state,
-      messages: [
-        ...coerced,
-        new AIMessage(text),
-      ],
+      messages: [...coerced, new AIMessage(text)],
     };
   })
   .addEdge(START, "hello")

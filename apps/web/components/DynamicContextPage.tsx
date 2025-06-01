@@ -63,18 +63,18 @@ const CONTEXTS = [
     id: contextConfigBrilliant.context_id,
     title: contextConfigBrilliant.context_title,
     subtitle: contextConfigBrilliant.context_subtitle,
-    icon: "🌟"
+    icon: "🌟",
   },
   {
     id: contextConfigLeaderforge.context_id,
     title: contextConfigLeaderforge.context_title,
     subtitle: contextConfigLeaderforge.context_subtitle,
-    icon: "🏢"
-  }
+    icon: "🏢",
+  },
 ];
 const CONTEXT_MAP = {
   [contextConfigBrilliant.context_id]: contextConfigBrilliant,
-  [contextConfigLeaderforge.context_id]: contextConfigLeaderforge
+  [contextConfigLeaderforge.context_id]: contextConfigLeaderforge,
 };
 
 export default function DynamicContextPage() {

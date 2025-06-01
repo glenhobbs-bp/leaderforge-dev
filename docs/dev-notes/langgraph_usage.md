@@ -1,6 +1,7 @@
 # LangGraph Usage in LeaderForge
 
 ## Overview
+
 LangGraph (via `@langchain/langgraph`) is used in LeaderForge to orchestrate complex agent flows, multi-step reasoning, and tool invocation. This document outlines best practices for structuring, integrating, and maintaining LangGraph-powered logic in our TypeScript/Node codebase.
 
 ---
@@ -45,18 +46,26 @@ LangGraph (via `@langchain/langgraph`) is used in LeaderForge to orchestrate com
 
 ```ts
 // packages/agent-core/agents/conversationAgent.ts
-import { createGraph, Node, Edge } from "@langchain/langgraph"
-import { echoTool } from "../tools/ToolRegistry"
+import { createGraph, Node, Edge } from "@langchain/langgraph";
+import { echoTool } from "../tools/ToolRegistry";
 
-export async function runConversationAgent({ userId, input }: { userId: string; input: string }) {
-  const graph = createGraph()
+export async function runConversationAgent({
+  userId,
+  input,
+}: {
+  userId: string;
+  input: string;
+}) {
+  const graph = createGraph();
   // Add nodes, edges, and tools as needed
-  graph.addNode(new Node({
-    id: "start",
-    run: async () => ({ message: `Hello, ${userId}!` })
-  }))
+  graph.addNode(
+    new Node({
+      id: "start",
+      run: async () => ({ message: `Hello, ${userId}!` }),
+    }),
+  );
   // ...add more nodes/edges/tools
-  return await graph.run({ start: { input } })
+  return await graph.run({ start: { input } });
 }
 ```
 
@@ -66,18 +75,19 @@ export async function runConversationAgent({ userId, input }: { userId: string; 
 
 ```ts
 // apps/api/routes/agent/ask.ts
-import { runConversationAgent } from "packages/agent-core/agents/conversationAgent"
+import { runConversationAgent } from "packages/agent-core/agents/conversationAgent";
 
 export default async function handler(req, res) {
-  const { userId, input } = req.body
-  const result = await runConversationAgent({ userId, input })
-  res.json(result)
+  const { userId, input } = req.body;
+  const result = await runConversationAgent({ userId, input });
+  res.json(result);
 }
 ```
 
 ---
 
 ## Summary
+
 - **All LangGraph logic lives in `agent-core/agents/`.**
 - **APIs call exported agent/flow functions.**
 - **Frontend never runs LangGraph directly.**

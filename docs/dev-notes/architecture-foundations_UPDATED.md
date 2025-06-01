@@ -3,12 +3,14 @@
 ## 🏛️ Core Architecture: Modular Monolith
 
 ### Why Modular Monolith?
+
 - **Simplicity**: Single deployment, easier debugging
 - **Performance**: No network calls between modules
 - **Flexibility**: Can extract modules to services later if needed
 - **Pure Libraries**: Keep CopilotKit and LangGraph untouched for easy upgrades
 
 ### Module Boundaries
+
 ```typescript
 // Each module is self-contained with clear interfaces
 interface Module {
@@ -28,6 +30,7 @@ interface Module {
 ### 1. Journaling with Local Storage & Voice Transcription
 
 **Foundation Requirements NOW:**
+
 ```typescript
 // packages/shared/types/storage.types.ts
 interface SecureStorage {
@@ -44,31 +47,33 @@ interface JournalEntry {
   transcript?: string;
   localOnly: boolean;
   encrypted: boolean;
-  syncStatus: 'pending' | 'synced' | 'conflict';
+  syncStatus: "pending" | "synced" | "conflict";
 }
 ```
 
 **Architecture Impact:**
+
 - **Offline-First Pattern**: Design all features to work offline with sync
 - **Encryption Strategy**: Use Web Crypto API for client-side encryption
 - **Sync Protocol**: Implement CRDT or operational transformation for conflict resolution
 - **Storage Abstraction**: Create interface that can use IndexedDB, localStorage, or future solutions
 
 **Implementation Approach:**
+
 ```typescript
 // packages/ai-core/storage/secure-storage.ts
 export class SecureStorage {
   private crypto = new ClientCrypto();
   private syncEngine = new SyncEngine();
-  
+
   async store(key: string, data: any, options: StorageOptions) {
     if (options.encrypt) {
       data = await this.crypto.encrypt(data, options.userKey);
     }
-    
+
     // Store locally first
     await this.localStore.set(key, data);
-    
+
     // Queue for sync
     if (!options.localOnly) {
       await this.syncEngine.queue(key, data);
@@ -80,6 +85,7 @@ export class SecureStorage {
 ### 2. Configuration-Driven Module System
 
 **Module Schema Definition:**
+
 ```typescript
 // packages/shared/schemas/module.schema.ts
 interface ModuleConfig {
@@ -109,25 +115,27 @@ interface ModuleRegistry {
 ```
 
 **Dynamic Module Loader:**
+
 ```typescript
 // apps/web/lib/module-loader.ts
 export class ModuleLoader {
   async loadFromConfig(configUrl: string): Promise<Module> {
     const config = await this.fetchConfig(configUrl);
     const validated = this.validateConfig(config);
-    
+
     return {
       id: validated.id,
       agents: await this.loadAgents(validated.agents),
       theme: this.loadTheme(validated.theme),
       routes: this.generateRoutes(validated.navigation),
-      entitlements: validated.entitlements
+      entitlements: validated.entitlements,
     };
   }
 }
 ```
 
 **JSON Configuration Example:**
+
 ```json
 {
   "id": "wealth-with-god",
@@ -143,7 +151,11 @@ export class ModuleLoader {
     {
       "id": "financial-coach",
       "name": "Financial Coach",
-      "capabilities": ["budget_analysis", "investment_guidance", "biblical_finance"],
+      "capabilities": [
+        "budget_analysis",
+        "investment_guidance",
+        "biblical_finance"
+      ],
       "prompts": {
         "system": "You are a biblical financial advisor..."
       }
@@ -160,6 +172,7 @@ export class ModuleLoader {
 ### 3. Flexible Entitlement & Licensing System
 
 **Database Schema:**
+
 ```sql
 -- Organizations with flexible hierarchy
 CREATE TABLE core.organizations (
@@ -213,7 +226,7 @@ CREATE TABLE core.org_entitlements (
 );
 
 -- Enhanced user entitlements
-ALTER TABLE core.user_entitlements 
+ALTER TABLE core.user_entitlements
   ADD COLUMN org_entitlement_id UUID REFERENCES core.org_entitlements(id);
 
 -- Email validation for secure provisioning
@@ -232,19 +245,20 @@ CREATE TABLE core.email_validations (
 ```
 
 **Runtime Enforcement:**
+
 ```typescript
 // Flexible provisioning strategies
 export class ProvisioningService {
   private strategies = {
-    'org_hierarchy': new HierarchicalProvisioning(),
-    'direct_user': new DirectProvisioning(),
-    'delegated_admin': new DelegatedAdminProvisioning()
+    org_hierarchy: new HierarchicalProvisioning(),
+    direct_user: new DirectProvisioning(),
+    delegated_admin: new DelegatedAdminProvisioning(),
   };
-  
+
   async provision(params: ProvisioningParams) {
     const model = await this.getProvisioningModel(params.moduleId);
     const strategy = this.strategies[model.type];
-    
+
     // Execute with audit trail
     return this.db.transaction(async (trx) => {
       const result = await strategy.provision(params);
@@ -259,17 +273,17 @@ export class MagicLinkAuth {
   async sendMagicLink(email: string) {
     const validation = await this.emailValidation.create({
       email,
-      type: 'magic_link',
-      token: generateSecureToken()
+      type: "magic_link",
+      token: generateSecureToken(),
     });
-    
+
     await this.emailService.send({
       to: email,
-      template: 'magic_link',
-      data: { url: `${BASE_URL}/auth/magic/${validation.token}` }
+      template: "magic_link",
+      data: { url: `${BASE_URL}/auth/magic/${validation.token}` },
     });
   }
-  
+
   async validateToken(token: string) {
     const validation = await this.emailValidation.validate(token);
     return this.createSession(validation.userId);
@@ -278,6 +292,7 @@ export class MagicLinkAuth {
 ```
 
 **Key Features:**
+
 - **Flexible Hierarchy**: Not hardcoded to company/team
 - **Three Provisioning Models**: Covers all use cases
 - **Email Validation**: Required for all provisioning
@@ -288,11 +303,13 @@ export class MagicLinkAuth {
 ### 4. Code Review Automation
 
 **Recommended Stack:**
+
 - **CodeRabbit**: Good for AI-powered reviews
 - **Danger.js**: More customizable, can enforce project-specific rules
 - **GitHub Actions**: Custom checks for architecture compliance
 
 **Custom Architecture Checks:**
+
 ```yaml
 # .github/workflows/architecture-check.yml
 name: Architecture Compliance
@@ -306,11 +323,11 @@ jobs:
       - name: Check Agent Pattern Compliance
         run: |
           npx ts-node scripts/check-agent-patterns.ts
-      
+
       - name: Check Module Configuration
         run: |
           npx ts-node scripts/validate-module-configs.ts
-      
+
       - name: Check Entitlement Usage
         run: |
           npx ts-node scripts/check-entitlements.ts
@@ -323,6 +340,7 @@ jobs:
 ### 5. Tribe Social CMS Integration
 
 **Why Critical Now:** Content management system for 600+ videos
+
 ```typescript
 // packages/shared/services/tribe-service.ts
 export class TribeService {
@@ -330,16 +348,19 @@ export class TribeService {
   async getContent(id: string): Promise<TribeContent> {
     const cached = await this.cache.get(`tribe:content:${id}`);
     if (cached) return cached;
-    
+
     const content = await this.tribeApi.get(`/content/${id}`);
     await this.cache.set(`tribe:content:${id}`, content, 300);
     return content;
   }
-  
+
   // Search with module context
-  async searchContent(query: string, moduleId: string): Promise<TribeContent[]> {
+  async searchContent(
+    query: string,
+    moduleId: string,
+  ): Promise<TribeContent[]> {
     const platformId = this.getPlatformId(moduleId);
-    return this.tribeApi.get('/content/search', { q: query, platformId });
+    return this.tribeApi.get("/content/search", { q: query, platformId });
   }
 }
 
@@ -349,12 +370,12 @@ export class UserSyncService {
     const tribeUser = await this.tribe.users.upsert({
       email: user.email,
       name: user.full_name,
-      platformId: this.mapModuleToPlatform(user.current_module)
+      platformId: this.mapModuleToPlatform(user.current_module),
     });
-    
+
     // Store mapping
     await this.db.users.update(user.id, {
-      metadata: { ...user.metadata, tribe_user_id: tribeUser.id }
+      metadata: { ...user.metadata, tribe_user_id: tribeUser.id },
     });
   }
 }
@@ -363,6 +384,7 @@ export class UserSyncService {
 ### 6. Event Sourcing for Agent Conversations
 
 **Why Critical Now:** Enables conversation replay, debugging, and analytics
+
 ```typescript
 // packages/shared/events/conversation-events.ts
 interface ConversationEvent {
@@ -370,7 +392,7 @@ interface ConversationEvent {
   conversationId: string;
   userId: string;
   agentId: string;
-  eventType: 'message' | 'handoff' | 'action' | 'error';
+  eventType: "message" | "handoff" | "action" | "error";
   payload: any;
   timestamp: Date;
   moduleContext: string;
@@ -383,7 +405,7 @@ export class ConversationEventStore {
     await this.db.conversationEvents.insert(event);
     await this.publishToStream(event);
   }
-  
+
   async replay(conversationId: string): Promise<ConversationEvent[]> {
     // Reconstruct conversation from events
   }
@@ -393,18 +415,19 @@ export class ConversationEventStore {
 ### 6. Plugin Architecture for Extensibility
 
 **Module Plugin System:**
+
 ```typescript
 // packages/shared/plugins/plugin-system.ts
 interface Plugin {
   id: string;
   version: string;
   moduleId: string;
-  
+
   // Lifecycle hooks
   onModuleLoad?: (context: ModuleContext) => Promise<void>;
   onAgentRegister?: (agent: Agent) => void;
   onContentRender?: (content: Content) => Content;
-  
+
   // Extension points
   agents?: Agent[];
   components?: ComponentMap;
@@ -423,6 +446,7 @@ export class PluginManager {
 ### 7. Content Versioning & CDN Strategy
 
 **Content Version Control:**
+
 ```sql
 CREATE TABLE content_versions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -437,10 +461,14 @@ CREATE TABLE content_versions (
 ```
 
 **CDN Integration:**
+
 ```typescript
 // packages/shared/cdn/content-delivery.ts
 export class ContentDelivery {
-  async uploadContent(file: File, metadata: ContentMetadata): Promise<CDNResult> {
+  async uploadContent(
+    file: File,
+    metadata: ContentMetadata,
+  ): Promise<CDNResult> {
     // Upload to Cloudflare Stream for videos
     // Generate signed URLs
     // Cache invalidation strategy
@@ -451,17 +479,18 @@ export class ContentDelivery {
 ### 8. Offline-First Architecture
 
 **Service Worker Strategy:**
+
 ```typescript
 // apps/web/service-worker.ts
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   // Cache API responses
   // Queue mutations for sync
   // Serve from cache when offline
 });
 
 // Sync manager
-self.addEventListener('sync', async (event) => {
-  if (event.tag === 'sync-conversations') {
+self.addEventListener("sync", async (event) => {
+  if (event.tag === "sync-conversations") {
     await syncConversations();
   }
 });
@@ -470,12 +499,17 @@ self.addEventListener('sync', async (event) => {
 ### 9. Analytics Pipeline
 
 **Learning Analytics Foundation:**
+
 ```typescript
 // packages/shared/analytics/learning-analytics.ts
 interface LearningEvent {
   userId: string;
   moduleId: string;
-  eventType: 'content_view' | 'content_complete' | 'assessment_score' | 'milestone_achieved';
+  eventType:
+    | "content_view"
+    | "content_complete"
+    | "assessment_score"
+    | "milestone_achieved";
   contentId?: string;
   duration?: number;
   score?: number;
@@ -494,6 +528,7 @@ export class AnalyticsPipeline {
 ### 10. Multi-Tenant Architecture
 
 **Tenant Isolation:**
+
 ```sql
 -- Add tenant_id to all tables
 ALTER TABLE users ADD COLUMN tenant_id UUID;
@@ -507,6 +542,7 @@ CREATE POLICY tenant_isolation ON users
 ## 📋 Updated Day 1 Checklist
 
 ### Must-Have Foundations:
+
 - [x] Module configuration schema and loader
 - [x] Entitlement system database schema
 - [x] Event sourcing for conversations
@@ -517,6 +553,7 @@ CREATE POLICY tenant_isolation ON users
 - [x] CDN integration pattern
 
 ### Can Defer (But Design For):
+
 - [ ] Voice transcription implementation (but design storage)
 - [ ] Full offline sync (but use offline-first patterns)
 - [ ] Complete plugin system (but define interfaces)
@@ -554,24 +591,29 @@ leaderforge/
 4. **Analytics Depth**: Basic metrics or full learning analytics from day 1?
 5. **Module Distribution**: Hosted configs or packaged with deployment?
 
-These architectural decisions will significantly impact the implementation approach and must be decided before starting development.
----
+## These architectural decisions will significantly impact the implementation approach and must be decided before starting development.
 
 ## 🧠 Architecture Enhancements
 
 ### 🧩 Dynamic Module Loader
+
 Introduce a runtime module loader in `libs/runtime-engine` to dynamically:
+
 - Resolve which modules to load based on active experience config
 - Support lazy loading to reduce bundle size
 - Enable feature flags or A/B testing
 
 ### 🔐 Experience Isolation
+
 Ensure modules are sandboxed per experience to prevent leakage across tenants:
+
 - Namespace module state by experience ID
 - Validate config against schema before activation
 
 ### 📦 Module Registry
+
 Each module should expose a `manifest.json` describing:
+
 - Name, version, description
 - Inputs and outputs
 - UI components registered
@@ -580,7 +622,9 @@ Each module should expose a `manifest.json` describing:
 This allows auto-documentation and dynamic UI generation.
 
 ### 📜 Declarative Agent Composition
+
 Explore defining LangGraph DAGs through config DSL:
+
 ```json
 {
   "agents": ["retriever", "planner", "executor"],
@@ -592,4 +636,3 @@ Explore defining LangGraph DAGs through config DSL:
 ```
 
 Allows low-code creation of custom agent orchestration flows per module/experience.
-

@@ -43,13 +43,18 @@ interface NavPanelProps {
   onSelect?: (item: NavItem) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
-  contextOptions?: { id: string; title: string; subtitle?: string; icon?: string }[];
+  contextOptions?: {
+    id: string;
+    title: string;
+    subtitle?: string;
+    icon?: string;
+  }[];
   contextValue?: string;
   onContextChange?: (id: string) => void;
 }
 
 // Toggle for demo: set to 'solid' or 'translucent'
-const UNSELECTED_BG_MODE: 'solid' | 'translucent' = 'solid'; // change to 'translucent' to demo
+const UNSELECTED_BG_MODE: "solid" | "translucent" = "solid"; // change to 'translucent' to demo
 
 export default function NavPanel({
   items,
@@ -67,7 +72,8 @@ export default function NavPanel({
     <aside
       className="h-full flex flex-col transition-all duration-300 relative shadow-lg"
       style={{
-        background: "linear-gradient(135deg, var(--bg-light) 60%, var(--bg-gradient) 100%)",
+        background:
+          "linear-gradient(135deg, var(--bg-light) 60%, var(--bg-gradient) 100%)",
         boxShadow: "0 4px 24px 0 rgba(60, 60, 60, 0.04)",
       }}
     >
@@ -85,9 +91,15 @@ export default function NavPanel({
           <button
             onClick={onToggleCollapse}
             className="ml-2 rounded-full p-1 hover:bg-gray-200 transition"
-            aria-label={isCollapsed ? "Expand navigation" : "Collapse navigation"}
+            aria-label={
+              isCollapsed ? "Expand navigation" : "Collapse navigation"
+            }
           >
-            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            {isCollapsed ? (
+              <ChevronRight size={20} />
+            ) : (
+              <ChevronLeft size={20} />
+            )}
           </button>
         </div>
         <div className="px-4 py-2 space-y-6">
@@ -107,41 +119,46 @@ export default function NavPanel({
                 <button
                   key={item.href}
                   onClick={() => onSelect?.(item)}
-                  className={
-                    [
-                      "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-150 border-l-4",
-                      isActive ? "shadow-md font-semibold" : "font-medium",
-                    ].join(" ")
-                  }
+                  className={[
+                    "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-150 border-l-4",
+                    isActive ? "shadow-md font-semibold" : "font-medium",
+                  ].join(" ")}
                   style={{
                     fontSize: 15,
                     justifyContent: isCollapsed ? "center" : "flex-start",
-                    boxShadow: isActive ? "0 4px 16px 0 rgba(60,60,60,0.06)" : undefined,
+                    boxShadow: isActive
+                      ? "0 4px 16px 0 rgba(60,60,60,0.06)"
+                      : undefined,
                     borderLeftColor: isActive ? "var(--accent)" : "transparent",
                     background: isActive
                       ? "var(--bg-neutral)"
-                      : UNSELECTED_BG_MODE === 'solid'
+                      : UNSELECTED_BG_MODE === "solid"
                         ? "var(--bg-neutral)"
                         : "rgba(232, 244, 248, 0.5)", // translucent leaderforge neutral (e8f4f8)
                     color: isActive ? "var(--primary)" : "var(--text-primary)",
                     borderRadius: "16px",
                     marginBottom: "4px",
-                    transition: "background 0.2s, border-color 0.2s, box-shadow 0.2s",
+                    transition:
+                      "background 0.2s, border-color 0.2s, box-shadow 0.2s",
                   }}
-                  onMouseEnter={e => {
+                  onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = UNSELECTED_BG_MODE === 'solid'
-                        ? "var(--bg-neutral)"
-                        : "rgba(232, 244, 248, 0.8)";
-                      e.currentTarget.style.borderLeftColor = "var(--secondary)";
-                      e.currentTarget.style.boxShadow = "0 2px 8px 0 rgba(60,60,60,0.04)";
+                      e.currentTarget.style.background =
+                        UNSELECTED_BG_MODE === "solid"
+                          ? "var(--bg-neutral)"
+                          : "rgba(232, 244, 248, 0.8)";
+                      e.currentTarget.style.borderLeftColor =
+                        "var(--secondary)";
+                      e.currentTarget.style.boxShadow =
+                        "0 2px 8px 0 rgba(60,60,60,0.04)";
                     }
                   }}
-                  onMouseLeave={e => {
+                  onMouseLeave={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = UNSELECTED_BG_MODE === 'solid'
-                        ? "var(--bg-neutral)"
-                        : "rgba(232, 244, 248, 0.5)";
+                      e.currentTarget.style.background =
+                        UNSELECTED_BG_MODE === "solid"
+                          ? "var(--bg-neutral)"
+                          : "rgba(232, 244, 248, 0.5)";
                       e.currentTarget.style.borderLeftColor = "transparent";
                       e.currentTarget.style.boxShadow = "none";
                     }
@@ -151,7 +168,11 @@ export default function NavPanel({
                   {!isCollapsed && (
                     <div className="flex flex-col items-start">
                       <span className="text-sm">{item.label}</span>
-                      {item.description && <span className="text-xs opacity-70">{item.description}</span>}
+                      {item.description && (
+                        <span className="text-xs opacity-70">
+                          {item.description}
+                        </span>
+                      )}
                     </div>
                   )}
                 </button>

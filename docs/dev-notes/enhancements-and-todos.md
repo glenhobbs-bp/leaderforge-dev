@@ -7,6 +7,7 @@ This document tracks enhancements, technical to-dos, and deferred items for the 
 ## Enhancement Backlog
 
 ### 1. Feature-level or Content-level Entitlement
+
 - **Description:**
   - Implement fine-grained access control for specific features (e.g., analytics, chat) or individual content/media items (e.g., videos, courses) within a context.
 - **Status:**

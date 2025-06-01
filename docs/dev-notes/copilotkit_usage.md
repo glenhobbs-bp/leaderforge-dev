@@ -1,6 +1,7 @@
 # CopilotKit Usage in LeaderForge
 
 ## Overview
+
 CopilotKit powers the AI-native conversational UI in LeaderForge. It provides composable React components, context management, and seamless integration with backend agent APIs. This document outlines best practices for integrating and maintaining CopilotKit in our Next.js frontend.
 
 ---
@@ -42,11 +43,11 @@ CopilotKit powers the AI-native conversational UI in LeaderForge. It provides co
 
 ```tsx
 // apps/web/components/ai/AIExperience.tsx
-import { CopilotProvider, CopilotPanel } from "@copilotkit/react-ui"
-import { useSession } from "@/lib/session"
+import { CopilotProvider, CopilotPanel } from "@copilotkit/react-ui";
+import { useSession } from "@/lib/session";
 
 export default function AIExperience() {
-  const session = useSession()
+  const session = useSession();
   // Fetch feature flags, entitlements, etc.
 
   return (
@@ -59,7 +60,7 @@ export default function AIExperience() {
       <CopilotPanel />
       {/* ...other panels */}
     </CopilotProvider>
-  )
+  );
 }
 ```
 
@@ -73,15 +74,16 @@ export async function sendAgentMessage({ userId, contextKey, message }) {
   const res = await fetch("/api/agent/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, contextKey, message })
-  })
-  return await res.json()
+    body: JSON.stringify({ userId, contextKey, message }),
+  });
+  return await res.json();
 }
 ```
 
 ---
 
 ## Summary
+
 - **All CopilotKit UI lives in `components/ai/` (or similar).**
 - **Provider and panels are added to the main layout.**
 - **Context and feature flags are injected for entitlement-aware UX.**

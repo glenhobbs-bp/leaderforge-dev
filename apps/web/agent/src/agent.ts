@@ -15,12 +15,12 @@ import { ChatOpenAI } from "@langchain/openai";
 // 1. Import necessary helpers for CopilotKit actions
 import { convertActionsToDynamicStructuredTools } from "@copilotkit/sdk-js/langgraph";
 import { CopilotKitStateAnnotation } from "@copilotkit/sdk-js/langgraph";
- 
+
 // 2. Define our agent state, which includes CopilotKit state to
 //    provide actions to the state.
 export const AgentStateAnnotation = Annotation.Root({
-    proverbs: Annotation<string[]>,
-    ...CopilotKitStateAnnotation.spec,
+  proverbs: Annotation<string[]>,
+  ...CopilotKitStateAnnotation.spec,
 });
 
 // 3. Define the type for our agent state
@@ -37,7 +37,7 @@ const getWeather = tool(
     schema: z.object({
       location: z.string().describe("The location to get weather for"),
     }),
-  }
+  },
 );
 
 // 5. Put our tools into an array
@@ -50,12 +50,10 @@ async function chat_node(state: AgentState, config: RunnableConfig) {
 
   // 6.2 Bind the tools to the model, include CopilotKit actions. This allows
   //     the model to call tools that are defined in CopilotKit by the frontend.
-  const modelWithTools = model.bindTools!(
-    [
-      ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions || []),
-      ...tools,
-    ],
-  );
+  const modelWithTools = model.bindTools!([
+    ...convertActionsToDynamicStructuredTools(state.copilotkit?.actions || []),
+    ...tools,
+  ]);
 
   // 6.3 Define the system message, which will be used to guide the model, in this case
   //     we also add in the language to use from the state.
@@ -66,7 +64,7 @@ async function chat_node(state: AgentState, config: RunnableConfig) {
   // 6.4 Invoke the model with the system message and the messages in the state
   const response = await modelWithTools.invoke(
     [systemMessage, ...state.messages],
-    config
+    config,
   );
 
   // 6.5 Return the response, which will be added to the state
@@ -88,7 +86,7 @@ function shouldContinue({ messages, copilotkit }: AgentState) {
 
     // 7.3 Only route to the tool node if the tool call is not a CopilotKit action
     if (!actions || actions.every((action) => action.name !== toolCallName)) {
-      return "tool_node"
+      return "tool_node";
     }
   }
 

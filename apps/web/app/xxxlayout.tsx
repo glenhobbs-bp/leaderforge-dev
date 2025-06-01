@@ -1,18 +1,18 @@
 import "./globals.css";
 
 export const metadata = {
-  title: 'LeaderForge',
-  description: 'Building something epic!',
-}
+  title: "LeaderForge",
+  description: "Building something epic!",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
       <body>{children}</body>
     </html>
-  )
+  );
 }

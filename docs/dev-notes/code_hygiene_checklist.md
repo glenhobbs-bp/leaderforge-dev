@@ -1,11 +1,13 @@
 # Code Hygiene & Dependency Checklist for Production
 
 ## Overview
+
 This document outlines essential code hygiene and dependency management actions to take before deploying to production. It also covers how to clean up failed or duplicate package installs, especially in a monorepo.
 
 ---
 
 ## 1. Dependency Hygiene
+
 - **Remove unused dependencies** from all `package.json` files.
 - **Run `pnpm prune`** to remove extraneous packages from `node_modules`.
 - **Run `pnpm dedupe`** to minimize duplicate packages.
@@ -17,6 +19,7 @@ This document outlines essential code hygiene and dependency management actions 
 ---
 
 ## 2. Cleaning Up Failed or Duplicate Installs
+
 - **Search for duplicate package folders:**
   - Use `find . -name "@copilotkit*"` or similar to locate all instances.
   - Remove any unused or orphaned directories (especially in subfolders or old test projects).
@@ -36,6 +39,7 @@ This document outlines essential code hygiene and dependency management actions 
 ---
 
 ## 3. General Code Hygiene
+
 - **Remove unused files, components, and scripts.**
 - **Lint and format code** using your standard tools (e.g., ESLint, Prettier).
 - **Run all tests** and ensure they pass.
@@ -45,6 +49,7 @@ This document outlines essential code hygiene and dependency management actions 
 ---
 
 ## 4. Before Production Release
+
 - **Run a full build and test cycle.**
 - **Check for any warnings or errors in the build output.**
 - **Review all open issues and TODOs.**
@@ -53,6 +58,7 @@ This document outlines essential code hygiene and dependency management actions 
 ---
 
 ## References
+
 - [pnpm docs](https://pnpm.io/)
 - [CopilotKit docs](https://docs.copilotkit.ai/)
 - [Husky docs](https://typicode.github.io/husky/#/)

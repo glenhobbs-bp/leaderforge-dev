@@ -7,6 +7,7 @@ This guide provides a streamlined deployment approach for the initial LeaderForg
 ## Local Development Setup
 
 ### 1. Prerequisites
+
 ```bash
 # Required tools
 - Node.js 20+ (via nvm)
@@ -24,6 +25,7 @@ npm install -g pnpm
 ```
 
 ### 2. Repository Setup
+
 ```bash
 # Clone repository
 git clone https://github.com/brilliant-perspectives/leaderforge.git
@@ -37,6 +39,7 @@ cp .env.example .env.local
 ```
 
 ### 3. Local Services
+
 ```bash
 # Start Supabase locally
 pnpm supabase:start
@@ -52,6 +55,7 @@ pnpm db:seed
 ```
 
 ### 4. Development Workflow
+
 ```bash
 # Start all services (uses Turborepo)
 pnpm dev
@@ -65,12 +69,14 @@ pnpm dev
 ## Deployment Strategy
 
 ### Phase 1: Development (Current)
+
 - **Frontend**: Vercel (automatic from GitHub)
 - **API**: Railway or Render
 - **Database**: Supabase Cloud (free tier)
 - **Redis**: Upstash (serverless Redis)
 
 ### Vercel Deployment (Frontend)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -83,6 +89,7 @@ vercel --prod
 ```
 
 ### Environment Variables (Vercel)
+
 ```bash
 # Add via CLI
 vercel env add NEXT_PUBLIC_SUPABASE_URL
@@ -95,6 +102,7 @@ vercel env add OPENAI_API_KEY
 ```
 
 ### Railway Deployment (API)
+
 ```bash
 # Install Railway CLI
 npm install -g @railway/cli
@@ -114,6 +122,7 @@ railway variables set DATABASE_URL=${{Postgres.DATABASE_URL}}
 ## Database Management
 
 ### Migrations
+
 ```bash
 # Create new migration
 pnpm supabase migration new <migration_name>
@@ -126,6 +135,7 @@ pnpm supabase db push
 ```
 
 ### Backup Strategy
+
 ```bash
 # Manual backup (for now)
 pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql
@@ -137,19 +147,20 @@ psql $DATABASE_URL < backup_20240115.sql
 ## Monitoring & Debugging
 
 ### Basic Monitoring
+
 ```javascript
 // apps/api/src/monitoring.ts
 export const monitor = {
   // Simple health check endpoint
   health: async (req, res) => {
     const checks = {
-      api: 'ok',
+      api: "ok",
       database: await checkDatabase(),
       redis: await checkRedis(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
     res.json(checks);
-  }
+  },
 };
 
 // Add to Uptime Robot or similar
@@ -157,6 +168,7 @@ export const monitor = {
 ```
 
 ### Error Tracking
+
 ```bash
 # Install Sentry
 pnpm add @sentry/nextjs @sentry/node
@@ -166,6 +178,7 @@ npx @sentry/wizard -i nextjs
 ```
 
 ### Logs
+
 ```bash
 # View Vercel logs
 vercel logs --follow
@@ -180,6 +193,7 @@ railway logs
 ## Quick Deployment Checklist
 
 ### Before First Deploy
+
 - [ ] Set up GitHub repository
 - [ ] Create Vercel account and connect repo
 - [ ] Create Supabase project
@@ -187,6 +201,7 @@ railway logs
 - [ ] Configure environment variables
 
 ### For Each Deploy
+
 - [ ] Run tests locally: `pnpm test`
 - [ ] Check TypeScript: `pnpm type-check`
 - [ ] Review changes: `git diff`
@@ -198,12 +213,14 @@ railway logs
 ## LangGraph Agent Integration Checklist
 
 ### For Local Development
+
 - [ ] Ensure LangGraph agent is running locally (e.g., `pnpm exec langgraphjs dev --host localhost --port 8000`)
 - [ ] Confirm `langgraph.json` is present and correctly configured in the agent directory
 - [ ] In CopilotKit API handler, set remote endpoint to `http://localhost:8000` using `langGraphPlatformEndpoint`
 - [ ] Verify CopilotKit frontend can connect to the local LangGraph agent
 
 ### For Production
+
 - [ ] Choose deployment: LangGraph Platform (managed) or Self-Hosted (FastAPI/Node)
 - [ ] Update CopilotKit API handler to use production LangGraph deployment URL and API key
 - [ ] Add/verify agent(s) in `langgraph.json` and update descriptions/IDs as needed
@@ -212,6 +229,7 @@ railway logs
 ## Useful Scripts
 
 Add to root `package.json`:
+
 ```json
 {
   "scripts": {
@@ -241,6 +259,7 @@ Add to root `package.json`:
 ## Environment Management
 
 ### Required Environment Variables
+
 ```bash
 # .env.local (Frontend)
 NEXT_PUBLIC_SUPABASE_URL=
@@ -261,20 +280,17 @@ TRIBE_API_KEY=
 ```
 
 ### Environment Validation Script
+
 ```javascript
 // scripts/check-env.js
-const required = [
-  'DATABASE_URL',
-  'OPENAI_API_KEY',
-  'NEXT_PUBLIC_SUPABASE_URL'
-];
+const required = ["DATABASE_URL", "OPENAI_API_KEY", "NEXT_PUBLIC_SUPABASE_URL"];
 
-const missing = required.filter(key => !process.env[key]);
+const missing = required.filter((key) => !process.env[key]);
 if (missing.length) {
-  console.error('Missing environment variables:', missing);
+  console.error("Missing environment variables:", missing);
   process.exit(1);
 }
-console.log('✅ All required environment variables set');
+console.log("✅ All required environment variables set");
 ```
 
 ## Troubleshooting
@@ -282,6 +298,7 @@ console.log('✅ All required environment variables set');
 ### Common Issues
 
 **Port already in use**
+
 ```bash
 # Find and kill process
 lsof -i :3000
@@ -289,6 +306,7 @@ kill -9 <PID>
 ```
 
 **Database connection issues**
+
 ```bash
 # Reset local Supabase
 pnpm supabase stop
@@ -297,6 +315,7 @@ pnpm supabase db reset
 ```
 
 **Build failures**
+
 ```bash
 # Clear all caches
 rm -rf .next node_modules
@@ -305,6 +324,7 @@ pnpm build
 ```
 
 **Type errors after package updates**
+
 ```bash
 # Regenerate types
 pnpm supabase gen types typescript --local > packages/database/types/supabase.ts
@@ -313,16 +333,19 @@ pnpm supabase gen types typescript --local > packages/database/types/supabase.ts
 ## Next Steps (When Ready to Scale)
 
 1. **Add CI/CD Pipeline**
+
    - GitHub Actions for automated testing
    - Preview deployments for PRs
    - Automated database migrations
 
 2. **Enhanced Monitoring**
+
    - APM with DataDog or New Relic
    - Structured logging with winston
    - Performance monitoring
 
 3. **Infrastructure as Code**
+
    - Terraform for resource management
    - Docker containerization
    - Kubernetes for orchestration
@@ -332,33 +355,39 @@ pnpm supabase gen types typescript --local > packages/database/types/supabase.ts
    - DDoS protection
    - Regular security audits
 
-For now, focus on shipping features quickly while maintaining basic monitoring and error tracking.
----
+## For now, focus on shipping features quickly while maintaining basic monitoring and error tracking.
 
 ## 🚀 DevOps & Deployment Enhancements
 
 ### 📦 Container Strategy
+
 Use multi-stage Docker builds:
+
 - Stage 1: Build (Node/Yarn/PNPM)
 - Stage 2: Runtime (minimal Node image)
 
 Ensure images are optimized and scanned for vulnerabilities (use `snyk` or `trivy`).
 
 ### 🔄 Zero Downtime Deployments
+
 Use blue-green or rolling deployment strategies for API and frontend services to minimize disruption.
 
 Recommended tools:
+
 - Google Cloud Run
 - Kubernetes with Istio/Argo Rollouts
 - Fly.io for fast preview environments
 
 ### 🔐 Secrets and Env Configuration
+
 Leverage secret managers (GCP, AWS, Doppler) and inject secrets at runtime rather than build time.
 
 Avoid storing sensitive values in `.env` or Docker images.
 
 ### 🛠 CI/CD Automation
+
 Use GitHub Actions with reusable workflows for:
+
 - Build
 - Lint & test
 - Deploy to staging/production
@@ -366,8 +395,9 @@ Use GitHub Actions with reusable workflows for:
 Support PR preview environments for frontend via Vercel/Fly or ephemeral containers.
 
 ### 📊 Observability
+
 Add tracing, logs, and metrics reporting:
+
 - OpenTelemetry + collector
 - Log aggregation (Loki, GCP Logging)
 - Sentry for error tracking
-

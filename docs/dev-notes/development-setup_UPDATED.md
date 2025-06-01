@@ -16,6 +16,7 @@ npm run dev
 ## 🛠️ Required Tools
 
 ### Core Development Tools
+
 ```bash
 # Node.js 20+ (via nvm)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -30,8 +31,10 @@ pnpm add -g turbo
 ```
 
 ### Cursor IDE Setup
+
 1. **Install Cursor** from [cursor.sh](https://cursor.sh)
 2. **Install Extensions**:
+
    ```
    - Tailwind CSS IntelliSense
    - Prisma
@@ -43,6 +46,7 @@ pnpm add -g turbo
    ```
 
 3. **Configure Cursor Settings**:
+
    ```json
    {
      "cursor.aiProvider": "anthropic",
@@ -57,6 +61,7 @@ pnpm add -g turbo
    ```
 
 4. **Add Project Context** (`.cursorcontext`):
+
    ```
    This is LeaderForge, an agent-first learning platform.
    Key principles:
@@ -64,7 +69,7 @@ pnpm add -g turbo
    - Multi-context support (Business, Spiritual, MLM)
    - Agent orchestration with LangGraph
    - Built with Next.js 14, CopilotKit, and Supabase
-   
+
    See .cursorrules for coding standards.
    ```
 
@@ -73,6 +78,7 @@ pnpm add -g turbo
 ## 📦 Project Initialization
 
 ### 1. Create Monorepo Structure
+
 ```bash
 # Initialize monorepo
 mkdir leaderforge && cd leaderforge
@@ -84,7 +90,9 @@ mkdir -p apps/web apps/api packages/shared packages/database packages/ai-core
 ```
 
 ### 2. Configure Turborepo
+
 Create `turbo.json`:
+
 ```json
 {
   "$schema": "https://turbo.build/schema.json",
@@ -111,6 +119,7 @@ Create `turbo.json`:
 ```
 
 ### 3. Setup Next.js Frontend
+
 ```bash
 cd apps/web
 pnpm create next-app . --typescript --tailwind --app --src-dir --import-alias "@/*"
@@ -127,6 +136,7 @@ pnpm dlx shadcn-ui@latest init
 ```
 
 ### 4. Setup API Server
+
 ```bash
 cd apps/api
 pnpm init
@@ -139,6 +149,7 @@ pnpm add -D @types/express @types/node typescript tsx nodemon
 ```
 
 ### 5. Configure Shared Packages
+
 ```bash
 cd packages/shared
 pnpm init
@@ -150,7 +161,9 @@ pnpm init
 ## 🔧 Environment Configuration
 
 ### 1. Create Environment Files
+
 Create `.env.local` in project root:
+
 ```bash
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -188,6 +201,7 @@ TWILIO_AUTH_TOKEN=your_twilio_token
 ```
 
 ### 2. Setup Git Hooks
+
 ```bash
 # Install husky for pre-commit hooks
 pnpm add -D husky lint-staged
@@ -198,16 +212,12 @@ pnpm dlx husky add .husky/pre-commit "pnpm lint-staged"
 ```
 
 Add to `package.json`:
+
 ```json
 {
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yml}": [
-      "prettier --write"
-    ]
+    "*.{ts,tsx,js,jsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,yml}": ["prettier --write"]
   }
 }
 ```
@@ -217,6 +227,7 @@ Add to `package.json`:
 ## 🏗️ Database Setup
 
 ### 1. Initialize Supabase
+
 ```bash
 # Install Supabase CLI
 brew install supabase/tap/supabase
@@ -229,6 +240,7 @@ supabase start
 ```
 
 ### 2. Create Database Schema
+
 ```sql
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -341,6 +353,7 @@ ALTER TABLE core.conversation_events ENABLE ROW LEVEL SECURITY;
 ```
 
 ### 3. Generate TypeScript Types
+
 ```bash
 cd packages/database
 pnpm add -D @supabase/supabase-js
@@ -352,12 +365,13 @@ pnpm dlx supabase gen types typescript --local > types/supabase.ts
 ## 🧪 Testing Setup
 
 ### 1. Install Testing Dependencies
+
 ```bash
 # Unit testing
 pnpm add -D vitest @testing-library/react @testing-library/jest-dom
 pnpm add -D @testing-library/user-event @testing-library/react-hooks
 
-# E2E testing  
+# E2E testing
 pnpm add -D playwright @playwright/test
 
 # API testing
@@ -365,28 +379,31 @@ pnpm add -D supertest @types/supertest
 ```
 
 ### 2. Configure Vitest
+
 Create `vitest.config.ts`:
+
 ```typescript
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: './tests/setup.ts',
+    setupFiles: "./tests/setup.ts",
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });
 ```
 
 ### 3. Create Test Utilities
+
 ```typescript
 // tests/utils/test-utils.tsx
 import { render } from '@testing-library/react';
@@ -412,6 +429,7 @@ export function renderWithProviders(ui: React.ReactElement) {
 ## 🚀 Development Workflow
 
 ### 1. Start Development Servers
+
 ```bash
 # Terminal 1: Start all services
 pnpm dev
@@ -424,7 +442,9 @@ docker run -p 6379:6379 redis
 ```
 
 ### 2. Development Scripts
+
 Add to root `package.json`:
+
 ```json
 {
   "scripts": {
@@ -445,6 +465,7 @@ Add to root `package.json`:
 ### 3. Cursor Workflow Tips
 
 #### Quick Agent Creation
+
 ```bash
 # Use Cursor's AI to generate agent boilerplate
 # Type: "Create a new agent for handling user progress tracking"
@@ -452,6 +473,7 @@ Add to root `package.json`:
 ```
 
 #### Conversation Flow Testing
+
 ```typescript
 // Create test conversations in Cursor
 // Type: "Generate test cases for content discovery conversation"
@@ -459,6 +481,7 @@ Add to root `package.json`:
 ```
 
 #### Component Generation
+
 ```bash
 # Use Cursor to generate UI components
 # Type: "Create a chat message component with thinking animation"
@@ -470,28 +493,31 @@ Add to root `package.json`:
 ## 📊 Monitoring & Debugging
 
 ### 1. Development Tools
+
 ```typescript
 // Add debug logging for agents
-if (process.env.NODE_ENV === 'development') {
-  console.log('[Agent]', agentId, 'Processing:', message);
-  console.log('[Agent]', agentId, 'Response:', response);
+if (process.env.NODE_ENV === "development") {
+  console.log("[Agent]", agentId, "Processing:", message);
+  console.log("[Agent]", agentId, "Response:", response);
 }
 ```
 
 ### 2. Chrome DevTools Setup
+
 - Install React Developer Tools
 - Install Redux DevTools (for Zustand)
 - Use Network tab to monitor WebSocket connections
 
 ### 3. Logging Configuration
+
 ```typescript
 // lib/logger.ts
-import pino from 'pino';
+import pino from "pino";
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env.LOG_LEVEL || "info",
   transport: {
-    target: 'pino-pretty',
+    target: "pino-pretty",
     options: {
       colorize: true,
     },
@@ -504,24 +530,28 @@ export const logger = pino({
 ## 🚢 Pre-Deployment Checklist
 
 ### Code Quality
+
 - [ ] All TypeScript errors resolved
 - [ ] ESLint warnings addressed
 - [ ] Tests passing (>80% coverage)
 - [ ] No console.logs in production code
 
 ### Performance
+
 - [ ] Lighthouse score >90
 - [ ] Bundle size analyzed and optimized
 - [ ] Images optimized and lazy loaded
 - [ ] API responses <500ms
 
 ### Security
+
 - [ ] Environment variables secured
 - [ ] API routes protected
 - [ ] Input validation implemented
 - [ ] RLS policies tested
 
 ### Documentation
+
 - [ ] README updated
 - [ ] API documentation current
 - [ ] Deployment guide complete
@@ -534,6 +564,7 @@ export const logger = pino({
 ### Common Issues
 
 #### 1. Type Errors with CopilotKit
+
 ```bash
 # Clear TypeScript cache
 rm -rf node_modules/.cache
@@ -541,6 +572,7 @@ pnpm type-check
 ```
 
 #### 2. Supabase Connection Issues
+
 ```bash
 # Check Supabase status
 supabase status
@@ -550,12 +582,13 @@ supabase db reset
 ```
 
 #### 3. Agent Not Responding
+
 ```typescript
 // Check agent registration
-console.log('Registered agents:', agentRegistry.list());
+console.log("Registered agents:", agentRegistry.list());
 
 // Verify message routing
-logger.debug('Routing message to:', targetAgent);
+logger.debug("Routing message to:", targetAgent);
 ```
 
 ---
@@ -563,25 +596,30 @@ logger.debug('Routing message to:', targetAgent);
 ## 📚 Resources
 
 ### Documentation
+
 - [Next.js 14 Docs](https://nextjs.org/docs)
 - [CopilotKit Docs](https://docs.copilotkit.ai)
 - [LangGraph Guide](https://langchain.com/docs/langgraph)
 - [Supabase Docs](https://supabase.com/docs)
 
 ### Community
+
 - Project Discord: [Join Here]
 - Weekly Dev Syncs: Thursdays 2PM EST
 - Code Reviews: Via GitHub PRs
 
 ### Learning Resources
+
 - [Agent Architecture Patterns](./docs/agent-patterns.md)
 - [Conversation Design Guide](./docs/conversation-design.md)
 - [Multi-Context Best Practices](./docs/multi-context.md)
+
 ---
 
 ## 🧪 Dev Environment Improvements
 
 ### 🧱 Dev Containers
+
 Include a `.devcontainer/` directory to define a containerized development environment compatible with [Cursor](https://www.cursor.so), [VS Code Dev Containers](https://containers.dev/), or [GitHub Codespaces](https://github.com/features/codespaces). This should specify:
 
 - Node version and dependencies
@@ -590,6 +628,7 @@ Include a `.devcontainer/` directory to define a containerized development envir
 - Useful CLI tools
 
 ### 🚀 TurboRepo Pipelines
+
 Use `turbo.json` to optimize build/test/lint pipelines. Define dependency relationships and cache configuration:
 
 ```json
@@ -606,13 +645,17 @@ Use `turbo.json` to optimize build/test/lint pipelines. Define dependency relati
 ```
 
 ### 🔍 Lint + Format Presets
+
 Adopt shared linting and formatting rules:
+
 - ESLint with base config in `libs/eslint-config-custom`
 - Prettier config in root `.prettierrc`
 - Husky for pre-commit hooks with lint + test
 
 ### 📖 Add Developer Handbook
+
 Create a top-level `docs/` folder containing:
+
 - Environment setup
 - Running dev server
 - Testing strategy

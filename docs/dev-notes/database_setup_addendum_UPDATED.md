@@ -1,6 +1,7 @@
 # Database Setup Addendum
-*Addendum to LeaderForge Master Technical Specification v2.0*
-*Created: January 2025*
+
+_Addendum to LeaderForge Master Technical Specification v2.0_
+_Created: January 2025_
 
 ## 📋 Purpose
 
@@ -292,35 +293,35 @@ CREATE INDEX idx_email_validation_expires ON core.email_validations(expires_at) 
 
 -- Content library
 CREATE TABLE IF NOT EXISTS modules.content (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  title TEXT NOT NULL,
-  description TEXT,
-  content_type TEXT CHECK (content_type IN ('video', 'audio', 'document', 'course', 'live_session')),
-  video_url TEXT,
-  audio_url TEXT,
-  thumbnail_url TEXT,
-  transcript_url TEXT,
-  duration_seconds INTEGER,
-  file_size_bytes BIGINT,
-  difficulty_level TEXT CHECK (difficulty_level IN ('beginner', 'intermediate', 'advanced')),
-  available_contexts TEXT[] NOT NULL,
-  categories JSONB DEFAULT '{}',
-  tags TEXT[],
-  instructor_name TEXT,
-  instructor_id UUID,
-  source_platform TEXT,
-  external_id TEXT,
-  search_vector tsvector,
-  embedding vector(1536),
-  published_at TIMESTAMPTZ,
-  published_by UUID REFERENCES core.users(id),
-  visibility TEXT DEFAULT 'public' CHECK (visibility IN ('public', 'context', 'organization', 'private')),
-  parent_content_id UUID REFERENCES modules.content(id),
-  sort_order INTEGER DEFAULT 0,
-  metadata JSONB DEFAULT '{}',
-  settings JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+title TEXT NOT NULL,
+description TEXT,
+content_type TEXT CHECK (content_type IN ('video', 'audio', 'document', 'course', 'live_session')),
+video_url TEXT,
+audio_url TEXT,
+thumbnail_url TEXT,
+transcript_url TEXT,
+duration_seconds INTEGER,
+file_size_bytes BIGINT,
+difficulty_level TEXT CHECK (difficulty_level IN ('beginner', 'intermediate', 'advanced')),
+available_contexts TEXT[] NOT NULL,
+categories JSONB DEFAULT '{}',
+tags TEXT[],
+instructor_name TEXT,
+instructor_id UUID,
+source_platform TEXT,
+external_id TEXT,
+search_vector tsvector,
+embedding vector(1536),
+published_at TIMESTAMPTZ,
+published_by UUID REFERENCES core.users(id),
+visibility TEXT DEFAULT 'public' CHECK (visibility IN ('public', 'context', 'organization', 'private')),
+parent_content_id UUID REFERENCES modules.content(id),
+sort_order INTEGER DEFAULT 0,
+metadata JSONB DEFAULT '{}',
+settings JSONB DEFAULT '{}',
+created_at TIMESTAMPTZ DEFAULT NOW(),
+updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_content_contexts ON modules.content USING GIN(available_contexts);
@@ -333,27 +334,27 @@ CREATE INDEX IF NOT EXISTS idx_content_parent ON modules.content(parent_content_
 
 -- User progress tracking
 CREATE TABLE IF NOT EXISTS modules.user_progress (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
-  content_id UUID NOT NULL REFERENCES modules.content(id) ON DELETE CASCADE,
-  context_key TEXT NOT NULL,
-  progress_percentage INTEGER DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
-  watch_time_seconds INTEGER DEFAULT 0,
-  last_position_seconds INTEGER DEFAULT 0,
-  completion_count INTEGER DEFAULT 0,
-  bookmark_count INTEGER DEFAULT 0,
-  total_sessions INTEGER DEFAULT 0,
-  current_session_id UUID,
-  started_at TIMESTAMPTZ DEFAULT NOW(),
-  last_viewed_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ,
-  notes TEXT,
-  bookmarks JSONB DEFAULT '[]',
-  sync_status sync_status DEFAULT 'synced',
-  last_synced_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT unique_user_content_context UNIQUE (user_id, content_id, context_key),
-  CONSTRAINT valid_position CHECK (last_position_seconds >= 0),
-  CONSTRAINT valid_watch_time CHECK (watch_time_seconds >= 0)
+id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+user_id UUID NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
+content_id UUID NOT NULL REFERENCES modules.content(id) ON DELETE CASCADE,
+context_key TEXT NOT NULL,
+progress_percentage INTEGER DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
+watch_time_seconds INTEGER DEFAULT 0,
+last_position_seconds INTEGER DEFAULT 0,
+completion_count INTEGER DEFAULT 0,
+bookmark_count INTEGER DEFAULT 0,
+total_sessions INTEGER DEFAULT 0,
+current_session_id UUID,
+started_at TIMESTAMPTZ DEFAULT NOW(),
+last_viewed_at TIMESTAMPTZ DEFAULT NOW(),
+completed_at TIMESTAMPTZ,
+notes TEXT,
+bookmarks JSONB DEFAULT '[]',
+sync_status sync_status DEFAULT 'synced',
+last_synced_at TIMESTAMPTZ DEFAULT NOW(),
+CONSTRAINT unique_user_content_context UNIQUE (user_id, content_id, context_key),
+CONSTRAINT valid_position CHECK (last_position_seconds >= 0),
+CONSTRAINT valid_watch_time CHECK (watch_time_seconds >= 0)
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_progress_user ON modules.user_progress(user_id);
@@ -511,14 +512,14 @@ INSERT INTO core.module_access_policies (module_id, required_entitlements, acces
 
 -- Context access policies
 CREATE TABLE core.context_access_policies (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  context_key TEXT NOT NULL,
-  required_entitlements TEXT[] NOT NULL,
-  access_mode TEXT CHECK (access_mode IN ('any', 'all')) DEFAULT 'any',
-  additional_rules JSONB DEFAULT '{}',
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  CONSTRAINT unique_context_policy UNIQUE (context_key)
+id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+context_key TEXT NOT NULL,
+required_entitlements TEXT[] NOT NULL,
+access_mode TEXT CHECK (access_mode IN ('any', 'all')) DEFAULT 'any',
+additional_rules JSONB DEFAULT '{}',
+created_at TIMESTAMPTZ DEFAULT NOW(),
+updated_at TIMESTAMPTZ DEFAULT NOW(),
+CONSTRAINT unique_context_policy UNIQUE (context_key)
 );
 
 -- Seeding context access policies
@@ -531,43 +532,45 @@ INSERT INTO core.context_access_policies (context_key, required_entitlements, ac
 
 -- Function to check context access
 CREATE OR REPLACE FUNCTION core.user_can_access_context(
-  p_user_id UUID,
-  p_context_key TEXT
+p_user_id UUID,
+p_context_key TEXT
 ) RETURNS BOOLEAN AS $$
 DECLARE
-  v_required_entitlements TEXT[];
-  v_access_mode TEXT;
-  v_has_access BOOLEAN := FALSE;
+v_required_entitlements TEXT[];
+v_access_mode TEXT;
+v_has_access BOOLEAN := FALSE;
 BEGIN
-  -- Get context requirements
-  SELECT required_entitlements, access_mode
-  INTO v_required_entitlements, v_access_mode
-  FROM core.context_access_policies
-  WHERE context_key = p_context_key;
+-- Get context requirements
+SELECT required_entitlements, access_mode
+INTO v_required_entitlements, v_access_mode
+FROM core.context_access_policies
+WHERE context_key = p_context_key;
 
-  -- No policy means open access
-  IF NOT FOUND THEN
-    RETURN TRUE;
-  END IF;
+-- No policy means open access
+IF NOT FOUND THEN
+RETURN TRUE;
+END IF;
 
-  -- Check entitlements based on mode
-  IF v_access_mode = 'any' THEN
-    SELECT EXISTS (
-      SELECT 1
-      FROM unnest(v_required_entitlements) AS required
-      WHERE core.user_has_entitlement(p_user_id, required)
-    ) INTO v_has_access;
-  ELSE
-    SELECT NOT EXISTS (
-      SELECT 1
-      FROM unnest(v_required_entitlements) AS required
-      WHERE NOT core.user_has_entitlement(p_user_id, required)
-    ) INTO v_has_access;
-  END IF;
+-- Check entitlements based on mode
+IF v_access_mode = 'any' THEN
+SELECT EXISTS (
+SELECT 1
+FROM unnest(v_required_entitlements) AS required
+WHERE core.user_has_entitlement(p_user_id, required)
+) INTO v_has_access;
+ELSE
+SELECT NOT EXISTS (
+SELECT 1
+FROM unnest(v_required_entitlements) AS required
+WHERE NOT core.user_has_entitlement(p_user_id, required)
+) INTO v_has_access;
+END IF;
 
-  RETURN v_has_access;
+RETURN v_has_access;
 END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+$$
+LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 -- (Optional) You may now deprecate or drop the old module_access_policies and user_can_access_module if not needed for code modules.
 
@@ -671,61 +674,74 @@ INSERT INTO core.user_entitlements (user_id, entitlement_id, granted_by) VALUES
 CREATE OR REPLACE FUNCTION core.user_has_entitlement(
   p_user_id UUID,
   p_entitlement_name TEXT
-) RETURNS BOOLEAN AS $$
-DECLARE
-  v_has_entitlement BOOLEAN;
-BEGIN
-  SELECT EXISTS (
-    SELECT 1
-    FROM core.user_entitlements ue
-    JOIN core.entitlements e ON e.id = ue.entitlement_id
-    WHERE ue.user_id = p_user_id
-      AND e.name = p_entitlement_name
-      AND ue.revoked_at IS NULL
-      AND (ue.expires_at IS NULL OR ue.expires_at > NOW())
-  ) INTO v_has_entitlement;
+) RETURNS BOOLEAN AS
+$$
 
-  RETURN v_has_entitlement;
+DECLARE
+v_has_entitlement BOOLEAN;
+BEGIN
+SELECT EXISTS (
+SELECT 1
+FROM core.user_entitlements ue
+JOIN core.entitlements e ON e.id = ue.entitlement_id
+WHERE ue.user_id = p_user_id
+AND e.name = p_entitlement_name
+AND ue.revoked_at IS NULL
+AND (ue.expires_at IS NULL OR ue.expires_at > NOW())
+) INTO v_has_entitlement;
+
+RETURN v_has_entitlement;
 END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+$$
+LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 -- Function to check context access (see above for definition)
 -- CREATE OR REPLACE FUNCTION core.user_can_access_context ...
 
 -- Function to update search vectors for content (search indexing)
 CREATE OR REPLACE FUNCTION modules.update_content_search_vector()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS
+$$
+
 BEGIN
-  NEW.search_vector := to_tsvector('english',
-    COALESCE(NEW.title, '') || ' ' ||
-    COALESCE(NEW.description, '') || ' ' ||
-    COALESCE(NEW.instructor_name, '')
-  );
-  RETURN NEW;
+NEW.search_vector := to_tsvector('english',
+COALESCE(NEW.title, '') || ' ' ||
+COALESCE(NEW.description, '') || ' ' ||
+COALESCE(NEW.instructor_name, '')
+);
+RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+
+$$
+LANGUAGE plpgsql;
 
 -- Function to update organization path
 CREATE OR REPLACE FUNCTION core.update_organization_path()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS
+$$
+
 DECLARE
-  v_parent_path TEXT[];
+v_parent_path TEXT[];
 BEGIN
-  IF NEW.parent_org_id IS NULL THEN
-    NEW.path := ARRAY[]::TEXT[];
-    NEW.level := 0;
-  ELSE
-    SELECT path, level INTO v_parent_path, NEW.level
-    FROM core.organizations
-    WHERE id = NEW.parent_org_id;
+IF NEW.parent_org_id IS NULL THEN
+NEW.path := ARRAY[]::TEXT[];
+NEW.level := 0;
+ELSE
+SELECT path, level INTO v_parent_path, NEW.level
+FROM core.organizations
+WHERE id = NEW.parent_org_id;
 
     NEW.path := v_parent_path || NEW.parent_org_id::TEXT;
     NEW.level := NEW.level + 1;
-  END IF;
 
-  RETURN NEW;
+END IF;
+
+RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+
+$$
+LANGUAGE plpgsql;
 ```
 
 ### 2. Automated Triggers
@@ -746,12 +762,16 @@ CREATE TRIGGER trigger_update_organization_path
 -- Update timestamps on record changes
 -- Ensures the updated_at column is set to NOW() on any update
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER AS
+$$
+
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
+NEW.updated_at = NOW();
+RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+
+$$
+LANGUAGE plpgsql;
 
 -- Apply to all tables with updated_at columns
 CREATE TRIGGER trigger_users_updated_at
@@ -1014,3 +1034,5 @@ LIMIT 5;
 -- 7. Show context access policies
 SELECT * FROM core.context_access_policies;
 
+
+$$

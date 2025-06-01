@@ -1,6 +1,7 @@
 # Environment Configuration Addendum
-*Addendum to LeaderForge Master Technical Specification v2.0*
-*Created: January 2025*
+
+_Addendum to LeaderForge Master Technical Specification v2.0_
+_Created: January 2025_
 
 ## 📋 Purpose
 
@@ -277,45 +278,55 @@ MAINTENANCE_BYPASS_TOKEN=
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['@langchain/core', '@langchain/openai']
+    serverComponentsExternalPackages: ["@langchain/core", "@langchain/openai"],
   },
-  
+
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
-  
+
   images: {
     domains: [
-      'cdn.tribesocial.io',
-      'your-project.supabase.co',
-      'app.posthog.com'
+      "cdn.tribesocial.io",
+      "your-project.supabase.co",
+      "app.posthog.com",
     ],
-    formats: ['image/webp', 'image/avif'],
+    formats: ["image/webp", "image/avif"],
   },
-  
+
   async rewrites() {
     return [
       {
-        source: '/api/webhooks/:path*',
-        destination: '/api/webhooks/:path*',
+        source: "/api/webhooks/:path*",
+        destination: "/api/webhooks/:path*",
       },
     ];
   },
-  
+
   async headers() {
     return [
       {
-        source: '/api/:path*',
+        source: "/api/:path*",
         headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: process.env.CORS_ORIGINS },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,OPTIONS,PATCH,DELETE,POST,PUT' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' },
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          {
+            key: "Access-Control-Allow-Origin",
+            value: process.env.CORS_ORIGINS,
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value:
+              "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization",
+          },
         ],
       },
     ];
   },
-  
+
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -336,15 +347,15 @@ module.exports = nextConfig;
 
 ```typescript
 // lib/supabase/config.ts
-import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/types/supabase";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error("Missing Supabase environment variables");
 }
 
 // Client-side Supabase client
@@ -362,20 +373,24 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 });
 
 // Server-side Supabase client (with service role)
-export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false,
+export const supabaseAdmin = createClient<Database>(
+  supabaseUrl,
+  supabaseServiceKey,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
   },
-});
+);
 
 // Environment-specific configuration
 export const supabaseConfig = {
   url: supabaseUrl,
   anonKey: supabaseAnonKey,
   storageUrl: process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL!,
-  realtimeEnabled: process.env.NODE_ENV === 'production',
-  debug: process.env.NODE_ENV === 'development',
+  realtimeEnabled: process.env.NODE_ENV === "production",
+  debug: process.env.NODE_ENV === "development",
 };
 ```
 
@@ -383,8 +398,8 @@ export const supabaseConfig = {
 
 ```typescript
 // lib/redis/config.ts
-import { Redis } from '@upstash/redis';
-import { createClient } from 'redis';
+import { Redis } from "@upstash/redis";
+import { createClient } from "redis";
 
 // Upstash Redis (Production)
 export const upstashRedis = process.env.UPSTASH_REDIS_REST_URL
@@ -395,35 +410,37 @@ export const upstashRedis = process.env.UPSTASH_REDIS_REST_URL
   : null;
 
 // Local Redis (Development)
-export const localRedis = process.env.NODE_ENV === 'development'
-  ? createClient({
-      url: process.env.REDIS_URL || 'redis://localhost:6379',
-      password: process.env.REDIS_PASSWORD,
-      database: parseInt(process.env.REDIS_DB || '0'),
-    })
-  : null;
+export const localRedis =
+  process.env.NODE_ENV === "development"
+    ? createClient({
+        url: process.env.REDIS_URL || "redis://localhost:6379",
+        password: process.env.REDIS_PASSWORD,
+        database: parseInt(process.env.REDIS_DB || "0"),
+      })
+    : null;
 
 // Redis client selection
 export const redis = upstashRedis || localRedis;
 
 if (!redis) {
-  console.warn('No Redis configuration found. Caching will be disabled.');
+  console.warn("No Redis configuration found. Caching will be disabled.");
 }
 
 // Redis configuration
 export const redisConfig = {
-  keyPrefix: process.env.REDIS_KEY_PREFIX || 'leaderforge:',
+  keyPrefix: process.env.REDIS_KEY_PREFIX || "leaderforge:",
   defaultTTL: 300, // 5 minutes
   longTTL: 3600, // 1 hour
   shortTTL: 60, // 1 minute
-  
+
   // Cache keys
   keys: {
     user: (id: string) => `user:${id}`,
     content: (id: string) => `content:${id}`,
     module: (id: string) => `module:${id}`,
     conversation: (id: string) => `conversation:${id}`,
-    progress: (userId: string, contentId: string) => `progress:${userId}:${contentId}`,
+    progress: (userId: string, contentId: string) =>
+      `progress:${userId}:${contentId}`,
   },
 };
 ```
@@ -432,8 +449,8 @@ export const redisConfig = {
 
 ```typescript
 // lib/ai/config.ts
-import { OpenAI } from 'openai';
-import Anthropic from '@anthropic-ai/sdk';
+import { OpenAI } from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
 // OpenAI Configuration
 export const openai = new OpenAI({
@@ -452,27 +469,27 @@ export const anthropic = new Anthropic({
 // AI Model Configuration
 export const aiConfig = {
   openai: {
-    model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
-    maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS || '4000'),
-    temperature: parseFloat(process.env.OPENAI_TEMPERATURE || '0.7'),
+    model: process.env.OPENAI_MODEL || "gpt-4-turbo-preview",
+    maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS || "4000"),
+    temperature: parseFloat(process.env.OPENAI_TEMPERATURE || "0.7"),
     stream: true,
   },
-  
+
   anthropic: {
-    model: process.env.ANTHROPIC_MODEL || 'claude-3-sonnet-20240229',
-    maxTokens: parseInt(process.env.ANTHROPIC_MAX_TOKENS || '4000'),
-    temperature: parseFloat(process.env.ANTHROPIC_TEMPERATURE || '0.7'),
+    model: process.env.ANTHROPIC_MODEL || "claude-3-sonnet-20240229",
+    maxTokens: parseInt(process.env.ANTHROPIC_MAX_TOKENS || "4000"),
+    temperature: parseFloat(process.env.ANTHROPIC_TEMPERATURE || "0.7"),
   },
-  
+
   // Default provider
-  defaultProvider: 'openai',
-  
+  defaultProvider: "openai",
+
   // Rate limiting
   rateLimit: {
     requestsPerMinute: 60,
     tokensPerMinute: 100000,
   },
-  
+
   // Retry configuration
   retry: {
     maxAttempts: 3,
@@ -502,7 +519,7 @@ check_var() {
   local var_name=$1
   local var_value=${!var_name}
   local required=${2:-true}
-  
+
   if [ -z "$var_value" ]; then
     if [ "$required" = true ]; then
       echo "❌ Missing required environment variable: $var_name"
@@ -697,9 +714,9 @@ check_http() {
   local name=$1
   local url=$2
   local expected_status=${3:-200}
-  
+
   echo "🔍 Checking $name at $url..."
-  
+
   if command -v curl >/dev/null 2>&1; then
     status=$(curl -s -o /dev/null -w "%{http_code}" "$url" || echo "000")
     if [ "$status" = "$expected_status" ]; then
@@ -869,33 +886,35 @@ BACKUP_ENABLED=true
 
 ```typescript
 // lib/env/validation.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
   // Core application
-  NODE_ENV: z.enum(['development', 'staging', 'production']),
+  NODE_ENV: z.enum(["development", "staging", "production"]),
   NEXT_PUBLIC_APP_URL: z.string().url(),
   NEXT_PUBLIC_API_URL: z.string().url(),
-  
+
   // Authentication
-  SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 characters'),
-  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
-  
+  SESSION_SECRET: z
+    .string()
+    .min(32, "SESSION_SECRET must be at least 32 characters"),
+  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
+
   // Database
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   DATABASE_URL: z.string().url(),
-  
+
   // AI Services (at least one required)
   OPENAI_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
-  
+
   // External services (optional)
   RESEND_API_KEY: z.string().optional(),
   TRIBE_API_KEY: z.string().optional(),
   REDIS_URL: z.string().optional(),
-  
+
   // Security
   ENCRYPTION_KEY: z.string().min(32),
   MAGIC_LINK_SECRET: z.string().min(32),
@@ -904,7 +923,9 @@ const envSchema = z.object({
 // Custom validation for AI providers
 const validateEnv = (env: z.infer<typeof envSchema>) => {
   if (!env.OPENAI_API_KEY && !env.ANTHROPIC_API_KEY) {
-    throw new Error('At least one AI provider (OpenAI or Anthropic) must be configured');
+    throw new Error(
+      "At least one AI provider (OpenAI or Anthropic) must be configured",
+    );
   }
   return env;
 };
@@ -919,22 +940,25 @@ export type Env = typeof env;
 
 ```typescript
 // lib/config/checker.ts
-import { env } from '@/lib/env/validation';
+import { env } from "@/lib/env/validation";
 
 export class ConfigChecker {
   static async checkDatabaseConnection(): Promise<boolean> {
     try {
-      const { supabase } = await import('@/lib/supabase/config');
-      const { data, error } = await supabase.from('users').select('count').limit(1);
+      const { supabase } = await import("@/lib/supabase/config");
+      const { data, error } = await supabase
+        .from("users")
+        .select("count")
+        .limit(1);
       return !error;
     } catch {
       return false;
     }
   }
-  
+
   static async checkRedisConnection(): Promise<boolean> {
     try {
-      const { redis } = await import('@/lib/redis/config');
+      const { redis } = await import("@/lib/redis/config");
       if (!redis) return false;
       await redis.ping();
       return true;
@@ -942,26 +966,26 @@ export class ConfigChecker {
       return false;
     }
   }
-  
+
   static async checkAIProvider(): Promise<boolean> {
     try {
       if (env.OPENAI_API_KEY) {
-        const { openai } = await import('@/lib/ai/config');
+        const { openai } = await import("@/lib/ai/config");
         await openai.models.list({ limit: 1 });
         return true;
       }
-      
+
       if (env.ANTHROPIC_API_KEY) {
         // Anthropic doesn't have a simple health check, so we assume it's working
         return true;
       }
-      
+
       return false;
     } catch {
       return false;
     }
   }
-  
+
   static async runAllChecks(): Promise<{
     database: boolean;
     redis: boolean;
@@ -974,9 +998,9 @@ export class ConfigChecker {
       ai: await this.checkAIProvider(),
       overall: false,
     };
-    
+
     results.overall = results.database && results.ai;
-    
+
     return results;
   }
 }
@@ -987,6 +1011,7 @@ export class ConfigChecker {
 ## 📋 Implementation Checklist
 
 ### Environment Setup
+
 - [ ] Copy `.env.example` to `.env.local`
 - [ ] Run environment setup script
 - [ ] Update all placeholder values
@@ -997,6 +1022,7 @@ export class ConfigChecker {
 - [ ] Verify all external service connections
 
 ### Development Environment
+
 - [ ] Install all required dependencies
 - [ ] Set up local Supabase instance
 - [ ] Set up local Redis (optional)
@@ -1004,7 +1030,8 @@ export class ConfigChecker {
 - [ ] Load development fixtures
 - [ ] Test environment with health check script
 
-### Staging Environment  
+### Staging Environment
+
 - [ ] Set up staging infrastructure
 - [ ] Configure staging environment variables
 - [ ] Deploy to staging
@@ -1012,6 +1039,7 @@ export class ConfigChecker {
 - [ ] Test staging with real data
 
 ### Production Environment
+
 - [ ] Set up production infrastructure
 - [ ] Configure production environment variables
 - [ ] Set up monitoring and alerts
@@ -1021,32 +1049,36 @@ export class ConfigChecker {
 
 ---
 
-**This addendum provides complete environment configuration for all deployment stages, ensuring consistent and secure setup across development, staging, and production environments.**
----
+## **This addendum provides complete environment configuration for all deployment stages, ensuring consistent and secure setup across development, staging, and production environments.**
 
 ## 🧩 Environment Configuration Enhancements
 
 ### 🧪 Config Schema Validation
+
 All JSON config files should be validated at runtime using a schema validation library (e.g., [Zod](https://zod.dev/) or [AJV](https://ajv.js.org/)).
 
 Include checks for:
+
 - Required fields
 - Allowed enums
 - Field types
 - Version compatibility
 
 ### 🔐 Secrets Management
+
 Use `.env` for local development, but adopt:
+
 - Google Secret Manager (GCP) or AWS SSM for cloud
 - HashiCorp Vault or Doppler for multi-cloud teams
 
 Secrets should never be committed to the repo or embedded in the frontend.
 
 ### 📚 Config Discovery
+
 Add a `config/docs/README.md` that indexes:
+
 - All available JSON config files
 - Their purpose and scope
 - Links to schema definitions
 
 This serves as developer reference and aids onboarding.
-
