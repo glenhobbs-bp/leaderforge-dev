@@ -444,6 +444,69 @@ CREATE INDEX IF NOT EXISTS idx_learning_events_created ON analytics.learning_eve
 CREATE INDEX IF NOT EXISTS idx_learning_events_content ON analytics.learning_events(content_id);
 ```
 
+### 3B. Context & Navigation Tables
+
+```sql
+-- Context configuration table
+CREATE TABLE core.context_configs (
+  context_key TEXT PRIMARY KEY,
+  display_name TEXT NOT NULL,
+  theme JSONB NOT NULL,
+  i18n JSONB,
+  logo_url TEXT,
+  settings JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Navigation options table
+CREATE TABLE core.nav_options (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  context_key TEXT REFERENCES core.context_configs(context_key) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  icon TEXT,
+  description TEXT,
+  "order" INTEGER,
+  route TEXT,
+  agent_prompt TEXT,
+  schema_hint JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_nav_options_context ON core.nav_options(context_key);
+```
+
+### 3B.1. Supabase API Access & Permissions for core.context_configs
+
+To allow Supabase API access to the `core.context_configs` table, you must:
+
+1. **Expose the `core` schema in Supabase project settings:**
+   - Go to Project Settings → API → Exposed Schemas
+   - Add `core` to the list (e.g., `public, graphql_public, core`)
+
+2. **Grant permissions:**
+```sql
+-- Allow authenticated and service_role access to the core schema and table
+GRANT USAGE ON SCHEMA core TO authenticated;
+GRANT USAGE ON SCHEMA core TO service_role;
+GRANT SELECT ON TABLE core.context_configs TO authenticated;
+GRANT SELECT ON TABLE core.context_configs TO service_role;
+```
+
+3. **Enable Row Level Security (RLS) and add a policy:**
+```sql
+ALTER TABLE core.context_configs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow all authenticated read"
+  ON core.context_configs
+  FOR SELECT
+  TO authenticated, service_role
+  USING (true);
+```
+
+> **Note:** For production, restrict the policy as needed. For development, `USING (true)` allows all reads.
+
 ---
 
 ## 🌱 Initial Data Seeding
@@ -614,6 +677,55 @@ INSERT INTO modules.content (title, description, content_type, available_context
  ARRAY['small-group-hub'], '{"smallgroup": ["facilitation", "conversation"]}', 'Bridget van Zyl', 1500, NOW()),
 ('Building Community in Small Groups', 'Creating deep connections and authentic relationships', 'video',
  ARRAY['small-group-hub'], '{"smallgroup": ["community", "relationships"]}', 'Bridget van Zyl', 1200, NOW());
+```
+
+### 4B. Context Configs and Navigation Seeding
+
+```sql
+-- seed-context-configs.sql
+
+INSERT INTO core.context_configs
+  (context_key, display_name, theme, i18n, logo_url, settings)
+VALUES
+  (
+    'brilliant',
+    'Brilliant Movement',
+    '{"primary": "#3E5E17", "secondary": "#74A78E", "accent": "#DD8D00", "bg_light": "#F8F4F1", "bg_neutral": "#E3DDC9", "text_primary": "#222222", "bg_gradient": "linear-gradient(135deg, #74A78E 0%, #DD8D00 50%, #3E5E17 100%)"}',
+    '{"language": "en"}',
+    '/logos/brilliant-logo.png',
+    '{"subtitle": "Kingdom Activation", "icon": {"src": "/logos/brilliant-icon.png", "alt": "Brilliant Icon", "size": 32}, "chat": {"heading": "AI Assistant", "message": "I''m here to help you navigate and learn."}, "content": {"heading": "Welcome to Brilliant Movement", "description": "Select a section to get started."}}'
+  ),
+  (
+    'leaderforge',
+    'LeaderForge',
+    '{"primary": "#667eea", "secondary": "#764ba2", "accent": "#4ecdc4", "bg_light": "#f8f9ff", "bg_neutral": "#e8f4f8", "text_primary": "#333333", "bg_gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"}',
+    '{"language": "en"}',
+    '/logos/leaderforge-logo.png',
+    '{"subtitle": "Turning Potential into Performance", "icon": {"src": "/logos/leaderforge-icon.png", "alt": "LeaderForge Icon", "size": 32}, "chat": {"heading": "AI Business Coach", "message": "I''m here to help you lead and grow."}, "content": {"heading": "Welcome to LeaderForge", "description": "Select a section to get started."}}'
+  );
+
+-- seed-nav-options.sql
+
+-- Brilliant Movement nav options
+INSERT INTO core.nav_options
+  (context_key, label, icon, description, "order", route)
+VALUES
+  ('brilliant', 'Your LeaderCoach', '/icons/target.svg', 'Ready to guide your journey', 1, '/leadercoach'),
+  ('brilliant', 'Brilliant+ Library', '/icons/books.svg', '600+ videos available', 2, '/library'),
+  ('brilliant', 'Ambassador Dashboard', '/icons/diamond.svg', 'Track your success', 3, '/dashboard'),
+  ('brilliant', 'Community', '/icons/users.svg', 'Connect with others', 4, '/community'),
+  ('brilliant', 'Customer Support', '/icons/support.svg', 'Here to help 24/7', 5, '/support');
+
+-- LeaderForge nav options
+INSERT INTO core.nav_options
+  (context_key, label, icon, description, "order", route)
+VALUES
+  ('leaderforge', 'My Dashboard', '/icons/target.svg', 'At a glance..', 1, '/lf_dashboard'),
+  ('leaderforge', 'Content Library', '/icons/books.svg', 'Ready to help', 2, '/library'),
+  ('leaderforge', 'Progress Tracker', '/icons/chart.svg', 'Monitoring goals', 3, '/progress'),
+  ('leaderforge', 'Team Insights', '/icons/bar-chart.svg', 'Waiting for team data', 4, '/team-insights'),
+  ('leaderforge', 'Team Leader', '/icons/handshake.svg', 'Next check-in: Tomorrow', 5, '/team-leader'),
+  ('leaderforge', 'Customer Support', '/icons/support.svg', 'Here to help 24/7', 6, '/support');
 ```
 
 ---

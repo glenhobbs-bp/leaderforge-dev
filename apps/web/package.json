@@ -9,6 +9,7 @@
     "@copilotkit/react-textarea": "latest",
     "@copilotkit/react-ui": "^1.8.13",
     "@copilotkit/runtime": "^1.8.13",
+    "@supabase/supabase-js": "^2.49.8",
     "class-validator": "^0.14.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

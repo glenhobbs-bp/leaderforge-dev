@@ -4,10 +4,12 @@
 import { useState } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
-import { ContentSchema } from "../../packages/agent-core/types/contentSchema";
+// import { ContentSchema } from "../../packages/agent-core/types/contentSchema";
+// Temporary fallback type if needed
+// type ContentSchema = any;
 import { ContentSchemaRenderer } from "./ai/ContentSchemaRenderer";
-import contextConfigBrilliant from "../config/contextConfig.json";
-import contextConfigLeaderforge from "../config/contextConfig-leaderforge.json";
+import { useContextConfig } from "../hooks/useContextConfig";
+import { useNavOptions } from "../hooks/useNavOptions";
 
 interface NavItem {
   label: string;
@@ -61,27 +63,24 @@ interface ContextConfig {
 
 const CONTEXTS = [
   {
-    id: contextConfigBrilliant.context_id,
-    title: contextConfigBrilliant.context_title,
-    subtitle: contextConfigBrilliant.context_subtitle,
+    id: "brilliant",
+    title: "Brilliant Movement",
+    subtitle: "Kingdom Activation",
     icon: "🌟",
   },
   {
-    id: contextConfigLeaderforge.context_id,
-    title: contextConfigLeaderforge.context_title,
-    subtitle: contextConfigLeaderforge.context_subtitle,
+    id: "leaderforge",
+    title: "LeaderForge",
+    subtitle: "Turning Potential into Performance",
     icon: "🏢",
   },
 ];
-const CONTEXT_MAP = {
-  [contextConfigBrilliant.context_id]: contextConfigBrilliant,
-  [contextConfigLeaderforge.context_id]: contextConfigLeaderforge,
-};
 
 export default function DynamicContextPage() {
   const [contextId, setContextId] = useState(CONTEXTS[0].id);
-  const config = CONTEXT_MAP[contextId];
-  const [schema, setSchema] = useState<ContentSchema | null>(null);
+  const { config, loading, error } = useContextConfig(contextId);
+  const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId);
+  const [schema, setSchema] = useState<any | null>(null);
 
   const handleNavSelect = async (navOptionId: string) => {
     const res = await fetch("/api/agent/content", {
@@ -93,11 +92,20 @@ export default function DynamicContextPage() {
     setSchema(data);
   };
 
+  const handleContentSchemaUpdate = (newSchema: any) => {
+    setSchema(newSchema);
+  };
+
+  if (loading) return <div>Loading context config...</div>;
+  if (error || !config || !config.theme) return <div style={{ background: '#fee', color: '#900', padding: 16 }}>Error loading context config</div>;
+  if (navLoading) return <div>Loading navigation...</div>;
+  if (navError || !navOptions) return <div style={{ background: '#fee', color: '#900', padding: 16 }}>Error loading navigation</div>;
+
   return (
     <ThreePanelLayout
       nav={
         <NavPanel
-          navOptions={config.nav}
+          navOptions={navOptions}
           contextOptions={CONTEXTS}
           contextValue={contextId}
           onContextChange={setContextId}
