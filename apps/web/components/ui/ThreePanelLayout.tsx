@@ -1,14 +1,14 @@
 // File: components/ui/ThreePanelLayout.tsx
 "use client";
 
-import React, { ReactNode, useState } from "react";
-import { ThemeProvider } from "@/components/ui/ThemeContext";
+import React, { ReactElement, useState } from "react";
+import { ThemeProvider } from "./ThemeContext";
 import AIExperience from "../ai/AIExperience";
 
 interface ThreePanelLayoutProps {
-  nav: ReactNode;
-  content: ReactNode;
-  chat?: ReactNode;
+  nav: ReactElement;
+  content: React.ReactNode;
+  chat?: React.ReactNode;
   contextConfig: any;
 }
 
@@ -42,12 +42,10 @@ export default function ThreePanelLayout({
             className="flex-shrink-0 transition-all duration-300 ease-in-out"
             style={{ width: isCollapsed ? 80 : 280 }}
           >
-            {React.isValidElement(nav)
-              ? React.cloneElement(nav, {
-                  isCollapsed,
-                  onToggleCollapse: () => setIsCollapsed((prev) => !prev),
-                })
-              : nav}
+            {React.cloneElement(nav, {
+              isCollapsed,
+              onToggleCollapse: () => setIsCollapsed((prev) => !prev),
+            })}
           </div>
           {/* ContentPanel: always fills available space */}
           <main className="flex-grow min-w-0 overflow-y-auto">{content}</main>

@@ -7,7 +7,8 @@ import NavPanel from "./ui/NavPanel";
 // import { ContentSchema } from "../../packages/agent-core/types/contentSchema";
 // Temporary fallback type if needed
 // type ContentSchema = any;
-import { ContentSchemaRenderer } from "./ai/ContentSchemaRenderer";
+import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
+import type { ComponentSchema } from "../../packages/agent-core/types/ComponentSchema";
 import { useContextConfig } from "../hooks/useContextConfig";
 import { useNavOptions } from "../hooks/useNavOptions";
 
@@ -80,7 +81,7 @@ export default function DynamicContextPage() {
   const [contextId, setContextId] = useState(CONTEXTS[0].id);
   const { config, loading, error } = useContextConfig(contextId);
   const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId);
-  const [schema, setSchema] = useState<any | null>(null);
+  const [schema, setSchema] = useState<ComponentSchema | null>(null);
 
   const handleNavSelect = async (navOptionId: string) => {
     const res = await fetch("/api/agent/content", {
@@ -112,7 +113,7 @@ export default function DynamicContextPage() {
           onNavSelect={handleNavSelect}
         />
       }
-      content={schema ? <ContentSchemaRenderer schema={schema} /> : null}
+      content={schema ? <ComponentSchemaRenderer schema={schema} /> : null}
       contextConfig={config}
     />
   );

@@ -1,76 +1,56 @@
 import { NextRequest } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { TribeSocialContentTool } from "../../../../../../packages/agent-core/tools/TribeSocialContentTool";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: NextRequest) {
   const { navOptionId } = await req.json();
+  console.log("[API] Received navOptionId:", navOptionId);
 
-  if (navOptionId === "library") {
-    return Response.json({
-      type: "Grid",
-      props: {
-        columns: 3,
-        items: [
-          {
-            type: "Card",
-            props: {
-              image: "/thumb1.png",
-              title: "Video One",
-              subtitle: "Module 1",
-              description: "Creating a new paradigm of leadership with a team of leaders not just a team with a leader.",
-              longDescription: "Creating a new paradigm of leadership with a team of leaders not just a team with a leader.",
-              videoWatched: false,
-              worksheetSubmitted: false,
-              progress: 70,
-              actions: [
-                { label: "Rewatch", action: "rewatch" },
-                { label: "Complete", action: "complete" }
-              ]
-            }
-          },
-          {
-            type: "Card",
-            props: {
-              image: "/thumb2.png",
-              title: "Video Two",
-              subtitle: "Module 1",
-              description: "Use this power tool to convert every challenge into a powerful possibility. This technique involves viewing a problem from different perspectives to generate a wider range of potential solutions. When leaders come across challenges, instead of approaching them with a fixed mindset, they can encourage their teams to look at them from various angles. This can lead to...",
-              longDescription: "Use this power tool to convert every challenge into a powerful possibility. This technique involves viewing a problem from different perspectives to generate a wider range of potential solutions. When leaders come across challenges, instead of approaching them with a fixed mindset, they can encourage their teams to look at them from various angles. This can lead to breakthrough solutions and foster a culture of innovation.",
-              videoWatched: true,
-              worksheetSubmitted: false,
-              progress: 20,
-              actions: [
-                { label: "Watch", action: "watch" },
-                { label: "Complete", action: "complete" }
-              ]
-            }
-          },
-          {
-            type: "Card",
-            props: {
-              image: "/thumb1.png",
-              title: "Video Three",
-              subtitle: "Module 1",
-              description: "This video presents an effective approach to leading team members with diverse personalities and responses to feedback. Learn a practical framework for identifying and managing three distinct types of people in your team, based on how they handle constructive criticism. In this video, you'll learn: A key factor in effective leadership and management How to...",
-              longDescription: "This video presents an effective approach to leading team members with diverse personalities and responses to feedback. Learn a practical framework for identifying and managing three distinct types of people in your team, based on how they handle constructive criticism. In this video, you'll learn: A key factor in effective leadership and management How to adapt your approach for each type Practical tips for building a high-trust, high-performance team.",
-              videoWatched: false,
-              worksheetSubmitted: true,
-              progress: 0,
-              actions: [
-                { label: "Watch", action: "watch" },
-                { label: "Complete", action: "complete" }
-              ]
-            }
-          }
-        ]
-      }
-    });
+  // Lookup nav option and agent (use correct schema API)
+  const { data: navOption, error: navError } = await supabase
+    .schema("core")
+    .from("nav_options")
+    .select("agent_id")
+    .eq("id", navOptionId)
+    .single();
+  console.log("[API] navOption lookup result:", navOption, navError);
+
+  if (navError || !navOption?.agent_id) {
+    console.error("[API] No agent configured for this nav option.", navError);
+    return new Response(
+      JSON.stringify({ error: "No agent configured for this nav option." }),
+      { status: 501 }
+    );
   }
 
-  // Default: return a placeholder panel
-  return Response.json({
-    type: "Panel",
-    props: {
-      heading: "Welcome",
-      description: "Select a section to get started.",
-    },
-  });
+  // Lookup agent config (use correct schema API)
+  const { data: agent, error: agentError } = await supabase
+    .schema("core")
+    .from("agents")
+    .select("*")
+    .eq("id", navOption.agent_id)
+    .single();
+  console.log("[API] agent lookup result:", agent, agentError);
+
+  if (agentError || !agent) {
+    console.error("[API] Agent not found or misconfigured.", agentError);
+    return new Response(
+      JSON.stringify({ error: "Agent not found or misconfigured." }),
+      { status: 501 }
+    );
+  }
+
+  // --- Agent invocation: use TribeSocialContentTool to return a ComponentSchema ---
+  // In production, you would use agent config to select the right tool(s)
+  // For now, always use the mock tool and platformId = 1
+  const tool = new TribeSocialContentTool();
+  const schema = await tool.listContentAsComponentSchema(1);
+  console.log("[API] Returning ComponentSchema:", schema);
+
+  return new Response(JSON.stringify(schema), { status: 200 });
 }

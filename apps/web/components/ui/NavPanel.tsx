@@ -6,8 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTheme } from "./ThemeContext";
 import ContextSelector from "./ContextSelector";
-import { ContentSchemaRenderer } from "../ai/ContentSchemaRenderer";
-import { ContentSchema } from "../../../../packages/agent-core/types/contentSchema";
+import { ComponentSchemaRenderer } from "../ai/ComponentSchemaRenderer";
 
 interface NavItem {
   label: string;
@@ -138,17 +137,17 @@ export default function NavPanel({
           )}
           {/* Navigation Items */}
           <nav className="flex flex-col gap-4 mt-2">
-            {navOptions.map((item) => {
-              const isActive = selectedNav === item.href.slice(1);
+            {navOptions.map((item: any) => {
+              const isActive = selectedNav === item.id;
               const iconSrc = item.icon || "/icons/default.svg";
               const tooltip = isCollapsed
                 ? item.label + (item.description ? ` — ${item.description}` : "")
                 : undefined;
               return (
-                <div key={item.href} {...(isCollapsed ? { title: tooltip } : {})}>
+                <div key={item.id} {...(isCollapsed ? { title: tooltip } : {})}>
                   <button
                     type="button"
-                    onClick={() => handleNavClick(item.href.slice(1))}
+                    onClick={() => handleNavClick(item.id)}
                     className={[
                       "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-150 border-l-4 w-full min-w-0",
                       isActive ? "shadow-md font-semibold" : "font-medium",

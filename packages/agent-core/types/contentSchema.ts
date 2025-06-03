@@ -1,3 +1,5 @@
+// All schema types are props-wrapped. Do not use flat schemas.
+
 export type CardAction = {
   label: string;
   action: string;
