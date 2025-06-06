@@ -57,6 +57,11 @@ export interface CardSchema {
   type: "Card";
   props: {
     image?: string;
+    featuredImage?: string;
+    coverImage?: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    publishedDate?: string;
     title: string;
     subtitle?: string;
     description?: string;

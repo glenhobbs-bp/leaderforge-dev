@@ -1,5 +1,8 @@
+"use client";
+
 import { ComponentSchema, CardAction } from "../../../../packages/agent-core/types/ComponentSchema";
 import Image from "next/image";
+import { useState } from "react";
 
 export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema }) {
   // Debug: log the received schema
@@ -70,6 +73,10 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     case "Card": {
       const {
         image,
+        featuredImage,
+        coverImage,
+        imageUrl,
+        videoUrl,
         title,
         subtitle,
         description,
@@ -77,18 +84,37 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
         worksheetSubmitted,
         progress,
         actions,
+        publishedDate,
       } = schema.props;
+      // Pick best image
+      const cardImage = image || featuredImage || coverImage || imageUrl || "/icons/placeholder.png";
+      const [showVideo, setShowVideo] = useState(false);
+      // Debug logs
+      console.log("[Card Render] title:", title, "cardImage:", cardImage, "videoUrl:", videoUrl);
       return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
-          <div className="relative w-full aspect-video rounded-t-lg overflow-hidden px-0 lg:px-4">
+          <div className="relative w-full aspect-video rounded-t-lg overflow-hidden px-0 lg:px-4 cursor-pointer group" onClick={() => {
+            if (videoUrl) {
+              console.log("[Card Render] Opening video modal for:", title, videoUrl);
+              setShowVideo(true);
+            }
+          }}>
             <Image
-              src={image || "/icons/placeholder.png"}
+              src={cardImage}
               alt={title}
               fill
               className="object-cover rounded-t-lg"
               sizes="(max-width: 768px) 100vw, 400px"
               priority={false}
             />
+            {/* Play button overlay if videoUrl */}
+            {videoUrl && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <button className="bg-black/60 rounded-full p-3 hover:bg-black/80 transition">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#fff" fillOpacity="0.7"/><polygon points="13,10 24,16 13,22" fill="#333"/></svg>
+                </button>
+              </div>
+            )}
             {/* Pill indicators */}
             <div className="absolute top-2 right-4 flex flex-row flex-wrap gap-1 z-10 items-end sm:items-center">
               {videoWatched === false && (
@@ -96,6 +122,9 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
               )}
               {worksheetSubmitted === false && (
                 <span className="bg-yellow-50 text-yellow-700 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-yellow-100 shadow-sm whitespace-nowrap line-clamp-1">Worksheet Not Submitted</span>
+              )}
+              {publishedDate && (
+                <span className="bg-blue-50 text-blue-700 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-blue-100 shadow-sm whitespace-nowrap line-clamp-1">{new Date(publishedDate).toLocaleDateString()}</span>
               )}
             </div>
           </div>
@@ -128,6 +157,21 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
               </div>
             )}
           </div>
+          {/* Video Modal */}
+          {showVideo && videoUrl && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowVideo(false)}>
+              <div className="bg-black rounded-lg overflow-hidden relative w-full max-w-2xl aspect-video" onClick={e => e.stopPropagation()}>
+                {videoUrl.endsWith('.m3u8') ? (
+                  <video controls autoPlay className="w-full h-full" src={videoUrl} />
+                ) : (
+                  <video controls autoPlay className="w-full h-full" src={videoUrl} />
+                )}
+                <button className="absolute top-2 right-2 bg-white/80 rounded-full p-1" onClick={() => setShowVideo(false)}>
+                  <svg width="20" height="20" viewBox="0 0 20 20"><line x1="4" y1="4" x2="16" y2="16" stroke="#333" strokeWidth="2"/><line x1="16" y1="4" x2="4" y2="16" stroke="#333" strokeWidth="2"/></svg>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }

@@ -20,6 +20,11 @@ const nextConfig = {
       // },
     ];
   },
+  images: {
+    domains: [
+      "cdn.tribesocial.io"
+    ]
+  },
 };
 
 module.exports = nextConfig;
