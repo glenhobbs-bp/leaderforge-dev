@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
-import NavPanel from "./ui/NavPanel";
+import NavPanel, { sampleNavSchema } from "./ui/NavPanel";
 // import { ContentSchema } from "../../packages/agent-core/types/contentSchema";
 // Temporary fallback type if needed
 // type ContentSchema = any;
@@ -97,11 +97,11 @@ export default function DynamicContextPage() {
       const intent = undefined; // or { type: 'viewLibrary' } if you want to be explicit
       const payload = { userId, contextKey, intent, navOptionId };
       console.log('[handleNavSelect] Sending payload:', payload);
-      const res = await fetch("/api/agent/content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    const res = await fetch("/api/agent/content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
+    });
       console.log('[handleNavSelect] Response status:', res.status);
       if (!res.ok) {
         setSchemaError("Server error. Please try again later.");
@@ -116,7 +116,7 @@ export default function DynamicContextPage() {
         console.error('[handleNavSelect] JSON parse error:', err);
         return;
       }
-      setSchema(data);
+    setSchema(data);
       console.log('[handleNavSelect] Set schema:', data);
     } catch (e: any) {
       setSchemaError(e.message || "Unknown error");
@@ -137,7 +137,7 @@ export default function DynamicContextPage() {
     <ThreePanelLayout
       nav={
         <NavPanel
-          navOptions={navOptions}
+          navSchema={sampleNavSchema}
           contextOptions={CONTEXTS}
           contextValue={contextId}
           onContextChange={setContextId}
@@ -152,7 +152,7 @@ export default function DynamicContextPage() {
             <div className="text-gray-700 mb-3">{schemaError}</div>
             <button
               className="px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
-              onClick={() => handleNavSelect(navOptions[0]?.id)}
+              onClick={() => handleNavSelect(sampleNavSchema.props.sections[0]?.items[0]?.id)}
             >
               Retry
             </button>

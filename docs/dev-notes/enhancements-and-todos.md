@@ -55,6 +55,12 @@
 - [ ] Add end-to-end tests for all major flows (content, progress, sync, nav).
 - [ ] Add logging and observability for all agent runs and tool calls.
 
+### 8. Avatar Handling in NavPanel
+- [ ] Refactor NavPanel to fetch user avatar via signed URL from API (private Supabase Storage).
+  - Use fallback to default avatar if fetch fails or avatar is missing.
+  - Remove hardcoded userId and wire to real user management/auth when available.
+  - Ensure both header and footer avatars use the signed URL.
+
 ---
 
 ## Enhancement Backlog

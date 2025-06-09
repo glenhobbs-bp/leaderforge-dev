@@ -151,13 +151,13 @@ export class TribeSocialContentTool {
     return {
       type: 'Card',
       props: {
-        title: data.title,
-        subtitle: data.type,
-        image: data.featuredImage ? `${this.apiUrl}/${data.featuredImage}` : undefined,
-        description: data.description,
-        longDescription: data.description,
+      title: data.title,
+      subtitle: data.type,
+      image: data.featuredImage ? `${this.apiUrl}/${data.featuredImage}` : undefined,
+      description: data.description,
+      longDescription: data.description,
         videoUrl: data.video || data.contentURI || undefined,
-        publishedDate: data.publishedDate,
+      publishedDate: data.publishedDate,
       }
     };
   }
