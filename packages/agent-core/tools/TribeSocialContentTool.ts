@@ -7,6 +7,7 @@
 // Place these in your .env file for local dev or in your deployment environment.
 
 import type { ComponentSchema, CardSchema } from "../types/ComponentSchema";
+import { supabase } from '../../../apps/web/app/lib/supabaseClient';
 
 export interface TribeSocialContent {
   id: number;
@@ -43,11 +44,22 @@ export class TribeSocialContentTool {
     }
     // Use absolute URL in Node.js, relative in browser
     const isServer = typeof window === 'undefined';
+    // Point to centralized API proxy in apps/api
     const baseUrl = isServer
       ? process.env.INTERNAL_API_BASE_URL || 'http://localhost:3001'
       : '';
     const url = `${baseUrl}/api/tribe/content/${collectionId}`;
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        // No need to send sessionToken for server-to-server
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Proxy API error: ${res.status} ${res.statusText}`);
+    }
+
     const text = await res.text();
     let data;
     try {
@@ -63,14 +75,14 @@ export class TribeSocialContentTool {
     const items = Array.isArray(data.Contents) ? data.Contents : [];
     const cards: CardSchema[] = items.map((item: any) => {
       // Image selection logic (legacy compatible)
-      let image = undefined;
+      let image: string | undefined = undefined;
       if (item.collectionBGImage) {
         image = `https://cdn.tribesocial.io/${item.collectionBGImage}`;
       } else if (item.featuredImage) {
         image = item.featuredImage.startsWith('http') ? item.featuredImage : `https://cdn.tribesocial.io/${item.featuredImage}`;
       } else if (item.coverImage) {
         image = item.coverImage.startsWith('http') ? item.coverImage : `https://cdn.tribesocial.io/${item.coverImage}`;
-      } else if (item.imageUrl) {
+      } else if (item.imageUrl && typeof item.imageUrl === 'string') {
         image = item.imageUrl;
       }
       // Video URL logic
@@ -105,6 +117,7 @@ export class TribeSocialContentTool {
     return {
       type: 'Grid',
       props: {
+        columns: 3,
         items: cards
       }
     };
@@ -137,14 +150,38 @@ export class TribeSocialContentTool {
     }
     return {
       type: 'Card',
-      id: String(data.id),
-      title: data.title,
-      subtitle: data.type,
-      image: data.featuredImage ? `${this.apiUrl}/${data.featuredImage}` : undefined,
-      description: data.description,
-      longDescription: data.description,
-      url: data.video || data.contentURI || undefined,
-      publishedDate: data.publishedDate,
+      props: {
+        title: data.title,
+        subtitle: data.type,
+        image: data.featuredImage ? `${this.apiUrl}/${data.featuredImage}` : undefined,
+        description: data.description,
+        longDescription: data.description,
+        videoUrl: data.video || data.contentURI || undefined,
+        publishedDate: data.publishedDate,
+      }
     };
+  }
+
+  /**
+   * Fetches all content for a given contextKey from TribeSocial (via proxy).
+   * PATCH: For 'leaderforge', fetch directly from TribeSocial using collectionId 99735660.
+   * Ignore Supabase for now.
+   */
+  async getContentForContext(contextKey: string): Promise<any[]> {
+    // Map contextKey to collectionId
+    let collectionId: number | undefined = undefined;
+    if (contextKey === 'leaderforge') {
+      collectionId = 99735660;
+    } else {
+      // TODO: Map other contextKeys to collectionIds as needed
+      throw new Error(`No collectionId mapping for contextKey: ${contextKey}`);
+    }
+    // Fetch from proxy/TribeSocial
+    const data = await this.listContentAsComponentSchema(collectionId);
+    // Return items array (cards)
+    if (data && data.type === 'Grid' && data.props && Array.isArray(data.props.items)) {
+      return data.props.items;
+    }
+    return [];
   }
 }

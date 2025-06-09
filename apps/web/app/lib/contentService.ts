@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient';
 
 export async function getContentForContext(contextKey: string) {
   const { data, error } = await supabase
+    .schema('modules')
     .from('content')
     .select('*')
     .contains('available_contexts', [contextKey])

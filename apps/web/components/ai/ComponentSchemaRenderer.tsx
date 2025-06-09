@@ -6,6 +6,7 @@ import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import Hls from "hls.js";
 import React from "react";
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
 export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema }) {
   // Debug: log the received schema
@@ -23,6 +24,10 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     onCompleteAction?: CardAction;
     description?: string;
   }>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentSchema, setCurrentSchema] = useState(schema);
 
   // Helper to open modal from Card actions
   const handleAction = (action: CardAction) => {
@@ -43,6 +48,55 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
       alert(`Action: ${action.action}`);
     }
   };
+
+  // Helper to get userId/contextKey (replace with your actual auth/context logic)
+  function getUserId() {
+    return (typeof window !== 'undefined' && localStorage.getItem('userId')) || '';
+  }
+  function getContextKey() {
+    return (typeof window !== 'undefined' && localStorage.getItem('contextKey')) || '';
+  }
+
+  // Progress update handler
+  async function handleProgressUpdate(contentId: string, progress: any) {
+    setLoading(true);
+    setError(null);
+    try {
+      const userId = getUserId();
+      const contextKey = getContextKey();
+      const resp = await fetch('/api/agent/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          contextKey,
+          intent: {
+            type: 'updateProgress',
+            contentId,
+            progress,
+          },
+        }),
+      });
+      if (!resp.ok) {
+        setError('Server error. Please try again later.');
+        setLoading(false);
+        return;
+      }
+      let newSchema;
+      try {
+        newSchema = await resp.json();
+      } catch {
+        setError('Unexpected server response. Please try again later.');
+        setLoading(false);
+        return;
+      }
+      setCurrentSchema(newSchema);
+    } catch (e: any) {
+      setError(e.message || 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function VideoPlayerModal({
     open,
@@ -70,7 +124,6 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     description?: string;
   }) {
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [hlsUsed, setHlsUsed] = useState(false);
     const [canPlayHlsNatively, setCanPlayHlsNatively] = useState<string | null>(null);
     const videoElRef = useRef<HTMLVideoElement | null>(null);
@@ -244,29 +297,58 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
             {onCompleteAction && (
               <button
                 className="mt-2 px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
-                onClick={() => {
-                  if (onCompleteAction.action) {
-                    alert(`Action: ${onCompleteAction.action}`);
+                onClick={async () => {
+                  if (onCompleteAction.action && onCompleteAction.contentId) {
+                    await handleProgressUpdate(onCompleteAction.contentId, onCompleteAction.progress || { progress_percentage: 100, completed_at: new Date().toISOString() });
                   }
                 }}
+                disabled={loading}
               >
-                {onCompleteAction.label}
+                {loading ? 'Updating...' : onCompleteAction.label}
               </button>
             )}
+            {error && <div className="text-red-500 text-xs mt-2">{error}</div>}
           </div>
         </DialogContent>
       </Dialog>
     );
   }
 
-  switch (schema.type) {
+  // User-friendly error UI
+  function ErrorMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[200px] text-center p-6">
+        <ExclamationTriangleIcon className="w-10 h-10 text-red-500 mb-2" />
+        <div className="text-lg font-semibold text-red-600 mb-1">Something went wrong</div>
+        <div className="text-gray-700 mb-3">{message}</div>
+        {onRetry && (
+          <button
+            className="px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
+            onClick={onRetry}
+          >
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // If error at top level, show error UI
+  if (error) {
+    return <ErrorMessage message={error} onRetry={() => window.location.reload()} />;
+  }
+  if (!currentSchema || typeof currentSchema !== 'object' || !currentSchema.type) {
+    return <ErrorMessage message="Unable to load content. Please try again later." onRetry={() => window.location.reload()} />;
+  }
+
+  switch (currentSchema.type) {
     case "Panel":
       return (
         <div>
-          <h2>{schema.props.heading}</h2>
-          {schema.props.description && <p>{schema.props.description}</p>}
-          {schema.props.widgets &&
-            schema.props.widgets.map((w, i) => (
+          <h2>{currentSchema.props.heading}</h2>
+          {currentSchema.props.description && <p>{currentSchema.props.description}</p>}
+          {currentSchema.props.widgets &&
+            currentSchema.props.widgets.map((w, i) => (
               <ComponentSchemaRenderer key={i} schema={w} />
             ))}
         </div>
@@ -274,17 +356,17 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     case "StatCard":
       return (
         <div className="rounded-lg shadow bg-white p-4 mb-4">
-          <h3 className="font-semibold text-lg mb-1">{schema.props.title}</h3>
-          <div className="text-2xl font-bold">{schema.props.value}</div>
-          {schema.props.description && <p className="text-gray-500 text-sm mt-1">{schema.props.description}</p>}
+          <h3 className="font-semibold text-lg mb-1">{currentSchema.props.title}</h3>
+          <div className="text-2xl font-bold">{currentSchema.props.value}</div>
+          {currentSchema.props.description && <p className="text-gray-500 text-sm mt-1">{currentSchema.props.description}</p>}
         </div>
       );
     case "Leaderboard":
       return (
         <div className="rounded-lg shadow bg-white p-4 mb-4">
-          <h3 className="font-semibold text-lg mb-2">{schema.props.title}</h3>
+          <h3 className="font-semibold text-lg mb-2">{currentSchema.props.title}</h3>
           <ol className="list-decimal pl-5">
-            {schema.props.items && schema.props.items.map((item, i) => (
+            {currentSchema.props.items && currentSchema.props.items.map((item, i) => (
               <li key={i} className="flex justify-between py-1">
                 <span>{item.name}</span>
                 <span className="font-mono">{item.score}</span>
@@ -296,9 +378,9 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     case "VideoList":
       return (
         <div className="mb-8">
-          <h3 className="font-semibold text-lg mb-2">{schema.props.title}</h3>
+          <h3 className="font-semibold text-lg mb-2">{currentSchema.props.title}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {schema.props.videos.map((video, i) => (
+            {currentSchema.props.videos.map((video, i) => (
               <div key={video.props.title + i} className="rounded-lg shadow bg-white p-4 flex flex-col items-center">
                 <img
                   src={video.props.image}
@@ -316,7 +398,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
       return (
         <div className="max-w-screen-2xl mx-auto p-6">
           <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-            {schema.props.items.map((item, i) => (
+            {currentSchema.props.items.map((item, i) => (
               <ComponentSchemaRenderer key={i} schema={item} />
             ))}
           </div>
@@ -338,7 +420,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
         progress,
         actions,
         pills,
-      } = schema.props;
+      } = currentSchema.props;
       const cardImage = image || featuredImage || coverImage || imageUrl || "/icons/placeholder.png";
       return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
@@ -360,63 +442,88 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
                 onClick={() =>
                   handleAction(
                     actions?.find(a => a.action === 'openVideoModal') ||
-                    { action: 'openVideoModal', label: 'Watch', videoUrl, title, videoWatched, worksheetSubmitted, pills, progress }
+                    { action: 'openVideoModal', label: 'Watch', videoUrl, title }
                   )
                 }
                 style={{ background: 'rgba(0,0,0,0.2)' }}
                 aria-label="Play video"
               >
                 <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                  <circle cx="24" cy="24" r="24" fill="#fff" fillOpacity="0.7"/>
-                  <polygon points="20,16 36,24 20,32" fill="#333"/>
+                  <circle cx="24" cy="24" r="24" fill="#fff" fillOpacity="0.7" />
+                  <polygon points="20,16 34,24 20,32" fill="#222" />
                 </svg>
               </button>
             )}
-            {/* Pill indicators */}
-            <div className="absolute top-2 right-4 flex flex-row flex-wrap gap-1 z-10 items-end sm:items-center">
-              {videoWatched === false && (
-                <span className="bg-gray-100 text-gray-600 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-gray-200 shadow-sm whitespace-nowrap line-clamp-1">Video Not Watched</span>
-              )}
-              {worksheetSubmitted === false && (
-                <span className="bg-yellow-50 text-yellow-700 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-yellow-100 shadow-sm whitespace-nowrap line-clamp-1">Worksheet Not Submitted</span>
-              )}
-              {publishedDate && (
-                <span className="bg-blue-50 text-blue-700 text-[9px] px-1.5 py-0.5 rounded-full font-normal border border-blue-100 shadow-sm whitespace-nowrap line-clamp-1">{new Date(publishedDate).toLocaleDateString()}</span>
-              )}
-              {pills && pills.length > 0 && pills.map((pill, i) => (
-                <span key={i} className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: pill.color || '#e0e7ef', color: '#222' }}>{pill.label}</span>
-              ))}
-            </div>
           </div>
-          <div className="flex-1 flex flex-col p-3 sm:p-4">
-            <h4 className="font-medium text-[15px] mb-0.5 text-gray-900">{title}</h4>
-            {subtitle && <div className="text-xs text-gray-400 mb-0.5">{subtitle}</div>}
-            {description && (
-              <p className="text-xs text-gray-500 mb-1 leading-snug line-clamp-3">{description}</p>
-            )}
+          <div className="flex-1 flex flex-col p-4 gap-2">
+            <div className="flex flex-row items-center gap-2 mb-1">
+              <span className="font-semibold text-base line-clamp-1">{title}</span>
+              {pills && pills.length > 0 && (
+                <div className="flex flex-row gap-1 ml-auto">
+                  {pills.map((pill, i) => (
+                    <span key={i} className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700" style={pill.color ? { background: pill.color } : {}}>
+                      {pill.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="text-sm text-gray-600 line-clamp-2 mb-2">{description}</div>
+            {/* Status indicators */}
+            <div className="flex flex-row items-center gap-4 mb-2">
+              <div className="flex items-center gap-1 text-xs">
+                <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+                  <circle cx="8" cy="8" r="8" fill={videoWatched ? '#22c55e' : '#d1d5db'} />
+                  {videoWatched ? (
+                    <path d="M5 8.5l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  ) : (
+                    <path d="M4 8l3 3 5-5" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  )}
+                </svg>
+                <span className={videoWatched ? 'text-green-600' : 'text-gray-400'}>
+                  Video {videoWatched ? 'Watched' : 'Not Watched'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 text-xs">
+                <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+                  <circle cx="8" cy="8" r="8" fill={worksheetSubmitted ? '#22c55e' : '#d1d5db'} />
+                  {worksheetSubmitted ? (
+                    <path d="M5 8.5l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  ) : (
+                    <path d="M4 8l3 3 5-5" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                  )}
+                </svg>
+                <span className={worksheetSubmitted ? 'text-green-600' : 'text-gray-400'}>
+                  Worksheet {worksheetSubmitted ? 'Submitted' : 'Not Submitted'}
+                </span>
+              </div>
+            </div>
             {/* Progress bar */}
-            {typeof progress === "number" && (
-              <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2 mt-auto">
+            {typeof progress === 'number' && (
+              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
                 <div
-                  className="bg-[var(--primary)] h-1.5 rounded-full transition-all"
-                  style={{ width: `${progress}%` }}
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%`, background: progress === 100 ? '#22c55e' : '#6366f1' }}
                 />
               </div>
             )}
-            {/* Actions */}
-            {actions && actions.length > 0 && (
-              <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-                {actions.map((action: CardAction, i: number) => (
-                  <button
-                    key={i}
-                    className="px-2 py-1 rounded bg-[var(--primary)] text-white text-[11px] hover:bg-[var(--accent)] transition font-normal w-full sm:w-auto"
-                    onClick={() => handleAction(action)}
-                  >
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Action buttons */}
+            <div className="flex flex-row gap-2 mt-auto">
+              {actions && actions.map((action, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleAction(action)}
+                  className={
+                    `px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-150 ` +
+                    (action.label.toLowerCase().includes('watch')
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'bg-gray-900 text-white hover:bg-gray-700')
+                  }
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
           </div>
           {/* VideoPlayer modal trigger */}
           {videoModal && (
@@ -439,7 +546,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     }
     case "VideoPlayer": {
       // This case is now only for direct VideoPlayer schema, not modal trigger
-      const { videoUrl, title, poster, progress, pills, onCompleteAction, videoWatched, worksheetSubmitted } = schema.props;
+      const { videoUrl, title, poster, progress, pills, onCompleteAction, videoWatched, worksheetSubmitted } = currentSchema.props;
       return (
         <div className="w-full max-w-2xl mx-auto">
           <VideoPlayerModal
@@ -453,12 +560,12 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
             videoWatched={videoWatched}
             worksheetSubmitted={worksheetSubmitted}
             onCompleteAction={onCompleteAction}
-            description={schema.props.description}
+            description={currentSchema.props.description}
           />
         </div>
       );
     }
     default:
-      return <div>Unknown schema type: {(schema as any).type}</div>;
+      return <div>Unknown schema type: {(currentSchema as any).type}</div>;
   }
 }

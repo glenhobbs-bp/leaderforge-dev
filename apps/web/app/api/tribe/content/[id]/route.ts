@@ -1,3 +1,5 @@
+/*
+// Old proxy route for TribeSocial content - DISABLED (migrated to apps/api)
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -39,3 +41,4 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
     return NextResponse.json({ error: 'Proxy fetch error', details: String(err) }, { status: 500 });
   }
 }
+*/

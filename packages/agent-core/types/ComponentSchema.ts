@@ -9,7 +9,8 @@ export type ComponentSchema =
   | LeaderboardSchema
   | VideoListSchema
   | GridSchema
-  | CardSchema;
+  | CardSchema
+  | VideoPlayerSchema;
 
 export interface PanelSchema {
   type: "Panel";
@@ -71,10 +72,27 @@ export interface CardSchema {
     progress?: number; // 0-100
     actions?: CardAction[];
     content?: ContentSchema; // Embed domain content if needed
+    pills?: { label: string; color?: string }[];
+  };
+}
+
+export interface VideoPlayerSchema {
+  type: "VideoPlayer";
+  props: {
+    videoUrl: string;
+    title?: string;
+    poster?: string;
+    progress?: number; // 0-100
+    pills?: { label: string; color?: string }[];
+    onCompleteAction?: CardAction;
+    videoWatched?: boolean;
+    worksheetSubmitted?: boolean;
+    description?: string;
   };
 }
 
 export interface CardAction {
   label: string;
   action: string;
+  [key: string]: any; // Allow extra properties for renderer use
 }

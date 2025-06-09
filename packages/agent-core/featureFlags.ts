@@ -1,8 +1,11 @@
-import posthog from "posthog-node";
+import { PostHog } from "posthog-node";
 
-const client = new posthog.PostHog(process.env.POSTHOG_API_KEY!, {
-  host: process.env.POSTHOG_HOST || "https://app.posthog.com",
-});
+const POSTHOG_API_KEY = process.env.POSTHOG_API_KEY;
+const POSTHOG_HOST = process.env.POSTHOG_HOST || "https://app.posthog.com";
+
+export const client = POSTHOG_API_KEY
+  ? new PostHog(POSTHOG_API_KEY, { host: POSTHOG_HOST })
+  : null;
 
 export async function isFeatureEnabled(
   flag: string,

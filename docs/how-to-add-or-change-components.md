@@ -53,5 +53,6 @@ This guide explains how to add or change the building blocks of the LeaderForge 
 **Note:**
 - The renderer and all tools/agents must always use the `{ type, props }` schema pattern for all components.
 - This ensures extensibility, composability, and architectural purity.
+- If you want agents to have explicit control over overlays, play button style, or other UI details, you can extend the schema (e.g., add a PlayButtonSchema or VideoCardSchema) and update the renderer accordingly. This is not required for simple overlays, but is supported by the architecture.
 
 If you need help, ask a developer to assist with the code changes.
