@@ -69,6 +69,16 @@
   - Fix all existing linter errors and warnings.
   - Document linting rules and workflow in the README.
 
+### 10. Auth Provider Configuration
+- [ ] Update Google OAuth credentials (Client ID/Secret) for production URI in Supabase Auth settings.
+  - Ensure all production and staging domains are added to Google Cloud Console and Supabase.
+  - Test Google login in both local and production environments.
+
+### 11. Metadata Export Refactor
+- [ ] Refactor metadata export for Next.js App Router compliance.
+  - Move metadata export from layout.tsx (currently commented out) to a server component or separate file.
+  - Ensure custom metadata is supported without breaking client components.
+
 ---
 
 ## Enhancement Backlog

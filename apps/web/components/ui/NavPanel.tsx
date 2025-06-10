@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, BookOpen, Library, Target, Users, LayoutDash
 import { useTheme } from "./ThemeContext";
 import ContextSelector from "./ContextSelector";
 import { ComponentSchemaRenderer } from "../ai/ComponentSchemaRenderer";
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
 interface NavItem {
   label: string;
@@ -119,6 +120,7 @@ export default function NavPanel({
   // Hard-coded userId for now
   const userId = "123e4567-e89b-12d3-a456-426614174000";
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
     if (!userId) {
@@ -135,6 +137,20 @@ export default function NavPanel({
     setSelectedNav(navOptionId);
     if (onNavSelect) {
       onNavSelect(navOptionId);
+    }
+  };
+
+  const handleFooterAction = async (action: string) => {
+    if (action === 'signOut') {
+      await supabase.auth.signOut();
+      await fetch('/api/auth/set-session', {
+        method: 'POST',
+        body: JSON.stringify({ session: null }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      window.location.href = '/';
+    } else {
+      handleNavClick(action);
     }
   };
 
@@ -253,7 +269,7 @@ export default function NavPanel({
                 <button
                   key={action.label}
                   type="button"
-                  onClick={() => handleNavClick(action.action)}
+                  onClick={() => handleFooterAction(action.action)}
                   className="flex items-center gap-2 px-2 py-2 rounded-lg text-[var(--primary)] hover:bg-[var(--accent)]/10 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                   tabIndex={0}
                   aria-label={action.label}
@@ -353,7 +369,7 @@ export const sampleNavSchema: NavPanelSchema = {
       {
         title: null,
         items: [
-          { id: "sign-out", label: "Sign Out", icon: "logout", href: "/logout", position: "bottom" },
+          { id: "sign-out", label: "Sign Out", icon: "logout", position: "bottom" },
         ],
       },
     ],

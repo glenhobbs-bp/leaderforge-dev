@@ -1,9 +1,10 @@
 // File: apps/web/app/page.tsx
 
-import { loadContextConfig } from "@lib/server/loadContextConfig";
-import DynamicContextPage from "@/components/DynamicContextPage";
+// page.tsx is a server component by default in Next.js App Router
+// It should not use any client hooks or context directly.
+// All client-only logic is handled in AuthGate.tsx
+import AuthGate from "./AuthGate";
 
-export default async function Page() {
-  const config = await loadContextConfig();
-  return <DynamicContextPage config={config} />;
+export default function Page() {
+  return <AuthGate />;
 }

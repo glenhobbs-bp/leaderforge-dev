@@ -28,7 +28,7 @@ export const provisioningService = {
   async provisionEntitlementToUser(userId: string, entitlementId: string): Promise<boolean> {
     console.log(`[provisioningService] Provisioning entitlement ${entitlementId} to user ${userId}`);
     const { error } = await supabase
-      .from('user_entitlements')
+      .from('core.user_entitlements')
       .insert([{ user_id: userId, entitlement_id: entitlementId }]);
     if (error) {
       console.error(`[provisioningService] Error provisioning entitlement to user:`, error);

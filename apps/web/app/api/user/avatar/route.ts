@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-console.log('SERVICE ROLE KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 8));
+// console.log('SERVICE ROLE KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 8));
 
 // Use env vars for Supabase URL and key
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

@@ -35,6 +35,62 @@
 - Conditional entitlements reference prerequisite entitlements or completion events.
 - All relationships are auditable (created_by, granted_by, timestamps).
 
+### Why Both `entitlements` and `user_entitlements`?
+
+#### 1. `entitlements` (Definition Table)
+- **Purpose:**
+  This table defines the types of entitlements (features, licenses, permissions) that exist in your system.
+- **What it contains:**
+  - The name, description, module, and metadata for each entitlement type.
+  - Example: `"content_creator"`, `"admin_dashboard_access"`, `"premium_video"`, etc.
+- **Analogy:**
+  Think of this as the "catalog" of all possible features or licenses your platform can grant.
+
+#### 2. `user_entitlements` (Assignment Table)
+- **Purpose:**
+  This table records which users have been granted which entitlements, and tracks their status (active, revoked, expires, etc).
+- **What it contains:**
+  - A row for each user's active entitlement, with references to the user and the entitlement type.
+  - Validity dates, who granted it, metadata, etc.
+- **Analogy:**
+  This is the "ledger" or "assignment log"—it says "User X has Entitlement Y, granted on Z, expires on W."
+
+#### Why Not Just a Boolean or Array on the User?
+- **Scalability:**
+  As your system grows, you'll want to:
+  - Track when/why/how an entitlement was granted or revoked.
+  - Support expiration, revocation, and audit trails.
+  - Support multiple entitlements per user, possibly from different sources (org, purchase, admin grant, etc).
+- **Multi-Tenancy:**
+  You may want to assign entitlements at the org level, then allocate to users, or have different entitlements per module/context.
+- **Audit & Compliance:**
+  You need to know who gave what to whom, and when, for compliance and debugging.
+
+#### How They Work Together
+- **`entitlements`:**
+  - Defines what is possible.
+- **`user_entitlements`:**
+  - Records who has what, and the lifecycle of that assignment.
+
+**This is the same pattern used in:**
+- Role-based access control (RBAC): `roles` and `user_roles`
+- Licensing: `products` and `user_licenses`
+- Feature flags: `features` and `user_features`
+
+#### Is It Too Complex?
+- If you only ever have a handful of static features, and never need to track assignment, expiration, or audit, you could get away with a boolean or array.
+- But for a modular, multi-tenant, SaaS platform with compliance needs, this is the right level of complexity.
+
+#### Summary Table
+| Table               | Purpose                        | Example Row                                      |
+|---------------------|-------------------------------|--------------------------------------------------|
+| `entitlements`      | Defines available entitlements | `{ id: 1, name: "premium_video", ... }`          |
+| `user_entitlements` | Assigns entitlements to users  | `{ id: 42, user_id: 7, entitlement_id: 1, ... }` |
+
+**Bottom Line:**
+- Keep both tables.
+- This is the correct, scalable, auditable pattern for entitlements in a modern SaaS platform.
+
 ---
 
 ## 3. Service Layer (TypeScript)
@@ -284,3 +340,69 @@ export function EntitlementAwareContent({ userId, contextKey }: { userId: string
 - All hooks and clients are fully tested and robust to backend/API changes.
 
 ---
+
+## Supabase Auth Integration Plan
+
+To enable secure, production-grade authentication and user management, follow this step-by-step plan:
+
+### 1. Supabase Project Setup
+- [ ] Ensure Supabase Auth is enabled in your Supabase project.
+- [ ] Configure allowed OAuth providers (Google, Microsoft, etc.) and email/password as needed.
+- [ ] Set up email templates, domain whitelisting, and redirect URLs for production.
+
+### 2. Install Supabase Client & Auth Helpers
+- [ ] Install `@supabase/supabase-js` (already present) and `@supabase/auth-helpers-nextjs` in your web app.
+- [ ] Add any missing types (`@types/node`, etc.) if needed.
+
+### 3. Configure Supabase Client for Auth
+- [ ] Update your Supabase client to use the public anon key for frontend usage.
+- [ ] Store keys in `.env.local` (never commit secrets).
+
+### 4. Add Auth Context/Provider
+- [ ] Create a `SupabaseProvider` (or use the helper's built-in provider) at the top level of your app (e.g., in `layout.tsx`).
+- [ ] Ensure the provider is available to all pages/components.
+
+### 5. Implement Auth UI
+- [ ] Add a login/signup page using Supabase Auth UI or a custom form.
+- [ ] Support OAuth and email/password flows.
+- [ ] Handle errors, loading, and redirect after login.
+
+### 6. Protect Routes and Fetch User
+- [ ] Use Supabase Auth helpers to get the current user (client and server).
+- [ ] Protect sensitive pages/routes (e.g., dashboard, settings) by redirecting unauthenticated users to login.
+- [ ] Expose user info (id, email, etc.) via React context or hooks.
+
+### 7. Wire User ID to API/Service Layer
+- [ ] Pass the authenticated user's ID to all API calls, hooks, and agent requests.
+- [ ] Remove all hardcoded or stubbed user IDs.
+
+### 8. Logout and Session Handling
+- [ ] Add a logout button that calls `supabase.auth.signOut()`.
+- [ ] Handle session expiration and auto-redirect to login.
+
+### 9. Profile & Avatar
+- [ ] Fetch and display user profile info and avatar in the NavPanel and header.
+- [ ] Store avatars in Supabase Storage (private bucket) and serve via signed URLs.
+
+### 10. Security & Production Hardening
+- [ ] Enforce HTTPS and secure cookies.
+- [ ] Set up CORS, domain whitelisting, and email verification.
+- [ ] Test all flows (login, logout, session restore, error handling).
+- [ ] Add monitoring/logging for auth events.
+
+### 11. Testing
+- [ ] Add Vitest/React Testing Library tests for auth flows and protected routes.
+- [ ] Add end-to-end tests (Cypress/Playwright) for login/logout and user flows.
+
+---
+
+**Summary Checklist**
+- [ ] Supabase Auth enabled and configured
+- [ ] Auth helpers and provider set up in Next.js
+- [ ] Login/signup UI (OAuth + email)
+- [ ] Route protection and user context
+- [ ] User ID wired to all API/service calls
+- [ ] Logout/session handling
+- [ ] Profile/avatar integration
+- [ ] Security hardening
+- [ ] Automated tests

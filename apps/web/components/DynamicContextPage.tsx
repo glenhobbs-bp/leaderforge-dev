@@ -14,6 +14,7 @@ import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
 import type { ContentSchema as ComponentSchema } from 'agent-core/types/contentSchema';
 import { useContextConfig } from "../hooks/useContextConfig";
 import { useNavOptions } from "../hooks/useNavOptions";
+import { useSessionContext } from '@supabase/auth-helpers-react';
 
 interface NavItem {
   label: string;
@@ -81,9 +82,11 @@ const CONTEXTS = [
 ];
 
 export default function DynamicContextPage() {
+  const { session } = useSessionContext();
+  const userId = session?.user?.id || null;
   const [contextId, setContextId] = useState(CONTEXTS[0].id);
-  const { config, loading, error } = useContextConfig(contextId);
-  const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId);
+  const { config, loading, error } = useContextConfig(contextId, userId);
+  const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId, userId);
   const [schema, setSchema] = useState<ComponentSchema | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
 
@@ -91,17 +94,16 @@ export default function DynamicContextPage() {
     setSchemaError(null);
     setSchema(null);
     try {
-      // Get userId and contextKey
-      const userId = (typeof window !== 'undefined' && localStorage.getItem('userId')) || 'test-user';
+      // Always use authenticated userId
       const contextKey = contextId;
-      const intent = undefined; // or { type: 'viewLibrary' } if you want to be explicit
+      const intent = undefined;
       const payload = { userId, contextKey, intent, navOptionId };
       console.log('[handleNavSelect] Sending payload:', payload);
-    const res = await fetch("/api/agent/content", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      const res = await fetch("/api/agent/content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-    });
+      });
       console.log('[handleNavSelect] Response status:', res.status);
       if (!res.ok) {
         setSchemaError("Server error. Please try again later.");

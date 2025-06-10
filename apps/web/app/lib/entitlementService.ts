@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { SupabaseClient } from '@supabase/supabase-js';
 // import { Entitlement, Content } from '@/types'; // Uncomment and adjust as needed
 
 /**
@@ -9,9 +9,10 @@ export const entitlementService = {
   /**
    * Get all active entitlements for a user (context/module aware via RLS).
    */
-  async getUserEntitlements(userId: string): Promise<any[]> {
+  async getUserEntitlements(supabase: SupabaseClient<any, any, any>, userId: string): Promise<any[]> {
     console.log(`[entitlementService] Fetching entitlements for user: ${userId}`);
     const { data, error } = await supabase
+      .schema('core')
       .from('user_entitlements')
       .select('*, entitlement:entitlement_id(*)')
       .eq('user_id', userId)
@@ -27,10 +28,10 @@ export const entitlementService = {
   /**
    * Get all active entitlements for an organization.
    */
-  async getOrgEntitlements(orgId: string): Promise<any[]> {
+  async getOrgEntitlements(supabase: SupabaseClient<any, any, any>, orgId: string): Promise<any[]> {
     console.log(`[entitlementService] Fetching entitlements for org: ${orgId}`);
     const { data, error } = await supabase
-      .from('org_entitlements')
+      .from('core.org_entitlements')
       .select('*, entitlement:entitlement_id(*)')
       .eq('org_id', orgId)
       .eq('status', 'active');
@@ -45,14 +46,15 @@ export const entitlementService = {
   /**
    * Check if a user can access a given content item (using entitlements and content access policies).
    */
-  async canUserAccessContent(userId: string, contentId: string): Promise<boolean> {
+  async canUserAccessContent(supabase: SupabaseClient<any, any, any>, userId: string, contentId: string): Promise<boolean> {
     console.log(`[entitlementService] Checking access for user ${userId} to content ${contentId}`);
     // 1. Get user entitlements
-    const entitlements = await this.getUserEntitlements(userId);
+    const entitlements = await this.getUserEntitlements(supabase, userId);
     const entitlementIds = entitlements.map(e => e.entitlement_id);
 
     // 2. Get content access policy
     const { data: policies, error } = await supabase
+      .schema('core')
       .from('content_access_policies')
       .select('*')
       .eq('content_id', contentId);
@@ -79,7 +81,7 @@ export const entitlementService = {
   /**
    * Get all content in a context the user is entitled to access.
    */
-  async getAccessibleContent(userId: string, contextKey: string): Promise<any[]> {
+  async getAccessibleContent(supabase: SupabaseClient<any, any, any>, userId: string, contextKey: string): Promise<any[]> {
     console.log(`[entitlementService] Fetching accessible content for user ${userId} in context ${contextKey}`);
     // 1. Get all content for context
     const { data: allContent, error: contentError } = await supabase
@@ -94,7 +96,7 @@ export const entitlementService = {
     const accessible: any[] = [];
     for (const item of allContent || []) {
       try {
-        if (await this.canUserAccessContent(userId, item.id)) {
+        if (await this.canUserAccessContent(supabase, userId, item.id)) {
           accessible.push(item);
         }
       } catch (err) {

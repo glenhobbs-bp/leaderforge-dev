@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
 import { entitlementService } from '../../../lib/entitlementService';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 /**
  * GET /api/entitlements/[user_id]
@@ -16,7 +18,8 @@ export async function GET(
     return new Response(JSON.stringify({ error: 'Missing or invalid user_id' }), { status: 400 });
   }
   try {
-    const entitlements = await entitlementService.getUserEntitlements(user_id);
+    const supabase = createServerComponentClient({ cookies });
+    const entitlements = await entitlementService.getUserEntitlements(supabase, user_id);
     console.log(`[API] Found ${entitlements.length} entitlements for user ${user_id}`);
     return new Response(JSON.stringify(entitlements), { status: 200 });
   } catch (error: any) {

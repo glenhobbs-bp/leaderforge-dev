@@ -109,6 +109,21 @@ importers:
       '@copilotkit/runtime':
         specifier: ^1.8.13
         version: 1.8.13(@ag-ui/client@0.0.28)(@ag-ui/core@0.0.28)(@ag-ui/encoder@0.0.28)(@ag-ui/proto@0.0.28)(@browserbasehq/sdk@2.6.0)(@browserbasehq/stagehand@1.14.0(@playwright/test@1.52.0)(deepmerge@4.3.1)(dotenv@16.5.0)(openai@4.104.0(ws@8.18.2)(zod@3.25.46))(zod@3.25.46))(@ibm-cloud/watsonx-ai@1.6.7)(@supabase/supabase-js@2.49.8)(axios@1.9.0)(google-auth-library@8.9.0)(ibm-cloud-sdk-core@5.4.0)(jsdom@26.1.0)(jsonwebtoken@9.0.2)(lodash@4.17.21)(playwright@1.52.0)(react@19.1.0)(weaviate-client@3.5.5)(ws@8.18.2)
+      '@supabase/auth-helpers-nextjs':
+        specifier: ^0.10.0
+        version: 0.10.0(@supabase/supabase-js@2.49.8)
+      '@supabase/auth-helpers-react':
+        specifier: ^0.5.0
+        version: 0.5.0(@supabase/supabase-js@2.49.8)
+      '@supabase/auth-ui-react':
+        specifier: ^0.4.7
+        version: 0.4.7(@supabase/supabase-js@2.49.8)
+      '@supabase/auth-ui-shared':
+        specifier: ^0.1.8
+        version: 0.1.8(@supabase/supabase-js@2.49.8)
+      '@supabase/ssr':
+        specifier: ^0.6.1
+        version: 0.6.1(@supabase/supabase-js@2.49.8)
       '@supabase/supabase-js':
         specifier: ^2.49.8
         version: 2.49.8
@@ -163,7 +178,7 @@ importers:
     dependencies:
       '@langchain/langgraph':
         specifier: ^0.2.74
-        version: 0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.46))
+        version: 0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.57))
 
   packages/env: {}
 
@@ -278,6 +293,10 @@ packages:
     resolution: {integrity: sha512-t3yaEOuGu9NlIZ+hIeGbBjFtZT7j2cb2tg0fuaJKeGotchRjjLfrBA9Kwf8quhpP1EUuxModQg04q/mBwyg8uA==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/runtime@7.27.6':
+    resolution: {integrity: sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/template@7.27.2':
     resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
     engines: {node: '>=6.9.0'}
@@ -306,8 +325,8 @@ packages:
       openai: ^4.62.1
       zod: ^3.23.8
 
-  '@bufbuild/protobuf@2.5.1':
-    resolution: {integrity: sha512-lut4UTvKL8tqtend0UDu7R79/n9jA7Jtxf77RNPbxtmWqfWI4qQ9bTjf7KCS4vfqLmpQbuHr1ciqJumAgJODdw==}
+  '@bufbuild/protobuf@2.5.2':
+    resolution: {integrity: sha512-foZ7qr0IsUBjzWIq+SuBLfdQCpJ1j8cTuNNT4owngTHoN5KsJb8L9t65fzz7SCeSWzescoOil/0ldqiL041ABg==}
 
   '@cfworker/json-schema@4.1.1':
     resolution: {integrity: sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==}
@@ -1993,8 +2012,39 @@ packages:
     resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
     engines: {node: '>=18'}
 
+  '@stitches/core@1.2.8':
+    resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
+
+  '@supabase/auth-helpers-nextjs@0.10.0':
+    resolution: {integrity: sha512-2dfOGsM4yZt0oS4TPiE7bD4vf7EVz7NRz/IJrV6vLg0GP7sMUx8wndv2euLGq4BjN9lUCpu6DG/uCC8j+ylwPg==}
+    deprecated: This package is now deprecated - please use the @supabase/ssr package instead.
+    peerDependencies:
+      '@supabase/supabase-js': ^2.39.8
+
+  '@supabase/auth-helpers-react@0.5.0':
+    resolution: {integrity: sha512-5QSaV2CGuhDhd7RlQCoviVEAYsP7XnrFMReOcBazDvVmqSIyjKcDwhLhWvnrxMOq5qjOaA44MHo7wXqDiF0puQ==}
+    deprecated: This package is now deprecated - please use the @supabase/ssr package instead.
+    peerDependencies:
+      '@supabase/supabase-js': ^2.39.8
+
+  '@supabase/auth-helpers-shared@0.7.0':
+    resolution: {integrity: sha512-FBFf2ei2R7QC+B/5wWkthMha8Ca2bWHAndN+syfuEUUfufv4mLcAgBCcgNg5nJR8L0gZfyuaxgubtOc9aW3Cpg==}
+    deprecated: This package is now deprecated - please use the @supabase/ssr package instead.
+    peerDependencies:
+      '@supabase/supabase-js': ^2.39.8
+
   '@supabase/auth-js@2.69.1':
     resolution: {integrity: sha512-FILtt5WjCNzmReeRLq5wRs3iShwmnWgBvxHfqapC/VoljJl+W8hDAyFmf1NVw3zH+ZjZ05AKxiKxVeb0HNWRMQ==}
+
+  '@supabase/auth-ui-react@0.4.7':
+    resolution: {integrity: sha512-Lp4FQGFh7BMX1Y/BFaUKidbryL7eskj1fl6Lby7BeHrTctbdvDbCMjVKS8wZ2rxuI8FtPS2iU900fSb70FHknQ==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.21.0
+
+  '@supabase/auth-ui-shared@0.1.8':
+    resolution: {integrity: sha512-ouQ0DjKcEFg+0gZigFIEgu01V3e6riGZPzgVD0MJsCBNsMsiDT74+GgCEIElMUpTGkwSja3xLwdFRFgMNFKcjg==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.21.0
 
   '@supabase/functions-js@2.4.4':
     resolution: {integrity: sha512-WL2p6r4AXNGwop7iwvul2BvOtuJ1YQy8EbOd0dhG1oN1q8el/BIRSFCFnWAMM/vJJlHWLi4ad22sKbKr9mvjoA==}
@@ -2008,6 +2058,11 @@ packages:
 
   '@supabase/realtime-js@2.11.2':
     resolution: {integrity: sha512-u/XeuL2Y0QEhXSoIPZZwR6wMXgB+RQbJzG9VErA3VghVt7uRfSVsjeqd7m5GhX3JR6dM/WRmLbVR8URpDWG4+w==}
+
+  '@supabase/ssr@0.6.1':
+    resolution: {integrity: sha512-QtQgEMvaDzr77Mk3vZ3jWg2/y+D8tExYF7vcJT+wQ8ysuvOeGGjYbZlvj5bHYsj/SpC0bihcisnwPrM4Gp5G4g==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.43.4
 
   '@supabase/storage-js@2.7.1':
     resolution: {integrity: sha512-asYHcyDR1fKqrMpytAS1zjyEfvxuOIp1CIXX7ji4lHHcJKqyk+sLl/Vxgm4sN6u8zvuUtae9e4kDxQP2qrwWBA==}
@@ -2226,6 +2281,9 @@ packages:
   '@types/node@18.19.110':
     resolution: {integrity: sha512-WW2o4gTmREtSnqKty9nhqF/vA0GKd0V/rbC0OyjSk9Bz6bzlsXKT+i7WDdS/a0z74rfT2PO4dArVCSnapNLA5Q==}
 
+  '@types/node@18.19.111':
+    resolution: {integrity: sha512-90sGdgA+QLJr1F9X79tQuEut0gEYIfkX9pydI4XGRgvFo9g2JWswefI+WUSUHPYVBHYSEfTEqBxA5hQvAZB3Mw==}
+
   '@types/node@22.15.29':
     resolution: {integrity: sha512-LNdjOkUDlU1RZb8e1kOIUpN1qQUlzGkEtbVNo53vbrwDg5om6oduhm4SiUaPW5ASTXhAiP0jInWG8Qx9fVlOeQ==}
 
@@ -2237,6 +2295,9 @@ packages:
 
   '@types/prop-types@15.7.14':
     resolution: {integrity: sha512-gNMvNH49DJ7OJYv+KAKn0Xp45p8PLl6zo2YnvDIbTd4J6MER2BmWN49TG7n9LvkyihINxeKW8+3bfS2yDC9dzQ==}
+
+  '@types/prop-types@15.7.15':
+    resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
 
   '@types/react-transition-group@4.4.12':
     resolution: {integrity: sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==}
@@ -2705,6 +2766,10 @@ packages:
   cookie@0.7.1:
     resolution: {integrity: sha512-6DnInpx7SJ2AK3+CTUE/ZM0vWTUboZCegxhC2xiIydHR9jNuTAASBrfEpHhiGOZw/nX51bHt6YQl8jsGo4y/0w==}
     engines: {node: '>= 0.6'}
+
+  cookie@1.0.2:
+    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
+    engines: {node: '>=18'}
 
   copy-anything@3.0.5:
     resolution: {integrity: sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==}
@@ -3497,6 +3562,9 @@ packages:
   jiti@2.4.2:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
+
+  jose@4.15.9:
+    resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
 
   jose@5.10.0:
     resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
@@ -4776,6 +4844,9 @@ packages:
     resolution: {integrity: sha512-VqpjJZKadQB/PEbEwvFdO43Ax5dFBZ2UECszz8bQ7pi7wt//PWe1P6MN7eCnjsatYtBT6EuiClbjSWP2WrIoTw==}
     engines: {node: '>= 0.8.0'}
 
+  set-cookie-parser@2.7.1:
+    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
+
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
@@ -5541,6 +5612,9 @@ packages:
   zod@3.25.46:
     resolution: {integrity: sha512-IqRxcHEIjqLd4LNS/zKffB3Jzg3NwqJxQQ0Ns7pdrvgGkwQsEBdEQcOHaBVqvvZArShRzI39+aMST3FBGmTrLQ==}
 
+  zod@3.25.57:
+    resolution: {integrity: sha512-6tgzLuwVST5oLUxXTmBqoinKMd3JeesgbgseXeFasKKj8Q1FCZrHnbqJOyiEvr4cVAlbug+CgIsmJ8cl/pU5FA==}
+
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -5560,12 +5634,12 @@ snapshots:
       rxjs: 7.8.1
       untruncate-json: 0.0.1
       uuid: 11.1.0
-      zod: 3.25.46
+      zod: 3.25.57
 
   '@ag-ui/core@0.0.28':
     dependencies:
       rxjs: 7.8.1
-      zod: 3.25.46
+      zod: 3.25.57
 
   '@ag-ui/encoder@0.0.28':
     dependencies:
@@ -5575,7 +5649,7 @@ snapshots:
   '@ag-ui/proto@0.0.28':
     dependencies:
       '@ag-ui/core': 0.0.28
-      '@bufbuild/protobuf': 2.5.1
+      '@bufbuild/protobuf': 2.5.2
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -5695,6 +5769,8 @@ snapshots:
 
   '@babel/runtime@7.27.4': {}
 
+  '@babel/runtime@7.27.6': {}
+
   '@babel/template@7.27.2':
     dependencies:
       '@babel/code-frame': 7.27.1
@@ -5725,7 +5801,7 @@ snapshots:
 
   '@browserbasehq/sdk@2.6.0':
     dependencies:
-      '@types/node': 18.19.110
+      '@types/node': 18.19.111
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -5751,7 +5827,7 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@bufbuild/protobuf@2.5.1': {}
+  '@bufbuild/protobuf@2.5.2': {}
 
   '@cfworker/json-schema@4.1.1': {}
 
@@ -6379,7 +6455,7 @@ snapshots:
 
   '@ibm-cloud/watsonx-ai@1.6.7':
     dependencies:
-      '@types/node': 18.19.110
+      '@types/node': 18.19.111
       extend: 3.0.2
       ibm-cloud-sdk-core: 5.4.0
     transitivePeerDependencies:
@@ -6585,6 +6661,23 @@ snapshots:
     transitivePeerDependencies:
       - openai
 
+  '@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))':
+    dependencies:
+      '@cfworker/json-schema': 4.1.1
+      ansi-styles: 5.2.0
+      camelcase: 6.3.0
+      decamelize: 1.2.0
+      js-tiktoken: 1.0.20
+      langsmith: 0.3.29(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
+      mustache: 4.2.0
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      uuid: 10.0.0
+      zod: 3.25.46
+      zod-to-json-schema: 3.24.5(zod@3.25.46)
+    transitivePeerDependencies:
+      - openai
+
   '@langchain/google-common@0.1.8(@langchain/core@0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.46)))(zod@3.25.46)':
     dependencies:
       '@langchain/core': 0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.46))
@@ -6639,6 +6732,11 @@ snapshots:
   '@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))':
     dependencies:
       '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
+      uuid: 10.0.0
+
+  '@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))':
+    dependencies:
+      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
       uuid: 10.0.0
 
   '@langchain/langgraph-checkpoint@0.0.18(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))':
@@ -6706,6 +6804,16 @@ snapshots:
       '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
       react: 19.1.0
 
+  '@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)':
+    dependencies:
+      '@types/json-schema': 7.0.15
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      uuid: 9.0.1
+    optionalDependencies:
+      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
+      react: 18.3.1
+
   '@langchain/langgraph-ui@0.0.38':
     dependencies:
       '@commander-js/extra-typings': 13.1.0(commander@13.1.0)
@@ -6723,6 +6831,18 @@ snapshots:
       zod: 3.25.46
     optionalDependencies:
       zod-to-json-schema: 3.24.5(zod@3.25.46)
+    transitivePeerDependencies:
+      - react
+
+  '@langchain/langgraph@0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.57))':
+    dependencies:
+      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
+      '@langchain/langgraph-checkpoint': 0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))
+      '@langchain/langgraph-sdk': 0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)
+      uuid: 10.0.0
+      zod: 3.25.46
+    optionalDependencies:
+      zod-to-json-schema: 3.24.5(zod@3.25.57)
     transitivePeerDependencies:
       - react
 
@@ -7325,9 +7445,39 @@ snapshots:
 
   '@sindresorhus/merge-streams@4.0.0': {}
 
+  '@stitches/core@1.2.8': {}
+
+  '@supabase/auth-helpers-nextjs@0.10.0(@supabase/supabase-js@2.49.8)':
+    dependencies:
+      '@supabase/auth-helpers-shared': 0.7.0(@supabase/supabase-js@2.49.8)
+      '@supabase/supabase-js': 2.49.8
+      set-cookie-parser: 2.7.1
+
+  '@supabase/auth-helpers-react@0.5.0(@supabase/supabase-js@2.49.8)':
+    dependencies:
+      '@supabase/supabase-js': 2.49.8
+
+  '@supabase/auth-helpers-shared@0.7.0(@supabase/supabase-js@2.49.8)':
+    dependencies:
+      '@supabase/supabase-js': 2.49.8
+      jose: 4.15.9
+
   '@supabase/auth-js@2.69.1':
     dependencies:
       '@supabase/node-fetch': 2.6.15
+
+  '@supabase/auth-ui-react@0.4.7(@supabase/supabase-js@2.49.8)':
+    dependencies:
+      '@stitches/core': 1.2.8
+      '@supabase/auth-ui-shared': 0.1.8(@supabase/supabase-js@2.49.8)
+      '@supabase/supabase-js': 2.49.8
+      prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@supabase/auth-ui-shared@0.1.8(@supabase/supabase-js@2.49.8)':
+    dependencies:
+      '@supabase/supabase-js': 2.49.8
 
   '@supabase/functions-js@2.4.4':
     dependencies:
@@ -7350,6 +7500,11 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@supabase/ssr@0.6.1(@supabase/supabase-js@2.49.8)':
+    dependencies:
+      '@supabase/supabase-js': 2.49.8
+      cookie: 1.0.2
 
   '@supabase/storage-js@2.7.1':
     dependencies:
@@ -7467,7 +7622,7 @@ snapshots:
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@babel/runtime': 7.27.4
+      '@babel/runtime': 7.27.6
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -7568,6 +7723,10 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
+  '@types/node@18.19.111':
+    dependencies:
+      undici-types: 5.26.5
+
   '@types/node@22.15.29':
     dependencies:
       undici-types: 6.21.0
@@ -7578,13 +7737,15 @@ snapshots:
 
   '@types/prop-types@15.7.14': {}
 
+  '@types/prop-types@15.7.15': {}
+
   '@types/react-transition-group@4.4.12(@types/react@18.3.23)':
     dependencies:
       '@types/react': 18.3.23
 
   '@types/react@18.3.23':
     dependencies:
-      '@types/prop-types': 15.7.14
+      '@types/prop-types': 15.7.15
       csstype: 3.1.3
 
   '@types/retry@0.12.0': {}
@@ -8053,6 +8214,8 @@ snapshots:
   cookie-signature@1.0.6: {}
 
   cookie@0.7.1: {}
+
+  cookie@1.0.2: {}
 
   copy-anything@3.0.5:
     dependencies:
@@ -8795,7 +8958,7 @@ snapshots:
   ibm-cloud-sdk-core@5.4.0:
     dependencies:
       '@types/debug': 4.1.12
-      '@types/node': 18.19.110
+      '@types/node': 18.19.111
       '@types/tough-cookie': 4.0.5
       axios: 1.9.0(debug@4.4.1)
       camelcase: 6.3.0
@@ -8926,6 +9089,8 @@ snapshots:
   jiti@1.21.7: {}
 
   jiti@2.4.2: {}
+
+  jose@4.15.9: {}
 
   jose@5.10.0: {}
 
@@ -9081,6 +9246,18 @@ snapshots:
       uuid: 10.0.0
     optionalDependencies:
       openai: 5.0.1(ws@8.18.2)(zod@3.25.46)
+
+  langsmith@0.3.29(openai@5.0.1(ws@8.18.2)(zod@3.25.57)):
+    dependencies:
+      '@types/uuid': 10.0.0
+      chalk: 4.1.2
+      console-table-printer: 2.14.0
+      p-queue: 6.6.2
+      p-retry: 4.6.2
+      semver: 7.7.2
+      uuid: 10.0.0
+    optionalDependencies:
+      openai: 5.0.1(ws@8.18.2)(zod@3.25.57)
 
   libphonenumber-js@1.12.8: {}
 
@@ -9938,6 +10115,12 @@ snapshots:
       ws: 8.18.2
       zod: 3.25.46
 
+  openai@5.0.1(ws@8.18.2)(zod@3.25.57):
+    optionalDependencies:
+      ws: 8.18.2
+      zod: 3.25.57
+    optional: true
+
   openapi-types@12.1.3: {}
 
   p-finally@1.0.0: {}
@@ -10602,6 +10785,8 @@ snapshots:
       send: 0.19.0
     transitivePeerDependencies:
       - supports-color
+
+  set-cookie-parser@2.7.1: {}
 
   setprototypeof@1.2.0: {}
 
@@ -11423,6 +11608,13 @@ snapshots:
     dependencies:
       zod: 3.25.46
 
+  zod-to-json-schema@3.24.5(zod@3.25.57):
+    dependencies:
+      zod: 3.25.57
+    optional: true
+
   zod@3.25.46: {}
+
+  zod@3.25.57: {}
 
   zwitch@2.0.4: {}

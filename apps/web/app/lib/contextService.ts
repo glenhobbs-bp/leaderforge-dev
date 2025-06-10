@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { SupabaseClient } from '@supabase/supabase-js';
 // import { ContextConfig } from '@/types'; // Uncomment and adjust as needed
 
 /**
@@ -9,7 +10,7 @@ export const contextService = {
   /**
    * Get a single context config by key.
    */
-  async getContextConfig(contextKey: string): Promise<any | null> {
+  async getContextConfig(supabase: SupabaseClient<any, any, any>, contextKey: string, userId?: string): Promise<any | null> {
     console.log(`[contextService] Fetching context config: ${contextKey}`);
     const { data, error } = await supabase
       .schema('core')

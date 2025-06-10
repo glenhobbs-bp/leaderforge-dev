@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient';
+import { SupabaseClient } from '@supabase/supabase-js';
 import { entitlementService } from './entitlementService';
 // import { NavOption } from '@/types'; // Uncomment and adjust as needed
 
@@ -10,7 +10,7 @@ export const navService = {
   /**
    * Get nav options for a context, filtered by user entitlement.
    */
-  async getNavOptions(contextKey: string, userId: string): Promise<any[]> {
+  async getNavOptions(supabase: SupabaseClient<any, any, any>, contextKey: string, userId: string): Promise<any[]> {
     console.log(`[navService] Fetching nav options for context: ${contextKey}, user: ${userId}`);
     const { data, error } = await supabase
       .schema('core')
@@ -23,7 +23,7 @@ export const navService = {
     }
     if (!data) return [];
     // Filter by entitlement if required
-    const userEntitlements = await entitlementService.getUserEntitlements(userId);
+    const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
     const filtered = data.filter((nav: any) => {
       if (!nav.required_entitlements || nav.required_entitlements.length === 0) return true;
       return nav.required_entitlements.every((ent: string) => userEntitlements.some((ue: any) => ue.entitlement_id === ent));
@@ -35,7 +35,7 @@ export const navService = {
   /**
    * Get a single nav option by key, filtered by user entitlement.
    */
-  async getNavOption(contextKey: string, navKey: string, userId: string): Promise<any | null> {
+  async getNavOption(supabase: SupabaseClient<any, any, any>, contextKey: string, navKey: string, userId: string): Promise<any | null> {
     console.log(`[navService] Fetching nav option: ${navKey} for context: ${contextKey}, user: ${userId}`);
     const { data, error } = await supabase
       .schema('core')
@@ -51,7 +51,7 @@ export const navService = {
     if (!data) return null;
     // Filter by entitlement if required
     if (data.required_entitlements && data.required_entitlements.length > 0) {
-      const userEntitlements = await entitlementService.getUserEntitlements(userId);
+      const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
       const hasAll = data.required_entitlements.every((ent: string) => userEntitlements.some((ue: any) => ue.entitlement_id === ent));
       if (!hasAll) {
         console.log(`[navService] User does not have required entitlements for nav option: ${navKey}`);
