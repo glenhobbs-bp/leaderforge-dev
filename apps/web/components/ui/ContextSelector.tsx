@@ -40,47 +40,44 @@ export default function ContextSelector({
   return (
     <div
       ref={ref}
-      className={`relative ${collapsed ? "px-2 pt-2 pb-2" : "px-4 pt-4 pb-2"}`}
+      className={`relative ${collapsed ? "flex justify-center items-center pt-2 pb-2" : "w-full pt-2 pb-2"}`}
     >
       <button
         className={
           collapsed
-            ? "w-12 h-12 p-0 flex items-center justify-center rounded-2xl border border-[var(--bg-neutral)] bg-[var(--bg-light)] hover:bg-[var(--bg-neutral)] transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-            : "w-full flex items-center gap-2 px-2 py-2 rounded-xl text-left border border-[var(--bg-neutral)] bg-[var(--bg-light)] hover:bg-[var(--bg-neutral)] transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            ? "w-10 h-10 p-0 flex items-center justify-center rounded-2xl border border-[var(--bg-neutral)] bg-[var(--bg-light)] hover:bg-[var(--bg-neutral)] transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            : "w-full flex items-center gap-2 px-0 py-2 rounded-xl text-left border border-[var(--bg-neutral)] bg-[var(--bg-light)] hover:bg-[var(--bg-neutral)] transition focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         }
         onClick={() => multi && setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
         disabled={!multi}
-        style={{ minHeight: 48 }}
+        style={{ minHeight: 40 }}
       >
         {iconImg && (
           <img
             src={iconImg}
             alt={current?.title}
             className={
-              collapsed ? "w-6 h-6" : "w-8 h-8 rounded-md object-contain"
+              collapsed ? "w-5 h-5 mx-auto" : "w-6 h-6 rounded-md object-contain pl-2"
             }
+            style={!collapsed ? { marginRight: 8 } : {}}
           />
         )}
         {!collapsed && (
           <div className="flex flex-col flex-1 min-w-0">
-            <span className="font-bold text-[var(--primary)] text-base truncate">
+            <span className="font-medium text-[var(--primary)] text-sm truncate">
               {current?.title}
             </span>
-            {current?.subtitle && (
-              <span className="text-xs text-[var(--primary)] opacity-70 truncate">
-                {current.subtitle}
-              </span>
-            )}
           </div>
         )}
         {multi && !collapsed && (
           <svg
-            className="ml-2 w-4 h-4 text-[var(--primary)]"
+            className="ml-2 w-4 h-4 text-[var(--primary)] pr-2"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            style={{ paddingRight: 8 }}
           >
             <path
               strokeLinecap="round"
@@ -107,18 +104,11 @@ export default function ContextSelector({
                   <img
                     src={iconImgOpt}
                     alt={ctx.title}
-                    className="w-8 h-8 rounded-md object-contain"
+                    className="w-6 h-6 rounded-md object-contain"
                   />
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <span className="font-bold text-[var(--primary)] text-base truncate">
-                      {ctx.title}
-                    </span>
-                    {ctx.subtitle && (
-                      <span className="text-xs text-[var(--primary)] opacity-70 truncate">
-                        {ctx.subtitle}
-                      </span>
-                    )}
-                  </div>
+                  <span className="font-medium text-[var(--primary)] text-sm truncate">
+                    {ctx.title}
+                  </span>
                   {ctx.id === value && (
                     <span className="ml-auto text-[var(--accent)]">✓</span>
                   )}

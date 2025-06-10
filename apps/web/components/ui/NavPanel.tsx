@@ -164,31 +164,32 @@ export default function NavPanel({
   const bottomItems = bottomSection ? bottomSection.items.filter((i) => i.position === "bottom") : [];
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
       <aside
-        className="h-full flex flex-col transition-all duration-300 relative shadow-lg bg-[var(--bg-light)]"
+        className={`h-full flex flex-col justify-between shadow-2xl rounded-2xl bg-white/40 backdrop-blur-xl border border-gray-100 mx-2 transition-all duration-300
+          ${isCollapsed ? 'w-14 px-1' : 'w-64 px-3'}
+        `}
         style={{
-          background:
-            "linear-gradient(135deg, var(--bg-light) 60%, var(--bg-gradient) 100%)",
-          boxShadow: "0 4px 24px 0 rgba(60, 60, 60, 0.04)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.7) 60%, rgba(200,220,255,0.3) 100%)",
+          boxShadow: "0 12px 32px 0 rgba(60, 60, 60, 0.18)",
         }}
         aria-label="Sidebar navigation"
       >
         {/* Header: Greeting and Avatar */}
         {navSchema.props.header && !isCollapsed && (
-          <div className="flex items-center gap-2 px-4 pt-4 pb-2 sticky top-0 z-20 bg-[var(--bg-light)]/80 backdrop-blur border-b border-[var(--bg-neutral)]">
+          <div className="flex items-center gap-2 px-4 pt-4 pb-2 sticky top-0 z-20 bg-white/60 backdrop-blur rounded-t-2xl border-b border-gray-100">
             <img
               src={avatarUrl || "/icons/default-avatar.svg"}
               alt="User avatar"
-              className="rounded-full w-8 h-8 object-cover border border-[var(--accent)]"
+              className="rounded-full w-8 h-8 object-cover border border-gray-200 shadow-sm"
             />
             <div className="flex flex-col">
-              <span className="text-xs text-[var(--primary)] font-semibold">{navSchema.props.header.greeting}</span>
+              <span className="text-[11px] text-gray-700 font-medium tracking-wide opacity-80">{navSchema.props.header.greeting}</span>
             </div>
           </div>
         )}
         {/* Context Selector */}
-        <div className="px-2 pb-2 pt-2">
+        <div className={`${isCollapsed ? 'px-0 pb-2 pt-2' : 'w-full pb-2 pt-2'}`}>
           <ContextSelector
             contexts={contextOptions}
             value={contextValue || ""}
@@ -197,15 +198,15 @@ export default function NavPanel({
           />
         </div>
         {/* Scrollable nav */}
-        <div className="flex-1 overflow-y-auto px-2 py-2 space-y-3 custom-scrollbar" tabIndex={0} aria-label="Navigation sections">
+        <div className={`flex-1 overflow-y-auto ${isCollapsed ? 'px-0 py-1' : 'px-1 py-1'} space-y-4 custom-scrollbar`} tabIndex={0} aria-label="Navigation sections">
           {mainSections.map((section, idx) => (
-            <div key={idx} className="mb-1">
+            <div key={idx} className="mb-0.5">
               {section.title && !isCollapsed && (
-                <div className="text-xs font-bold uppercase tracking-wider text-[var(--primary)] mt-4 mb-1 opacity-70">
+                <div className="text-[10px] font-normal uppercase tracking-widest text-gray-400 mb-1 pl-2 select-none">
                   {section.title}
                 </div>
               )}
-              <nav className="flex flex-col gap-1 mt-1" aria-label={section.title || undefined}>
+              <nav className={`flex flex-col gap-0.5 mt-0.5 ${isCollapsed ? 'items-center' : ''}`} aria-label={section.title || undefined}>
                 {section.items.map((item) => {
                   const isActive = selectedNav === item.id;
                   const Icon = iconMap[(item.icon || '').replace('.svg', '').replace(/\//g, '').replace('-', '').toLowerCase()] || FileQuestion;
@@ -218,26 +219,28 @@ export default function NavPanel({
                         type="button"
                         onClick={() => handleNavClick(item.id)}
                         className={[
-                          "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-150 border-l-4 w-full min-w-0 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]",
+                          "flex items-center transition-all duration-150 w-full min-w-0 focus:outline-none focus:ring-2 focus:ring-blue-300",
+                          isCollapsed ? "justify-center px-0 py-2 rounded-full" : "gap-2 px-2 py-1.5 rounded-lg",
                           isActive
-                            ? "bg-[var(--accent)]/10 border-l-[var(--accent)] text-[var(--primary)] shadow animate-[slideIn_0.2s]"
-                            : "border-l-transparent hover:bg-[var(--accent)]/5 hover:text-[var(--primary)]",
-                          isCollapsed ? "justify-center" : "",
+                            ? "bg-blue-100/90 text-blue-700 shadow font-semibold scale-[1.04]"
+                            : "text-gray-700 hover:bg-blue-50/80 hover:text-blue-700 hover:scale-[1.03] hover:shadow-md",
                         ].join(" ")}
                         style={{
-                          fontSize: 14,
-                          borderRadius: "10px",
-                          marginBottom: "2px",
+                          fontSize: 13,
+                          marginBottom: "1px",
+                          fontWeight: isActive ? 600 : 400,
+                          boxShadow: isActive ? "0 2px 8px 0 rgba(60, 60, 60, 0.08)" : undefined,
+                          transform: isActive ? "scale(1.04)" : undefined,
                           transition:
-                            "background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s",
+                            "background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s",
                         }}
                         aria-current={isActive ? "page" : undefined}
                         tabIndex={0}
                         aria-label={item.label}
                       >
-                        <Icon className="w-5 h-5 shrink-0" strokeWidth={1.5} />
+                        <Icon className={isActive ? "w-4 h-4 text-blue-500" : "w-4 h-4 text-gray-400 group-hover:text-blue-500"} strokeWidth={1.6} />
                         {!isCollapsed && (
-                          <span className="text-sm leading-tight">{item.label}</span>
+                          <span className="text-[13px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{fontWeight: isActive ? 600 : 400}}>{item.label}</span>
                         )}
                       </button>
                     </div>
@@ -246,47 +249,56 @@ export default function NavPanel({
               </nav>
               {/* Section divider */}
               {idx < mainSections.length - 1 && (
-                <div className="border-b border-[var(--bg-neutral)] my-2" />
+                <div className="border-b border-gray-200 my-2" />
               )}
             </div>
           ))}
         </div>
         {/* Sticky footer: profile and actions */}
         {navSchema.props.footer && (
-          <div className="sticky bottom-0 z-30 bg-[var(--bg-light)]/95 backdrop-blur border-t border-[var(--bg-neutral)] px-4 py-2 flex flex-col gap-2">
+          <div className={`bg-white/70 backdrop-blur-xl rounded-b-2xl border-t border-gray-100 ${isCollapsed ? 'px-1 py-1' : 'px-4 py-2'} flex flex-col gap-1 shadow-sm`}>
             {navSchema.props.footer.profile && !isCollapsed && (
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-0.5">
                 <img
                   src={avatarUrl || "/icons/default-avatar.svg"}
                   alt="Profile avatar"
-                  className="rounded-full w-6 h-6 object-cover border border-[var(--accent)]"
+                  className="rounded-full w-6 h-6 object-cover border border-gray-200 shadow-sm"
                 />
-                <span className="text-sm font-medium text-[var(--primary)]">{navSchema.props.footer.profile.name}</span>
+                <span className="text-xs font-normal text-gray-700 opacity-80">{navSchema.props.footer.profile.name}</span>
               </div>
             )}
-            <div className="flex flex-col gap-1">
-              {navSchema.props.footer.actions?.map((action) => (
-                <button
-                  key={action.label}
-                  type="button"
-                  onClick={() => handleFooterAction(action.action)}
-                  className="flex items-center gap-2 px-2 py-2 rounded-lg text-[var(--primary)] hover:bg-[var(--accent)]/10 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                  tabIndex={0}
-                  aria-label={action.label}
-                >
-                  {action.icon && (
-                    <img
-                      src={action.icon}
-                      alt={action.label}
-                      width={16}
-                      height={16}
-                      className="shrink-0"
-                      onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
-                    />
-                  )}
-                  {!isCollapsed && <span>{action.label}</span>}
-                </button>
-              ))}
+            <div className={`flex flex-col gap-0.5 ${isCollapsed ? 'items-center' : ''}`}>
+              {navSchema.props.footer.actions?.map((action) => {
+                // Use Lucide LogOut icon for sign out
+                const isSignOut = action.action === 'signOut';
+                const ActionIcon = isSignOut ? LogOut : undefined;
+                return (
+                  <button
+                    key={action.label}
+                    type="button"
+                    onClick={() => handleFooterAction(action.action)}
+                    className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-2 py-1.5 rounded-lg'} text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-blue-300`}
+                    tabIndex={0}
+                    aria-label={action.label}
+                  >
+                    {isSignOut ? (
+                      <LogOut className="w-4 h-4 mr-1 text-gray-400" strokeWidth={1.6} />
+                    ) : (
+                      action.icon && (
+                        <img
+                          src={action.icon}
+                          alt={action.label}
+                          width={14}
+                          height={14}
+                          className="shrink-0 opacity-70"
+                          onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
+                        />
+                      )
+                    )}
+                    {!isCollapsed && <span className="text-[13px]">{action.label}</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -295,7 +307,7 @@ export default function NavPanel({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="absolute top-1/2 right-0 z-40 rounded-full p-0.5 bg-[var(--bg-neutral)] hover:bg-[var(--accent)] border border-gray-200 shadow transition"
+            className="absolute top-1/2 right-0 z-40 rounded-full p-1 bg-white/80 border border-gray-200 shadow-md hover:bg-blue-100 transition"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             style={{ transform: 'translateY(-50%) translateX(50%)' }}
           >
@@ -307,21 +319,17 @@ export default function NavPanel({
       <style jsx global>{`
         .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: var(--accent) var(--bg-neutral);
+          scrollbar-color: #a5b4fc #f3f4f6;
         }
         .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
+          width: 7px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: var(--accent);
+          background: #a5b4fc;
           border-radius: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: var(--bg-neutral);
-        }
-        @keyframes slideIn {
-          from { border-left-width: 0; opacity: 0.7; }
-          to { border-left-width: 4px; opacity: 1; }
+          background: #f3f4f6;
         }
       `}</style>
     </div>
