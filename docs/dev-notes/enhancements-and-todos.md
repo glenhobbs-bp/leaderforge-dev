@@ -61,6 +61,14 @@
   - Remove hardcoded userId and wire to real user management/auth when available.
   - Ensure both header and footer avatars use the signed URL.
 
+### 9. Linting and Code Quality
+- [ ] Add ESLint configuration for the monorepo (TypeScript, Next.js, React, Prettier integration).
+  - Scaffold .eslintrc at the root and in each package as needed.
+  - Add lint scripts to all package.json files.
+  - Ensure linting runs in CI and locally.
+  - Fix all existing linter errors and warnings.
+  - Document linting rules and workflow in the README.
+
 ---
 
 ## Enhancement Backlog

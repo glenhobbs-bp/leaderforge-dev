@@ -112,3 +112,18 @@ export async function GET(req: NextRequest, { params }: { params: { context_key:
 - API routes are thin wrappers that call the service layer and return JSON.
 - Entitlement and external API logic can be added to the service files.
 - This pattern is used for all context, nav, content, and entitlement endpoints.
+
+## Navigation options table
+CREATE TABLE core.nav_options (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  context_key TEXT REFERENCES core.context_configs(context_key) ON DELETE CASCADE,
+  label TEXT NOT NULL,
+  icon TEXT,
+  description TEXT,
+  "order" INTEGER,
+  route TEXT,
+  agent_prompt TEXT,
+  schema_hint JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
