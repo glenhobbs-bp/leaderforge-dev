@@ -68,7 +68,7 @@ importers:
         version: 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
       '@langchain/langgraph':
         specifier: ^0.2.74
-        version: 0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.46))
+        version: 0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.46))
       openai:
         specifier: ^5.0.1
         version: 5.0.1(ws@8.18.2)(zod@3.25.46)
@@ -178,7 +178,7 @@ importers:
     dependencies:
       '@langchain/langgraph':
         specifier: ^0.2.74
-        version: 0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.57))
+        version: 0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.63))
 
   packages/env: {}
 
@@ -5612,8 +5612,8 @@ packages:
   zod@3.25.46:
     resolution: {integrity: sha512-IqRxcHEIjqLd4LNS/zKffB3Jzg3NwqJxQQ0Ns7pdrvgGkwQsEBdEQcOHaBVqvvZArShRzI39+aMST3FBGmTrLQ==}
 
-  zod@3.25.57:
-    resolution: {integrity: sha512-6tgzLuwVST5oLUxXTmBqoinKMd3JeesgbgseXeFasKKj8Q1FCZrHnbqJOyiEvr4cVAlbug+CgIsmJ8cl/pU5FA==}
+  zod@3.25.63:
+    resolution: {integrity: sha512-3ttCkqhtpncYXfP0f6dsyabbYV/nEUW+Xlu89jiXbTBifUfjaSqXOG6JnQPLtqt87n7KAmnMqcjay6c0Wq0Vbw==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -5634,12 +5634,12 @@ snapshots:
       rxjs: 7.8.1
       untruncate-json: 0.0.1
       uuid: 11.1.0
-      zod: 3.25.57
+      zod: 3.25.63
 
   '@ag-ui/core@0.0.28':
     dependencies:
       rxjs: 7.8.1
-      zod: 3.25.57
+      zod: 3.25.63
 
   '@ag-ui/encoder@0.0.28':
     dependencies:
@@ -6661,14 +6661,14 @@ snapshots:
     transitivePeerDependencies:
       - openai
 
-  '@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))':
+  '@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.20
-      langsmith: 0.3.29(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
+      langsmith: 0.3.29(openai@5.0.1(ws@8.18.2)(zod@3.25.63))
       mustache: 4.2.0
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -6734,9 +6734,9 @@ snapshots:
       '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
       uuid: 10.0.0
 
-  '@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))':
+  '@langchain/langgraph-checkpoint@0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63)))':
     dependencies:
-      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
+      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63))
       uuid: 10.0.0
 
   '@langchain/langgraph-checkpoint@0.0.18(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))':
@@ -6784,16 +6784,6 @@ snapshots:
       '@langchain/core': 0.3.57(openai@4.104.0(ws@8.18.2)(zod@3.25.46))
       react: 19.1.0
 
-  '@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@18.3.1)':
-    dependencies:
-      '@types/json-schema': 7.0.15
-      p-queue: 6.6.2
-      p-retry: 4.6.2
-      uuid: 9.0.1
-    optionalDependencies:
-      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
-      react: 18.3.1
-
   '@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@19.1.0)':
     dependencies:
       '@types/json-schema': 7.0.15
@@ -6804,15 +6794,15 @@ snapshots:
       '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
       react: 19.1.0
 
-  '@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)':
+  '@langchain/langgraph-sdk@0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63)))(react@19.1.0)':
     dependencies:
       '@types/json-schema': 7.0.15
       p-queue: 6.6.2
       p-retry: 4.6.2
       uuid: 9.0.1
     optionalDependencies:
-      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
-      react: 18.3.1
+      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63))
+      react: 19.1.0
 
   '@langchain/langgraph-ui@0.0.38':
     dependencies:
@@ -6822,11 +6812,11 @@ snapshots:
       esbuild-plugin-tailwindcss: 2.0.1
       zod: 3.25.46
 
-  '@langchain/langgraph@0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.46))':
+  '@langchain/langgraph@0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.46))':
     dependencies:
       '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46))
       '@langchain/langgraph-checkpoint': 0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))
-      '@langchain/langgraph-sdk': 0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@18.3.1)
+      '@langchain/langgraph-sdk': 0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.46)))(react@19.1.0)
       uuid: 10.0.0
       zod: 3.25.46
     optionalDependencies:
@@ -6834,15 +6824,15 @@ snapshots:
     transitivePeerDependencies:
       - react
 
-  '@langchain/langgraph@0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)(zod-to-json-schema@3.24.5(zod@3.25.57))':
+  '@langchain/langgraph@0.2.74(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63)))(react@19.1.0)(zod-to-json-schema@3.24.5(zod@3.25.63))':
     dependencies:
-      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57))
-      '@langchain/langgraph-checkpoint': 0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))
-      '@langchain/langgraph-sdk': 0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.57)))(react@18.3.1)
+      '@langchain/core': 0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63))
+      '@langchain/langgraph-checkpoint': 0.0.17(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63)))
+      '@langchain/langgraph-sdk': 0.0.78(@langchain/core@0.3.57(openai@5.0.1(ws@8.18.2)(zod@3.25.63)))(react@19.1.0)
       uuid: 10.0.0
       zod: 3.25.46
     optionalDependencies:
-      zod-to-json-schema: 3.24.5(zod@3.25.57)
+      zod-to-json-schema: 3.24.5(zod@3.25.63)
     transitivePeerDependencies:
       - react
 
@@ -9247,7 +9237,7 @@ snapshots:
     optionalDependencies:
       openai: 5.0.1(ws@8.18.2)(zod@3.25.46)
 
-  langsmith@0.3.29(openai@5.0.1(ws@8.18.2)(zod@3.25.57)):
+  langsmith@0.3.29(openai@5.0.1(ws@8.18.2)(zod@3.25.63)):
     dependencies:
       '@types/uuid': 10.0.0
       chalk: 4.1.2
@@ -9257,7 +9247,7 @@ snapshots:
       semver: 7.7.2
       uuid: 10.0.0
     optionalDependencies:
-      openai: 5.0.1(ws@8.18.2)(zod@3.25.57)
+      openai: 5.0.1(ws@8.18.2)(zod@3.25.63)
 
   libphonenumber-js@1.12.8: {}
 
@@ -10115,10 +10105,10 @@ snapshots:
       ws: 8.18.2
       zod: 3.25.46
 
-  openai@5.0.1(ws@8.18.2)(zod@3.25.57):
+  openai@5.0.1(ws@8.18.2)(zod@3.25.63):
     optionalDependencies:
       ws: 8.18.2
-      zod: 3.25.57
+      zod: 3.25.63
     optional: true
 
   openapi-types@12.1.3: {}
@@ -11608,13 +11598,13 @@ snapshots:
     dependencies:
       zod: 3.25.46
 
-  zod-to-json-schema@3.24.5(zod@3.25.57):
+  zod-to-json-schema@3.24.5(zod@3.25.63):
     dependencies:
-      zod: 3.25.57
+      zod: 3.25.63
     optional: true
 
   zod@3.25.46: {}
 
-  zod@3.25.57: {}
+  zod@3.25.63: {}
 
   zwitch@2.0.4: {}

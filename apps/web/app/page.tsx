@@ -1,10 +1,21 @@
-// File: apps/web/app/page.tsx
+// File: app/page.tsx
+// Purpose: SSR Root page that redirects based on session status
 
-// page.tsx is a server component by default in Next.js App Router
-// It should not use any client hooks or context directly.
-// All client-only logic is handled in AuthGate.tsx
-import AuthGate from "./AuthGate";
+import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-export default function Page() {
-  return <AuthGate />;
+export default async function HomePage() {
+  const cookieStore = await cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (session?.user) {
+    redirect('/dashboard');
+  } else {
+    redirect('/login');
+  }
 }

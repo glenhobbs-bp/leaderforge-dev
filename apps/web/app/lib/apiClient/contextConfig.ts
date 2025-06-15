@@ -8,7 +8,7 @@
 export async function fetchContextConfig(contextKey: string, userId?: string): Promise<any> {
   console.log(`[apiClient] Fetching context config for: ${contextKey}, user: ${userId}`);
   const url = userId ? `/api/context/${contextKey}?user_id=${encodeURIComponent(userId)}` : `/api/context/${contextKey}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) {
     const error = await res.json();
     console.error('[apiClient] Error:', error);

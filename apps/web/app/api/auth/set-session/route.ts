@@ -1,20 +1,54 @@
-import { NextRequest, NextResponse } from 'next/server';
+// File: apps/web/app/api/auth/set-session/route.ts
+'use server';
 
-// This route sets the Supabase session cookie as a JSON stringified session object,
-// which is required for SSR and RLS to work. The cookie name must match the Supabase project ref.
-// See: https://supabase.com/docs/guides/auth/server-side/nextjs#using-access-tokens
+import { NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  // Accept the full session object from the client
-  const session = await req.json();
-  // Set the cookie to the JSON stringified session object
-  const res = NextResponse.json({ success: true });
-  res.cookies.set('sb-pcjaagjqydyqfsthsmac-auth-token', JSON.stringify(session), {
-    path: '/',
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: false, // Always false for localhost!
-  });
-  console.log('[set-session] Setting cookie sb-pcjaagjqydyqfsthsmac-auth-token:', session);
-  return res;
+const accessTokenCookie = 'sb-pcjaagjqydyqfsthsmac-auth-token';
+const refreshTokenCookie = 'sb-pcjaagjqydyqfsthsmac-refresh-token';
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+
+    const access_token = Array.isArray(body.access_token)
+      ? body.access_token[0]
+      : body.access_token;
+
+    const refresh_token = Array.isArray(body.refresh_token)
+      ? body.refresh_token[0]
+      : body.refresh_token;
+
+    console.log('[set-session] ✅ Preparing to set cookies...');
+    console.log('[set-session] typeof access_token:', typeof access_token, '| Value:', access_token);
+    console.log('[set-session] typeof refresh_token:', typeof refresh_token, '| Value:', refresh_token);
+
+    const response = NextResponse.json({ success: true });
+
+    if (access_token) {
+      response.cookies.set(accessTokenCookie, access_token, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7,
+      });
+      console.log('[set-session] ✅ Access token cookie set');
+    }
+
+    if (refresh_token) {
+      response.cookies.set(refreshTokenCookie, refresh_token, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 30,
+      });
+      console.log('[set-session] ✅ Refresh token cookie set');
+    }
+
+    return response;
+  } catch (err) {
+    console.error('[set-session] ❌ Error setting cookies:', err);
+    return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
+  }
 }

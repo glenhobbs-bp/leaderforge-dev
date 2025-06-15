@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 // @ts-ignore
 import { createContentLibraryAgent } from "agent-core";
+import { cookies as nextCookies } from 'next/headers';
+import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 
 /**
  * POST /api/agent/content
@@ -13,6 +15,28 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     console.log('[API] /api/agent/content POST body:', body);
     const { userId, contextKey, intent } = body;
+
+    // Hydrate SSR session
+    const cookieStore = await nextCookies();
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+    const supabase = createSupabaseServerClient(cookieStore);
+
+    if (accessToken && refreshToken) {
+      const setSessionRes = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      console.log('[API/agent/content] setSession result:', setSessionRes);
+    } else {
+      console.warn('[API/agent/content] Missing access or refresh token in cookies. SSR auth will likely fail.');
+    }
+
+    const { data: { user }, error } = await supabase.auth.getUser();
+    console.log('[API/agent/content] Supabase user:', user, 'Session error:', error);
+
     // TODO: Look up agent by navOptionId for true modularity
     const agent = createContentLibraryAgent();
     // Always construct a fully-initialized state object

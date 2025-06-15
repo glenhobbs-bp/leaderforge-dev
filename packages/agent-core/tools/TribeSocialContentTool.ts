@@ -49,78 +49,82 @@ export class TribeSocialContentTool {
       ? process.env.INTERNAL_API_BASE_URL || 'http://localhost:3001'
       : '';
     const url = `${baseUrl}/api/tribe/content/${collectionId}`;
-    const res = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-        // No need to send sessionToken for server-to-server
-      }
-    });
-
-    if (!res.ok) {
-      throw new Error(`Proxy API error: ${res.status} ${res.statusText}`);
-    }
-
-    const text = await res.text();
-    let data;
+    const headers = {
+      'Accept': 'application/json',
+      // No need to send sessionToken for server-to-server
+    };
+    console.log('[TribeSocialContentTool] Fetching from proxy:', url);
+    console.log('[TribeSocialContentTool] Headers:', headers);
     try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("Proxy API did not return JSON. Raw response:", text);
-      throw new Error("Proxy API did not return JSON");
-    }
-    if (data.error) {
-      throw new Error(`Proxy API error: ${data.error}`);
-    }
-    // Map to CardSchema[]
-    const items = Array.isArray(data.Contents) ? data.Contents : [];
-    const cards: CardSchema[] = items.map((item: any) => {
-      // Image selection logic (legacy compatible)
-      let image: string | undefined = undefined;
-      if (item.collectionBGImage) {
-        image = `https://cdn.tribesocial.io/${item.collectionBGImage}`;
-      } else if (item.featuredImage) {
-        image = item.featuredImage.startsWith('http') ? item.featuredImage : `https://cdn.tribesocial.io/${item.featuredImage}`;
-      } else if (item.coverImage) {
-        image = item.coverImage.startsWith('http') ? item.coverImage : `https://cdn.tribesocial.io/${item.coverImage}`;
-      } else if (item.imageUrl && typeof item.imageUrl === 'string') {
-        image = item.imageUrl;
+      const res = await fetch(url, { headers });
+      if (!res.ok) {
+        throw new Error(`Proxy API error: ${res.status} ${res.statusText}`);
       }
-      // Video URL logic
-      let videoUrl = undefined;
-      if (item.transcodingDataLP) {
-        try {
-          const transcoding = typeof item.transcodingDataLP === 'string' ? JSON.parse(item.transcodingDataLP) : item.transcodingDataLP;
-          if (transcoding && transcoding.hls) {
-            videoUrl = transcoding.hls.startsWith('http') ? transcoding.hls : `https://cdn.tribesocial.io/${transcoding.hls}`;
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Proxy API did not return JSON. Raw response:", text);
+        throw new Error("Proxy API did not return JSON");
+      }
+      if (data.error) {
+        throw new Error(`Proxy API error: ${data.error}`);
+      }
+      // Map to CardSchema[]
+      const items = Array.isArray(data.Contents) ? data.Contents : [];
+      const cards: CardSchema[] = items.map((item: any) => {
+        // Image selection logic (legacy compatible)
+        let image: string | undefined = undefined;
+        if (item.collectionBGImage) {
+          image = `https://cdn.tribesocial.io/${item.collectionBGImage}`;
+        } else if (item.featuredImage) {
+          image = item.featuredImage.startsWith('http') ? item.featuredImage : `https://cdn.tribesocial.io/${item.featuredImage}`;
+        } else if (item.coverImage) {
+          image = item.coverImage.startsWith('http') ? item.coverImage : `https://cdn.tribesocial.io/${item.coverImage}`;
+        } else if (item.imageUrl && typeof item.imageUrl === 'string') {
+          image = item.imageUrl;
+        }
+        // Video URL logic
+        let videoUrl = undefined;
+        if (item.transcodingDataLP) {
+          try {
+            const transcoding = typeof item.transcodingDataLP === 'string' ? JSON.parse(item.transcodingDataLP) : item.transcodingDataLP;
+            if (transcoding && transcoding.hls) {
+              videoUrl = transcoding.hls.startsWith('http') ? transcoding.hls : `https://cdn.tribesocial.io/${transcoding.hls}`;
+            }
+          } catch {}
+        } else if (item.video) {
+          videoUrl = item.video.startsWith('http') ? item.video : `https://cdn.tribesocial.io/${item.video}`;
+        }
+        return {
+          type: 'Card',
+          props: {
+            id: String(item.id),
+            title: item.title || item.name,
+            subtitle: item.type || '',
+            image,
+            featuredImage: item.featuredImage,
+            coverImage: item.coverImage,
+            imageUrl: item.imageUrl,
+            videoUrl,
+            description: item.descriptionPlain || item.description || '',
+            longDescription: item.descriptionHtml || '',
+            publishedDate: item.publishedDate,
           }
-        } catch {}
-      } else if (item.video) {
-        videoUrl = item.video.startsWith('http') ? item.video : `https://cdn.tribesocial.io/${item.video}`;
-      }
+        };
+      });
       return {
-        type: 'Card',
+        type: 'Grid',
         props: {
-          id: String(item.id),
-          title: item.title || item.name,
-          subtitle: item.type || '',
-          image,
-          featuredImage: item.featuredImage,
-          coverImage: item.coverImage,
-          imageUrl: item.imageUrl,
-          videoUrl,
-          description: item.descriptionPlain || item.description || '',
-          longDescription: item.descriptionHtml || '',
-          publishedDate: item.publishedDate,
+          columns: 3,
+          items: cards
         }
       };
-    });
-    return {
-      type: 'Grid',
-      props: {
-        columns: 3,
-        items: cards
-      }
-    };
+    } catch (err) {
+      console.error('[TribeSocialContentTool] Fetch error:', err);
+      throw err;
+    }
   }
 
   async getContentByIdAsComponentSchema(contentId: number, sessionToken?: string): Promise<CardSchema | null> {

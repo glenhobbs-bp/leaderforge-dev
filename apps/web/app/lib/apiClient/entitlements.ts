@@ -6,7 +6,7 @@
  */
 export async function fetchUserEntitlements(userId: string): Promise<any[]> {
   console.log(`[apiClient] Fetching entitlements for user: ${userId}`);
-  const res = await fetch(`/api/entitlements/${userId}`);
+  const res = await fetch(`/api/entitlements/${userId}`, { credentials: 'include' });
   if (!res.ok) {
     const error = await res.json();
     console.error('[apiClient] Error:', error);

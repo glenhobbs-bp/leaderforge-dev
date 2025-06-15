@@ -1,16 +1,15 @@
-"use client";
-// This component wraps all client-only providers (Supabase, CopilotKit, etc.)
-// It is required because Next.js App Router expects layout.tsx to be a server component for metadata/streaming.
-// Only client components can use React hooks and context providers like SessionContextProvider.
-import { ReactNode } from "react";
-import { supabase } from "./lib/supabaseClient";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { CopilotKit } from "@copilotkit/react-core";
+'use client';
+
+import { ReactNode, useState } from 'react';
+import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { CopilotKit } from '@copilotkit/react-core';
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
-  // console.log('[ClientProviders] Rendering SessionContextProvider and CopilotKit');
+  const [supabaseClient] = useState(() => createPagesBrowserClient());
+
   return (
-    <SessionContextProvider supabaseClient={supabase}>
+    <SessionContextProvider supabaseClient={supabaseClient}>
       <CopilotKit runtimeUrl="/api/copilotkit" agent="default">
         {children}
       </CopilotKit>

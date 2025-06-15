@@ -6,7 +6,7 @@
  */
 export async function fetchUserPreferences(userId: string): Promise<any> {
   console.log(`[apiClient] Fetching preferences for user: ${userId}`);
-  const res = await fetch(`/api/user/${userId}/preferences`);
+  const res = await fetch(`/api/user/${userId}/preferences`, { credentials: 'include' });
   if (!res.ok) {
     const error = await res.json();
     console.error('[apiClient] Error:', error);
@@ -30,6 +30,7 @@ export async function updateUserPreferences(userId: string, prefs: any): Promise
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(prefs),
+    credentials: 'include',
   });
   if (!res.ok) {
     const error = await res.json();

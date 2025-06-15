@@ -1,7 +1,6 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { entitlementService } from '../../../lib/entitlementService';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
+import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 
 /**
  * GET /api/entitlements/[user_id]
@@ -12,19 +11,20 @@ export async function GET(
   { params }: { params: { user_id: string } }
 ) {
   const { user_id } = params;
+  const res = NextResponse.next();
+  const supabase = await createSupabaseServerClient(res);
   console.log(`[API] GET /api/entitlements/${user_id}`);
   if (!user_id || typeof user_id !== 'string') {
     console.error('[API] Missing or invalid user_id');
-    return new Response(JSON.stringify({ error: 'Missing or invalid user_id' }), { status: 400 });
+    return NextResponse.json({ error: 'Missing or invalid user_id' }, { status: 400 });
   }
   try {
-    const supabase = createServerComponentClient({ cookies });
     const entitlements = await entitlementService.getUserEntitlements(supabase, user_id);
     console.log(`[API] Found ${entitlements.length} entitlements for user ${user_id}`);
-    return new Response(JSON.stringify(entitlements), { status: 200 });
+    return NextResponse.json(entitlements, { status: 200 });
   } catch (error: any) {
     console.error('[API] Error fetching entitlements:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Internal server error' }), { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 

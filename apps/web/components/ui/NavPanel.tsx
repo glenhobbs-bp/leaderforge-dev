@@ -82,6 +82,7 @@ interface NavPanelProps {
   onNavSelect?: (navOptionId: string) => void;
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
+  userId?: string | null;
 }
 
 // Toggle for demo: set to 'solid' or 'translucent'
@@ -114,11 +115,10 @@ export default function NavPanel({
   onNavSelect,
   isCollapsed = false,
   onToggleCollapse,
+  userId,
 }: NavPanelProps) {
   const theme = useTheme().nav;
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
-  // Hard-coded userId for now
-  const userId = "123e4567-e89b-12d3-a456-426614174000";
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const supabase = useSupabaseClient();
 

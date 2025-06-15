@@ -7,7 +7,7 @@
  */
 export async function fetchNavForContext(contextKey: string, userId: string): Promise<any[]> {
   console.log(`[apiClient] Fetching nav for context: ${contextKey}, user: ${userId}`);
-  const res = await fetch(`/api/nav/${contextKey}?user_id=${encodeURIComponent(userId)}`);
+  const res = await fetch(`/api/nav/${contextKey}?user_id=${encodeURIComponent(userId)}`, { credentials: 'include' });
   if (!res.ok) {
     const error = await res.json();
     console.error('[apiClient] Error:', error);
