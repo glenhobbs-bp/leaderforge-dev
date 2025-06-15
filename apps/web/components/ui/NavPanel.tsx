@@ -127,10 +127,17 @@ export default function NavPanel({
       setAvatarUrl(null);
       return;
     }
+    console.log('[NavPanel] Fetching avatar for userId:', userId);
     fetch(`/api/user/avatar?userId=${userId}`)
       .then(res => res.json())
-      .then(data => setAvatarUrl(data.url || "/icons/default-avatar.svg"))
-      .catch(() => setAvatarUrl("/icons/default-avatar.svg"));
+      .then(data => {
+        console.log('[NavPanel] Avatar API response:', data);
+        setAvatarUrl(data.url || "/icons/default-avatar.svg");
+      })
+      .catch((err) => {
+        console.error('[NavPanel] Avatar API error:', err);
+        setAvatarUrl("/icons/default-avatar.svg");
+      });
   }, [userId]);
 
   const handleNavClick = (navOptionId: string) => {
@@ -219,11 +226,11 @@ export default function NavPanel({
                         type="button"
                         onClick={() => handleNavClick(item.id)}
                         className={[
-                          "flex items-center transition-all duration-150 w-full min-w-0 focus:outline-none focus:ring-2 focus:ring-blue-300",
+                          "flex items-center transition-all duration-150 w-full min-w-0 focus:outline-none",
                           isCollapsed ? "justify-center px-0 py-2 rounded-full" : "gap-2 px-2 py-1.5 rounded-lg",
                           isActive
-                            ? "bg-blue-100/90 text-blue-700 shadow font-semibold scale-[1.04]"
-                            : "text-gray-700 hover:bg-blue-50/80 hover:text-blue-700 hover:scale-[1.03] hover:shadow-md",
+                            ? "font-semibold scale-[1.04] shadow"
+                            : "hover:scale-[1.03] hover:shadow-md",
                         ].join(" ")}
                         style={{
                           fontSize: 13,
@@ -233,12 +240,30 @@ export default function NavPanel({
                           transform: isActive ? "scale(1.04)" : undefined,
                           transition:
                             "background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s",
+                          background: isActive
+                            ? "rgba(var(--primary-rgb, 59,130,246), 0.12)"
+                            : undefined,
+                          color: isActive
+                            ? "var(--primary, #2563eb)"
+                            : undefined,
                         }}
                         aria-current={isActive ? "page" : undefined}
                         tabIndex={0}
                         aria-label={item.label}
+                        onMouseEnter={e => {
+                          if (!isActive) {
+                            e.currentTarget.style.background = "rgba(var(--primary-rgb, 59,130,246), 0.08)";
+                            e.currentTarget.style.color = "var(--primary, #2563eb)";
+                          }
+                        }}
+                        onMouseLeave={e => {
+                          if (!isActive) {
+                            e.currentTarget.style.background = "";
+                            e.currentTarget.style.color = "";
+                          }
+                        }}
                       >
-                        <Icon className={isActive ? "w-4 h-4 text-blue-500" : "w-4 h-4 text-gray-400 group-hover:text-blue-500"} strokeWidth={1.6} />
+                        <Icon className="w-4 h-4" strokeWidth={1.6} style={{ color: isActive ? "var(--primary, #2563eb)" : "#9ca3af" }} />
                         {!isCollapsed && (
                           <span className="text-[13px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{fontWeight: isActive ? 600 : 400}}>{item.label}</span>
                         )}
@@ -256,7 +281,7 @@ export default function NavPanel({
         </div>
         {/* Sticky footer: profile and actions */}
         {navSchema.props.footer && (
-          <div className={`bg-white/70 backdrop-blur-xl rounded-b-2xl border-t border-gray-100 ${isCollapsed ? 'px-1 py-1' : 'px-4 py-2'} flex flex-col gap-1 shadow-sm`}>
+          <div className={`bg-white/70 backdrop-blur-xl rounded-b-2xl border-t border-gray-100 ${isCollapsed ? 'px-1 py-2 mb-3' : 'px-4 py-2 mb-3'} flex flex-col gap-1 shadow-sm`}>
             {navSchema.props.footer.profile && !isCollapsed && (
               <div className="flex items-center gap-2 mb-0.5">
                 <img
@@ -269,17 +294,16 @@ export default function NavPanel({
             )}
             <div className={`flex flex-col gap-0.5 ${isCollapsed ? 'items-center' : ''}`}>
               {navSchema.props.footer.actions?.map((action) => {
-                // Use Lucide LogOut icon for sign out
                 const isSignOut = action.action === 'signOut';
-                const ActionIcon = isSignOut ? LogOut : undefined;
                 return (
                   <button
                     key={action.label}
                     type="button"
                     onClick={() => handleFooterAction(action.action)}
-                    className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-2 py-1.5 rounded-lg'} text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-blue-300`}
+                    className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-blue-300`}
                     tabIndex={0}
                     aria-label={action.label}
+                    style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
                   >
                     {isSignOut ? (
                       <LogOut className="w-4 h-4 mr-1 text-gray-400" strokeWidth={1.6} />

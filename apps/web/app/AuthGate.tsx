@@ -78,7 +78,11 @@ export default function AuthGate() {
     logCookies('on session change');
   }, [session]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return (
+    <div style={{ background: '#f3f4f6' }} className="flex min-h-screen items-center justify-center w-full h-full">
+      <span className="text-gray-500 text-lg">Loading...</span>
+    </div>
+  );
 
   if (!session) {
     console.log('[AuthGate] No session, rendering Auth UI');

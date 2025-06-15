@@ -17,9 +17,9 @@
       "primary": "#667eea",
       "secondary": "#764ba2",
       "accent": "#4ecdc4",
-      "bg_light": "#f8f9ff",
-      "bg_neutral": "#e8f4f8",
-      "text_primary": "#333333",
+      "bg_light": "#f6f8fa",
+      "bg_neutral": "#e3e8ee",
+      "text_primary": "#222b45",
       "bg_gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     },
     "nav": [

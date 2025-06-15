@@ -423,14 +423,14 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
       } = currentSchema.props;
       const cardImage = image || featuredImage || coverImage || imageUrl || "/icons/placeholder.png";
       return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
-          <div className="relative w-full aspect-video rounded-t-lg overflow-hidden px-0 lg:px-4">
+        <div className="bg-[var(--card-bg)] rounded-xl shadow border border-[var(--bg-neutral)] flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
+          <div className="relative w-full aspect-video rounded-t-xl overflow-hidden px-0 lg:px-4">
             {cardImage ? (
               <Image
                 src={cardImage}
                 alt={title}
                 fill
-                className="object-cover rounded-t-lg"
+                className="object-cover rounded-t-xl"
                 sizes="(max-width: 768px) 100vw, 400px"
                 priority={false}
                 onError={e => (e.currentTarget.src = '/icons/placeholder.png')}
@@ -503,7 +503,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
                 <div
                   className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%`, background: progress === 100 ? '#22c55e' : '#6366f1' }}
+                  style={{ width: `${progress}%`, background: progress === 100 ? 'var(--accent)' : 'var(--primary)' }}
                 />
               </div>
             )}
@@ -516,7 +516,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
                   className={
                     `px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-150 ` +
                     (action.label.toLowerCase().includes('watch')
-                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      ? 'bg-[var(--primary)] text-white hover:bg-[var(--accent)]'
                       : 'bg-gray-900 text-white hover:bg-gray-700')
                   }
                 >

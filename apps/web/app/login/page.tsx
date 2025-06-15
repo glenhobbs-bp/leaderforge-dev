@@ -46,11 +46,33 @@ export default function LoginPage() {
   }, [supabase, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-light)]">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+    <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
         <Auth
           supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
+          appearance={{
+            theme: ThemeSupa,
+            variables: {
+              default: {
+                colors: {
+                  brand: '#667eea', // LeaderForge blue
+                  brandAccent: '#764ba2', // LeaderForge purple
+                  inputBorder: '#e3e8ee',
+                  inputBackground: '#fff',
+                  inputText: '#222b45',
+                  messageText: '#222b45',
+                  anchorTextColor: '#667eea',
+                },
+                radii: {
+                  borderRadiusButton: '12px',
+                  inputBorderRadius: '12px',
+                },
+                fontSizes: {
+                  baseBodySize: '15px',
+                },
+              },
+            },
+          }}
           providers={['google']}
           theme="light"
         />

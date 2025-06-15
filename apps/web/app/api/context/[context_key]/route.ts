@@ -8,7 +8,7 @@ import { cookies as nextCookies } from 'next/headers';
  * Returns context config, including entitlement requirements.
  */
 export async function GET(req: NextRequest, context: { params: { context_key: string } }) {
-  console.log('[API/context] RAW HEADERS:', Object.fromEntries(req.headers.entries()));
+ // console.log('[API/context] RAW HEADERS:', Object.fromEntries(req.headers.entries()));
   const { context_key } = await context.params;
   const user_id = req.nextUrl.searchParams.get('user_id');
   const res = new NextResponse(); // NOTE: Not using NextResponse.next()
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
   // Log all incoming cookies
   const cookieStore = await nextCookies();
   const allCookies = cookieStore.getAll();
-  console.log('[API/context] Incoming cookies:', allCookies);
+ // console.log('[API/context] Incoming cookies:', allCookies);
 
   const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
   }
 
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  console.log('[API/context] SSR session:', session, 'error:', sessionError);
+//  console.log('[API/context] SSR session:', session, 'error:', sessionError);
 
   if (!session?.user?.id) {
     const acceptHeader = req.headers.get('accept') || '';
@@ -54,9 +54,9 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
   }
 
   try {
-    console.log('[API] Creating Supabase SSR server client for context route');
+   // console.log('[API] Creating Supabase SSR server client for context route');
     const { data: { user }, error: sessionError } = await supabase.auth.getUser();
-    console.log('[API] Supabase user:', user, 'Session error:', sessionError);
+   // console.log('[API] Supabase user:', user, 'Session error:', sessionError);
 
     const config = await contextService.getContextConfig(supabase, context_key, user_id);
     if (!config) {
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
       return NextResponse.json({ error: 'Context config not found' }, { status: 404, headers: res.headers });
     }
 
-    console.log(`[API] Found context config: ${context_key}`);
+  //  console.log(`[API] Found context config: ${context_key}`);
     return NextResponse.json(config, { status: 200, headers: res.headers });
   } catch (error: any) {
     console.error('[API] Error fetching context config:', error);

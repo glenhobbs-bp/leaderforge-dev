@@ -1,6 +1,5 @@
-// File: apps/web/components/DynamicContextPage.tsx
 "use client";
-
+// File: apps/web/components/DynamicContextPage.tsx
 import { useState } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel, { sampleNavSchema } from "./ui/NavPanel";
@@ -119,8 +118,16 @@ export default function DynamicContextPage() {
     setSchema(newSchema);
   };
 
-  if (loading) return <div>Loading context config...</div>;
-  if (error || !config || !config.theme) return <div style={{ background: '#fee', color: '#900', padding: 16 }}>Error loading context config</div>;
+  if (loading) return (
+    <div style={{ background: '#f3f4f6', minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', color: '#222b45', fontSize: 14, padding: 8 }}>
+      Loading context config...
+    </div>
+  );
+  if (error || !config || !config.theme) return (
+    <div style={{ background: '#f3f4f6', minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', color: '#d32f2f', fontSize: 15, fontWeight: 500, padding: 12, letterSpacing: 0.1 }}>
+      Error loading context config
+    </div>
+  );
   if (navLoading) return <div>Loading navigation...</div>;
   if (navError || !navOptions) return <div style={{ background: '#fee', color: '#900', padding: 16 }}>Error loading navigation</div>;
 

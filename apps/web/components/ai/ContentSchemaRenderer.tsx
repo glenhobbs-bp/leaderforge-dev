@@ -79,13 +79,13 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
         actions,
       } = schema.props;
       return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
-          <div className="relative w-full aspect-video rounded-t-lg overflow-hidden px-0 lg:px-4">
+        <div className="bg-[var(--card-bg)] rounded-xl shadow border border-[var(--bg-neutral)] flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
+          <div className="relative w-full aspect-video rounded-t-xl overflow-hidden px-0 lg:px-4">
             <Image
               src={image || "/icons/placeholder.png"}
               alt={title}
               fill
-              className="object-cover rounded-t-lg"
+              className="object-cover rounded-t-xl"
               sizes="(max-width: 768px) 100vw, 400px"
               priority={false}
             />
