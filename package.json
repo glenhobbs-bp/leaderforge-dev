@@ -9,10 +9,15 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@eslint/js": "^9.29.0",
     "@langchain/langgraph-cli": "^0.0.38",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
     "@vitejs/plugin-react": "^4.5.1",
     "browserslist": "4.25.0",
     "dotenv-cli": "^8.0.0",
+    "eslint": "^9.29.0",
+    "eslint-plugin-react": "^7.37.5",
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",

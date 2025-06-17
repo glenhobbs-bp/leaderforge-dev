@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./apps/web" },
+    { "path": "./apps/api" },
+    { "path": "./packages/agent-core" }
+  ],
+  "include": [
+    "apps/web/**/*",
+    "apps/api/**/*",
+    "packages/agent-core/**/*"
+  ]
+}

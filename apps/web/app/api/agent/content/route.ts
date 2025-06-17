@@ -3,18 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { createContentLibraryAgent } from "agent-core";
 import { cookies as nextCookies } from 'next/headers';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
+import { navService } from '../../../lib/navService';
 
 /**
  * POST /api/agent/content
  * Agent-native: invokes the LangGraph ContentLibraryAgent.
- * Expects { userId, contextKey, intent } in the request body.
+ * Expects { userId, contextKey, navOptionId, intent } in the request body.
  * Returns the schema built by the agent.
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     console.log('[API] /api/agent/content POST body:', body);
-    const { userId, contextKey, intent } = body;
+    const { userId, contextKey, navOptionId, intent } = body;
 
     // Hydrate SSR session
     const cookieStore = await nextCookies();
@@ -37,9 +38,22 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser();
     console.log('[API/agent/content] Supabase user:', user, 'Session error:', error);
 
-    // TODO: Look up agent by navOptionId for true modularity
+    // Look up nav option by id
+    if (!navOptionId) {
+      return NextResponse.json({ type: 'NoContent' });
+    }
+    const navOption = await navService.getNavOptionById(supabase, navOptionId, userId);
+    if (!navOption) {
+      // Could be access denied or not found
+      return NextResponse.json({ type: 'AccessDenied' });
+    }
+    if (!navOption.agent_id) {
+      return NextResponse.json({ type: 'NoContent' });
+    }
+
+    // TODO: Look up agent config by agent_id and invoke dynamically
+    // For now, fallback to createContentLibraryAgent for demo
     const agent = createContentLibraryAgent();
-    // Always construct a fully-initialized state object
     const initialState = {
       userId: userId || '',
       contextKey: contextKey || '',
@@ -60,7 +74,7 @@ export async function POST(req: NextRequest) {
     console.log('[API] Agent result.schema:', result.schema);
     return NextResponse.json(result.schema);
   } catch (error) {
-    console.error("[API] Error in /api/agent/content:", error);
+    console.error('[API] Error in /api/agent/content:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }

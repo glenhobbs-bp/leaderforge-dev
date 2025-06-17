@@ -79,6 +79,13 @@
   - Move metadata export from layout.tsx (currently commented out) to a server component or separate file.
   - Ensure custom metadata is supported without breaking client components.
 
+### 12. Nav Section Data Integrity (Option 1)
+- [ ] When using section_order in nav_options (Option 1), ensure all nav_options with the same section have the same section_order value.
+  - Admin UI should validate this on save/edit.
+  - Consider a migration or script to fix mismatches if they occur.
+  - Document this requirement for anyone managing nav data.
+  - If more robust enforcement is needed, consider migrating to a separate nav_sections table in the future.
+
 ---
 
 ## Enhancement Backlog

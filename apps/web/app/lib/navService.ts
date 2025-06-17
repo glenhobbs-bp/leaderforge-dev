@@ -10,26 +10,34 @@ export const navService = {
   /**
    * Get nav options for a context, filtered by user entitlement.
    */
-  async getNavOptions(supabase: SupabaseClient<any, any, any>, contextKey: string, userId: string): Promise<any[]> {
-    console.log(`[navService] Fetching nav options for context: ${contextKey}, user: ${userId}`);
+  async getNavOptions(
+    supabase: SupabaseClient<any, any, any>,
+    contextKey: string,
+    userId: string
+  ): Promise<any[]> {
     const { data, error } = await supabase
       .schema('core')
       .from('nav_options')
       .select('*')
-      .eq('context_key', contextKey);
-    if (error) {
-      console.error(`[navService] Error fetching nav options:`, error);
-      throw error;
-    }
+      .eq('context_key', contextKey)
+      .order('section', { ascending: true })
+      .order('order', { ascending: true });
+
+    if (error) throw error;
     if (!data) return [];
-    // Filter by entitlement if required
+
+    // Get user entitlements (array of entitlement_id or name)
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
-    const filtered = data.filter((nav: any) => {
+
+    // Filter nav options by required_entitlements
+    return data.filter((nav: any) => {
       if (!nav.required_entitlements || nav.required_entitlements.length === 0) return true;
-      return nav.required_entitlements.every((ent: string) => userEntitlements.some((ue: any) => ue.entitlement_id === ent));
+      return nav.required_entitlements.every((ent: string) =>
+        userEntitlements.some((ue: any) =>
+          ue.entitlement_id === ent || ue.entitlement === ent
+        )
+      );
     });
-    console.log(`[navService] Found ${filtered.length} nav options for user`);
-    return filtered;
   },
 
   /**
@@ -59,6 +67,36 @@ export const navService = {
       }
     }
     console.log(`[navService] Found nav option: ${data.nav_key}`);
+    return data;
+  },
+
+  /**
+   * Get a single nav option by UUID (id), filtered by user entitlement.
+   */
+  async getNavOptionById(
+    supabase: SupabaseClient<any, any, any>,
+    navOptionId: string,
+    userId: string
+  ): Promise<any | null> {
+    const { data, error } = await supabase
+      .schema('core')
+      .from('nav_options')
+      .select('*')
+      .eq('id', navOptionId)
+      .single();
+
+    if (error) throw error;
+    if (!data) return null;
+
+    if (data.required_entitlements && data.required_entitlements.length > 0) {
+      const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
+      const hasAll = data.required_entitlements.every((ent: string) =>
+        userEntitlements.some((ue: any) =>
+          ue.entitlement_id === ent || ue.entitlement === ent
+        )
+      );
+      if (!hasAll) return null;
+    }
     return data;
   },
 };

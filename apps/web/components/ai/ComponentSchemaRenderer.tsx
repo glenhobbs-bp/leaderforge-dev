@@ -27,7 +27,6 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentSchema, setCurrentSchema] = useState(schema);
 
   // Helper to open modal from Card actions
   const handleAction = (action: CardAction) => {
@@ -49,21 +48,13 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     }
   };
 
-  // Helper to get userId/contextKey (replace with your actual auth/context logic)
-  function getUserId() {
-    return (typeof window !== 'undefined' && localStorage.getItem('userId')) || '';
-  }
-  function getContextKey() {
-    return (typeof window !== 'undefined' && localStorage.getItem('contextKey')) || '';
-  }
-
-  // Progress update handler
+  // Progress update handler (if needed)
   async function handleProgressUpdate(contentId: string, progress: any) {
     setLoading(true);
     setError(null);
     try {
-      const userId = getUserId();
-      const contextKey = getContextKey();
+      const userId = (typeof window !== 'undefined' && localStorage.getItem('userId')) || '';
+      const contextKey = (typeof window !== 'undefined' && localStorage.getItem('contextKey')) || '';
       const resp = await fetch('/api/agent/content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,7 +81,9 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
         setLoading(false);
         return;
       }
-      setCurrentSchema(newSchema);
+      // Instead of setCurrentSchema, trigger a re-render by calling a callback or lifting state if needed
+      // For now, just reload the page or let parent handle schema update
+      window.location.reload();
     } catch (e: any) {
       setError(e.message || 'Unknown error');
     } finally {
@@ -213,101 +206,103 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-3xl w-full p-0">
-          <DialogTitle className="sr-only">{title || 'Video Player'}</DialogTitle>
-          <DialogDescription className="sr-only">
-            {description || (title ? `Watch ${title}` : 'Video player')}
-          </DialogDescription>
+          <div className="border border-[#E3DDC9]" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.12)' }}>
+            <DialogTitle className="sr-only">{title || 'Video Player'}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {description || (title ? `Watch ${title}` : 'Video player')}
+            </DialogDescription>
 
-          <div className="aspect-video w-full bg-black rounded-t-lg overflow-hidden relative">
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-              </div>
-            )}
-
-            {error ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4">
-                <p className="text-red-400 mb-2">{error}</p>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-md"
-                >
-                  Try Again
-                </button>
-              </div>
-            ) : (
-              fullVideoUrl && (
-                <video
-                  ref={setVideoEl}
-                  poster={poster || undefined}
-                  controls
-                  autoPlay
-                  className="w-full h-full object-cover"
-                  playsInline
-                  crossOrigin="anonymous"
-                >
-                  {!fullVideoUrl.endsWith('.m3u8') && (
-                    <source src={fullVideoUrl} type="video/mp4" />
-                  )}
-                  Your browser does not support the video tag.
-                </video>
-              )
-            )}
-          </div>
-          <div className="p-4 bg-white flex flex-col gap-2 rounded-b-lg">
-            {title && <DialogTitle>{title}</DialogTitle>}
-            {description && <DialogDescription>{description}</DialogDescription>}
-            {pills && pills.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {pills.map((pill, i) => (
-                  <span key={i} className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: pill.color || '#e0e7ef', color: '#222' }}>{pill.label}</span>
-                ))}
-              </div>
-            )}
-            {typeof progress === "number" && (
-              <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
-                <div
-                  className="bg-[var(--primary)] h-1.5 rounded-full transition-all"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            )}
-            <div className="flex flex-row gap-2 items-center mt-2">
-              {videoWatched !== undefined && (
-                <span className={`flex items-center gap-1 text-xs font-medium ${videoWatched ? 'text-green-600' : 'text-gray-400'}`}>
-                  {videoWatched ? (
-                    <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#e6f9ed"/><path d="M5 9.5l2.5 2.5L13 7.5" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  ) : (
-                    <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#f3f4f6"/><path d="M9 5v4l2.5 2.5" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  )}
-                  {videoWatched ? 'Watched' : 'Not Watched'}
-                </span>
+            <div className="aspect-video w-full bg-black rounded-t-lg overflow-hidden relative">
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                </div>
               )}
-              {worksheetSubmitted !== undefined && (
-                <span className={`flex items-center gap-1 text-xs font-medium ${worksheetSubmitted ? 'text-green-600' : 'text-yellow-600'}`}>
-                  {worksheetSubmitted ? (
-                    <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#fef9c3"/><path d="M5 9.5l2.5 2.5L13 7.5" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  ) : (
-                    <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#fef9c3"/><path d="M9 5v4l2.5 2.5" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  )}
-                  {worksheetSubmitted ? 'Worksheet Submitted' : 'Worksheet Not Submitted'}
-                </span>
+
+              {error ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4">
+                  <p className="text-red-400 mb-2">{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-md"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : (
+                fullVideoUrl && (
+                  <video
+                    ref={setVideoEl}
+                    poster={poster || undefined}
+                    controls
+                    autoPlay
+                    className="w-full h-full object-cover"
+                    playsInline
+                    crossOrigin="anonymous"
+                  >
+                    {!fullVideoUrl.endsWith('.m3u8') && (
+                      <source src={fullVideoUrl} type="video/mp4" />
+                    )}
+                    Your browser does not support the video tag.
+                  </video>
+                )
               )}
             </div>
-            {onCompleteAction && (
-              <button
-                className="mt-2 px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
-                onClick={async () => {
-                  if (onCompleteAction.action && onCompleteAction.contentId) {
-                    await handleProgressUpdate(onCompleteAction.contentId, onCompleteAction.progress || { progress_percentage: 100, completed_at: new Date().toISOString() });
-                  }
-                }}
-                disabled={loading}
-              >
-                {loading ? 'Updating...' : onCompleteAction.label}
-              </button>
-            )}
-            {error && <div className="text-red-500 text-xs mt-2">{error}</div>}
+            <div className="p-4 bg-white flex flex-col gap-2 rounded-b-lg">
+              {title && <DialogTitle>{title}</DialogTitle>}
+              {description && <DialogDescription>{description}</DialogDescription>}
+              {pills && pills.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {pills.map((pill, i) => (
+                    <span key={i} className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ background: pill.color || '#e0e7ef', color: '#222' }}>{pill.label}</span>
+                  ))}
+                </div>
+              )}
+              {typeof progress === "number" && (
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                  <div
+                    className="bg-[var(--primary)] h-1.5 rounded-full transition-all"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              )}
+              <div className="flex flex-row gap-2 items-center mt-2">
+                {videoWatched !== undefined && (
+                  <span className={`flex items-center gap-1 text-xs font-medium ${videoWatched ? 'text-green-600' : 'text-gray-400'}`}>
+                    {videoWatched ? (
+                      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#e6f9ed"/><path d="M5 9.5l2.5 2.5L13 7.5" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    ) : (
+                      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#f3f4f6"/><path d="M9 5v4l2.5 2.5" stroke="#a3a3a3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    )}
+                    {videoWatched ? 'Watched' : 'Not Watched'}
+                  </span>
+                )}
+                {worksheetSubmitted !== undefined && (
+                  <span className={`flex items-center gap-1 text-xs font-medium ${worksheetSubmitted ? 'text-green-600' : 'text-yellow-600'}`}>
+                    {worksheetSubmitted ? (
+                      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#fef9c3"/><path d="M5 9.5l2.5 2.5L13 7.5" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    ) : (
+                      <svg width="18" height="18" fill="none" viewBox="0 0 18 18"><circle cx="9" cy="9" r="9" fill="#fef9c3"/><path d="M9 5v4l2.5 2.5" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    )}
+                    {worksheetSubmitted ? 'Worksheet Submitted' : 'Worksheet Not Submitted'}
+                  </span>
+                )}
+              </div>
+              {onCompleteAction && (
+                <button
+                  className="mt-2 px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
+                  onClick={async () => {
+                    if (onCompleteAction.action && onCompleteAction.contentId) {
+                      await handleProgressUpdate(onCompleteAction.contentId, onCompleteAction.progress || { progress_percentage: 100, completed_at: new Date().toISOString() });
+                    }
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? 'Updating...' : onCompleteAction.label}
+                </button>
+              )}
+              {error && <div className="text-red-500 text-xs mt-2">{error}</div>}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -319,7 +314,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     return (
       <div className="flex flex-col items-center justify-center min-h-[200px] text-center p-6">
         <ExclamationTriangleIcon className="w-10 h-10 text-red-500 mb-2" />
-        <div className="text-lg font-semibold text-red-600 mb-1">Something went wrong</div>
+        <div className="text-lg font-semibold text-red-600 mb-1">No content available</div>
         <div className="text-gray-700 mb-3">{message}</div>
         {onRetry && (
           <button
@@ -337,18 +332,18 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
   if (error) {
     return <ErrorMessage message={error} onRetry={() => window.location.reload()} />;
   }
-  if (!currentSchema || typeof currentSchema !== 'object' || !currentSchema.type) {
+  if (!schema || typeof schema !== 'object' || !schema.type) {
     return <ErrorMessage message="Unable to load content. Please try again later." onRetry={() => window.location.reload()} />;
   }
 
-  switch (currentSchema.type) {
+  switch (schema.type) {
     case "Panel":
       return (
         <div>
-          <h2>{currentSchema.props.heading}</h2>
-          {currentSchema.props.description && <p>{currentSchema.props.description}</p>}
-          {currentSchema.props.widgets &&
-            currentSchema.props.widgets.map((w, i) => (
+          <h2>{schema.props.heading}</h2>
+          {schema.props.description && <p>{schema.props.description}</p>}
+          {schema.props.widgets &&
+            schema.props.widgets.map((w, i) => (
               <ComponentSchemaRenderer key={i} schema={w} />
             ))}
         </div>
@@ -356,17 +351,17 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     case "StatCard":
       return (
         <div className="rounded-lg shadow bg-white p-4 mb-4">
-          <h3 className="font-semibold text-lg mb-1">{currentSchema.props.title}</h3>
-          <div className="text-2xl font-bold">{currentSchema.props.value}</div>
-          {currentSchema.props.description && <p className="text-gray-500 text-sm mt-1">{currentSchema.props.description}</p>}
+          <h3 className="font-semibold text-lg mb-1">{schema.props.title}</h3>
+          <div className="text-2xl font-bold">{schema.props.value}</div>
+          {schema.props.description && <p className="text-gray-500 text-sm mt-1">{schema.props.description}</p>}
         </div>
       );
     case "Leaderboard":
       return (
         <div className="rounded-lg shadow bg-white p-4 mb-4">
-          <h3 className="font-semibold text-lg mb-2">{currentSchema.props.title}</h3>
+          <h3 className="font-semibold text-lg mb-2">{schema.props.title}</h3>
           <ol className="list-decimal pl-5">
-            {currentSchema.props.items && currentSchema.props.items.map((item, i) => (
+            {schema.props.items && schema.props.items.map((item, i) => (
               <li key={i} className="flex justify-between py-1">
                 <span>{item.name}</span>
                 <span className="font-mono">{item.score}</span>
@@ -378,9 +373,9 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     case "VideoList":
       return (
         <div className="mb-8">
-          <h3 className="font-semibold text-lg mb-2">{currentSchema.props.title}</h3>
+          <h3 className="font-semibold text-lg mb-2">{schema.props.title}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {currentSchema.props.videos.map((video, i) => (
+            {schema.props.videos.map((video, i) => (
               <div key={video.props.title + i} className="rounded-lg shadow bg-white p-4 flex flex-col items-center">
                 <img
                   src={video.props.image}
@@ -398,7 +393,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
       return (
         <div className="max-w-screen-2xl mx-auto p-6">
           <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-            {currentSchema.props.items.map((item, i) => (
+            {schema.props.items.map((item, i) => (
               <ComponentSchemaRenderer key={i} schema={item} />
             ))}
           </div>
@@ -420,7 +415,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
         progress,
         actions,
         pills,
-      } = currentSchema.props;
+      } = schema.props;
       const cardImage = image || featuredImage || coverImage || imageUrl || "/icons/placeholder.png";
       return (
         <div className="bg-[var(--card-bg)] rounded-xl shadow border border-[var(--bg-neutral)] flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
@@ -546,7 +541,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
     }
     case "VideoPlayer": {
       // This case is now only for direct VideoPlayer schema, not modal trigger
-      const { videoUrl, title, poster, progress, pills, onCompleteAction, videoWatched, worksheetSubmitted } = currentSchema.props;
+      const { videoUrl, title, poster, progress, pills, onCompleteAction, videoWatched, worksheetSubmitted } = schema.props;
       return (
         <div className="w-full max-w-2xl mx-auto">
           <VideoPlayerModal
@@ -560,12 +555,12 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
             videoWatched={videoWatched}
             worksheetSubmitted={worksheetSubmitted}
             onCompleteAction={onCompleteAction}
-            description={currentSchema.props.description}
+            description={schema.props.description}
           />
         </div>
       );
     }
     default:
-      return <div>Unknown schema type: {(currentSchema as any).type}</div>;
+      return <ErrorMessage message={(schema as any)?.type ? `No content available for this section.` : `No content available for this section.`} />;
   }
 }

@@ -1,4 +1,4 @@
-// File: app/AuthGate.tsx
+// File: app/AuthGate.PENDING_DELETE.tsx
 'use client';
 
 import { useEffect } from 'react';
@@ -12,14 +12,14 @@ import DynamicContextPage from 'components/DynamicContextPage';
 function logCookies(label: string) {
   if (typeof document !== 'undefined') {
     try {
-      console.log(`[AuthGate] ${label} document.cookie:`, document.cookie);
+      console.log(`[AuthGatePendingDelete] ${label} document.cookie:`, document.cookie);
     } catch (e) {
-      console.warn(`[AuthGate] ${label} document.cookie: error`, e);
+      console.warn(`[AuthGatePendingDelete] ${label} document.cookie: error`, e);
     }
   }
 }
 
-export default function AuthGate() {
+export default function AuthGatePendingDelete() {
   const { session, isLoading } = useSessionContext();
   const router = useRouter();
 
@@ -27,7 +27,7 @@ export default function AuthGate() {
     logCookies('on mount');
 
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[AuthGate] onAuthStateChange event:', event, 'session:', session);
+      console.log('[AuthGatePendingDelete] onAuthStateChange event:', event, 'session:', session);
       logCookies('onAuthStateChange');
 
       if (event === 'SIGNED_IN' && session) {
@@ -39,12 +39,12 @@ export default function AuthGate() {
           ? session.refresh_token[0]
           : session.refresh_token;
 
-        console.log('[AuthGate] Preparing to sync tokens...');
-        console.log('[AuthGate] access_token:', access_token);
-        console.log('[AuthGate] refresh_token:', refresh_token);
+        console.log('[AuthGatePendingDelete] Preparing to sync tokens...');
+        console.log('[AuthGatePendingDelete] access_token:', access_token);
+        console.log('[AuthGatePendingDelete] refresh_token:', refresh_token);
 
         if (!access_token || !refresh_token) {
-          console.warn('[AuthGate] Missing tokens, skipping cookie sync');
+          console.warn('[AuthGatePendingDelete] Missing tokens, skipping cookie sync');
           return;
         }
 
@@ -58,13 +58,13 @@ export default function AuthGate() {
           });
 
           const result = await res.json();
-          console.log('[AuthGate] Cookie sync result:', result);
+          console.log('[AuthGatePendingDelete] Cookie sync result:', result);
 
           setTimeout(() => {
             router.refresh();
           }, 300);
         } catch (err) {
-          console.error('[AuthGate] Error setting session cookie:', err);
+          console.error('[AuthGatePendingDelete] Error setting session cookie:', err);
         }
       }
     });
@@ -85,7 +85,7 @@ export default function AuthGate() {
   );
 
   if (!session) {
-    console.log('[AuthGate] No session, rendering Auth UI');
+    console.log('[AuthGatePendingDelete] No session, rendering Auth UI');
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--bg-light)]">
         <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
@@ -101,6 +101,6 @@ export default function AuthGate() {
     );
   }
 
-  console.log('[AuthGate] Session found, rendering DynamicContextPage');
+  console.log('[AuthGatePendingDelete] Session found, rendering DynamicContextPage');
   return <DynamicContextPage />;
 }

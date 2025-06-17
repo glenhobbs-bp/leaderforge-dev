@@ -8,6 +8,7 @@ import { useTheme } from "./ThemeContext";
 import ContextSelector from "./ContextSelector";
 import { ComponentSchemaRenderer } from "../ai/ComponentSchemaRenderer";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import * as LucideIcons from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -87,25 +88,6 @@ interface NavPanelProps {
 
 // Toggle for demo: set to 'solid' or 'translucent'
 const UNSELECTED_BG_MODE: "solid" | "translucent" = "solid"; // change to 'translucent' to demo
-
-// Map schema icon keys to Lucide icon components
-const iconMap: Record<string, React.ComponentType<any>> = {
-  book: BookOpen,
-  library: Library,
-  target: Target,
-  users: Users,
-  dashboard: LayoutDashboard,
-  settings: Settings,
-  logout: LogOut,
-  help: HelpCircle,
-  bug: Bug,
-  file: FileQuestion,
-  'bar-chart': BarChart,
-  diamond: Diamond,
-  handshake: Handshake,
-  user: UserIcon,
-  cog: Cog,
-};
 
 export default function NavPanel({
   navSchema,
@@ -216,7 +198,15 @@ export default function NavPanel({
               <nav className={`flex flex-col gap-0.5 mt-0.5 ${isCollapsed ? 'items-center' : ''}`} aria-label={section.title || undefined}>
                 {section.items.map((item) => {
                   const isActive = selectedNav === item.id;
-                  const Icon = iconMap[(item.icon || '').replace('.svg', '').replace(/\//g, '').replace('-', '').toLowerCase()] || FileQuestion;
+                  // Convert kebab-case to PascalCase for Lucide
+                  function toPascalCase(str: string) {
+                    return str
+                      .split('-')
+                      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+                      .join('');
+                  }
+                  const iconName = toPascalCase(item.icon || '');
+                  const Icon = (LucideIcons as any)[iconName] || LucideIcons.FileQuestion;
                   const tooltip = isCollapsed
                     ? item.label + (item.description ? ` — ${item.description}` : "")
                     : undefined;

@@ -17,7 +17,7 @@ function decodeJWT(token: string) {
   }
 }
 
-export default async function MinimalCookieTestPage() {
+export default async function MinimalCookieTestPagePendingDelete() {
   // --- Step 1: Read cookies from request headers ---
   const headersList = await headers();
   const rawCookieHeader = headersList.get('cookie') || '';

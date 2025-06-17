@@ -1,5 +1,7 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { provisioningService } from '../../lib/provisioningService';
+import { createSupabaseServerClient } from '../../lib/supabaseServerClient';
+import { cookies as nextCookies } from 'next/headers';
 
 /**
  * POST /api/provisioning
@@ -7,16 +9,35 @@ import { provisioningService } from '../../lib/provisioningService';
  * Body: { action: 'inviteUser' | 'grantEntitlement' | 'revokeEntitlement', ...params }
  */
 export async function POST(req: NextRequest) {
+  // SSR Auth: get cookies and hydrate session
+  const cookieStore = await nextCookies();
+  const allCookies = cookieStore.getAll();
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+  const supabase = createSupabaseServerClient(cookieStore);
+
+  if (accessToken && refreshToken) {
+    await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+  }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   let body: any;
   try {
     body = await req.json();
   } catch {
     console.error('[API] Invalid JSON body');
-    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
   if (!body || typeof body !== 'object' || !body.action) {
     console.error('[API] Missing or invalid action in body');
-    return new Response(JSON.stringify({ error: 'Missing or invalid action' }), { status: 400 });
+    return NextResponse.json({ error: 'Missing or invalid action' }, { status: 400 });
   }
   const { action } = body;
   try {
@@ -25,34 +46,34 @@ export async function POST(req: NextRequest) {
         const { userId, orgId, role } = body;
         if (!userId || !orgId || !role) {
           console.error('[API] Missing userId, orgId, or role for inviteUser');
-          return new Response(JSON.stringify({ error: 'Missing userId, orgId, or role' }), { status: 400 });
+          return NextResponse.json({ error: 'Missing userId, orgId, or role' }, { status: 400 });
         }
         const result = await provisioningService.provisionUserToOrg(userId, orgId, role);
         console.log(`[API] Invited user ${userId} to org ${orgId} as ${role}: ${result}`);
-        return new Response(JSON.stringify({ success: result }), { status: 200 });
+        return NextResponse.json({ success: result }, { status: 200 });
       }
       case 'grantEntitlement': {
         const { userId, entitlementId } = body;
         if (!userId || !entitlementId) {
           console.error('[API] Missing userId or entitlementId for grantEntitlement');
-          return new Response(JSON.stringify({ error: 'Missing userId or entitlementId' }), { status: 400 });
+          return NextResponse.json({ error: 'Missing userId or entitlementId' }, { status: 400 });
         }
         const result = await provisioningService.provisionEntitlementToUser(userId, entitlementId);
         console.log(`[API] Granted entitlement ${entitlementId} to user ${userId}: ${result}`);
-        return new Response(JSON.stringify({ success: result }), { status: 200 });
+        return NextResponse.json({ success: result }, { status: 200 });
       }
       case 'revokeEntitlement': {
         // Not implemented yet
         console.warn('[API] revokeEntitlement not implemented');
-        return new Response(JSON.stringify({ error: 'Not implemented' }), { status: 501 });
+        return NextResponse.json({ error: 'Not implemented' }, { status: 501 });
       }
       default:
         console.error('[API] Unknown action:', action);
-        return new Response(JSON.stringify({ error: 'Unknown action' }), { status: 400 });
+        return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
     }
   } catch (error: any) {
     console.error('[API] Error in provisioning:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Internal server error' }), { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
 

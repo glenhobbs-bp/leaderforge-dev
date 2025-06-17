@@ -1,4 +1,4 @@
-// File: app/AuthGateClient.tsx
+// File: app/AuthGateClient.PENDING_DELETE.tsx
 // Purpose: Client-side auth gate that renders children only if the user is logged in
 
 'use client';
@@ -10,7 +10,7 @@ import { createBrowserClient } from '@supabase/ssr';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export default function AuthGateClient({ children }: { children: React.ReactNode }) {
+export default function AuthGateClientPendingDelete({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);

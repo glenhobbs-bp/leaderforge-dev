@@ -35,7 +35,7 @@ export default function LoginPage() {
           }
 
           console.log('[login/page] Token sync successful. Redirecting to /dashboard...');
-          router.replace('/dashboard');
+          window.location.href = '/dashboard';
         } catch (error) {
           console.error('[login/page] Error syncing tokens:', error);
         }
@@ -48,6 +48,9 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+        </div>
         <Auth
           supabaseClient={supabase}
           appearance={{
@@ -55,13 +58,13 @@ export default function LoginPage() {
             variables: {
               default: {
                 colors: {
-                  brand: '#667eea', // LeaderForge blue
-                  brandAccent: '#764ba2', // LeaderForge purple
-                  inputBorder: '#e3e8ee',
-                  inputBackground: '#fff',
-                  inputText: '#222b45',
-                  messageText: '#222b45',
-                  anchorTextColor: '#667eea',
+                  brand: '#3E5E17', // Brilliant green
+                  brandAccent: '#DD8D00', // Brilliant orange
+                  inputBorder: '#E3DDC9',
+                  inputBackground: '#F8F4F1',
+                  inputText: '#222222',
+                  messageText: '#222222',
+                  anchorTextColor: '#3E5E17',
                 },
                 radii: {
                   borderRadiusButton: '12px',
@@ -73,7 +76,7 @@ export default function LoginPage() {
               },
             },
           }}
-          providers={['google']}
+           providers={[]} // Uncomment to enable Google sign-in
           theme="light"
         />
       </div>
