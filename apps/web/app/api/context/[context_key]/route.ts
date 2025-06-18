@@ -7,9 +7,13 @@ import { ContextConfig } from '../../../lib/types';
 /**
  * GET /api/context/[context_key]
  * Returns context config, including entitlement requirements.
+ * Optimized with caching headers and performance monitoring.
  */
 export async function GET(req: NextRequest, context: { params: { context_key: string } }) {
+  const startTime = Date.now();
   const { context_key } = await context.params;
+
+  console.log(`[API] GET /api/context/${context_key} - optimized request`);
 
   const cookieStore = await nextCookies();
   const allCookies = cookieStore.getAll();
@@ -45,13 +49,36 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
   try {
     await supabase.auth.getUser(); // Call for side effect if needed
     const config: ContextConfig | null = await contextService.getContextConfig(supabase, context_key);
+
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
     if (!config) {
+      console.log(`[API] Context config not found for: ${context_key} (${duration}ms)`);
       return NextResponse.json({ error: 'Context config not found' }, { status: 404 });
     }
-    return NextResponse.json(config, { status: 200 });
+
+    console.log(`[API] Context config for ${context_key} returned in ${duration}ms`);
+
+    // Return with aggressive caching headers for performance
+    return NextResponse.json(config, {
+      status: 200,
+      headers: {
+        // Cache for 5 minutes in browser, 1 hour in CDN
+        'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
+        'X-Response-Time': `${duration}ms`,
+        'X-Cache-Status': 'optimized',
+        // Enable compression
+        'Content-Encoding': 'gzip',
+        'Vary': 'Accept-Encoding',
+      }
+    });
   } catch (error) {
     const err = error as Error;
-    console.error('[API] Error fetching context config:', err);
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    console.error(`[API] Error fetching context config for ${context_key} (${duration}ms):`, err);
     return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,282 +1,394 @@
 "use client";
 // File: apps/web/components/DynamicContextPage.tsx
-// Purpose: Main 3-panel layout for schema-driven app. Fetches context config and entitlement-filtered nav options, builds dynamic NavPanel, and renders content panel based on agent/entitlement.
-import { useState, useEffect, useMemo } from "react";
+// Purpose: Agent-native 3-panel layout. Fetches complete UI schema from agents, renders dynamic content based on user entitlements.
+import { useState, useEffect, useRef } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
-import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
-// @ts-expect-error: Importing type from agent-core/types/contentSchema for schema rendering
-import type { ContentSchema as ComponentSchema } from 'agent-core/types/contentSchema';
-import { useContextConfig } from "../hooks/useContextConfig";
-import { useNavOptions } from "../hooks/useNavOptions";
 import { useSessionContext } from '@supabase/auth-helpers-react';
-import { Loader2 } from 'lucide-react';
-import { groupBy, sortBy } from "lodash";
-import React, { useRef } from "react";
-
-interface ContextItem {
-  context_key: string;
-  display_name: string;
-  subtitle?: string;
-  i18n?: { subtitle?: string };
-  logo_url?: string;
-}
+import React from "react";
 
 // Diagnostic: Track module load
-console.log('[DynamicContextPage] Module loaded');
+console.log('[DynamicContextPage] Module loaded - Agent-native mode');
 
-// --- New: useContextList hook ---
-function useContextList(initialContexts?: ContextItem[]) {
-  const [contexts, setContexts] = useState<ContextItem[]>(initialContexts || []);
-  const [loading, setLoading] = useState(!initialContexts);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    if (initialContexts && initialContexts.length > 0) return;
-    console.log('[useContextList] useEffect triggered');
-    setLoading(true);
-    fetch('/api/context/list', { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => {
-        setContexts(Array.isArray(data) ? data : []);
-        setLoading(false);
-        setError(null);
-        console.log('[useContextList] Loaded contexts:', data);
-      })
-      .catch((e: unknown) => {
-        let message = 'Failed to load contexts';
-        if (typeof e === 'object' && e && 'message' in e && typeof (e as { message?: unknown }).message === 'string') {
-          message = (e as { message: string }).message;
-        }
-        setError(message);
-        setLoading(false);
-        setContexts([]);
-        console.error('[useContextList] Error:', e);
-      });
-  }, [initialContexts]);
-  return { contexts, loading, error };
+// Basic types for agent schema
+interface AgentSchema {
+  type: string;
+  schema: {
+    contextKey: string;
+    contextName: string;
+    theme: {
+      primary: string;
+      secondary: string;
+      accent: string;
+      bg_light: string;
+      bg_neutral: string;
+      text_primary: string;
+    };
+    navigation: Array<{
+      id: string;
+      label: string;
+      icon?: string;
+      description?: string;
+      route?: string;
+    }> | Array<{
+      title?: string;
+      items: Array<{
+        id: string;
+        label: string;
+        icon?: string;
+        description?: string;
+        href?: string;
+        route?: string;
+      }>;
+    }>;
+    content: {
+      recommendations: Array<{
+        type: string;
+        title: string;
+        description: string;
+        action?: string;
+      }>;
+    };
+    chat: {
+      heading: string;
+      message: string;
+    };
+  };
 }
 
 type DynamicContextPageProps = {
-  initialContexts?: ContextItem[];
-  initialContextConfig?: any;
-  initialNavOptions?: any;
+  // Props for context management
+  initialContexts?: Array<{
+    id: string;
+    context_key: string;
+    display_name: string;
+    description?: string;
+  }>;
+  initialContextConfig?: unknown;
+  initialNavOptions?: unknown;
   defaultContextKey?: string;
 };
-export default function DynamicContextPage({
-  initialContexts,
-  initialContextConfig,
-  initialNavOptions,
-  defaultContextKey
-}: DynamicContextPageProps) {
-  console.log('[DynamicContextPage] RENDER');
-  // All hooks at the top!
+
+export default function DynamicContextPage(props: DynamicContextPageProps) {
+  console.log('[DynamicContextPage] RENDER - Agent-native', props);
+
+  // Core state
   const hasMounted = useRef(false);
-  React.useEffect(() => {
-    console.log('[DynamicContextPage] useEffect: mount');
-    if (process.env.NODE_ENV === 'development' && !hasMounted.current) {
-      console.log('[DynamicContextPage] Component mounted');
-      hasMounted.current = true;
-    }
-    return () => {
-      console.log('[DynamicContextPage] useEffect: unmount');
-    };
-  }, []);
-  const { contexts, loading: contextsLoading, error: contextsError } = useContextList(initialContexts);
+  const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentContext, setCurrentContext] = useState(props.defaultContextKey || 'brilliant');
+
+  // Auth context
   const { session } = useSessionContext();
-  const userId = session?.user?.id || null;
-  const [contextId, setContextId] = useState<string | null>(defaultContextKey || null);
-  // Set default contextId to first available context if not already set
+
+  // Track mounting for debug logging
   useEffect(() => {
-    if (!contextId && contexts.length > 0) {
-      setContextId(contexts[0].context_key);
-      console.log('[DynamicContextPage] Defaulting contextId to:', contexts[0].context_key);
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[DynamicContextPage] Component mounted - Agent-native mode');
+      }
     }
-  }, [contexts, contextId]);
+  }, []);
+
+  // 🤖 AGENT-NATIVE: Single API call to get complete UI schema
   useEffect(() => {
-    console.log('[DynamicContextPage] contextId changed:', contextId);
-  }, [contextId]);
-  // Always call hooks; let them handle empty keys
-  // Pass initial data for faster hydration
-  const shouldUseInitialConfig = contextId === defaultContextKey && initialContextConfig;
-  const shouldUseInitialNav = contextId === defaultContextKey && initialNavOptions;
-
-  const { config, loading, error } = useContextConfig(
-    contextId || '',
-    shouldUseInitialConfig ? initialContextConfig : undefined
-  );
-  const { navOptions, loading: navLoading, error: navError } = useNavOptions(
-    contextId || '',
-    shouldUseInitialNav ? initialNavOptions : undefined
-  );
-
-  useEffect(() => {
-    console.log('[DynamicContextPage] navOptions changed:', navOptions);
-  }, [navOptions]);
-
-  const [schema, setSchema] = useState<ComponentSchema | null>(null);
-  const [schemaError, setSchemaError] = useState<string | null>(null);
-  const [schemaLoading, setSchemaLoading] = useState(false);
-
-  useEffect(() => {
-    console.log('[DynamicContextPage] schema changed:', schema);
-  }, [schema]);
-
-  // Build NavPanel schema dynamically from navOptions
-  const navSections = useMemo(() => {
-    if (!navOptions || !Array.isArray(navOptions)) return [];
-    const grouped = groupBy(navOptions, item => (item.section?.trim() || ''));
-    const allSectionsEmpty = Object.keys(grouped).length === 1 && Object.keys(grouped)[0] === '';
-    if (allSectionsEmpty) {
-      return [{ title: null, items: sortBy(navOptions, 'order') }];
-    }
-    return Object.entries(grouped)
-      .map(([section, items]) => ({
-        title: section || null,
-        sectionOrder: Math.min(...items.map(i => i.section_order ?? 0)),
-        items: sortBy(items, 'order'),
-      }))
-      .sort((a, b) => a.sectionOrder - b.sectionOrder);
-  }, [navOptions]);
-
-  const handleNavSelect = async (navOptionId: string) => {
-    setSchemaError(null);
-    setSchema(null);
-    setSchemaLoading(true);
-    try {
-      const contextKey = contextId;
-      const intent = undefined;
-      const payload = { userId, contextKey, intent, navOptionId };
-      console.log('[handleNavSelect] Sending payload:', payload);
-      const res = await fetch("/api/agent/content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        credentials: 'include',
-      });
-      console.log('[handleNavSelect] Response status:', res.status);
-      if (!res.ok) {
-        setSchemaError("Server error. Please try again later.");
-        setSchemaLoading(false);
+    const fetchAgentSchema = async () => {
+      // Wait for authentication
+      if (!session?.user?.id) {
+        setLoading(true);
         return;
       }
-      const data = await res.json();
-      console.log('[handleNavSelect] Response JSON:', data);
-      setSchema(data);
-    } catch (e: unknown) {
-      let message = 'Unknown error';
-      if (typeof e === 'object' && e && 'message' in e && typeof (e as { message?: unknown }).message === 'string') {
-        message = (e as { message: string }).message;
+
+      try {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[DynamicContextPage] Requesting UI schema from agent for context:', currentContext);
+        }
+
+        const response = await fetch('/api/agent/context', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            message: `What should I see on my dashboard for ${currentContext}?`,
+            userId: session?.user?.id, // Pass user ID explicitly to bypass auth issues
+            context: currentContext // Pass the current context
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch agent schema');
+        }
+
+        const agentResponse = await response.json();
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[DynamicContextPage] Agent schema received:', agentResponse);
+        }
+
+        setAgentSchema(agentResponse);
+        setError(null);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[DynamicContextPage] Agent schema fetch failed:', errorMessage);
+        setError(errorMessage);
+
+        // Fallback: Use default schema if agent fails
+        setAgentSchema({
+          type: 'context_schema',
+          schema: {
+            contextKey: 'default',
+            contextName: 'Welcome',
+            theme: {
+              primary: '#667eea',
+              secondary: '#764ba2',
+              accent: '#4ecdc4',
+              bg_light: '#f8f9ff',
+              bg_neutral: '#e8f4f8',
+              text_primary: '#333333'
+            },
+            navigation: [{
+              id: 'support',
+              label: 'Support',
+              icon: '/icons/support.svg',
+              description: 'Get help',
+              route: '/support'
+            }],
+            content: {
+              recommendations: [{
+                type: 'welcome',
+                title: 'Welcome',
+                description: 'Please check your connection and try again.',
+                action: 'Retry'
+              }]
+            },
+            chat: {
+              heading: 'Assistant',
+              message: 'How can I help you today?'
+            }
+          }
+        });
+      } finally {
+        setLoading(false);
       }
-      setSchemaError(message);
+    };
+
+    fetchAgentSchema();
+  }, [session?.user?.id, currentContext]); // Re-fetch when user or context changes
+
+  // Handle context change
+  const handleContextChange = (contextKey: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[DynamicContextPage] Context changed to:', contextKey);
+    }
+    setCurrentContext(contextKey);
+  };
+
+  // Handle navigation selection
+  const handleNavSelect = async (navId: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[DynamicContextPage] Navigation selected:', navId);
+    }
+
+    // 🤖 AGENT-NATIVE: Ask agent for updated schema based on navigation
+    try {
+      setLoading(true);
+      const response = await fetch('/api/agent/context', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          message: `I want to access ${navId}`,
+          context: currentContext
+        })
+      });
+
+      if (response.ok) {
+        const updatedSchema = await response.json();
+        setAgentSchema(updatedSchema);
+      }
+    } catch (err) {
+      console.error('[DynamicContextPage] Navigation update failed:', err);
     } finally {
-      setSchemaLoading(false);
+      setLoading(false);
     }
   };
 
-  // Debug logging for hydration issues
-  useEffect(() => {
-    console.log({ contexts, contextId, session, userId });
-  }, [contexts, contextId, session, userId]);
-
-  // Debug logging for nav options
-  useEffect(() => {
-    console.log({ navOptions, navOptionsLoading: navLoading, navOptionsError: navError });
-  }, [navOptions, navLoading, navError]);
-
-  // Replace all other debug logs with NODE_ENV check
-  if (process.env.NODE_ENV === 'development') {
-    console.log("Loading guard check", {
-      contextsLoading,
-      contextsLength: contexts.length,
-      contextId,
-      session,
-      userId,
-    });
-    console.log('DynamicContextPage mounted');
-  }
-
-  // Now do your loading guard
-  if (contextsLoading || !contexts.length || !session || !userId || !contextId) {
+  // Show loading state while waiting for auth or schema
+  if (!session || loading) {
     return (
-      <div style={{ background: '#f3f4f6', minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', color: '#222b45', fontSize: 14, padding: 8 }}>
-        Loading context...
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {!session ? 'Authenticating...' : 'Loading your personalized experience...'}
+          </p>
+        </div>
       </div>
     );
   }
 
-  if (contextsError || !contexts.length) return (
-    <div style={{ background: '#fee', color: '#900', padding: 16 }}>Error loading contexts</div>
-  );
-  if (loading) return (
-    <div style={{ background: '#f3f4f6', minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', color: '#222b45', fontSize: 14, padding: 8 }}>
-      Loading context config...
+  // Show error state
+  if (error && !agentSchema) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center max-w-md">
+          <div className="text-red-500 mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold mb-2">Unable to Load Experience</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Extract schema data
+  const schema = agentSchema?.schema;
+  if (!schema) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div>Invalid agent response - please refresh</div>
+      </div>
+    );
+  }
+
+    // 🎨 RENDER AGENT-GENERATED SCHEMA
+  // Convert agent navigation to NavPanel schema format
+  // Handle both new sections format and legacy flat navigation format
+  let sections;
+
+  // Type guard to check if it's the new sections format
+  const isSectionsFormat = (nav: any): nav is Array<{ title?: string; items: Array<any> }> => {
+    return Array.isArray(nav) && nav.length > 0 && nav[0] && typeof nav[0] === 'object' && 'items' in nav[0];
+  };
+
+  // Type guard to check if it's the legacy flat format
+  const isLegacyFormat = (nav: any): nav is Array<{ id: string; label: string; icon?: string; description?: string; route?: string; }> => {
+    return Array.isArray(nav) && nav.length > 0 && nav[0] && typeof nav[0] === 'object' && 'id' in nav[0] && !('items' in nav[0]);
+  };
+
+  if (isSectionsFormat(schema.navigation)) {
+    // New sections format - use directly
+    sections = schema.navigation.map(section => ({
+      title: section.title,
+      items: section.items.map(navItem => ({
+        id: navItem.id,
+        label: navItem.label,
+        icon: navItem.icon?.replace('/icons/', '').replace('.svg', '') || 'folder',
+        href: navItem.href || navItem.route || `/${navItem.id}`,
+        description: navItem.description || ''
+      }))
+    }));
+  } else if (isLegacyFormat(schema.navigation)) {
+    // Legacy flat navigation format - convert to single section
+    sections = [{
+      title: null,
+      items: schema.navigation.map(navItem => ({
+        id: navItem.id,
+        label: navItem.label,
+        icon: navItem.icon?.replace('/icons/', '').replace('.svg', '') || 'folder',
+        href: navItem.route || `/${navItem.id}`,
+        description: navItem.description || ''
+      }))
+    }];
+  } else {
+    // Fallback
+    sections = [{
+      title: null,
+      items: []
+    }];
+  }
+
+  const navSchema = {
+    type: "NavPanel" as const,
+    props: {
+      header: {
+        greeting: "Welcome back"
+      },
+      sections,
+      footer: {
+        actions: [{
+          label: 'Sign Out',
+          action: 'signOut',
+          icon: 'logout'
+        }]
+      }
+    }
+  };
+
+  // Context options for context selector (using all available contexts)
+  const contextOptions = props.initialContexts?.map(ctx => ({
+    id: ctx.context_key,
+    title: ctx.display_name,
+    subtitle: ctx.description || 'AI-Powered Experience',
+    icon: 'star'
+  })) || [{
+    id: schema.contextKey,
+    title: schema.contextName,
+    subtitle: 'AI-Powered Experience',
+    icon: 'star'
+  }];
+
+    // Create proper nav component that accepts isCollapsed and onToggleCollapse props
+  const NavComponent = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
+    return (
+      <NavPanel
+        navSchema={navSchema}
+        contextOptions={contextOptions}
+        contextValue={currentContext}
+        onContextChange={handleContextChange}
+        onNavSelect={handleNavSelect}
+        isCollapsed={isCollapsed}
+        onToggleCollapse={onToggleCollapse}
+        userId={session?.user?.id}
+      />
+    );
+  };
+
+  const navComponent = <NavComponent />;
+
+  const contentComponent = (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        {schema.content.recommendations[0]?.title || 'Welcome'}
+      </h1>
+      <p className="text-gray-600 mb-6">
+        {schema.content.recommendations[0]?.description || ''}
+      </p>
+      <div className="space-y-4">
+        {schema.content.recommendations.map((rec, index: number) => (
+          <div key={index} className="p-4 border rounded-lg">
+            <h3 className="font-semibold">{rec.title}</h3>
+            <p className="text-sm text-gray-600">{rec.description}</p>
+            {rec.action && (
+              <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                {rec.action}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
-  if (error || !config || !config.theme) return (
-    <div style={{ background: '#f3f4f6', minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', color: '#d32f2f', fontSize: 15, fontWeight: 500, padding: 12, letterSpacing: 0.1 }}>
-      Error loading context config
-    </div>
-  );
-  if (navLoading) return <div>Loading navigation...</div>;
-  if (navError || !navOptions) return <div style={{ background: '#fee', color: '#900', padding: 16 }}>Error loading navigation</div>;
 
   return (
     <ThreePanelLayout
-      nav={
-        <NavPanel
-          navSchema={{
-            type: "NavPanel",
-            props: {
-              header: { greeting: "Welcome back, Glen!" },
-              sections: navSections,
-              footer: {
-                profile: {
-                  name: session?.user?.user_metadata?.full_name || session?.user?.email || "User",
-                  avatarUrl: session?.user?.user_metadata?.avatar_url || null,
-                },
-                actions: [
-                  { label: "Sign Out", action: "signOut", icon: "logout" }
-                ]
-              }
-            }
-          }}
-          contextOptions={contexts.map(ctx => ({
-            id: ctx.context_key,
-            title: ctx.display_name,
-            subtitle: ctx.subtitle || ctx.i18n?.subtitle || "",
-            icon: ctx.logo_url,
-          }))}
-          contextValue={contextId || ''}
-          onContextChange={setContextId}
-          onNavSelect={handleNavSelect}
-          userId={userId}
-        />
-      }
-      content={
-        schemaLoading ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <Loader2 className="animate-spin w-8 h-8 mb-4" />
-            <span>Loading...</span>
-          </div>
-        ) : schemaError ? (
-          <div className="flex flex-col items-center justify-center h-full text-red-500">
-            <span>{schemaError}</span>
-          </div>
-        ) : schema ? (
-          schema.type === 'AccessDenied' ? (
-            <div className="flex flex-col items-center justify-center h-full text-yellow-600">
-              <span>Access Denied: You do not have permission to view this section.</span>
-            </div>
-          ) : (
-            <ComponentSchemaRenderer schema={schema} />
-          )
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <span>No content available for this section.</span>
-          </div>
-        )
-      }
-      contextConfig={config}
+      nav={navComponent}
+      content={contentComponent}
+      contextConfig={{
+        theme: schema.theme
+      }}
     />
   );
 }

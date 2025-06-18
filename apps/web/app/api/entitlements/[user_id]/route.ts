@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { entitlementService } from '../../../lib/entitlementService';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
+import { cookies as nextCookies } from 'next/headers';
 import { Entitlement } from '../../../lib/types';
 
 /**
@@ -12,7 +13,8 @@ export async function GET(
   { params }: { params: { user_id: string } }
 ) {
   const { user_id } = params;
-  const supabase = await createSupabaseServerClient();
+  const cookieStore = await nextCookies();
+  const supabase = createSupabaseServerClient(cookieStore);
   console.log(`[API] GET /api/entitlements/${user_id}`);
   if (!user_id || typeof user_id !== 'string') {
     console.error('[API] Missing or invalid user_id');
