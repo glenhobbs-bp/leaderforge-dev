@@ -58,13 +58,18 @@ function useContextList(initialContexts?: ContextItem[]) {
 
 type DynamicContextPageProps = { initialContexts?: ContextItem[] };
 export default function DynamicContextPage({ initialContexts }: DynamicContextPageProps) {
+  console.log('[DynamicContextPage] RENDER');
   // All hooks at the top!
   const hasMounted = useRef(false);
   React.useEffect(() => {
+    console.log('[DynamicContextPage] useEffect: mount');
     if (process.env.NODE_ENV === 'development' && !hasMounted.current) {
       console.log('[DynamicContextPage] Component mounted');
       hasMounted.current = true;
     }
+    return () => {
+      console.log('[DynamicContextPage] useEffect: unmount');
+    };
   }, []);
   const { contexts, loading: contextsLoading, error: contextsError } = useContextList(initialContexts);
   const { session } = useSessionContext();
@@ -78,15 +83,23 @@ export default function DynamicContextPage({ initialContexts }: DynamicContextPa
     }
   }, [contexts, contextId]);
   useEffect(() => {
-    console.log('[DynamicContextPage] contextId:', contextId);
+    console.log('[DynamicContextPage] contextId changed:', contextId);
   }, [contextId]);
   // Always call hooks; let them handle empty keys
   const { config, loading, error } = useContextConfig(contextId || '');
   const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId || '');
 
   useEffect(() => {
-    console.log('[DynamicContextPage] navOptions:', navOptions);
+    console.log('[DynamicContextPage] navOptions changed:', navOptions);
   }, [navOptions]);
+
+  const [schema, setSchema] = useState<ComponentSchema | null>(null);
+  const [schemaError, setSchemaError] = useState<string | null>(null);
+  const [schemaLoading, setSchemaLoading] = useState(false);
+
+  useEffect(() => {
+    console.log('[DynamicContextPage] schema changed:', schema);
+  }, [schema]);
 
   // Build NavPanel schema dynamically from navOptions
   const navSections = useMemo(() => {
@@ -104,10 +117,6 @@ export default function DynamicContextPage({ initialContexts }: DynamicContextPa
       }))
       .sort((a, b) => a.sectionOrder - b.sectionOrder);
   }, [navOptions]);
-
-  const [schema, setSchema] = useState<ComponentSchema | null>(null);
-  const [schemaError, setSchemaError] = useState<string | null>(null);
-  const [schemaLoading, setSchemaLoading] = useState(false);
 
   const handleNavSelect = async (navOptionId: string) => {
     setSchemaError(null);

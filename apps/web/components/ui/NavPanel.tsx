@@ -2,43 +2,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight, BookOpen, Library, Target, Users, LayoutDashboard, Settings, LogOut, HelpCircle, Bug, FileQuestion, BarChart, Diamond, Handshake, User as UserIcon, Cog } from "lucide-react";
-import { useTheme } from "./ThemeContext";
+import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import ContextSelector from "./ContextSelector";
-import { ComponentSchemaRenderer } from "../ai/ComponentSchemaRenderer";
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import * as LucideIcons from "lucide-react";
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon?: string;
-  description?: string;
-}
-
-interface Theme {
-  panelBg: string;
-  panelText: string;
-  activeBg: string;
-  activeText: string;
-  inactiveBg: string;
-  inactiveText: string;
-  inactiveBorder: string;
-}
-
-interface Logo {
-  src: string;
-  alt: string;
-  width?: number;
-  height?: number;
-}
-
-interface Icon {
-  src: string;
-  alt: string;
-  size?: number;
-}
 
 // Add NavPanelSchema type
 export interface NavPanelSchema {
@@ -86,9 +53,6 @@ interface NavPanelProps {
   userId?: string | null;
 }
 
-// Toggle for demo: set to 'solid' or 'translucent'
-const UNSELECTED_BG_MODE: "solid" | "translucent" = "solid"; // change to 'translucent' to demo
-
 export default function NavPanel({
   navSchema,
   contextOptions = [],
@@ -99,30 +63,81 @@ export default function NavPanel({
   onToggleCollapse,
   userId,
 }: NavPanelProps) {
-  const theme = useTheme().nav;
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[NavPanel] RENDER');
+  }
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);
   const supabase = useSupabaseClient();
 
   useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] useEffect: userId changed to:', userId);
+    }
+
+    // Reset avatar if no userId
     if (!userId) {
       setAvatarUrl(null);
+      setIsLoadingAvatar(false);
       return;
     }
-    console.log('[NavPanel] Fetching avatar for userId:', userId);
+
+    // Skip if we're already loading or have the avatar for this user
+    if (isLoadingAvatar) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[NavPanel] Skipping avatar fetch - already loading');
+      }
+      return;
+    }
+
+    // Check if we already have an avatar URL for any user
+    // (basic optimization - in a real app you'd want per-user caching)
+    if (avatarUrl && avatarUrl !== "/icons/default-avatar.svg") {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[NavPanel] Using cached avatar URL');
+      }
+      return;
+    }
+
+    setIsLoadingAvatar(true);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] Fetching avatar for userId:', userId);
+    }
+
     fetch(`/api/user/avatar?userId=${userId}`)
       .then(res => res.json())
       .then(data => {
-        console.log('[NavPanel] Avatar API response:', data);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[NavPanel] Avatar API response:', data);
+        }
         setAvatarUrl(data.url || "/icons/default-avatar.svg");
       })
       .catch((err) => {
         console.error('[NavPanel] Avatar API error:', err);
         setAvatarUrl("/icons/default-avatar.svg");
+      })
+      .finally(() => {
+        setIsLoadingAvatar(false);
       });
-  }, [userId]);
+  }, [userId, isLoadingAvatar, avatarUrl]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] navSchema changed:', navSchema);
+    }
+  }, [navSchema]);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] contextValue changed:', contextValue);
+    }
+  }, [contextValue]);
 
   const handleNavClick = (navOptionId: string) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] handleNavClick:', navOptionId);
+    }
     setSelectedNav(navOptionId);
     if (onNavSelect) {
       onNavSelect(navOptionId);
@@ -147,10 +162,6 @@ export default function NavPanel({
   const mainSections = navSchema.props.sections.filter(
     (s) => !s.items.some((i) => i.position === "bottom")
   );
-  const bottomSection = navSchema.props.sections.find(
-    (s) => s.items.some((i) => i.position === "bottom")
-  );
-  const bottomItems = bottomSection ? bottomSection.items.filter((i) => i.position === "bottom") : [];
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
