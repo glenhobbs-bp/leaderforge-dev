@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { contentService } from '../../../lib/contentService';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { cookies } from 'next/headers';
+import { Content } from '../../../lib/types';
 
 export async function GET(
   req: NextRequest,
   context: { params: { context_key: string } }
 ) {
   const { context_key } = context.params;
-  const res = NextResponse.next();
   const cookieStore = await cookies();
   const supabase = createSupabaseServerClient(cookieStore);
   console.log(`[API] GET /api/content/${context_key}`);
@@ -37,11 +37,12 @@ export async function GET(
   const user_id = session.user.id;
 
   try {
-    const content = await contentService.getContentForContext(supabase, context_key, user_id);
+    const content: Content[] = await contentService.getContentForContext(supabase, context_key, user_id);
     console.log(`[API] Found ${content.length} items for user ${user_id} in context ${context_key}`);
     return NextResponse.json(content, { status: 200 });
-  } catch (error: any) {
-    console.error('[API] Error fetching content:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('[API] Error fetching content:', err);
+    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }

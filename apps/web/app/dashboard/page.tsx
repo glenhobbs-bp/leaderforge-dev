@@ -36,6 +36,9 @@ export default async function DashboardPage() {
 
   // --- SSR: Fetch entitled context list ---
   let initialContexts = [];
+  let initialContextConfig = null;
+  let initialNavOptions = null;
+
   try {
     let allContexts = await contextService.getAllContexts(supabase);
     // Filter by user entitlement if required_entitlements is present
@@ -45,10 +48,34 @@ export default async function DashboardPage() {
       if (!ctx.required_entitlements || ctx.required_entitlements.length === 0) return true;
       return ctx.required_entitlements.every((ent: string) => entitlementIds.includes(ent));
     });
+
     if (initialContexts.length === 0) {
       console.error('[dashboard/page] No entitled contexts for user:', session.user.id);
       redirect('/login?error=no_contexts');
     }
+
+    // --- SSR: Pre-fetch default context configuration and nav options ---
+    const defaultContextKey = initialContexts[0].context_key;
+    console.log('[dashboard/page] Pre-fetching config for default context:', defaultContextKey);
+
+    try {
+      // Fetch context config server-side
+      const { contextService } = await import('../lib/contextService');
+      initialContextConfig = await contextService.getContextConfig(supabase, defaultContextKey);
+      console.log('[dashboard/page] Pre-fetched context config:', !!initialContextConfig);
+    } catch (configErr) {
+      console.error('[dashboard/page] Error pre-fetching context config:', configErr);
+    }
+
+    try {
+      // Fetch nav options server-side
+      const { navService } = await import('../lib/navService');
+      initialNavOptions = await navService.getNavOptions(supabase, defaultContextKey, session.user.id);
+      console.log('[dashboard/page] Pre-fetched nav options:', Array.isArray(initialNavOptions) ? initialNavOptions.length : 'null');
+    } catch (navErr) {
+      console.error('[dashboard/page] Error pre-fetching nav options:', navErr);
+    }
+
   } catch (err) {
     console.error('[dashboard/page] Error fetching contexts:', err);
     initialContexts = [];
@@ -57,6 +84,14 @@ export default async function DashboardPage() {
   // TODO: Fetch last-used context for user (future)
   // For now, client will default to first context
 
-  // Pass session and initialContexts to client for hydration
-  return <DashboardClient initialSession={session} initialContexts={initialContexts} />;
+  // Pass all SSR data to client for hydration
+  return (
+    <DashboardClient
+      initialSession={session}
+      initialContexts={initialContexts}
+      initialContextConfig={initialContextConfig}
+      initialNavOptions={initialNavOptions}
+      defaultContextKey={initialContexts[0]?.context_key}
+    />
+  );
 }

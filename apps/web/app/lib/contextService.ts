@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient';
 import { SupabaseClient } from '@supabase/supabase-js';
+import type { ContextConfig } from './types';
 // import { ContextConfig } from '@/types'; // Uncomment and adjust as needed
 
 /**
@@ -10,7 +11,10 @@ export const contextService = {
   /**
    * Get a single context config by key.
    */
-  async getContextConfig(supabase: SupabaseClient<any, any, any>, contextKey: string, userId?: string): Promise<any | null> {
+  async getContextConfig(
+    supabase: SupabaseClient,
+    contextKey: string
+  ): Promise<ContextConfig | null> {
     console.log(`[contextService] Fetching context config: ${contextKey}`);
     const { data, error } = await supabase
       .schema('core')
@@ -23,13 +27,15 @@ export const contextService = {
       throw error;
     }
     console.log(`[contextService] Found context config: ${data?.context_key ?? 'none'}`);
-    return data || null;
+    return data as ContextConfig || null;
   },
 
   /**
    * Get all context configs.
    */
-  async getAllContexts(): Promise<any[]> {
+  async getAllContexts(
+    supabase: SupabaseClient
+  ): Promise<ContextConfig[]> {
     console.log(`[contextService] Fetching all context configs`);
     const { data, error } = await supabase
       .schema('core')
@@ -40,13 +46,16 @@ export const contextService = {
       throw error;
     }
     console.log(`[contextService] Found ${data?.length ?? 0} context configs`);
-    return data || [];
+    return (data || []) as ContextConfig[];
   },
 
   /**
    * Update a context config (partial update).
    */
-  async updateContextConfig(contextKey: string, config: any): Promise<any | null> {
+  async updateContextConfig(
+    contextKey: string,
+    config: Partial<ContextConfig>
+  ): Promise<ContextConfig | null> {
     console.log(`[contextService] Updating context config: ${contextKey}`);
     const { data, error } = await supabase
       .schema('core')
@@ -60,6 +69,6 @@ export const contextService = {
       throw error;
     }
     console.log(`[contextService] Updated context config: ${data?.context_key ?? 'none'}`);
-    return data || null;
+    return data as ContextConfig || null;
   },
 };

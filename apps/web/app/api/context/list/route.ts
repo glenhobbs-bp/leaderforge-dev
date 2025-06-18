@@ -4,9 +4,9 @@
 import { NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
+import { ContextConfig } from '../../../lib/types';
 
 export async function GET() {
-  console.log('[API/context/list] Fetching available contexts for user');
   const cookieStore = await nextCookies();
   const allCookies = cookieStore.getAll();
   const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
@@ -17,20 +17,16 @@ export async function GET() {
 
   // Hydrate session if tokens are present
   if (accessToken && refreshToken) {
-    const setSessionRes = await supabase.auth.setSession({
+    await supabase.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
-    console.log('[API/context/list] setSession result:', setSessionRes);
-  } else {
-    console.warn('[API/context/list] Missing access or refresh token in cookies.');
   }
 
   // Get userId from session
   const { data: { session } } = await supabase.auth.getSession();
   const userId = session?.user?.id;
   if (!userId) {
-    console.warn('[API/context/list] Not authenticated after setSession');
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
@@ -42,18 +38,15 @@ export async function GET() {
       .select('context_key, display_name, theme, i18n, logo_url, nav_options, settings')
       .order('display_name', { ascending: true });
     if (error) throw error;
-    if (!data) return NextResponse.json([], { status: 200 });
+    if (!data) return NextResponse.json([] as ContextConfig[], { status: 200 });
 
     // Optionally filter by entitlement (if required_entitlements is set)
     // For now, just return all contexts (add entitlement filtering as needed)
-    console.log(`[API/context/list] Returning ${data.length} contexts for user ${userId}`);
-    return NextResponse.json(data, { status: 200 });
-  } catch (err: unknown) {
-    let message = 'Failed to fetch contexts';
-    if (typeof err === 'object' && err && 'message' in err && typeof (err as { message?: unknown }).message === 'string') {
-      message = (err as { message: string }).message;
-    }
-    console.error('[API/context/list] Error fetching contexts:', err);
+    return NextResponse.json(data as ContextConfig[], { status: 200 });
+  } catch (err) {
+    const error = err as Error;
+    const message = error.message || 'Failed to fetch contexts';
+    console.error('[API/context/list] Error fetching contexts:', error);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

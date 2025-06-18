@@ -1,3 +1,5 @@
+import type { ContextConfig } from '../types';
+
 /**
  * Fetches context config from the API.
  * @param contextKey - The context key to fetch config for.
@@ -5,7 +7,7 @@
  * @returns Promise of context config object.
  * @throws Error if the API call fails.
  */
-export async function fetchContextConfig(contextKey: string, userId?: string): Promise<any> {
+export async function fetchContextConfig(contextKey: string, userId?: string): Promise<ContextConfig> {
   console.log(`[apiClient] Fetching context config for: ${contextKey}, user: ${userId}`);
   const url = userId ? `/api/context/${contextKey}?user_id=${encodeURIComponent(userId)}` : `/api/context/${contextKey}`;
   const res = await fetch(url, { credentials: 'include' });
@@ -16,7 +18,7 @@ export async function fetchContextConfig(contextKey: string, userId?: string): P
   }
   const data = await res.json();
   console.log(`[apiClient] Got context config for ${contextKey}`);
-  return data;
+  return data as ContextConfig;
 }
 
 // TODO: Add test coverage for this API client.

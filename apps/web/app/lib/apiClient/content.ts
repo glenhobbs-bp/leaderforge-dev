@@ -1,3 +1,5 @@
+import type { Content } from '../types';
+
 /**
  * Fetches content for a context and user from the API.
  * @param contextKey - The context key to fetch content for.
@@ -5,7 +7,7 @@
  * @returns Promise of content array.
  * @throws Error if the API call fails.
  */
-export async function fetchContentForContext(contextKey: string, userId: string): Promise<any[]> {
+export async function fetchContentForContext(contextKey: string, userId: string): Promise<Content[]> {
   console.log(`[apiClient] Fetching content for context: ${contextKey}, user: ${userId}`);
   const res = await fetch(`/api/content/${contextKey}?user_id=${encodeURIComponent(userId)}`, { credentials: 'include' });
   if (!res.ok) {
@@ -15,7 +17,7 @@ export async function fetchContentForContext(contextKey: string, userId: string)
   }
   const data = await res.json();
   console.log(`[apiClient] Got ${data.length} content items for context ${contextKey}`);
-  return data;
+  return data as Content[];
 }
 
 // TODO: Add test coverage for this API client.

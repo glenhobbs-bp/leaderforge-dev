@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import type { ProvisioningAuditLogEntry } from './types';
 // import { ProvisioningAuditLogEntry } from '@/types'; // Uncomment and adjust as needed
 
 /**
@@ -57,7 +58,7 @@ export const provisioningService = {
   /**
    * Get the provisioning audit log (optionally filtered).
    */
-  async getProvisioningAuditLog(filters?: any): Promise<any[]> {
+  async getProvisioningAuditLog(filters?: Partial<ProvisioningAuditLogEntry>): Promise<ProvisioningAuditLogEntry[]> {
     console.log(`[provisioningService] Fetching provisioning audit log`, filters);
     let query = supabase.from('provisioning_audit_log').select('*');
     if (filters) {
@@ -71,6 +72,6 @@ export const provisioningService = {
       throw error;
     }
     console.log(`[provisioningService] Found ${data?.length ?? 0} audit log entries`);
-    return data || [];
+    return (data || []) as ProvisioningAuditLogEntry[];
   },
 };

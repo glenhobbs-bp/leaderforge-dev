@@ -5,12 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { navService } from '../../../lib/navService';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
+import { NavOption } from '../../../lib/types';
 
 /**
  * GET /api/nav/[context_key]
  * Returns nav options for the context, entitlement-filtered.
  */
-export async function GET(req) {
+export async function GET(req: NextRequest) {
   // Extract context_key from the URL
   const context_key = req.nextUrl.pathname.split('/').pop();
   console.log('[API/nav] context_key:', context_key);
@@ -45,12 +46,13 @@ export async function GET(req) {
   }
 
   try {
-    const navOptions = await navService.getNavOptions(supabase, context_key, userId);
+    const navOptions: NavOption[] = await navService.getNavOptions(supabase, context_key, userId);
     console.log(`[API/nav] Returning ${navOptions.length} nav options for user ${userId} in context ${context_key}`);
     return NextResponse.json(navOptions);
   } catch (err) {
-    console.error('[API/nav] Error fetching nav options:', err);
-    return NextResponse.json({ error: err.message || 'Failed to fetch nav options' }, { status: 500 });
+    const error = err as Error;
+    console.error('[API/nav] Error fetching nav options:', error);
+    return NextResponse.json({ error: error.message || 'Failed to fetch nav options' }, { status: 500 });
   }
 }
 

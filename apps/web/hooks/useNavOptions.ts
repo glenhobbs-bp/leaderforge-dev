@@ -16,11 +16,16 @@ async function fetchWithCredentials(url: string) {
   return data;
 }
 
-export function useNavOptions(contextKey: string) {
+export function useNavOptions(contextKey: string, initialData?: any) {
   const shouldFetch = !!contextKey;
   const { data, error, isLoading } = useSWR(
     shouldFetch ? `/api/nav/${contextKey}` : null,
-    fetchWithCredentials
+    fetchWithCredentials,
+    {
+      fallbackData: initialData,
+      // Don't revalidate immediately if we have initial data
+      revalidateOnMount: !initialData,
+    }
   );
 
   if (error) {

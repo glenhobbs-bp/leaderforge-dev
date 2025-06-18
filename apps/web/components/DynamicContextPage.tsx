@@ -56,8 +56,18 @@ function useContextList(initialContexts?: ContextItem[]) {
   return { contexts, loading, error };
 }
 
-type DynamicContextPageProps = { initialContexts?: ContextItem[] };
-export default function DynamicContextPage({ initialContexts }: DynamicContextPageProps) {
+type DynamicContextPageProps = {
+  initialContexts?: ContextItem[];
+  initialContextConfig?: any;
+  initialNavOptions?: any;
+  defaultContextKey?: string;
+};
+export default function DynamicContextPage({
+  initialContexts,
+  initialContextConfig,
+  initialNavOptions,
+  defaultContextKey
+}: DynamicContextPageProps) {
   console.log('[DynamicContextPage] RENDER');
   // All hooks at the top!
   const hasMounted = useRef(false);
@@ -74,8 +84,8 @@ export default function DynamicContextPage({ initialContexts }: DynamicContextPa
   const { contexts, loading: contextsLoading, error: contextsError } = useContextList(initialContexts);
   const { session } = useSessionContext();
   const userId = session?.user?.id || null;
-  const [contextId, setContextId] = useState<string | null>(null);
-  // Set default contextId to first available context
+  const [contextId, setContextId] = useState<string | null>(defaultContextKey || null);
+  // Set default contextId to first available context if not already set
   useEffect(() => {
     if (!contextId && contexts.length > 0) {
       setContextId(contexts[0].context_key);
@@ -86,8 +96,18 @@ export default function DynamicContextPage({ initialContexts }: DynamicContextPa
     console.log('[DynamicContextPage] contextId changed:', contextId);
   }, [contextId]);
   // Always call hooks; let them handle empty keys
-  const { config, loading, error } = useContextConfig(contextId || '');
-  const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId || '');
+  // Pass initial data for faster hydration
+  const shouldUseInitialConfig = contextId === defaultContextKey && initialContextConfig;
+  const shouldUseInitialNav = contextId === defaultContextKey && initialNavOptions;
+
+  const { config, loading, error } = useContextConfig(
+    contextId || '',
+    shouldUseInitialConfig ? initialContextConfig : undefined
+  );
+  const { navOptions, loading: navLoading, error: navError } = useNavOptions(
+    contextId || '',
+    shouldUseInitialNav ? initialNavOptions : undefined
+  );
 
   useEffect(() => {
     console.log('[DynamicContextPage] navOptions changed:', navOptions);

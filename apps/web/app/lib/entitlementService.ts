@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-// import { Entitlement, Content } from '@/types'; // Uncomment and adjust as needed
+import type { Entitlement, ContentAccessPolicy } from './types';
 
 /**
  * Service for entitlement and access logic. All business rules and data access for entitlements live here.
@@ -9,7 +9,10 @@ export const entitlementService = {
   /**
    * Get all active entitlements for a user (context/module aware via RLS).
    */
-  async getUserEntitlements(supabase: SupabaseClient<any, any, any>, userId: string): Promise<any[]> {
+  async getUserEntitlements(
+    supabase: SupabaseClient,
+    userId: string
+  ): Promise<Entitlement[]> {
     console.log(`[entitlementService] Fetching entitlements for user: ${userId}`);
     const { data, error } = await supabase
       .schema('core')
@@ -22,13 +25,16 @@ export const entitlementService = {
       throw error;
     }
     console.log(`[entitlementService] Found ${data?.length ?? 0} entitlements for user ${userId}`);
-    return data || [];
+    return (data || []) as Entitlement[];
   },
 
   /**
    * Get all active entitlements for an organization.
    */
-  async getOrgEntitlements(supabase: SupabaseClient<any, any, any>, orgId: string): Promise<any[]> {
+  async getOrgEntitlements(
+    supabase: SupabaseClient,
+    orgId: string
+  ): Promise<Entitlement[]> {
     console.log(`[entitlementService] Fetching entitlements for org: ${orgId}`);
     const { data, error } = await supabase
       .from('core.org_entitlements')
@@ -40,13 +46,17 @@ export const entitlementService = {
       throw error;
     }
     console.log(`[entitlementService] Found ${data?.length ?? 0} entitlements for org ${orgId}`);
-    return data || [];
+    return (data || []) as Entitlement[];
   },
 
   /**
    * Check if a user can access a given content item (using entitlements and content access policies).
    */
-  async canUserAccessContent(supabase: SupabaseClient<any, any, any>, userId: string, contentId: string): Promise<boolean> {
+  async canUserAccessContent(
+    supabase: SupabaseClient,
+    userId: string,
+    contentId: string
+  ): Promise<boolean> {
     console.log(`[entitlementService] Checking access for user ${userId} to content ${contentId}`);
     // 1. Get user entitlements
     const entitlements = await this.getUserEntitlements(supabase, userId);
@@ -68,7 +78,7 @@ export const entitlementService = {
       return true;
     }
     // Check if user meets any/all required entitlements (default: any)
-    const policy = policies[0];
+    const policy = policies[0] as ContentAccessPolicy;
     const required = policy.required_entitlements || [];
     const mode = policy.access_mode || 'any';
     const hasAccess = mode === 'all'
@@ -81,7 +91,11 @@ export const entitlementService = {
   /**
    * Get all content in a context the user is entitled to access.
    */
-  async getAccessibleContent(supabase: SupabaseClient<any, any, any>, userId: string, contextKey: string): Promise<any[]> {
+  async getAccessibleContent(
+    supabase: SupabaseClient,
+    userId: string,
+    contextKey: string
+  ): Promise<unknown[]> {
     console.log(`[entitlementService] Fetching accessible content for user ${userId} in context ${contextKey}`);
     // 1. Get all content for context
     const { data: allContent, error: contentError } = await supabase
@@ -93,7 +107,7 @@ export const entitlementService = {
       throw contentError;
     }
     // 2. Filter by access
-    const accessible: any[] = [];
+    const accessible: unknown[] = [];
     for (const item of allContent || []) {
       try {
         if (await this.canUserAccessContent(supabase, userId, item.id)) {

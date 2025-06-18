@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: any;
+  let body: Record<string, unknown> | undefined;
   try {
-    body = await req.json();
+    body = await req.json() as Record<string, unknown>;
   } catch {
     console.error('[API] Invalid JSON body');
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           console.error('[API] Missing userId, orgId, or role for inviteUser');
           return NextResponse.json({ error: 'Missing userId, orgId, or role' }, { status: 400 });
         }
-        const result = await provisioningService.provisionUserToOrg(userId, orgId, role);
+        const result = await provisioningService.provisionUserToOrg(userId as string, orgId as string, role as string);
         console.log(`[API] Invited user ${userId} to org ${orgId} as ${role}: ${result}`);
         return NextResponse.json({ success: result }, { status: 200 });
       }
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
           console.error('[API] Missing userId or entitlementId for grantEntitlement');
           return NextResponse.json({ error: 'Missing userId or entitlementId' }, { status: 400 });
         }
-        const result = await provisioningService.provisionEntitlementToUser(userId, entitlementId);
+        const result = await provisioningService.provisionEntitlementToUser(userId as string, entitlementId as string);
         console.log(`[API] Granted entitlement ${entitlementId} to user ${userId}: ${result}`);
         return NextResponse.json({ success: result }, { status: 200 });
       }
@@ -71,9 +71,10 @@ export async function POST(req: NextRequest) {
         console.error('[API] Unknown action:', action);
         return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
     }
-  } catch (error: any) {
-    console.error('[API] Error in provisioning:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('[API] Error in provisioning:', err);
+    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }
 

@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-// import { User } from '@/types'; // Uncomment and adjust as needed
+import type { User } from './types';
 
 /**
  * Service for user profile and preferences logic. All business rules and data access for users live here.
@@ -9,7 +9,7 @@ export const userService = {
   /**
    * Get a single user by ID.
    */
-  async getUser(userId: string): Promise<any | null> {
+  async getUser(userId: string): Promise<User | null> {
     console.log(`[userService] Fetching user: ${userId}`);
     const { data, error } = await supabase
       .from('users')
@@ -21,13 +21,13 @@ export const userService = {
       throw error;
     }
     console.log(`[userService] Found user: ${data?.id ?? 'none'}`);
-    return data || null;
+    return data as User || null;
   },
 
   /**
    * Get a single user by email.
    */
-  async getUserByEmail(email: string): Promise<any | null> {
+  async getUserByEmail(email: string): Promise<User | null> {
     console.log(`[userService] Fetching user by email: ${email}`);
     const { data, error } = await supabase
       .from('users')
@@ -39,13 +39,13 @@ export const userService = {
       throw error;
     }
     console.log(`[userService] Found user: ${data?.id ?? 'none'}`);
-    return data || null;
+    return data as User || null;
   },
 
   /**
    * Get multiple users by their IDs.
    */
-  async getUsersByIds(userIds: string[]): Promise<any[]> {
+  async getUsersByIds(userIds: string[]): Promise<User[]> {
     console.log(`[userService] Fetching users by IDs: ${userIds.join(', ')}`);
     if (!userIds.length) return [];
     const { data, error } = await supabase
@@ -57,13 +57,13 @@ export const userService = {
       throw error;
     }
     console.log(`[userService] Found ${data?.length ?? 0} users`);
-    return data || [];
+    return (data || []) as User[];
   },
 
   /**
    * Update user preferences (partial update).
    */
-  async updateUserPreferences(userId: string, preferences: any): Promise<any | null> {
+  async updateUserPreferences(userId: string, preferences: Partial<User['preferences']>): Promise<User | null> {
     console.log(`[userService] Updating preferences for user: ${userId}`);
     const { data, error } = await supabase
       .from('users')
@@ -76,6 +76,6 @@ export const userService = {
       throw error;
     }
     console.log(`[userService] Updated preferences for user: ${data?.id ?? 'none'}`);
-    return data || null;
+    return data as User || null;
   },
 };

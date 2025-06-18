@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { entitlementService } from './entitlementService';
-// import { Content } from '@/types'; // Uncomment and adjust as needed
+import type { Content, Entitlement } from './types';
 
 /**
  * Service for content logic. All business rules and data access for content live here.
@@ -10,7 +10,11 @@ export const contentService = {
   /**
    * Get all content for a context, filtered by user entitlement and prerequisites.
    */
-  async getContentForContext(supabase: SupabaseClient<any, any, any>, contextKey: string, userId: string): Promise<any[]> {
+  async getContentForContext(
+    supabase: SupabaseClient,
+    contextKey: string,
+    userId: string
+  ): Promise<Content[]> {
     console.log(`[contentService] Fetching content for context: ${contextKey}, user: ${userId}`);
     const { data, error } = await supabase
       .schema('core')
@@ -24,9 +28,11 @@ export const contentService = {
     if (!data) return [];
     // Filter by entitlement
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
-    const filtered = data.filter((item: any) => {
+    const filtered = (data as Content[]).filter((item) => {
       if (!item.required_entitlements || item.required_entitlements.length === 0) return true;
-      return item.required_entitlements.every((ent: string) => userEntitlements.some((ue: any) => ue.entitlement_id === ent));
+      return item.required_entitlements.every((ent) =>
+        userEntitlements.some((ue: Entitlement) => ue.entitlement_id === ent)
+      );
     });
     // Filter by prerequisites (e.g., must complete Module 1 before Module 2)
     // For now, assume user progress is not tracked; add logic here if needed
@@ -37,7 +43,11 @@ export const contentService = {
   /**
    * Get a single content item by ID, filtered by user entitlement and prerequisites.
    */
-  async getContentById(supabase: SupabaseClient<any, any, any>, contentId: string, userId: string): Promise<any | null> {
+  async getContentById(
+    supabase: SupabaseClient,
+    contentId: string,
+    userId: string
+  ): Promise<Content | null> {
     console.log(`[contentService] Fetching content by id: ${contentId}, user: ${userId}`);
     const { data, error } = await supabase
       .schema('core')
@@ -53,7 +63,9 @@ export const contentService = {
     // Filter by entitlement
     if (data.required_entitlements && data.required_entitlements.length > 0) {
       const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
-      const hasAll = data.required_entitlements.every((ent: string) => userEntitlements.some((ue: any) => ue.entitlement_id === ent));
+      const hasAll = data.required_entitlements.every((ent: string) =>
+        userEntitlements.some((ue: Entitlement) => ue.entitlement_id === ent)
+      );
       if (!hasAll) {
         console.log(`[contentService] User does not have required entitlements for content: ${contentId}`);
         return null;
@@ -61,13 +73,17 @@ export const contentService = {
     }
     // Filter by prerequisites (future: check user progress)
     console.log(`[contentService] Found content: ${data.id}`);
-    return data;
+    return data as Content;
   },
 
   /**
    * Get all content accessible to a user for a context (alias for getContentForContext).
    */
-  async getAccessibleContent(supabase: SupabaseClient<any, any, any>, userId: string, contextKey: string): Promise<any[]> {
+  async getAccessibleContent(
+    supabase: SupabaseClient,
+    userId: string,
+    contextKey: string
+  ): Promise<Content[]> {
     return this.getContentForContext(supabase, contextKey, userId);
   },
 };

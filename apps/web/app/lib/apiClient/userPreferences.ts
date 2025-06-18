@@ -1,10 +1,12 @@
+import type { User } from '../types';
+
 /**
  * Fetches user preferences from the API.
  * @param userId - The user ID to fetch preferences for.
  * @returns Promise of preferences object.
  * @throws Error if the API call fails.
  */
-export async function fetchUserPreferences(userId: string): Promise<any> {
+export async function fetchUserPreferences(userId: string): Promise<User['preferences'] | undefined> {
   console.log(`[apiClient] Fetching preferences for user: ${userId}`);
   const res = await fetch(`/api/user/${userId}/preferences`, { credentials: 'include' });
   if (!res.ok) {
@@ -14,7 +16,7 @@ export async function fetchUserPreferences(userId: string): Promise<any> {
   }
   const data = await res.json();
   console.log(`[apiClient] Got preferences for user ${userId}`);
-  return data;
+  return data as User['preferences'];
 }
 
 /**
@@ -24,7 +26,7 @@ export async function fetchUserPreferences(userId: string): Promise<any> {
  * @returns Promise of updated preferences object.
  * @throws Error if the API call fails.
  */
-export async function updateUserPreferences(userId: string, prefs: any): Promise<any> {
+export async function updateUserPreferences(userId: string, prefs: Partial<User['preferences']>): Promise<User['preferences'] | undefined> {
   console.log(`[apiClient] Updating preferences for user: ${userId}`);
   const res = await fetch(`/api/user/${userId}/preferences`, {
     method: 'PATCH',
@@ -39,7 +41,7 @@ export async function updateUserPreferences(userId: string, prefs: any): Promise
   }
   const data = await res.json();
   console.log(`[apiClient] Updated preferences for user ${userId}`);
-  return data;
+  return data as User['preferences'];
 }
 
 // TODO: Add test coverage for this API client.

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '../../../../lib/userService';
 import { createSupabaseServerClient } from '../../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
+import { User } from '../../../../lib/types';
 
 /**
  * GET /api/user/[user_id]/preferences
@@ -41,16 +42,17 @@ export async function GET(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   try {
-    const user = await userService.getUser(user_id);
+    const user: User | null = await userService.getUser(user_id);
     if (!user) {
       console.error(`[API] User not found: ${user_id}`);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     console.log(`[API] Found preferences for user: ${user_id}`);
     return NextResponse.json(user.preferences || {}, { status: 200 });
-  } catch (error: any) {
-    console.error('[API] Error fetching user preferences:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('[API] Error fetching user preferences:', err);
+    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -91,9 +93,9 @@ export async function PATCH(
   if (session.user.id !== user_id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
-  let body: any;
+  let body: Record<string, unknown> | undefined;
   try {
-    body = await req.json();
+    body = await req.json() as Record<string, unknown>;
   } catch {
     console.error('[API] Invalid JSON body');
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
@@ -103,16 +105,17 @@ export async function PATCH(
     return NextResponse.json({ error: 'Missing or invalid preferences' }, { status: 400 });
   }
   try {
-    const updated = await userService.updateUserPreferences(user_id, body);
+    const updated: User | null = await userService.updateUserPreferences(user_id, body);
     if (!updated) {
       console.error(`[API] User not found for update: ${user_id}`);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     console.log(`[API] Updated preferences for user: ${user_id}`);
     return NextResponse.json(updated.preferences || {}, { status: 200 });
-  } catch (error: any) {
-    console.error('[API] Error updating user preferences:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('[API] Error updating user preferences:', err);
+    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }
 
