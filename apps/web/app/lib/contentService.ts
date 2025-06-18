@@ -9,6 +9,7 @@ import type { Content, Entitlement } from './types';
 export const contentService = {
   /**
    * Get all content for a context, filtered by user entitlement and prerequisites.
+   * Uses cached entitlements for better performance.
    */
   async getContentForContext(
     supabase: SupabaseClient,
@@ -26,7 +27,8 @@ export const contentService = {
       throw error;
     }
     if (!data) return [];
-    // Filter by entitlement
+
+    // Filter by entitlement (cached)
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
     const filtered = (data as Content[]).filter((item) => {
       if (!item.required_entitlements || item.required_entitlements.length === 0) return true;
@@ -36,6 +38,38 @@ export const contentService = {
     });
     // Filter by prerequisites (e.g., must complete Module 1 before Module 2)
     // For now, assume user progress is not tracked; add logic here if needed
+    console.log(`[contentService] Found ${filtered.length} content items for user`);
+    return filtered;
+  },
+
+  /**
+   * Get all content for a context with pre-fetched entitlements.
+   * More efficient when you already have entitlements.
+   */
+  async getContentForContextWithEntitlements(
+    supabase: SupabaseClient,
+    contextKey: string,
+    userEntitlements: Entitlement[]
+  ): Promise<Content[]> {
+    console.log(`[contentService] Fetching content for context: ${contextKey} with pre-fetched entitlements`);
+    const { data, error } = await supabase
+      .schema('core')
+      .from('content')
+      .select('*')
+      .eq('context_key', contextKey);
+    if (error) {
+      console.error(`[contentService] Error fetching content:`, error);
+      throw error;
+    }
+    if (!data) return [];
+
+    // Filter by entitlement using pre-fetched data
+    const filtered = (data as Content[]).filter((item) => {
+      if (!item.required_entitlements || item.required_entitlements.length === 0) return true;
+      return item.required_entitlements.every((ent) =>
+        userEntitlements.some((ue: Entitlement) => ue.entitlement_id === ent)
+      );
+    });
     console.log(`[contentService] Found ${filtered.length} content items for user`);
     return filtered;
   },

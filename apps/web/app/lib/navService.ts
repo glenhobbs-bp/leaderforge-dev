@@ -10,6 +10,7 @@ import type { NavOption, Entitlement } from './types';
 export const navService = {
   /**
    * Get nav options for a context, filtered by user entitlement.
+   * Uses cached entitlements for better performance.
    */
   async getNavOptions(
     supabase: SupabaseClient,
@@ -27,10 +28,39 @@ export const navService = {
     if (error) throw error;
     if (!data) return [];
 
-    // Get user entitlements (array of entitlement_id)
+    // Get user entitlements (cached)
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
 
     // Filter nav options by required_entitlements
+    return (data as NavOption[]).filter((nav) => {
+      if (!nav.required_entitlements || nav.required_entitlements.length === 0) return true;
+      return nav.required_entitlements.every((ent) =>
+        userEntitlements.some((ue: Entitlement) => ue.entitlement_id === ent)
+      );
+    });
+  },
+
+  /**
+   * Get nav options for a context with pre-fetched entitlements.
+   * More efficient when you already have entitlements.
+   */
+  async getNavOptionsWithEntitlements(
+    supabase: SupabaseClient,
+    contextKey: string,
+    userEntitlements: Entitlement[]
+  ): Promise<NavOption[]> {
+    const { data, error } = await supabase
+      .schema('core')
+      .from('nav_options')
+      .select('*')
+      .eq('context_key', contextKey)
+      .order('section', { ascending: true })
+      .order('order', { ascending: true });
+
+    if (error) throw error;
+    if (!data) return [];
+
+    // Filter nav options by required_entitlements using pre-fetched data
     return (data as NavOption[]).filter((nav) => {
       if (!nav.required_entitlements || nav.required_entitlements.length === 0) return true;
       return nav.required_entitlements.every((ent) =>

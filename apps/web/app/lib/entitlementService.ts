@@ -2,17 +2,35 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import type { Entitlement, ContentAccessPolicy } from './types';
 
 /**
+ * In-memory cache for user entitlements to prevent redundant DB calls
+ * within the same request context
+ */
+const entitlementCache = new Map<string, { data: Entitlement[]; timestamp: number }>();
+const CACHE_TTL = 30 * 1000; // 30 seconds
+
+/**
  * Service for entitlement and access logic. All business rules and data access for entitlements live here.
  * All methods are robustly logged for observability.
  */
 export const entitlementService = {
   /**
    * Get all active entitlements for a user (context/module aware via RLS).
+   * Includes in-memory caching to prevent redundant calls.
    */
   async getUserEntitlements(
     supabase: SupabaseClient,
     userId: string
   ): Promise<Entitlement[]> {
+    // Check cache first
+    const cacheKey = userId;
+    const cached = entitlementCache.get(cacheKey);
+    const now = Date.now();
+
+    if (cached && (now - cached.timestamp) < CACHE_TTL) {
+      console.log(`[entitlementService] Using cached entitlements for user: ${userId}`);
+      return cached.data;
+    }
+
     console.log(`[entitlementService] Fetching entitlements for user: ${userId}`);
     const { data, error } = await supabase
       .schema('core')
@@ -24,8 +42,28 @@ export const entitlementService = {
       console.error(`[entitlementService] Error fetching user entitlements:`, error);
       throw error;
     }
-    console.log(`[entitlementService] Found ${data?.length ?? 0} entitlements for user ${userId}`);
-    return (data || []) as Entitlement[];
+
+    const entitlements = (data || []) as Entitlement[];
+
+    // Cache the result
+    entitlementCache.set(cacheKey, { data: entitlements, timestamp: now });
+
+    console.log(`[entitlementService] Found ${entitlements.length} entitlements for user ${userId}`);
+    return entitlements;
+  },
+
+  /**
+   * Clear cache for a specific user (useful for real-time updates)
+   */
+  clearUserCache(userId: string): void {
+    entitlementCache.delete(userId);
+  },
+
+  /**
+   * Clear all cached entitlements
+   */
+  clearAllCache(): void {
+    entitlementCache.clear();
   },
 
   /**
