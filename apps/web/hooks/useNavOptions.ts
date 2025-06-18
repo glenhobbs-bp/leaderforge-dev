@@ -17,7 +17,7 @@ async function fetchWithCredentials(url: string) {
 }
 
 export function useNavOptions(contextKey: string) {
-  const shouldFetch = Boolean(contextKey);
+  const shouldFetch = !!contextKey;
   const { data, error, isLoading } = useSWR(
     shouldFetch ? `/api/nav/${contextKey}` : null,
     fetchWithCredentials
@@ -28,7 +28,7 @@ export function useNavOptions(contextKey: string) {
   }
 
   return {
-    navOptions: Array.isArray(data) ? data : [],
+    navOptions: data,
     loading: isLoading,
     error,
   };

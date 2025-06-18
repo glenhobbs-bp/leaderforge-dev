@@ -5,71 +5,34 @@ import { useState, useEffect, useMemo } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
 import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
-// @ts-ignore
+// @ts-expect-error: Importing type from agent-core/types/contentSchema for schema rendering
 import type { ContentSchema as ComponentSchema } from 'agent-core/types/contentSchema';
 import { useContextConfig } from "../hooks/useContextConfig";
 import { useNavOptions } from "../hooks/useNavOptions";
 import { useSessionContext } from '@supabase/auth-helpers-react';
 import { Loader2 } from 'lucide-react';
 import { groupBy, sortBy } from "lodash";
-import React from "react";
+import React, { useRef } from "react";
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon: string;
-  description?: string;
+interface ContextItem {
+  context_key: string;
+  display_name: string;
+  subtitle?: string;
+  i18n?: { subtitle?: string };
+  logo_url?: string;
 }
 
-interface Theme {
-  panelBg: string;
-  panelText: string;
-  activeBg: string;
-  activeText: string;
-  inactiveBg: string;
-  inactiveText: string;
-  inactiveBorder: string;
-}
-
-interface Logo {
-  src: string;
-  alt: string;
-  width?: number;
-  height?: number;
-}
-
-interface Icon {
-  src: string;
-  alt: string;
-  size?: number;
-}
-
-interface ContextConfig {
-  context_id: string;
-  context_title?: string;
-  context_subtitle?: string;
-  logo?: Logo;
-  icon?: Icon;
-  theme: {
-    nav: Theme;
-  };
-  nav: NavItem[];
-  content: {
-    heading: string;
-    description: string;
-  };
-  chat: {
-    heading: string;
-    message: string;
-  };
-}
+// Diagnostic: Track module load
+console.log('[DynamicContextPage] Module loaded');
 
 // --- New: useContextList hook ---
-function useContextList() {
-  const [contexts, setContexts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+function useContextList(initialContexts?: ContextItem[]) {
+  const [contexts, setContexts] = useState<ContextItem[]>(initialContexts || []);
+  const [loading, setLoading] = useState(!initialContexts);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
+    if (initialContexts && initialContexts.length > 0) return;
+    console.log('[useContextList] useEffect triggered');
     setLoading(true);
     fetch('/api/context/list', { credentials: 'include' })
       .then(res => res.json())
@@ -79,25 +42,34 @@ function useContextList() {
         setError(null);
         console.log('[useContextList] Loaded contexts:', data);
       })
-      .catch(e => {
-        setError(e.message || 'Failed to load contexts');
+      .catch((e: unknown) => {
+        let message = 'Failed to load contexts';
+        if (typeof e === 'object' && e && 'message' in e && typeof (e as { message?: unknown }).message === 'string') {
+          message = (e as { message: string }).message;
+        }
+        setError(message);
         setLoading(false);
         setContexts([]);
         console.error('[useContextList] Error:', e);
       });
-  }, []);
+  }, [initialContexts]);
   return { contexts, loading, error };
 }
 
-export default function DynamicContextPage() {
+type DynamicContextPageProps = { initialContexts?: ContextItem[] };
+export default function DynamicContextPage({ initialContexts }: DynamicContextPageProps) {
   // All hooks at the top!
-  const { contexts, loading: contextsLoading, error: contextsError } = useContextList();
+  const hasMounted = useRef(false);
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && !hasMounted.current) {
+      console.log('[DynamicContextPage] Component mounted');
+      hasMounted.current = true;
+    }
+  }, []);
+  const { contexts, loading: contextsLoading, error: contextsError } = useContextList(initialContexts);
   const { session } = useSessionContext();
   const userId = session?.user?.id || null;
-
-  // --- Load available contexts dynamically ---
   const [contextId, setContextId] = useState<string | null>(null);
-
   // Set default contextId to first available context
   useEffect(() => {
     if (!contextId && contexts.length > 0) {
@@ -105,11 +77,10 @@ export default function DynamicContextPage() {
       console.log('[DynamicContextPage] Defaulting contextId to:', contexts[0].context_key);
     }
   }, [contexts, contextId]);
-
   useEffect(() => {
     console.log('[DynamicContextPage] contextId:', contextId);
   }, [contextId]);
-
+  // Always call hooks; let them handle empty keys
   const { config, loading, error } = useContextConfig(contextId || '');
   const { navOptions, loading: navLoading, error: navError } = useNavOptions(contextId || '');
 
@@ -162,15 +133,15 @@ export default function DynamicContextPage() {
       const data = await res.json();
       console.log('[handleNavSelect] Response JSON:', data);
       setSchema(data);
-    } catch (e: any) {
-      setSchemaError(e.message || "Unknown error");
+    } catch (e: unknown) {
+      let message = 'Unknown error';
+      if (typeof e === 'object' && e && 'message' in e && typeof (e as { message?: unknown }).message === 'string') {
+        message = (e as { message: string }).message;
+      }
+      setSchemaError(message);
     } finally {
       setSchemaLoading(false);
     }
-  };
-
-  const handleContentSchemaUpdate = (newSchema: ComponentSchema) => {
-    setSchema(newSchema);
   };
 
   // Debug logging for hydration issues
@@ -183,22 +154,23 @@ export default function DynamicContextPage() {
     console.log({ navOptions, navOptionsLoading: navLoading, navOptionsError: navError });
   }, [navOptions, navLoading, navError]);
 
-  // Debug loading guard
-  console.log("Loading guard check", {
-    contextsLoading,
-    contextsLength: contexts.length,
-    contextId,
-    session,
-    userId,
-  });
-
-  console.log('DynamicContextPage mounted');
+  // Replace all other debug logs with NODE_ENV check
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Loading guard check", {
+      contextsLoading,
+      contextsLength: contexts.length,
+      contextId,
+      session,
+      userId,
+    });
+    console.log('DynamicContextPage mounted');
+  }
 
   // Now do your loading guard
-  if (contextsLoading || !contexts.length || !session || !userId) {
+  if (contextsLoading || !contexts.length || !session || !userId || !contextId) {
     return (
       <div style={{ background: '#f3f4f6', minHeight: '100vh', width: '100vw', display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', color: '#222b45', fontSize: 14, padding: 8 }}>
-        Loading...
+        Loading context...
       </div>
     );
   }
