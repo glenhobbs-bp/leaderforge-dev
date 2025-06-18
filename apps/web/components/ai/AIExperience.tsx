@@ -1,8 +1,19 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CopilotPopup } from "@copilotkit/react-ui";
 
 export default function AIExperience() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Only render CopilotKit on client side to avoid hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // Return nothing during SSR
+  }
+
   return (
     <CopilotPopup
       instructions={
