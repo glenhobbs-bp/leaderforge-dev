@@ -1,7 +1,7 @@
 ---
 description:
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 Title: Senior Designer Task Execution Rule
 Applies to: All Design Tasks
