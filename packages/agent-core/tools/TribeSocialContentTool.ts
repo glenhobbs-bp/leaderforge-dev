@@ -46,7 +46,7 @@ export class TribeSocialContentTool {
     const isServer = typeof window === 'undefined';
     // Point to centralized API proxy in apps/api
     const baseUrl = isServer
-      ? process.env.INTERNAL_API_BASE_URL || 'http://localhost:3001'
+      ? process.env.INTERNAL_API_BASE_URL || 'http://localhost:3000'
       : '';
     const url = `${baseUrl}/api/tribe/content/${collectionId}`;
     const headers = {

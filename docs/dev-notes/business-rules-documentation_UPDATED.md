@@ -4,6 +4,8 @@
 
 This document defines the business rules and logic that govern the LeaderForge platform's behavior, ensuring consistent application of Brilliant's theology, business model, and user experience principles.
 
+> **⚠️ CRITICAL ARCHITECTURAL CHANGE**: We are moving from a complex agent-driven entitlement system to a **simplified, deterministic database-driven approach**. See [Simplified Entitlement System](./simplified-entitlement-system.md) for the new architecture that replaces much of the complexity below.
+
 ## User Access & Entitlements
 
 ### Membership Types & Access Rules

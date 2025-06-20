@@ -1,9 +1,9 @@
 import "./globals.css";
 import "@copilotkit/react-ui/styles.css";
-import ClientProviders from "./ClientProviders";
+import CopilotKitProvider from "./CopilotKitProvider";
 import SupabaseProvider from '../components/SupabaseProvider';
-// layout.tsx must be a server component for Next.js App Router (for metadata, streaming, etc.)
-// All client-only providers (Supabase, CopilotKit) are wrapped in ClientProviders.tsx
+import { cookies } from 'next/headers';
+import { createSupabaseServerClient } from './lib/supabaseServerClient';
 
 // TODO: See enhancements-and-todos.md — move metadata export to a server component or separate file for App Router compliance.
 // export const metadata = {
@@ -11,14 +11,19 @@ import SupabaseProvider from '../components/SupabaseProvider';
 //   description: "Building something epic!",
 // };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Get initial session server-side for SSR
+  const cookieStore = await cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
+  const { data: { session } } = await supabase.auth.getSession();
+
   return (
     <html lang="en">
       <body>
-        <SupabaseProvider>
-          <ClientProviders>
+        <SupabaseProvider initialSession={session}>
+          <CopilotKitProvider>
             {children}
-          </ClientProviders>
+          </CopilotKitProvider>
         </SupabaseProvider>
       </body>
     </html>

@@ -60,6 +60,7 @@ export interface NavOption {
   section?: string;
   order?: number;
   required_entitlements?: string[];
+  agent_id?: string; // UUID of the agent to invoke for this navigation item
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;

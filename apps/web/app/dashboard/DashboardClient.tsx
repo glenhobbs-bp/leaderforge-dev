@@ -1,6 +1,6 @@
 "use client";
 import SupabaseProvider from '../../components/SupabaseProvider';
-import { Session } from '@supabase/auth-helpers-react';
+import { Session } from '@supabase/supabase-js';
 import DynamicContextPage from '../../components/DynamicContextPage';
 
 export default function DashboardClient({

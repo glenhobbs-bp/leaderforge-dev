@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "start": "npx @langchain/langgraph-api@latest serve --port 8000"
   },
   "keywords": [],
   "author": "Glen Hobbs <glen@rockstar-ventures.com>",

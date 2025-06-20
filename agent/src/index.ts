@@ -1,138 +1,95 @@
-import http from "http";
 import "dotenv/config";
-import { Anthropic } from "@anthropic-ai/sdk";
 import { StateGraph, END, START, Annotation } from "@langchain/langgraph";
-import { AIMessage, HumanMessage, BaseMessage } from "@langchain/core/messages";
+import { BaseMessage } from "@langchain/core/messages";
+import { TribeSocialContentTool } from "../../packages/agent-core/tools/TribeSocialContentTool";
 
-// TODO: Import and initialize your LangGraph agent here
+// Initialize tools
+const tribeContentTool = new TribeSocialContentTool();
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-
-const PORT = process.env.PORT || 4000;
-
-const server = http.createServer(async (req, res) => {
-  if (req.method === "POST" && req.url === "/api/agent") {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-    });
-    req.on("end", async () => {
-      // TODO: Wire up LangGraph agent logic here using CopilotKit request format
-      // For now, just echo the request body and a Claude placeholder
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(
-        JSON.stringify({
-          message: "LangGraph agent operational",
-          request: JSON.parse(body),
-          llm: "Anthropic Claude (placeholder)",
-        }),
-      );
-    });
-  } else {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("LangGraph agent is running!\n");
-  }
+// Define the agent state
+const ContentAgentState = Annotation.Root({
+  userId: Annotation<string>(),
+  contextKey: Annotation<string>(),
+  navOptionId: Annotation<string>(),
+  intent: Annotation<any>(),
+  contentList: Annotation<any[]>(),
+  schema: Annotation<any>(),
+  messages: Annotation<BaseMessage[]>({
+    reducer: (x, y) => x.concat(y),
+    default: () => [],
+  }),
 });
 
-server.listen(PORT, () => {
-  console.log(`LangGraph agent server listening on port ${PORT}`);
-});
+type ContentState = typeof ContentAgentState.State;
 
-// Helper to coerce plain objects to LangChain message instances
-function coerceMessages(messages: any[]): BaseMessage[] {
-  return (messages || []).map((msg) => {
-    if (msg.type === "TextMessage" && msg.role === "user") {
-      return new HumanMessage(msg.content);
-    }
-    if (msg.type === "TextMessage" && msg.role === "assistant") {
-      return new AIMessage(msg.content);
-    }
-    return msg;
-  });
-}
+// Content fetching node
+async function fetchContent(state: ContentState): Promise<Partial<ContentState>> {
+  console.log('[ContentAgent] Fetching content for context:', state.contextKey);
 
-const AgentStateAnnotation = Annotation.Root({
-  messages: Annotation<BaseMessage[]>(),
-});
+  try {
+    // Use TribeSocialContentTool to get real content
+    const contentList = await tribeContentTool.getContentForContext(state.contextKey || 'leaderforge');
 
-type AgentState = typeof AgentStateAnnotation.State;
+    console.log('[ContentAgent] Retrieved content count:', contentList?.length || 0);
 
-function toClaudeMessages(
-  messages: BaseMessage[],
-): { role: "user" | "assistant"; content: string }[] {
-  return messages.map((msg) => {
-    let content: string = "";
-    if (msg._getType() === "human") {
-      const raw = (msg as HumanMessage).content;
-      if (typeof raw === "string") {
-        content = raw;
-      } else if (Array.isArray(raw)) {
-        // Only join text blocks
-        content = raw
-          .map((b) => {
-            if (typeof b === "string") return b;
-            if (
-              typeof b === "object" &&
-              b !== null &&
-              b.type === "text" &&
-              typeof b.text === "string"
-            )
-              return b.text;
-            return "";
-          })
-          .join(" ");
-      } else {
-        content = String(raw);
+    // Transform to proper ComponentSchema Grid format
+    const schema = {
+      type: 'Grid',
+      props: {
+        columns: 3,
+        items: (contentList || []).map((content: any) => {
+          // Extract props from TribeSocialContentTool response structure
+          const props = content.props || content;
+
+          return {
+            type: 'Card',
+            props: {
+              title: props.title || props.name || 'Untitled',
+              description: props.description || props.shortDescription || '',
+              image: props.image || props.thumbnail || props.featuredImage || '/placeholder.png',
+              videoUrl: props.videoUrl || props.url || props.link,
+              publishedDate: props.publishedDate || props.createdAt,
+              duration: props.duration,
+              progress: props.progress || 0,
+              actions: [{
+                action: 'openVideoModal',
+                label: 'Watch Video',
+                videoUrl: props.videoUrl || props.url || props.link,
+                title: props.title || props.name || 'Untitled'
+              }]
+            }
+          };
+        })
       }
-      return { role: "user", content };
-    }
-    if (msg._getType() === "ai") {
-      const raw = (msg as AIMessage).content;
-      if (typeof raw === "string") {
-        content = raw;
-      } else if (Array.isArray(raw)) {
-        content = raw
-          .map((b) => {
-            if (typeof b === "string") return b;
-            if (
-              typeof b === "object" &&
-              b !== null &&
-              b.type === "text" &&
-              typeof b.text === "string"
-            )
-              return b.text;
-            return "";
-          })
-          .join(" ");
-      } else {
-        content = String(raw);
-      }
-      return { role: "assistant", content };
-    }
-    throw new Error("Unsupported message type for Claude");
-  });
-}
-
-const graph = new StateGraph(AgentStateAnnotation)
-  .addNode("hello", async (state: AgentState) => {
-    const coerced = coerceMessages(state.messages);
-    const claudeMessages = toClaudeMessages(coerced);
-    const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",
-      max_tokens: 256,
-      messages: claudeMessages,
-    });
-    const text =
-      Array.isArray(response.content) && response.content[0]?.type === "text"
-        ? response.content[0].text
-        : "[No response]";
-    return {
-      ...state,
-      messages: [...coerced, new AIMessage(text)],
     };
-  })
-  .addEdge(START, "hello")
-  .addEdge("hello", END)
+
+    return {
+      contentList,
+      schema
+    };
+  } catch (error) {
+    console.error('[ContentAgent] Error fetching content:', error);
+
+    // Return fallback schema on error
+    return {
+      contentList: [],
+      schema: {
+        type: 'Grid',
+        props: {
+          columns: 3,
+          items: []
+        }
+      }
+    };
+  }
+}
+
+// Create the content library agent graph
+const graph = new StateGraph(ContentAgentState)
+  .addNode("fetchContent", fetchContent)
+  .addEdge(START, "fetchContent")
+  .addEdge("fetchContent", END)
   .compile();
 
+// Export as default for LangGraph CLI
 export default graph;

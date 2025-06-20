@@ -68,21 +68,79 @@ ALTER TABLE core.nav_options
 
 ---
 
-## 4. Agent Lookup and Invocation Flow
+## 4. Universal Agent Invocation Pattern
 
-1. **User clicks a nav option** in the UI.
-2. **Frontend** sends the nav option ID to the backend.
-3. **Backend**:
-   - Looks up the nav option in `core.nav_options`
-   - Gets the `agent_id`
-   - Loads the agent config from `core.agents`
-   - Uses the agent config to:
-     - Build the prompt
-     - Select the model
-     - Bind tools
-     - (If type is `langgraph`, load the workflow config)
-   - Invokes the agent (LLM or LangGraph)
-   - Returns the structured response to the frontend
+### Core Principle: Single Route to Agents
+All agent interactions follow the same universal pattern regardless of agent type:
+
+1. **User Action** (nav click, chat message, etc.)
+2. **Frontend** sends request to single agent API endpoint: `/api/agent/content`
+3. **Agent API**:
+   - Authenticates user
+   - Looks up navigation option → gets `agent_id`
+   - Loads agent config from `core.agents`
+   - **Routes to appropriate agent type handler:**
+     - `type: "llm"` → Direct LLM call with tools
+     - `type: "langgraph"` → LangGraph HTTP API call
+     - `type: "tool"` → Direct tool execution
+     - `type: "workflow"` → Custom workflow execution
+4. **Agent Processing**:
+   - Agent uses registered tools to fetch/process data
+   - Agent returns **standardized ComponentSchema response**
+5. **Frontend** renders ComponentSchema using `ComponentSchemaRenderer`
+
+### Universal Response Format
+All agents must return responses conforming to `ComponentSchema` types:
+
+```typescript
+interface AgentResponse {
+  type: "content_schema";
+  content: ComponentSchema; // Grid, Card, Panel, etc.
+  metadata?: any;
+}
+```
+
+### ComponentSchema Structure
+All UI components must follow the props-wrapped pattern:
+
+```typescript
+// Correct: Props-wrapped structure
+{
+  type: "Grid",
+  props: {
+    columns: 3,
+    items: [
+      {
+        type: "Card",
+        props: {
+          title: "Video Title",
+          description: "Description",
+          actions: [...]
+        }
+      }
+    ]
+  }
+}
+```
+
+### Agent-Tool Orchestration
+Each agent type handles tool orchestration differently:
+
+- **LangGraph Agents**: Define tools in their state graph, invoke tools via LangChain tool calling
+- **LLM Agents**: Use function calling to invoke registered tools
+- **Tool Agents**: Direct tool execution without LLM orchestration
+- **Workflow Agents**: Custom business logic with optional tool usage
+
+**Key Principle**: Tools do the work, agents orchestrate and format responses.
+
+### Example Flow: Leadership Library
+1. User clicks "Leadership Library" → `/api/agent/content`
+2. API looks up nav option → finds `agent_id` for `leaderforgeContentLibrary`
+3. API finds agent type `langgraph` → routes to LangGraph HTTP API
+4. LangGraph agent invokes `TribeSocialContentTool`
+5. Tool fetches videos from TribeSocial API
+6. Agent transforms tool response → ComponentSchema Grid format
+7. Frontend renders video grid using ComponentSchemaRenderer
 
 ---
 

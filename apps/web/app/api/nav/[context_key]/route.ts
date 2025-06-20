@@ -25,7 +25,27 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     return NextResponse.json({ error: 'Missing or invalid context_key' }, { status: 400 });
   }
 
-  // Get session from Supabase cookie
+  // SSR Auth: get cookies and hydrate session (same pattern as avatar API)
+  const allCookies = cookieStore.getAll();
+  console.log('[API/nav] Incoming cookies:', allCookies.length, 'cookies');
+
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+  console.log('[API/nav] Extracted tokens:', { hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
+
+  // Hydrate session manually (if tokens found)
+  if (accessToken && refreshToken) {
+    const setSessionRes = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
+    console.log('[API/nav] setSession result:', { hasUser: !!setSessionRes.data?.user, error: setSessionRes.error });
+  } else {
+    console.warn('[API/nav] Missing access or refresh token in cookies. SSR auth will likely fail.');
+  }
+
+  // Get session from Supabase
   const {
     data: { session },
     error,
@@ -59,8 +79,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
         'Cache-Control': 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400',
         'X-Response-Time': `${duration}ms`,
         'X-Cache-Status': 'optimized',
-        // Enable compression
-        'Content-Encoding': 'gzip',
+        // Remove manual Content-Encoding - Next.js handles compression automatically
         'Vary': 'Accept-Encoding',
       }
     });

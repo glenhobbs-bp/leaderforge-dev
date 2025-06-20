@@ -1,84 +1,159 @@
 import { NextRequest, NextResponse } from "next/server";
-// @ts-ignore
-import { createContentLibraryAgent } from "agent-core";
 import { cookies as nextCookies } from 'next/headers';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
-import { navService } from '../../../lib/navService';
+import { createClient } from '@supabase/supabase-js';
+import { AgentService } from '../../../lib/agentService';
 
 /**
  * POST /api/agent/content
- * Agent-native: invokes the LangGraph ContentLibraryAgent.
- * Expects { userId, contextKey, navOptionId, intent } in the request body.
- * Returns the schema built by the agent.
+ * Agent-native: Thin API that looks up the agent from navigation and invokes it.
+ * Follows the architectural principle: APIs only invoke agents and return their schema.
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log('[API] /api/agent/content POST body:', body);
     const { userId, contextKey, navOptionId, intent } = body;
 
-    // Hydrate SSR session
+    console.log('[API/agent/content] Request:', { userId, contextKey, navOptionId, intent });
+
+    // Get user session for authentication (using same method as avatar API)
     const cookieStore = await nextCookies();
     const allCookies = cookieStore.getAll();
+    console.log('[API/agent/content] Cookies available:', allCookies.map(c => ({ name: c.name, value: c.value?.substring(0, 10) + '...' })));
+
+    // Extract tokens like the avatar API does
     const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
     const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
     const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+    console.log('[API/agent/content] Extracted tokens:', { accessToken: accessToken ? 'present' : 'missing', refreshToken: refreshToken ? 'present' : 'missing' });
+
     const supabase = createSupabaseServerClient(cookieStore);
 
+    // Manually restore session if tokens are present
     if (accessToken && refreshToken) {
       const setSessionRes = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
       });
-      console.log('[API/agent/content] setSession result:', setSessionRes);
+      console.log('[API/agent/content] setSession result:', setSessionRes.error ? { error: setSessionRes.error } : 'success');
     } else {
-      console.warn('[API/agent/content] Missing access or refresh token in cookies. SSR auth will likely fail.');
+      console.warn('[API/agent/content] Missing access or refresh token in cookies');
     }
 
-    const { data: { user }, error } = await supabase.auth.getUser();
-    console.log('[API/agent/content] Supabase user:', user, 'Session error:', error);
+    // Get current session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log('[API/agent/content] Auth result:', { user: session?.user?.id, error: sessionError });
 
-    // Look up nav option by id
-    if (!navOptionId) {
-      return NextResponse.json({ type: 'NoContent' });
-    }
-    const navOption = await navService.getNavOptionById(supabase, navOptionId, userId);
-    if (!navOption) {
-      // Could be access denied or not found
-      return NextResponse.json({ type: 'AccessDenied' });
-    }
-    if (!navOption.agent_id) {
-      return NextResponse.json({ type: 'NoContent' });
+    if (sessionError || !session?.user) {
+      console.error('[API/agent/content] Auth error:', sessionError);
+      return NextResponse.json({
+        type: 'AuthError',
+        message: 'Authentication required',
+        details: {
+          error: sessionError?.message || 'No session',
+          cookieCount: allCookies.length
+        }
+      }, { status: 401 });
     }
 
-    // TODO: Look up agent config by agent_id and invoke dynamically
-    // For now, fallback to createContentLibraryAgent for demo
-    const agent = createContentLibraryAgent();
-    const initialState = {
-      userId: userId || '',
-      contextKey: contextKey || '',
-      intent: intent,
-      contentList: [],
-      progressMap: {},
-      schema: null,
-      updateResult: null,
-      __input: {
-        userId: userId || '',
-        contextKey: contextKey || '',
-        intent: intent,
-      },
-    };
-    console.log('[API] Invoking agent with initialState:', initialState);
-    const result = await agent.invoke(initialState);
-    console.log('[API] Agent result:', result);
-    console.log('[API] Agent result.schema:', result.schema);
-    return NextResponse.json(result.schema);
-  } catch (error) {
-    console.error('[API] Error in /api/agent/content:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
+    const user = session.user;
+
+    const effectiveUserId = userId || user.id;
+
+    // Use service role for database lookups to avoid RLS issues
+    const serviceSupabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
+
+    // 1. Look up the navigation option to get the agent_id
+    console.log('[API/agent/content] Looking up navOptionId:', navOptionId, 'in context:', contextKey);
+
+    const { data: navOption, error: queryError } = await serviceSupabase
+      .schema('core')
+      .from('nav_options')
+      .select('*')
+      .eq('context_key', contextKey)
+      .eq('id', navOptionId)
+      .single();
+
+    if (queryError || !navOption) {
+      console.error('[API/agent/content] Navigation lookup error:', queryError);
+      return NextResponse.json({
+        type: 'NavOptionNotFound',
+        message: 'Navigation option not found',
+        details: { contextKey, navOptionId }
+      }, { status: 404 });
+    }
+
+    console.log('[API/agent/content] Found nav option:', navOption);
+
+    // 2. Check if nav option has an agent_id
+    if (!navOption.agent_id) {
+      console.log('[API/agent/content] No agent assigned to nav option, returning fallback');
+      return NextResponse.json({
+        type: 'no_agent',
+        message: 'No agent assigned to this navigation option',
+        fallback: {
+          type: 'message',
+          content: `No agent configured for ${navOption.label}. Please contact support.`
+        }
+      });
+    }
+
+    // 3. Look up the agent from the database
+    const { data: agent, error: agentError } = await serviceSupabase
+      .schema('core')
+      .from('agents')
+      .select('*')
+      .eq('id', navOption.agent_id)
+      .single();
+
+    if (agentError || !agent) {
+      console.error('[API/agent/content] Agent lookup error:', agentError);
+      return NextResponse.json({
+        type: 'AgentNotFound',
+        message: 'Agent not found',
+        details: { agentId: navOption.agent_id }
+      }, { status: 404 });
+    }
+
+    console.log('[API/agent/content] Found agent:', { id: agent.id, name: agent.name, type: agent.type });
+
+    // 4. Invoke the agent based on its type using AgentService
+    try {
+      const agentService = new AgentService(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        process.env.LANGGRAPH_URL || 'http://localhost:8000'
+      );
+
+      const agentResponse = await agentService.invokeAgent(agent.id, {
+        message: intent?.message || `Show me content for ${navOption.label}`,
+        userId: effectiveUserId,
+        contextKey,
+        navOptionId,
+        metadata: { navOption, agent }
+      });
+
+      console.log('[API/agent/content] Agent response:', agentResponse);
+      return NextResponse.json(agentResponse);
+
+    } catch (agentError) {
+      console.error('[API/agent/content] Agent invocation error:', agentError);
+      return NextResponse.json({
+        type: 'AgentError',
+        message: 'Agent invocation failed',
+        error: agentError.message
+      }, { status: 500 });
+    }
+
+  } catch (error) {
+    console.error('[API/agent/content] Unexpected error:', error);
+    return NextResponse.json({
+      type: 'ServerError',
+      message: 'Internal server error'
+    }, { status: 500 });
   }
 }
 

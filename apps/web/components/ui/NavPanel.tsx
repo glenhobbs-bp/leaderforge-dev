@@ -4,8 +4,19 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import ContextSelector from "./ContextSelector";
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSupabase } from '../SupabaseProvider';
 import * as LucideIcons from "lucide-react";
+
+// Global avatar cache to persist across component remounts
+const globalAvatarCache = new Map<string, string>();
+
+// Convert kebab-case to PascalCase for Lucide icons
+function toPascalCase(str: string) {
+  return str
+    .split('-')
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('');
+}
 
 // Add NavPanelSchema type
 export interface NavPanelSchema {
@@ -69,7 +80,7 @@ export default function NavPanel({
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);
-  const supabase = useSupabaseClient();
+  const { supabase } = useSupabase();
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
@@ -83,24 +94,29 @@ export default function NavPanel({
       return;
     }
 
-    // Skip if we're already loading or have the avatar for this user
-    if (isLoadingAvatar) {
+    // Check global cache first for this specific user
+    const cachedUrl = globalAvatarCache.get(userId);
+    if (cachedUrl) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Skipping avatar fetch - already loading');
+        console.log('[NavPanel] Using cached avatar URL for user:', userId);
+      }
+      setAvatarUrl(cachedUrl);
+      return;
+    }
+
+    // Check if we're already loading this specific user to prevent duplicate API calls
+    const loadingKey = `loading_${userId}`;
+    if (globalAvatarCache.has(loadingKey)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[NavPanel] Avatar already being fetched for user:', userId);
       }
       return;
     }
 
-    // Check if we already have an avatar URL for any user
-    // (basic optimization - in a real app you'd want per-user caching)
-    if (avatarUrl && avatarUrl !== "/icons/default-avatar.svg") {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Using cached avatar URL');
-      }
-      return;
-    }
-
+    // Mark as loading to prevent duplicate requests
+    globalAvatarCache.set(loadingKey, 'true');
     setIsLoadingAvatar(true);
+
     if (process.env.NODE_ENV === 'development') {
       console.log('[NavPanel] Fetching avatar for userId:', userId);
     }
@@ -108,19 +124,27 @@ export default function NavPanel({
     fetch(`/api/user/avatar?userId=${userId}`)
       .then(res => res.json())
       .then(data => {
+        const url = data.url || "/icons/default-avatar.svg";
         if (process.env.NODE_ENV === 'development') {
           console.log('[NavPanel] Avatar API response:', data);
         }
-        setAvatarUrl(data.url || "/icons/default-avatar.svg");
+
+        // Cache the result globally for this user
+        globalAvatarCache.set(userId, url);
+        setAvatarUrl(url);
       })
       .catch((err) => {
         console.error('[NavPanel] Avatar API error:', err);
-        setAvatarUrl("/icons/default-avatar.svg");
+        const defaultUrl = "/icons/default-avatar.svg";
+        globalAvatarCache.set(userId, defaultUrl);
+        setAvatarUrl(defaultUrl);
       })
       .finally(() => {
+        // Remove loading flag
+        globalAvatarCache.delete(loadingKey);
         setIsLoadingAvatar(false);
       });
-  }, [userId, isLoadingAvatar, avatarUrl]);
+  }, [userId]); // Only depend on userId to prevent cycles
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
@@ -200,39 +224,32 @@ export default function NavPanel({
         {/* Scrollable nav */}
         <div className={`flex-1 overflow-y-auto ${isCollapsed ? 'px-0 py-1' : 'px-1 py-1'} space-y-4 custom-scrollbar`} tabIndex={0} aria-label="Navigation sections">
           {mainSections.map((section, idx) => (
-            <div key={idx} className="mb-0.5">
+            <div key={section.title || `section-${idx}`} className="mb-0.5">
               {section.title && !isCollapsed && (
                 <div className="text-[10px] font-normal uppercase tracking-widest text-gray-400 mb-1 pl-2 select-none">
                   {section.title}
                 </div>
               )}
               <nav className={`flex flex-col gap-0.5 mt-0.5 ${isCollapsed ? 'items-center' : ''}`} aria-label={section.title || undefined}>
-                {section.items.map((item) => {
+                {section.items.map((item, itemIdx) => {
                   const isActive = selectedNav === item.id;
-                  // Convert kebab-case to PascalCase for Lucide
-                  function toPascalCase(str: string) {
-                    return str
-                      .split('-')
-                      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
-                      .join('');
-                  }
                   const iconName = toPascalCase(item.icon || '');
-                  const Icon = (LucideIcons as any)[iconName] || LucideIcons.FileQuestion;
+                  const Icon = (LucideIcons as Record<string, any>)[iconName] || LucideIcons.FileQuestion;
                   const tooltip = isCollapsed
                     ? item.label + (item.description ? ` — ${item.description}` : "")
                     : undefined;
                   return (
-                    <div key={item.id} {...(isCollapsed ? { title: tooltip } : {})}>
+                    <div key={`${idx}-${itemIdx}-${item.id}`} title={isCollapsed ? tooltip : undefined}>
                       <button
                         type="button"
                         onClick={() => handleNavClick(item.id)}
-                        className={[
-                          "flex items-center transition-all duration-150 w-full min-w-0 focus:outline-none",
-                          isCollapsed ? "justify-center px-0 py-2 rounded-full" : "gap-2 px-2 py-1.5 rounded-lg",
+                        className={`flex items-center transition-all duration-150 w-full min-w-0 focus:outline-none ${
+                          isCollapsed ? "justify-center px-0 py-2 rounded-full" : "gap-2 px-2 py-1.5 rounded-lg"
+                        } ${
                           isActive
                             ? "font-semibold scale-[1.04] shadow"
-                            : "hover:scale-[1.03] hover:shadow-md",
-                        ].join(" ")}
+                            : "hover:scale-[1.03] hover:shadow-md"
+                        }`}
                         style={{
                           fontSize: 13,
                           marginBottom: "1px",
@@ -308,18 +325,16 @@ export default function NavPanel({
                   >
                     {isSignOut ? (
                       <LogOut className="w-4 h-4 mr-1 text-gray-400" strokeWidth={1.6} />
-                    ) : (
-                      action.icon && (
-                        <img
-                          src={action.icon}
-                          alt={action.label}
-                          width={14}
-                          height={14}
-                          className="shrink-0 opacity-70"
-                          onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
-                        />
-                      )
-                    )}
+                    ) : action.icon ? (
+                      <img
+                        src={action.icon}
+                        alt={action.label}
+                        width={14}
+                        height={14}
+                        className="shrink-0 opacity-70"
+                        onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
+                      />
+                    ) : null}
                     {!isCollapsed && <span className="text-[13px]">{action.label}</span>}
                   </button>
                 );
@@ -340,23 +355,7 @@ export default function NavPanel({
           </button>
         )}
       </aside>
-      {/* Custom scrollbar styles and micro-interaction keyframes */}
-      <style jsx global>{`
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: #a5b4fc #f3f4f6;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 7px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #a5b4fc;
-          border-radius: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f3f4f6;
-        }
-      `}</style>
+
     </div>
   );
 }

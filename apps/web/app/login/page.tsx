@@ -4,13 +4,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { useSupabase } from '../../components/SupabaseProvider';
 
 export default function LoginPage() {
-  const supabase = createClientComponentClient();
+  const { supabase } = useSupabase();
   const router = useRouter();
 
   useEffect(() => {

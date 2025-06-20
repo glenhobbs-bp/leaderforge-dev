@@ -1,3 +1,10 @@
+/**
+ * File: apps/web/components/ai/ComponentSchemaRenderer.tsx
+ * Purpose: Primary component renderer for agent-generated UI schemas.
+ * Handles all component types including Cards, Grids, VideoPlayer modals, and interactive elements.
+ * Features: HLS video support, modal player, progress tracking, responsive design.
+ * Used by: Agent context API responses, dynamic content rendering
+ */
 "use client";
 
 import { ComponentSchema, CardAction } from "../../../../packages/agent-core/types/ComponentSchema";

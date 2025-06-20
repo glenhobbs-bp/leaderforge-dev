@@ -1,5 +1,57 @@
 # LeaderForge Critical Architecture Foundations
 
+## 🚀 Simplified Authentication & Navigation System
+
+### Simple Login Flow (5 Clear Steps)
+
+1. **User Authentication** via Supabase
+2. **Check Entitlements** from database tables:
+   - `core.users` for user accounts
+   - `core.user_entitlements` maps users to entitlement groups
+   - `core.entitlements` lists entitlement groups with features
+3. **Restore Last Position** from `core.users.last_nav_selection` (or `current_module`)
+4. **Query Entitled Navigation** in single database call
+5. **Render Navigation** based on entitled features
+
+### UUID Best Practices with Human-Readable Debug Fields
+
+- **System operations** use `nav_options.id` (UUID) for consistency and performance
+- **Human debugging** uses readable fields (`href`, `title`) for debugging
+- **Admin screens** translate UUIDs to readable names for display
+- **Logs** include both UUID and readable context when possible
+
+Example: `nav_options` table structure:
+```sql
+id UUID PRIMARY KEY           -- System operations
+href VARCHAR(255)            -- Human debugging ("leadership-library")
+title VARCHAR(255)           -- Human debugging ("Leadership Library")
+context_key VARCHAR(50)      -- Human debugging ("leaderforge")
+agent_id UUID               -- Only if agent needed
+```
+
+### Single Query Entitlement Resolution
+
+Replace complex agent-driven navigation with a single SQL query:
+
+```sql
+-- Get all entitled navigation options for a user
+WITH user_entitlements AS (
+    SELECT e.features
+    FROM core.user_entitlements ue
+    JOIN core.entitlements e ON e.id = ue.entitlement_id
+    WHERE ue.user_id = $1 AND ue.active = true
+),
+entitled_nav_hrefs AS (
+    SELECT DISTINCT jsonb_array_elements_text(features->'nav_options') as href
+    FROM user_entitlements
+)
+SELECT no.id, no.href, no.title, no.context_key, no.agent_id
+FROM core.nav_options no
+JOIN entitled_nav_hrefs enh ON enh.href = no.href
+WHERE no.active = true
+ORDER BY no.sort_order;
+```
+
 ## 🏛️ Core Architecture: Modular Monolith
 
 ### Why Modular Monolith?

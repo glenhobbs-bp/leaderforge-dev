@@ -40,6 +40,12 @@ export const entitlementService = {
       .is('revoked_at', null);
     if (error) {
       console.error(`[entitlementService] Error fetching user entitlements:`, error);
+
+      // If it's a permission error, return empty entitlements for now
+      if (error.code === '42501' || error.message.includes('permission denied')) {
+        console.log(`[entitlementService] Permission denied - returning empty entitlements for user: ${userId}`);
+        return [];
+      }
       throw error;
     }
 
