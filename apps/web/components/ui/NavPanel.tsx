@@ -5,10 +5,7 @@ import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import ContextSelector from "./ContextSelector";
 import { useSupabase } from '../SupabaseProvider';
-import { useNavigation } from '@/hooks/useNavigation';
-import { authService } from '@/app/lib/authService';
 import * as LucideIcons from "lucide-react";
-import { useNavigation } from '@/hooks/useNavigation';
 
 // Global avatar cache to persist across component remounts
 const globalAvatarCache = new Map<string, string>();
@@ -82,7 +79,6 @@ export default function NavPanel({
   }
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isLoadingAvatar, setIsLoadingAvatar] = useState<boolean>(false);
   const { supabase } = useSupabase();
 
   useEffect(() => {
