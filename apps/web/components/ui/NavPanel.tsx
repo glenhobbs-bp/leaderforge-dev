@@ -79,7 +79,7 @@ export default function NavPanel({
   }
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);
+  const [isLoadingAvatar, setIsLoadingAvatar] = useState<boolean>(false);
   const { supabase } = useSupabase();
 
   useEffect(() => {
