@@ -86,8 +86,8 @@ export default function NavPanelDatabaseDriven({
   const [, setIsLoadingAvatar] = useState<boolean>(false);
   const { supabase } = useSupabase();
 
-  // Database-driven navigation
-  const { navSchema, loading: navLoading, error: navError } = useNavigation(contextKey);
+  // Database-driven navigation using the context key
+  const { navSchema, loading, error } = useNavigation(contextKey, userId);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
@@ -185,7 +185,7 @@ export default function NavPanelDatabaseDriven({
   };
 
   // Handle loading state
-  if (navLoading) {
+  if (loading) {
     return (
       <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
         <aside
@@ -206,7 +206,7 @@ export default function NavPanelDatabaseDriven({
   }
 
   // Handle error state
-  if (navError) {
+  if (error) {
     return (
       <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
         <aside
@@ -219,7 +219,7 @@ export default function NavPanelDatabaseDriven({
           }}
         >
           <div className="text-red-500 text-center text-sm">
-            {isCollapsed ? "!" : `Navigation Error: ${navError}`}
+            {isCollapsed ? "!" : `Navigation Error: ${error}`}
           </div>
         </aside>
       </div>
@@ -433,11 +433,6 @@ export default function NavPanelDatabaseDriven({
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}
           userId={userId || ""}
-          currentUser={{
-            email: navSchema?.props?.footer?.profile?.name || "",
-            full_name: navSchema?.props?.footer?.profile?.name || "",
-            avatar_url: avatarUrl || undefined
-          }}
         />
       </aside>
     </div>

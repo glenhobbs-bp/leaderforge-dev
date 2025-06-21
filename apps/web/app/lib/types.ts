@@ -58,9 +58,11 @@ export interface NavOption {
   icon?: string;
   href?: string;
   section?: string;
+  section_order?: number;
   order?: number;
   required_entitlements?: string[];
   agent_id?: string; // UUID of the agent to invoke for this navigation item
+  description?: string;
   is_active?: boolean;
   created_at?: string;
   updated_at?: string;
@@ -71,6 +73,8 @@ export interface User {
   id: string;
   email: string;
   full_name?: string;
+  first_name?: string;
+  last_name?: string;
   avatar_url?: string;
   preferences?: Record<string, unknown>;
   last_sign_in_at?: string;

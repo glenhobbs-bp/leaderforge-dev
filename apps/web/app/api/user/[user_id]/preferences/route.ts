@@ -1,122 +1,99 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '../../../../lib/userService';
-import { createSupabaseServerClient } from '../../../../lib/supabaseServerClient';
-import { cookies as nextCookies } from 'next/headers';
-import { User } from '../../../../lib/types';
 
 /**
  * GET /api/user/[user_id]/preferences
- * Returns user preferences (localization, avatar, etc.).
+ * Fetches user profile and preferences data.
  */
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ user_id: string }> }
 ) {
-  // SSR Auth: get cookies and hydrate session
-  const cookieStore = await nextCookies();
-  const allCookies = cookieStore.getAll();
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-  const supabase = createSupabaseServerClient(cookieStore);
-
-  if (accessToken && refreshToken) {
-    await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-  }
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { user_id } = await params;
-  console.log(`[API] GET /api/user/${user_id}/preferences`);
-  if (!user_id || typeof user_id !== 'string') {
-    console.error('[API] Missing or invalid user_id');
-    return NextResponse.json({ error: 'Missing or invalid user_id' }, { status: 400 });
-  }
-  // Only allow user to fetch their own preferences
-  if (session.user.id !== user_id) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
   try {
-    const user: User | null = await userService.getUser(user_id);
+    const { user_id } = await params;
+    console.log(`[GET /api/user/${user_id}/preferences] Fetching user data`);
+
+    const user = await userService.getUser(user_id);
     if (!user) {
-      console.error(`[API] User not found: ${user_id}`);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    console.log(`[API] Found preferences for user: ${user_id}`);
-    return NextResponse.json(user.preferences || {}, { status: 200 });
+
+    // Return both user profile and preferences
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        full_name: user.full_name,
+        avatar_url: user.avatar_url,
+      },
+      preferences: user.preferences || {}
+    });
   } catch (error) {
-    const err = error as Error;
-    console.error('[API] Error fetching user preferences:', err);
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
+    console.error('[GET /api/user/preferences] Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch user data' },
+      { status: 500 }
+    );
   }
 }
 
 /**
- * PATCH /api/user/[user_id]/preferences
- * Updates user preferences (partial update).
+ * PUT /api/user/[user_id]/preferences
+ * Updates user profile and/or preferences data.
  */
-export async function PATCH(
-  req: NextRequest,
+export async function PUT(
+  request: NextRequest,
   { params }: { params: Promise<{ user_id: string }> }
 ) {
-  // SSR Auth: get cookies and hydrate session
-  const cookieStore = await nextCookies();
-  const allCookies = cookieStore.getAll();
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-  const supabase = createSupabaseServerClient(cookieStore);
-
-  if (accessToken && refreshToken) {
-    await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-  }
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { user_id } = await params;
-  console.log(`[API] PATCH /api/user/${user_id}/preferences`);
-  if (!user_id || typeof user_id !== 'string') {
-    console.error('[API] Missing or invalid user_id');
-    return NextResponse.json({ error: 'Missing or invalid user_id' }, { status: 400 });
-  }
-  // Only allow user to update their own preferences
-  if (session.user.id !== user_id) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
-  let body: Record<string, unknown> | undefined;
   try {
-    body = await req.json() as Record<string, unknown>;
-  } catch {
-    console.error('[API] Invalid JSON body');
-    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
-  }
-  if (!body || typeof body !== 'object') {
-    console.error('[API] Missing or invalid preferences in body');
-    return NextResponse.json({ error: 'Missing or invalid preferences' }, { status: 400 });
-  }
-  try {
-    const updated: User | null = await userService.updateUserPreferences(user_id, body);
-    if (!updated) {
-      console.error(`[API] User not found for update: ${user_id}`);
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const { user_id } = await params;
+    const body = await request.json();
+    console.log(`[PUT /api/user/${user_id}/preferences] Updating user data:`, body);
+
+    // Separate profile fields from preferences
+    const { first_name, last_name, full_name, avatar_url, ...preferences } = body;
+
+    const profileFields: any = {};
+    if (first_name !== undefined) profileFields.first_name = first_name;
+    if (last_name !== undefined) profileFields.last_name = last_name;
+    if (full_name !== undefined) profileFields.full_name = full_name;
+    if (avatar_url !== undefined) profileFields.avatar_url = avatar_url;
+
+    // Update both profile and preferences if both are provided
+    let updatedUser;
+    if (Object.keys(profileFields).length > 0 && Object.keys(preferences).length > 0) {
+      updatedUser = await userService.updateUserProfileAndPreferences(user_id, profileFields, preferences);
+    } else if (Object.keys(profileFields).length > 0) {
+      updatedUser = await userService.updateUserProfile(user_id, profileFields);
+    } else if (Object.keys(preferences).length > 0) {
+      updatedUser = await userService.updateUserPreferences(user_id, preferences);
+    } else {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
-    console.log(`[API] Updated preferences for user: ${user_id}`);
-    return NextResponse.json(updated.preferences || {}, { status: 200 });
+
+    if (!updatedUser) {
+      return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+    }
+
+    // Return updated user data
+    return NextResponse.json({
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        full_name: updatedUser.full_name,
+        avatar_url: updatedUser.avatar_url,
+      },
+      preferences: updatedUser.preferences || {}
+    });
   } catch (error) {
-    const err = error as Error;
-    console.error('[API] Error updating user preferences:', err);
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
+    console.error('[PUT /api/user/preferences] Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update user data' },
+      { status: 500 }
+    );
   }
 }
-
-// TODO: Add test coverage for this route using integration tests.

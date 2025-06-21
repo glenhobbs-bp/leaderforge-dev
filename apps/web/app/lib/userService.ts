@@ -108,4 +108,97 @@ export const userService = {
     console.log(`[userService] Updated preferences for user: ${data?.id ?? 'none'}`);
     return data as User || null;
   },
+
+  /**
+   * Update user profile information (first_name, last_name, full_name, etc.)
+   */
+  async updateUserProfile(userId: string, profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>): Promise<User | null> {
+    console.log(`[userService] Updating profile for user: ${userId}`, profile);
+    const cookieStore = await cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
+
+    // SSR Auth: extract tokens from cookies and set session
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    } else {
+      console.error('[userService] Missing access or refresh token in cookies');
+      throw new Error('Authentication required');
+    }
+
+    const { data, error } = await supabase
+      .schema('core')
+      .from('users')
+      .update({
+        ...profile,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`[userService] Error updating user profile:`, error);
+      throw error;
+    }
+
+    console.log(`[userService] Updated profile for user: ${data?.id ?? 'none'}`);
+    return data as User || null;
+  },
+
+  /**
+   * Update both user profile and preferences in a single transaction
+   */
+  async updateUserProfileAndPreferences(
+    userId: string,
+    profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>,
+    preferences: Partial<User['preferences']>
+  ): Promise<User | null> {
+    console.log(`[userService] Updating profile and preferences for user: ${userId}`);
+    const cookieStore = await cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
+
+    // SSR Auth: extract tokens from cookies and set session
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    } else {
+      console.error('[userService] Missing access or refresh token in cookies');
+      throw new Error('Authentication required');
+    }
+
+    const { data, error } = await supabase
+      .schema('core')
+      .from('users')
+      .update({
+        ...profile,
+        preferences,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`[userService] Error updating user profile and preferences:`, error);
+      throw error;
+    }
+
+    console.log(`[userService] Updated profile and preferences for user: ${data?.id ?? 'none'}`);
+    return data as User || null;
+  },
 };

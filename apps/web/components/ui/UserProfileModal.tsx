@@ -1,9 +1,18 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from './dialog';
 import { Camera, User, Edit3 } from 'lucide-react';
-import { useUserPreferences, useUpdateUserPreferences } from '../../app/hooks/useUserPreferences';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+interface UserData {
+  id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  avatar_url?: string;
+}
 
 interface UserPreferences {
   theme?: string;
@@ -14,56 +23,112 @@ interface UserPreferences {
 interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentUser: {
-    id: string;
-    email: string;
-    full_name?: string;
-    avatar_url?: string;
-  };
+  userId: string;
 }
 
-export function UserProfileModal({ isOpen, onClose, currentUser }: UserProfileModalProps) {
-  const { data: preferences, isLoading } = useUserPreferences(currentUser?.id);
-  const updatePreferences = useUpdateUserPreferences(currentUser?.id);
-
-  if (isLoading || !currentUser) {
-    return null;
+// Fetch user data from API
+async function fetchUserData(userId: string): Promise<{ user: UserData; preferences: UserPreferences }> {
+  const response = await fetch(`/api/user/${userId}/preferences`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch user data');
   }
+  return response.json();
+}
 
-  const userPrefs = preferences as UserPreferences;
+// Update user data via API
+async function updateUserData(userId: string, data: Partial<UserData & UserPreferences>): Promise<{ user: UserData; preferences: UserPreferences }> {
+  const response = await fetch(`/api/user/${userId}/preferences`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update user data');
+  }
+  return response.json();
+}
+
+export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalProps) {
+  const queryClient = useQueryClient();
+
+  // Fetch user data
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['userData', userId],
+    queryFn: () => fetchUserData(userId),
+    enabled: isOpen && !!userId,
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: (updateData: Partial<UserData & UserPreferences>) => updateUserData(userId, updateData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userData', userId] });
+      setIsEditing(false);
+      onClose();
+    },
+    onError: (error) => {
+      console.error('Failed to update user data:', error);
+    },
+  });
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: currentUser?.full_name || '',
-    theme: userPrefs?.theme || 'light',
-    notifications: userPrefs?.notifications !== false,
-    language: userPrefs?.language || 'en',
+    first_name: '',
+    last_name: '',
+    theme: 'light',
+    notifications: true,
+    language: 'en',
   });
+
+  // Update form data when user data loads
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        first_name: data.user.first_name || '',
+        last_name: data.user.last_name || '',
+        theme: data.preferences.theme || 'light',
+        notifications: data.preferences.notifications !== false,
+        language: data.preferences.language || 'en',
+      });
+    }
+  }, [data]);
 
   const handleSave = async () => {
     try {
-      await updatePreferences.mutateAsync({
-        theme: formData.theme,
-        notifications: formData.notifications,
-        language: formData.language,
-        full_name: formData.full_name,
-      });
-      setIsEditing(false);
-      onClose();
+      await updateMutation.mutateAsync(formData);
     } catch (error) {
-      console.error('Failed to update preferences:', error);
+      console.error('Failed to update user data:', error);
     }
   };
 
   const handleCancel = () => {
-    setFormData({
-      full_name: currentUser?.full_name || '',
-      theme: userPrefs?.theme || 'light',
-      notifications: userPrefs?.notifications !== false,
-      language: userPrefs?.language || 'en',
-    });
+    if (data) {
+      setFormData({
+        first_name: data.user.first_name || '',
+        last_name: data.user.last_name || '',
+        theme: data.preferences.theme || 'light',
+        notifications: data.preferences.notifications !== false,
+        language: data.preferences.language || 'en',
+      });
+    }
     setIsEditing(false);
   };
+
+  if (isLoading || !data) {
+    return null;
+  }
+
+  if (error) {
+    console.error('Error loading user data:', error);
+    return null;
+  }
+
+  const currentUser = data.user;
+  const displayName = currentUser.first_name && currentUser.last_name
+    ? `${currentUser.first_name} ${currentUser.last_name}`
+    : currentUser.full_name || 'User Profile';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -124,7 +189,7 @@ export function UserProfileModal({ isOpen, onClose, currentUser }: UserProfileMo
             </div>
             <div className="mt-2 text-center">
               <p className="text-xs font-medium text-slate-700">
-                {currentUser?.full_name || 'User Profile'}
+                {displayName}
               </p>
               <p className="text-[10px] text-slate-500 mt-0.5">
                 {currentUser?.email}
@@ -134,18 +199,33 @@ export function UserProfileModal({ isOpen, onClose, currentUser }: UserProfileMo
 
           {/* Form Fields */}
           <div className="space-y-4">
-            {/* Full Name */}
+            {/* First Name */}
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1.5">
-                Full Name
+                First Name
               </label>
               <input
                 type="text"
-                value={formData.full_name}
-                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                value={formData.first_name}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                 disabled={!isEditing}
                 className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200 disabled:bg-slate-50/50 disabled:text-slate-600"
-                placeholder="Enter your full name"
+                placeholder="Enter your first name"
+              />
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1.5">
+                Last Name
+              </label>
+              <input
+                type="text"
+                value={formData.last_name}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                disabled={!isEditing}
+                className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200 disabled:bg-slate-50/50 disabled:text-slate-600"
+                placeholder="Enter your last name"
               />
             </div>
 
@@ -213,26 +293,26 @@ export function UserProfileModal({ isOpen, onClose, currentUser }: UserProfileMo
                   disabled={!isEditing}
                   className="sr-only peer"
                 />
-                <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-slate-400/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate-600 disabled:opacity-50"></div>
+                <div className="relative w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-slate-600 disabled:opacity-50"></div>
               </label>
             </div>
           </div>
 
           {/* Action Buttons */}
           {isEditing && (
-            <div className="flex gap-2.5 mt-6 pt-5 border-t border-slate-200/50">
+            <div className="flex gap-2 mt-6 pt-4 border-t border-slate-200/50">
               <button
                 onClick={handleCancel}
-                className="flex-1 px-3 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-800 bg-white/60 hover:bg-white/80 border border-slate-200/80 hover:border-slate-300/80 rounded-xl transition-all duration-200"
+                className="flex-1 px-3 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-white/60 rounded-xl transition-all duration-200 border border-slate-200/60 hover:border-slate-300/60"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                disabled={updatePreferences.isPending}
-                className="flex-1 px-3 py-2.5 text-xs font-medium text-white bg-slate-700 hover:bg-slate-800 disabled:bg-slate-400 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50"
+                disabled={updateMutation.isPending}
+                className="flex-1 px-3 py-2.5 text-xs font-medium text-white bg-slate-600 hover:bg-slate-700 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {updatePreferences.isPending ? 'Saving...' : 'Save Changes'}
+                {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           )}
