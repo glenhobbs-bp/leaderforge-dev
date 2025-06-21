@@ -22,10 +22,15 @@ export async function GET(req: NextRequest) {
 
     // Hydrate session if tokens exist
     if (accessToken && refreshToken) {
-      await supabase.auth.setSession({
+      const { error: setSessionError } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
       });
+
+      if (setSessionError) {
+        console.warn('[AVATAR API] Session hydration failed:', setSessionError.message);
+        return NextResponse.json({ error: 'Session expired' }, { status: 401 });
+      }
     }
 
     // Check session after hydration
