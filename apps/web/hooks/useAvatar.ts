@@ -17,7 +17,8 @@ export function useAvatar(userId: string | null, options: UseAvatarOptions = {})
 
       try {
         const response = await fetch(`/api/user/avatar?userId=${userId}`, {
-          // Add cache headers for browser-level caching
+          // Include credentials for authentication
+          credentials: 'include',
           headers: {
             'Cache-Control': 'public, max-age=300', // 5 minutes browser cache
           },

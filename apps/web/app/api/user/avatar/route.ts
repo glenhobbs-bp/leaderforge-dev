@@ -11,13 +11,27 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Fast SSR Auth setup
+    // SSR Auth setup with proper session hydration
     const cookieStore = await nextCookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
-    // Quick session check
+    // Get auth tokens from cookies for session hydration
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+
+    // Hydrate session if tokens exist
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    }
+
+    // Check session after hydration
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user?.id) {
+      console.warn('[AVATAR API] No session after hydration');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
