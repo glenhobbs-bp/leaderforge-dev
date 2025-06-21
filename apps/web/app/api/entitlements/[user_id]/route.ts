@@ -10,9 +10,9 @@ import { Entitlement } from '../../../lib/types';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { user_id: string } }
+  { params }: { params: Promise<{ user_id: string }> }
 ) {
-  const { user_id } = params;
+  const { user_id } = await params;
   const cookieStore = await nextCookies();
   const supabase = createSupabaseServerClient(cookieStore);
   console.log(`[API] GET /api/entitlements/${user_id}`);

@@ -10,7 +10,7 @@ import { User } from '../../../../lib/types';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { user_id: string } }
+  { params }: { params: Promise<{ user_id: string }> }
 ) {
   // SSR Auth: get cookies and hydrate session
   const cookieStore = await nextCookies();
@@ -31,7 +31,7 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { user_id } = params;
+  const { user_id } = await params;
   console.log(`[API] GET /api/user/${user_id}/preferences`);
   if (!user_id || typeof user_id !== 'string') {
     console.error('[API] Missing or invalid user_id');
@@ -62,7 +62,7 @@ export async function GET(
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { user_id: string } }
+  { params }: { params: Promise<{ user_id: string }> }
 ) {
   // SSR Auth: get cookies and hydrate session
   const cookieStore = await nextCookies();
@@ -83,7 +83,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { user_id } = params;
+  const { user_id } = await params;
   console.log(`[API] PATCH /api/user/${user_id}/preferences`);
   if (!user_id || typeof user_id !== 'string') {
     console.error('[API] Missing or invalid user_id');

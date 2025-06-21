@@ -1,13 +1,11 @@
+// File: apps/web/components/ui/NavPanel.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import ContextSelector from "./ContextSelector";
 import { useSupabase } from '../SupabaseProvider';
-import { useNavigation } from '../../hooks/useNavigation';
-import { authService } from '../../app/lib/authService';
 import * as LucideIcons from "lucide-react";
-import { UserProfileModal } from "./UserProfileModal";
 
 // Global avatar cache to persist across component remounts
 const globalAvatarCache = new Map<string, string>();
@@ -20,7 +18,7 @@ function toPascalCase(str: string) {
     .join('');
 }
 
-// Keep the NavPanelSchema type for compatibility
+// Add NavPanelSchema type
 export interface NavPanelSchema {
   type: "NavPanel";
   props: {
@@ -51,7 +49,7 @@ export interface NavPanelSchema {
 }
 
 interface NavPanelProps {
-  contextKey: string; // Database-driven: context key for navigation query
+  navSchema: NavPanelSchema;
   contextOptions?: {
     id: string;
     title: string;
@@ -66,8 +64,8 @@ interface NavPanelProps {
   userId?: string | null;
 }
 
-export default function NavPanelDatabaseDriven({
-  contextKey,
+export default function NavPanel({
+  navSchema,
   contextOptions = [],
   contextValue,
   onContextChange,
@@ -77,17 +75,11 @@ export default function NavPanelDatabaseDriven({
   userId,
 }: NavPanelProps) {
   if (process.env.NODE_ENV === 'development') {
-    console.log('[NavPanel] RENDER - Database-driven with contextKey:', contextKey);
+    console.log('[NavPanel] RENDER');
   }
-
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [, setIsLoadingAvatar] = useState<boolean>(false);
   const { supabase } = useSupabase();
-
-  // Database-driven navigation
-  const { navSchema, loading: navLoading, error: navError } = useNavigation(contextKey);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
@@ -177,75 +169,17 @@ export default function NavPanelDatabaseDriven({
 
   const handleFooterAction = async (action: string) => {
     if (action === 'signOut') {
-      await authService.signOut(supabase);
+      await supabase.auth.signOut();
+      await fetch('/api/auth/set-session', {
+        method: 'POST',
+        body: JSON.stringify({ session: null }),
+        headers: { 'Content-Type': 'application/json' },
+      });
       window.location.href = '/';
     } else {
       handleNavClick(action);
     }
   };
-
-  // Handle loading state
-  if (navLoading) {
-    return (
-      <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
-        <aside
-          className={`h-full flex flex-col justify-center items-center shadow-2xl rounded-2xl bg-white/40 backdrop-blur-xl border border-gray-100 mx-2 transition-all duration-300
-            ${isCollapsed ? 'w-14 px-1' : 'w-64 px-3'}
-          `}
-          style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.7) 60%, rgba(200,220,255,0.3) 100%)",
-            boxShadow: "0 12px 32px 0 rgba(60, 60, 60, 0.18)",
-          }}
-        >
-          <div className="animate-pulse text-gray-600">
-            {isCollapsed ? "..." : "Loading navigation..."}
-          </div>
-        </aside>
-      </div>
-    );
-  }
-
-  // Handle error state
-  if (navError) {
-    return (
-      <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
-        <aside
-          className={`h-full flex flex-col justify-center items-center shadow-2xl rounded-2xl bg-white/40 backdrop-blur-xl border border-gray-100 mx-2 transition-all duration-300
-            ${isCollapsed ? 'w-14 px-1' : 'w-64 px-3'}
-          `}
-          style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.7) 60%, rgba(200,220,255,0.3) 100%)",
-            boxShadow: "0 12px 32px 0 rgba(60, 60, 60, 0.18)",
-          }}
-        >
-          <div className="text-red-500 text-center text-sm">
-            {isCollapsed ? "!" : `Navigation Error: ${navError}`}
-          </div>
-        </aside>
-      </div>
-    );
-  }
-
-  // Handle no navigation data
-  if (!navSchema) {
-    return (
-      <div className="flex flex-col h-[calc(100vh-2rem)] my-4">
-        <aside
-          className={`h-full flex flex-col justify-center items-center shadow-2xl rounded-2xl bg-white/40 backdrop-blur-xl border border-gray-100 mx-2 transition-all duration-300
-            ${isCollapsed ? 'w-14 px-1' : 'w-64 px-3'}
-          `}
-          style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.7) 60%, rgba(200,220,255,0.3) 100%)",
-            boxShadow: "0 12px 32px 0 rgba(60, 60, 60, 0.18)",
-          }}
-        >
-          <div className="text-gray-500 text-center text-sm">
-            {isCollapsed ? "?" : "No navigation available"}
-          </div>
-        </aside>
-      </div>
-    );
-  }
 
   // Split nav items for sticky bottom (position: 'bottom')
   const mainSections = navSchema.props.sections.filter(
@@ -277,7 +211,6 @@ export default function NavPanelDatabaseDriven({
             </div>
           </div>
         )}
-
         {/* Context Selector */}
         <div className={`${isCollapsed ? 'px-0 pb-2 pt-2' : 'w-full pb-2 pt-2'}`}>
           <ContextSelector
@@ -287,7 +220,6 @@ export default function NavPanelDatabaseDriven({
             collapsed={isCollapsed}
           />
         </div>
-
         {/* Scrollable nav */}
         <div className={`flex-1 overflow-y-auto ${isCollapsed ? 'px-0 py-1' : 'px-1 py-1'} space-y-4 custom-scrollbar`} tabIndex={0} aria-label="Navigation sections">
           {mainSections.map((section, idx) => (
@@ -301,8 +233,7 @@ export default function NavPanelDatabaseDriven({
                 {section.items.map((item, itemIdx) => {
                   const isActive = selectedNav === item.id;
                   const iconName = toPascalCase(item.icon || '');
-                  const IconComponent = LucideIcons[iconName as keyof typeof LucideIcons] as React.ComponentType<{ className?: string; strokeWidth?: number; style?: React.CSSProperties }> | undefined;
-                  const Icon = IconComponent || LucideIcons.FileQuestion;
+                  const Icon = (LucideIcons as Record<string, any>)[iconName] || LucideIcons.FileQuestion;
                   const tooltip = isCollapsed
                     ? item.label + (item.description ? ` — ${item.description}` : "")
                     : undefined;
@@ -365,7 +296,6 @@ export default function NavPanelDatabaseDriven({
             </div>
           ))}
         </div>
-
         {/* Sticky footer: profile and actions */}
         {navSchema.props.footer && (
           <div className={`bg-white/70 backdrop-blur-xl rounded-b-2xl border-t border-gray-100 ${isCollapsed ? 'px-1 py-2 mb-3' : 'px-4 py-2 mb-3'} flex flex-col gap-1 shadow-sm`}>
@@ -380,41 +310,37 @@ export default function NavPanelDatabaseDriven({
               </div>
             )}
             <div className={`flex flex-col gap-0.5 ${isCollapsed ? 'items-center' : ''}`}>
-              {/* User Profile Button */}
-              <button
-                type="button"
-                onClick={() => setIsProfileModalOpen(true)}
-                className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-blue-300`}
-                tabIndex={0}
-                aria-label="User Profile"
-                style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
-              >
-                <img
-                  src={avatarUrl || "/icons/default-avatar.svg"}
-                  alt="Profile"
-                  width={14}
-                  height={14}
-                  className="shrink-0 rounded-full"
-                />
-                {!isCollapsed && <span className="text-[13px]">My Profile</span>}
-              </button>
-
-              {/* Sign Out Button */}
-              <button
-                type="button"
-                onClick={() => handleFooterAction('signOut')}
-                className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} text-gray-600 hover:bg-red-50/80 hover:text-red-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-red-300`}
-                tabIndex={0}
-                aria-label="Sign Out"
-                style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
-              >
-                <LogOut className="w-4 h-4 mr-1 text-gray-400" strokeWidth={1.6} />
-                {!isCollapsed && <span className="text-[13px]">Sign Out</span>}
-              </button>
+              {navSchema.props.footer.actions?.map((action) => {
+                const isSignOut = action.action === 'signOut';
+                return (
+                  <button
+                    key={action.label}
+                    type="button"
+                    onClick={() => handleFooterAction(action.action)}
+                    className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-blue-300`}
+                    tabIndex={0}
+                    aria-label={action.label}
+                    style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
+                  >
+                    {isSignOut ? (
+                      <LogOut className="w-4 h-4 mr-1 text-gray-400" strokeWidth={1.6} />
+                    ) : action.icon ? (
+                      <img
+                        src={action.icon}
+                        alt={action.label}
+                        width={14}
+                        height={14}
+                        className="shrink-0 opacity-70"
+                        onError={e => (e.currentTarget.src = "/icons/placeholder.png")}
+                      />
+                    ) : null}
+                    {!isCollapsed && <span className="text-[13px]">{action.label}</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
-
         {/* Middle right expand/collapse button */}
         {onToggleCollapse && (
           <button
@@ -427,19 +353,62 @@ export default function NavPanelDatabaseDriven({
             {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
         )}
-
-        {/* User Profile Modal */}
-        <UserProfileModal
-          isOpen={isProfileModalOpen}
-          onClose={() => setIsProfileModalOpen(false)}
-          userId={userId || ""}
-          currentUser={{
-            email: navSchema?.props?.footer?.profile?.name || "",
-            full_name: navSchema?.props?.footer?.profile?.name || "",
-            avatar_url: avatarUrl || undefined
-          }}
-        />
       </aside>
+
     </div>
   );
 }
+
+// Sample schema for testing
+export const sampleNavSchema: NavPanelSchema = {
+  type: "NavPanel",
+  props: {
+    header: {
+      greeting: "Welcome back, Glen!",
+      avatarUrl: null, // No avatar set, will fallback to default
+    },
+    sections: [
+      {
+        title: "LEARNING",
+        items: [
+          { id: "my-learning", label: "My Learning", icon: "book", href: "/learning" },
+          { id: "training-library", label: "Training Library", icon: "library", href: "/library" },
+          { id: "bold-actions", label: "Bold Actions", icon: "target", href: "/actions" },
+        ],
+      },
+      {
+        title: "OVERVIEW",
+        items: [
+          { id: "my-team", label: "My Team", icon: "users", href: "/team" },
+          { id: "executive-dashboard", label: "Executive Dashboard", icon: "dashboard", href: "/dashboard" },
+        ],
+      },
+      {
+        title: "COMPANY",
+        items: [
+          { id: "company-settings", label: "Company Settings", icon: "settings", href: "/company" },
+        ],
+      },
+      {
+        title: "ACCOUNT",
+        items: [
+          { id: "account-settings", label: "Account Settings", icon: "settings", href: "/account" },
+          { id: "onboarding-guide", label: "Onboarding Guide", icon: "help", href: "/onboarding" },
+          { id: "report-bug", label: "Report a Bug", icon: "bug", href: "/bug" },
+        ],
+      },
+      {
+        title: null,
+        items: [
+          { id: "sign-out", label: "Sign Out", icon: "logout", position: "bottom" },
+        ],
+      },
+    ],
+    footer: {
+      profile: { name: "Glen", avatarUrl: null },
+      actions: [
+        { label: "Sign Out", action: "signOut", icon: "logout" },
+      ],
+    },
+  },
+};

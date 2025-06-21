@@ -20,17 +20,24 @@ export default async function DashboardPage() {
   const supabase = createSupabaseServerClient(cookieStore);
 
   if (accessToken && refreshToken) {
-    await supabase.auth.setSession({
+    const setSessionRes = await supabase.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
+    console.log('[dashboard/page] setSession result:', { hasUser: !!setSessionRes.data?.user, error: setSessionRes.error });
+  } else {
+    console.warn('[dashboard/page] Missing access or refresh token in cookies');
   }
 
   const {
     data: { session },
+    error: sessionError,
   } = await supabase.auth.getSession();
 
+  console.log('[dashboard/page] Final session check:', { hasUser: !!session?.user, error: sessionError });
+
   if (!session?.user) {
+    console.warn('[dashboard/page] No user found in session, redirecting to login');
     redirect('/login');
   }
 

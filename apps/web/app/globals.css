@@ -17,4 +17,35 @@
 
 body {
     @apply bg-red-100;
-  }
+}
+
+/* Custom scrollbar styles for NavPanel */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* Firefox scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.3) rgba(255, 255, 255, 0.1);
+}
+
+/* Modal focus ring using theme colors */
+.modal-focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary, #3b82f6);
+}

@@ -9,7 +9,7 @@ import { cookies as nextCookies } from 'next/headers';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { org_id: string } }
+  { params }: { params: Promise<{ org_id: string }> }
 ) {
   // SSR Auth: get cookies and hydrate session
   const cookieStore = await nextCookies();
@@ -30,7 +30,7 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { org_id } = params;
+  const { org_id } = await params;
   console.log(`[API] GET /api/orgs/${org_id}/entitlements`);
   if (!org_id || typeof org_id !== 'string') {
     console.error('[API] Missing or invalid org_id');

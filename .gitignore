@@ -39,6 +39,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# --- Development Session Management ---
+*.pid
+.web-dev.pid
+.langgraph-dev.pid
+
 # --- Misc ---
 coverage/
 *.local

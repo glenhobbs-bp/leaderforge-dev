@@ -10,8 +10,6 @@ export function useUserPreferences(userId: string) {
     queryKey: ['user-preferences', userId],
     queryFn: () => fetchUserPreferences(userId),
     enabled: !!userId,
-    onError: (err) => console.error('[hook] useUserPreferences error:', err),
-    onSuccess: (data) => console.log('[hook] useUserPreferences success:', data),
   });
 }
 
@@ -25,7 +23,7 @@ export function useUpdateUserPreferences(userId: string) {
     mutationFn: (prefs: any) => updateUserPreferences(userId, prefs),
     onSuccess: (data) => {
       console.log('[hook] useUpdateUserPreferences success:', data);
-      queryClient.invalidateQueries(['user-preferences', userId]);
+      queryClient.invalidateQueries({ queryKey: ['user-preferences', userId] });
     },
     onError: (err) => console.error('[hook] useUpdateUserPreferences error:', err),
   });

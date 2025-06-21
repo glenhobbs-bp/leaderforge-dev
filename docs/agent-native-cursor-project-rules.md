@@ -35,17 +35,29 @@
 - API endpoints must be thin: receive user intent, invoke the agent, return the schema.
 - No business logic, data access, or tool calls in API handlers.
 
+## Development Environment Rules
+- **Session Hygiene:** Use `./monitor-sessions.sh` regularly to check for session buildup. Run `./cleanup-sessions.sh` if more than 5 shell sessions are detected.
+- **Clean Startup:** Always use `./start-dev.sh` to start development services. Never start services manually in multiple terminals.
+- **Graceful Shutdown:** Always use `./stop-dev.sh` to stop development services. Never leave orphaned processes running.
+- **Daily Cleanup:** Run session cleanup at the start of each development session to prevent resource accumulation.
+- **Port Conflicts:** If ports 3000 or 8000 are occupied, run cleanup scripts before attempting manual process killing.
+- **Build Cache:** Clear Next.js cache (`rm -rf apps/web/.next`) when experiencing route conflicts or stale build issues.
+
 ## Testing & Review
 - All new features must be tested end-to-end via agent invocation.
 - No feature is complete unless it is agent-native and schema-driven.
 - Code reviews must check for architectural purity and separation of concerns.
+- Development environment must be clean before testing (use `./monitor-sessions.sh` to verify).
 
 ## Do's and Don'ts
 - **Do:** Add new features by composing agents and tools, not by adding logic to UI or API.
 - **Do:** Use configuration and schema for extensibility.
+- **Do:** Use provided session management scripts for development workflow.
 - **Don't:** Hardcode business rules or UI logic in the frontend or API.
 - **Don't:** Bypass the agent layer for "quick fixes" or expediency.
 - **Don't:** Couple tools to specific agents or UI components.
+- **Don't:** Start development services manually in multiple terminals.
+- **Don't:** Leave orphaned terminal sessions or processes running.
 
 ## New Feature Checklist
 - [ ] All business logic is in the agent, not the UI or API.
@@ -55,6 +67,7 @@
 - [ ] Feature is observable in LangSmith or equivalent.
 - [ ] Code review confirms architectural purity.
 - [ ] Themes (colors, typography, etc.) are managed as configuration and dynamic.
+- [ ] Development environment is clean (verified with `./monitor-sessions.sh`).
 
 ---
 

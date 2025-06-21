@@ -6,9 +6,9 @@ import { Content } from '../../../lib/types';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { context_key: string } }
+  context: { params: Promise<{ context_key: string }> }
 ) {
-  const { context_key } = context.params;
+  const { context_key } = await context.params;
   const cookieStore = await cookies();
   const supabase = createSupabaseServerClient(cookieStore);
   console.log(`[API] GET /api/content/${context_key}`);

@@ -1,6 +1,7 @@
 import "./globals.css";
 import "@copilotkit/react-ui/styles.css";
 import CopilotKitProvider from "./CopilotKitProvider";
+import QueryClientProvider from "./QueryClientProvider";
 import SupabaseProvider from '../components/SupabaseProvider';
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from './lib/supabaseServerClient';
@@ -20,11 +21,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body>
-        <SupabaseProvider initialSession={session}>
-          <CopilotKitProvider>
-            {children}
-          </CopilotKitProvider>
-        </SupabaseProvider>
+        <QueryClientProvider>
+          <SupabaseProvider initialSession={session}>
+            <CopilotKitProvider>
+              {children}
+            </CopilotKitProvider>
+          </SupabaseProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

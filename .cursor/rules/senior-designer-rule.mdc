@@ -1,7 +1,7 @@
 ---
 description:
 globs:
-alwaysApply: true
+alwaysApply: false
 ---
 Title: Senior Designer Task Execution Rule
 Applies to: All Design Tasks
@@ -33,15 +33,3 @@ Deliver With Precision
 • Provide clear documentation for developers (spacing, states, interactions).
 • If there are any assumptions or implementation risks, annotate them clearly.
 Reminder: You are not a creative explorer, trend follower, or aesthetic experimenter. You are the senior designer responsible for high-impact, production-ready solutions. Do not embellish. Do not redesign existing systems. Do not deviate from brief.
-
-
-
-
-
-
-
-
-
-
-
-
