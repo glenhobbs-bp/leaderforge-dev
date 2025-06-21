@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from './dialog';
 import { Camera, User, Edit3 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { forceAvatarRefresh } from './NavPanel';
 
 interface UserData {
   id: string;
@@ -50,47 +51,101 @@ async function updateUserData(userId: string, data: Partial<UserData & UserPrefe
   return response.json();
 }
 
+// Fetch avatar signed URL
+async function fetchAvatarUrl(userId: string): Promise<string> {
+  const response = await fetch(`/api/user/avatar?userId=${userId}`);
+  if (!response.ok) {
+    return "/icons/default-avatar.svg";
+  }
+  const data = await response.json();
+  return data.url || "/icons/default-avatar.svg";
+}
+
 export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalProps) {
-  const queryClient = useQueryClient();
-
-  // Fetch user data
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['userData', userId],
-    queryFn: () => fetchUserData(userId),
-    enabled: isOpen && !!userId,
-  });
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: (updateData: Partial<UserData & UserPreferences>) => updateUserData(userId, updateData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userData', userId] });
-      setIsEditing(false);
-      onClose();
-    },
-    onError: (error) => {
-      console.error('Failed to update user data:', error);
-    },
-  });
-
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
     theme: 'light',
     notifications: true,
-    language: 'en',
+    language: 'en'
   });
 
-  // Update form data when user data loads
+  const queryClient = useQueryClient();
+
+  // Fetch user data
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUserData(userId),
+    enabled: !!userId && isOpen,
+  });
+
+  // Fetch avatar URL separately
+  const { data: avatarUrl } = useQuery({
+    queryKey: ['avatar', userId],
+    queryFn: () => fetchAvatarUrl(userId),
+    enabled: !!userId && isOpen,
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: (data: Partial<UserData & UserPreferences>) => updateUserData(userId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user', userId] });
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      console.error('Failed to update user data:', error);
+    }
+  });
+
+  // Avatar upload mutation
+  const avatarUploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      formData.append('userId', userId);
+
+      const response = await fetch('/api/user/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to upload avatar');
+      }
+
+      return response.json();
+    },
+            onSuccess: () => {
+      // Force NavPanel avatar refresh with event system
+      forceAvatarRefresh(userId);
+
+      // Invalidate all avatar-related queries to refresh NavPanel and modal
+      queryClient.invalidateQueries({ queryKey: ['avatar', userId] });
+      queryClient.invalidateQueries({ queryKey: ['user', userId] });
+      // Also invalidate any other avatar queries that might exist in NavPanel
+      queryClient.invalidateQueries({ queryKey: ['avatar'] });
+      queryClient.invalidateQueries({ predicate: (query) =>
+        query.queryKey.includes('avatar') || query.queryKey.includes(userId)
+      });
+    },
+    onError: (error) => {
+      console.error('Avatar upload failed:', error);
+      // You could add a toast notification here
+    },
+  });
+
+  // Initialize form data when user data loads
   useEffect(() => {
     if (data) {
       setFormData({
         first_name: data.user.first_name || '',
         last_name: data.user.last_name || '',
         theme: data.preferences.theme || 'light',
-        notifications: data.preferences.notifications !== false,
-        language: data.preferences.language || 'en',
+        notifications: data.preferences.notifications ?? true,
+        language: data.preferences.language || 'en'
       });
     }
   }, [data]);
@@ -99,7 +154,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
     try {
       await updateMutation.mutateAsync(formData);
     } catch (error) {
-      console.error('Failed to update user data:', error);
+      console.error('Error saving user data:', error);
     }
   };
 
@@ -109,19 +164,48 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
         first_name: data.user.first_name || '',
         last_name: data.user.last_name || '',
         theme: data.preferences.theme || 'light',
-        notifications: data.preferences.notifications !== false,
-        language: data.preferences.language || 'en',
+        notifications: data.preferences.notifications ?? true,
+        language: data.preferences.language || 'en'
       });
     }
     setIsEditing(false);
   };
 
-  if (isLoading || !data) {
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      console.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (10MB limit for high quality images)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      console.error('File size must be less than 10MB');
+      return;
+    }
+
+    // Upload the file
+    avatarUploadMutation.mutate(file);
+
+    // Clear the input so the same file can be selected again
+    event.target.value = '';
+  };
+
+  if (isLoading) {
     return null;
   }
 
   if (error) {
     console.error('Error loading user data:', error);
+    return null;
+  }
+
+  if (!data || !data.user) {
+    console.warn('User data not available yet');
     return null;
   }
 
@@ -171,9 +255,9 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                   background: 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
                 }}
               >
-                {currentUser?.avatar_url ? (
+                {avatarUrl && avatarUrl !== "/icons/default-avatar.svg" ? (
                   <img
-                    src={currentUser.avatar_url}
+                    src={avatarUrl}
                     alt="Profile"
                     className="w-full h-full rounded-full object-cover"
                   />
@@ -181,11 +265,28 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                   <User className="w-6 h-6" />
                 )}
               </div>
-              <button
-                className="absolute -bottom-0.5 -right-0.5 w-6 h-6 bg-slate-600 hover:bg-slate-700 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110"
+              <label
+                htmlFor="avatar-upload"
+                className={`absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110 ${
+                  avatarUploadMutation.isPending
+                    ? 'bg-blue-500 cursor-wait'
+                    : 'bg-slate-600 hover:bg-slate-700 cursor-pointer'
+                }`}
               >
-                <Camera className="w-3 h-3 text-white" />
-              </button>
+                {avatarUploadMutation.isPending ? (
+                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-3 h-3 text-white" />
+                )}
+              </label>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+                disabled={!isEditing}
+              />
             </div>
             <div className="mt-2 text-center">
               <p className="text-xs font-medium text-slate-700">

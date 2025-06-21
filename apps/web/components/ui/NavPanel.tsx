@@ -12,6 +12,26 @@ import { UserProfileModal } from "./UserProfileModal";
 // Global avatar cache to persist across component remounts
 const globalAvatarCache = new Map<string, string>();
 
+// Export function to clear avatar cache for a specific user
+export function clearAvatarCache(userId: string) {
+  globalAvatarCache.delete(userId);
+  globalAvatarCache.delete(`loading_${userId}`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[NavPanel] Cleared avatar cache for user:', userId);
+    console.log('[NavPanel] Remaining cache keys:', Array.from(globalAvatarCache.keys()));
+  }
+}
+
+// Export function to force avatar refresh for a user
+export function forceAvatarRefresh(userId: string) {
+  clearAvatarCache(userId);
+  // Trigger a custom event that NavPanel can listen to
+  window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: { userId } }));
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[NavPanel] Triggered avatar refresh for user:', userId);
+  }
+}
+
 // Convert kebab-case to PascalCase for Lucide icons
 function toPascalCase(str: string) {
   return str
@@ -101,21 +121,55 @@ export default function NavPanelDatabaseDriven({
       return;
     }
 
-    // Check global cache first for this specific user
-    const cachedUrl = globalAvatarCache.get(userId);
-    if (cachedUrl) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Using cached avatar URL for user:', userId);
+    // Initial avatar fetch (use cache)
+    fetchAvatarForUser(userId, false);
+
+    // Listen for avatar update events
+    const handleAvatarUpdate = (event: CustomEvent) => {
+      if (event.detail.userId === userId) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[NavPanel] Avatar update event received for user:', userId);
+        }
+        // Force refetch avatar (bypass cache)
+        fetchAvatarForUser(userId, true);
       }
-      setAvatarUrl(cachedUrl);
-      return;
+    };
+
+    window.addEventListener('avatarUpdated', handleAvatarUpdate as EventListener);
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener('avatarUpdated', handleAvatarUpdate as EventListener);
+    };
+  }, [userId]);
+
+  // Normal function to fetch avatar (with cache)
+  const fetchAvatarForUser = (targetUserId: string, forceRefresh: boolean = false) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] fetchAvatarForUser called for:', targetUserId, 'forceRefresh:', forceRefresh);
+    }
+
+    // Check global cache first (unless forcing refresh)
+    if (!forceRefresh) {
+      const cachedUrl = globalAvatarCache.get(targetUserId);
+      if (cachedUrl) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[NavPanel] Using cached avatar URL for user:', targetUserId);
+        }
+        setAvatarUrl(cachedUrl);
+        return;
+      }
+    } else {
+      // Clear cache only when forcing refresh
+      globalAvatarCache.delete(targetUserId);
+      globalAvatarCache.delete(`loading_${targetUserId}`);
     }
 
     // Check if we're already loading this specific user to prevent duplicate API calls
-    const loadingKey = `loading_${userId}`;
+    const loadingKey = `loading_${targetUserId}`;
     if (globalAvatarCache.has(loadingKey)) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Avatar already being fetched for user:', userId);
+        console.log('[NavPanel] Avatar already being fetched for user:', targetUserId);
       }
       return;
     }
@@ -125,10 +179,10 @@ export default function NavPanelDatabaseDriven({
     setIsLoadingAvatar(true);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] Fetching avatar for userId:', userId);
+      console.log('[NavPanel] Fetching avatar for userId:', targetUserId);
     }
 
-    fetch(`/api/user/avatar?userId=${userId}`)
+    fetch(`/api/user/avatar?userId=${targetUserId}`)
       .then(res => res.json())
       .then(data => {
         const url = data.url || "/icons/default-avatar.svg";
@@ -137,13 +191,13 @@ export default function NavPanelDatabaseDriven({
         }
 
         // Cache the result globally for this user
-        globalAvatarCache.set(userId, url);
+        globalAvatarCache.set(targetUserId, url);
         setAvatarUrl(url);
       })
       .catch((err) => {
         console.error('[NavPanel] Avatar API error:', err);
         const defaultUrl = "/icons/default-avatar.svg";
-        globalAvatarCache.set(userId, defaultUrl);
+        globalAvatarCache.set(targetUserId, defaultUrl);
         setAvatarUrl(defaultUrl);
       })
       .finally(() => {
@@ -151,7 +205,9 @@ export default function NavPanelDatabaseDriven({
         globalAvatarCache.delete(loadingKey);
         setIsLoadingAvatar(false);
       });
-  }, [userId]); // Only depend on userId to prevent cycles
+  };
+
+
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
