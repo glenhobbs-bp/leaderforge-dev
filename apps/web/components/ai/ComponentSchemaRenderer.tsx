@@ -15,7 +15,7 @@ import Hls from "hls.js";
 import React from "react";
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 
-export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema }) {
+export function ComponentSchemaRenderer({ schema, userId }: { schema: ComponentSchema; userId?: string }) {
   // Debug: log the received schema
   console.log("[ComponentSchemaRenderer] schema:", schema);
 

@@ -76,11 +76,39 @@ export interface User {
   first_name?: string;
   last_name?: string;
   avatar_url?: string;
-  preferences?: Record<string, unknown>;
+  preferences?: UserPreferences;
   last_sign_in_at?: string;
   created_at?: string;
   updated_at?: string;
   [key: string]: unknown;
+}
+
+export interface UserPreferences {
+  // Navigation state
+  navigation?: {
+    lastContextKey?: string;
+    lastNavOptionId?: string;
+    lastVisitedAt?: string;
+  };
+
+  // Video progress state
+  videoProgress?: Record<string, VideoProgress>;
+
+  // UI preferences
+  theme?: 'light' | 'dark' | 'system';
+  language?: string;
+
+  // Extensible for future components
+  [componentName: string]: unknown;
+}
+
+export interface VideoProgress {
+  contentId: string;
+  currentTime: number; // seconds
+  duration: number; // seconds
+  completed: boolean;
+  lastWatchedAt: string;
+  watchTime: number; // total watch time in seconds
 }
 
 export interface ContentAccessPolicy {
@@ -92,7 +120,7 @@ export interface ContentAccessPolicy {
 }
 
 // Utility types for Supabase
-export type Database = any; // TODO: Replace with generated Supabase types when available
+export type Database = Record<string, unknown>; // TODO: Replace with generated Supabase types when available
 export type TypedSupabaseClient = SupabaseClient<Database>;
 
 // Service response types

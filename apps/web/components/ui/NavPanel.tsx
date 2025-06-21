@@ -11,6 +11,7 @@ import ContextSelector from "./ContextSelector";
 import { useSupabase } from '../SupabaseProvider';
 import { useNavigation } from '../../hooks/useNavigation';
 import { useAvatar } from '../../hooks/useAvatar';
+import { useNavigationState } from '../../app/hooks/useNavigationState';
 import { authService } from '../../app/lib/authService';
 import * as LucideIcons from "lucide-react";
 import { UserProfileModal } from "./UserProfileModal";
@@ -102,6 +103,15 @@ export default function NavPanel({
   // Avatar fetching with React Query
   const { data: avatarUrl = "/icons/default-avatar.svg" } = useAvatar(userId);
 
+  // Navigation state persistence
+  const {
+    lastNavOptionId,
+    updateNavigationState
+  } = useNavigationState({
+    userId: userId || '',
+    contextKey
+  });
+
   // Listen for avatar update events and refetch when needed
   useEffect(() => {
     if (!userId) return;
@@ -137,11 +147,27 @@ export default function NavPanel({
     }
   }, [contextValue]);
 
+  // Initialize selected nav from persisted state
+  useEffect(() => {
+    if (lastNavOptionId && !selectedNav) {
+      setSelectedNav(lastNavOptionId);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[NavPanel] Restored navigation state:', lastNavOptionId);
+      }
+    }
+  }, [lastNavOptionId, selectedNav]);
+
   const handleNavClick = (navOptionId: string) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('[NavPanel] handleNavClick:', navOptionId);
     }
     setSelectedNav(navOptionId);
+
+    // Persist navigation state
+    if (userId) {
+      updateNavigationState(navOptionId);
+    }
+
     if (onNavSelect) {
       onNavSelect(navOptionId);
     }

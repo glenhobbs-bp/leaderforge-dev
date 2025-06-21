@@ -5,7 +5,7 @@
 
 import { createSupabaseServerClient } from './supabaseServerClient';
 import { cookies } from 'next/headers';
-import type { User } from './types';
+import type { User, VideoProgress } from './types';
 
 /**
  * Service for user profile and preferences logic. All business rules and data access for users live here.
@@ -193,5 +193,76 @@ export const userService = {
     }
 
     return data as User || null;
+  },
+
+  /**
+   * Update user navigation state (optimized for frequent updates)
+   */
+  async updateNavigationState(userId: string, contextKey: string, navOptionId: string): Promise<void> {
+    const cookieStore = await cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
+
+    // Get current preferences
+    const user = await this.getUser(userId);
+    const currentPrefs = user?.preferences || {};
+
+    const updatedPrefs = {
+      ...currentPrefs,
+      navigation: {
+        lastContextKey: contextKey,
+        lastNavOptionId: navOptionId,
+        lastVisitedAt: new Date().toISOString()
+      }
+    };
+
+    const { error } = await supabase
+      .schema('core')
+      .from('users')
+      .update({ preferences: updatedPrefs })
+      .eq('id', userId);
+
+    if (error) {
+      console.error(`[userService] Error updating navigation state:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update video progress (optimized for frequent updates)
+   */
+  async updateVideoProgress(userId: string, contentId: string, progress: Partial<VideoProgress>): Promise<void> {
+    const cookieStore = await cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
+
+    // Get current preferences
+    const user = await this.getUser(userId);
+    const currentPrefs = user?.preferences || {};
+    const currentVideoProgress = currentPrefs.videoProgress || {};
+
+    const updatedProgress = {
+      ...currentVideoProgress[contentId],
+      ...progress,
+      contentId,
+      lastWatchedAt: new Date().toISOString()
+    };
+
+    const updatedPrefs = {
+      ...currentPrefs,
+      videoProgress: {
+        ...currentVideoProgress,
+        [contentId]: updatedProgress
+      }
+    };
+
+    const { error } = await supabase
+      .schema('core')
+      .from('users')
+      .update({ preferences: updatedPrefs })
+      .eq('id', userId);
+
+    if (error) {
+      console.error(`[userService] Error updating video progress:`, error);
+      throw error;
+    }
   }
 };

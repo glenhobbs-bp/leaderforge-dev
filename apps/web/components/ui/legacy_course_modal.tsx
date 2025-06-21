@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./dialog"
 import { Video } from 'lucide-react'
+import { useVideoProgress } from '../../app/hooks/useVideoProgress'
 
 interface CourseModalProps {
   isOpen: boolean
@@ -15,6 +16,7 @@ interface CourseModalProps {
   }
   nextTrainingDate: string | null
   onVideoComplete?: () => void
+  userId?: string
 }
 
 // Simple Button component
@@ -51,11 +53,25 @@ function Button({
   )
 }
 
-export function CourseModal({ isOpen, onClose, course, nextTrainingDate, onVideoComplete }: CourseModalProps) {
-  const [videoCompleted, setVideoCompleted] = useState(false)
+export function CourseModal({ isOpen, onClose, course, nextTrainingDate, onVideoComplete, userId }: CourseModalProps) {
   const [loading, setLoading] = useState(true)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [featuredImage, setFeaturedImage] = useState<string | null>(null)
+  const [videoDuration, setVideoDuration] = useState<number>(0)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  // Video progress tracking
+  const {
+    progress,
+    updateProgress,
+    markCompleted,
+    isCompleted,
+    progressPercentage
+  } = useVideoProgress({
+    userId: userId || '',
+    contentId: course.id,
+    duration: videoDuration
+  })
 
   useEffect(() => {
     const fetchVideoUrlAndCheckCompletion = async () => {
