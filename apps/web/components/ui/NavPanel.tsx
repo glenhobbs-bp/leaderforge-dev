@@ -1,3 +1,8 @@
+// File: apps/web/components/ui/NavPanel.tsx
+// Purpose: Navigation panel for agent-native app, themed via contextConfig
+// Owner: Frontend team
+// Tags: UI, navigation, context-based, React
+
 "use client";
 
 import React, { useState, useEffect } from "react";

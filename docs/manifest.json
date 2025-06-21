@@ -1,0 +1,3358 @@
+{
+  "metadata": {
+    "generated_at": "2025-06-21T12:09:13.648Z",
+    "generator_version": "1.0.0",
+    "total_files": 171,
+    "total_size_bytes": 1334579,
+    "file_types": {
+      ".ts": 89,
+      ".json": 12,
+      ".tsx": 31,
+      ".js": 2,
+      ".md": 36,
+      ".sql": 1
+    },
+    "tags": {
+      "TypeScript": 120,
+      "API": 31,
+      "AI agent": 47,
+      "React": 31,
+      "React hooks": 14,
+      "Next.js API": 22,
+      "security": 58,
+      "test": 24,
+      "hooks": 13,
+      "React Query": 10,
+      "utility": 39,
+      "UI": 16,
+      "navigation": 2,
+      "context-based": 1,
+      "documentation": 37,
+      "comma": 1,
+      "separated": 1,
+      "tags (e.g.": 1,
+      "\"UI": 1,
+      "context-based\")": 1
+    }
+  },
+  "files": [
+    {
+      "path": "apps/api/next-env.d.ts",
+      "name": "next-env.d.ts",
+      "directory": "apps/api",
+      "extension": ".ts",
+      "purpose": "/ <reference types=\"next\" />",
+      "tags": [
+        "TypeScript",
+        "API"
+      ],
+      "last_modified": "2025-06-01T11:14:57.833Z",
+      "size_bytes": 213,
+      "hash": "7dea1a8e",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/api/package.json",
+      "name": "package.json",
+      "directory": "apps/api",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "API"
+      ],
+      "last_modified": "2025-06-01T11:38:37.979Z",
+      "size_bytes": 201,
+      "hash": "41e6c1b2"
+    },
+    {
+      "path": "apps/api/pages/api/tribe/content/[id].ts",
+      "name": "[id].ts",
+      "directory": "apps/api/pages/api/tribe/content",
+      "extension": ".ts",
+      "purpose": "edge.tribesocial.io';",
+      "tags": [
+        "TypeScript",
+        "API"
+      ],
+      "dependencies": [
+        "next"
+      ],
+      "last_modified": "2025-06-08T14:02:42.515Z",
+      "size_bytes": 1372,
+      "hash": "8e5706ef",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/api/tsconfig.json",
+      "name": "tsconfig.json",
+      "directory": "apps/api",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "API"
+      ],
+      "last_modified": "2025-06-01T11:14:57.833Z",
+      "size_bytes": 515,
+      "hash": "c6c44fca"
+    },
+    {
+      "path": "apps/web/agent/langgraph.json",
+      "name": "langgraph.json",
+      "directory": "apps/web/agent",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-05-31T10:19:39.136Z",
+      "size_bytes": 157,
+      "hash": "885eeb80"
+    },
+    {
+      "path": "apps/web/agent/package.json",
+      "name": "package.json",
+      "directory": "apps/web/agent",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-05-31T10:19:39.136Z",
+      "size_bytes": 704,
+      "hash": "2a3e04c8"
+    },
+    {
+      "path": "apps/web/agent/src/agent.ts",
+      "name": "agent.ts",
+      "directory": "apps/web/agent/src",
+      "extension": ".ts",
+      "purpose": "This is the main entry point for the agent.",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "dependencies": [
+        "zod",
+        "@langchain/core/runnables",
+        "@langchain/core/tools",
+        "@langchain/langgraph/prebuilt",
+        "@langchain/core/messages",
+        "@langchain/langgraph",
+        "@langchain/langgraph",
+        "@langchain/openai",
+        "@copilotkit/sdk-js/langgraph",
+        "@copilotkit/sdk-js/langgraph"
+      ],
+      "last_modified": "2025-06-01T09:16:52.232Z",
+      "size_bytes": 3954,
+      "hash": "e21efa97",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/agent/src/index.ts",
+      "name": "index.ts",
+      "directory": "apps/web/agent/src",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript"
+      ],
+      "last_modified": "2025-05-31T10:19:39.133Z",
+      "size_bytes": 0,
+      "hash": "e3b0c442",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/agent/tsconfig.json",
+      "name": "tsconfig.json",
+      "directory": "apps/web/agent",
+      "extension": ".json",
+      "purpose": "aka.ms/tsconfig to read more about this file */",
+      "tags": [],
+      "last_modified": "2025-05-31T10:19:39.136Z",
+      "size_bytes": 12404,
+      "hash": "2f2b7059"
+    },
+    {
+      "path": "apps/web/app/api/agent/content/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/agent/content",
+      "extension": ".ts",
+      "purpose": "POST /api/agent/content",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient",
+        "@supabase/supabase-js",
+        "../../../lib/agentService"
+      ],
+      "last_modified": "2025-06-20T10:37:08.005Z",
+      "size_bytes": 6079,
+      "hash": "6a216606",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/agent/context/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/agent/context",
+      "extension": ".ts",
+      "purpose": "POST /api/agent/context",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "../../../lib/types",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-21T11:51:56.577Z",
+      "size_bytes": 21583,
+      "hash": "88134310",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/app/api/auth/callback/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/auth/callback",
+      "extension": ".ts",
+      "purpose": "Handles Supabase auth redirect and sets cookies for SSR session access.",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "exports": [
+        "dynamic"
+      ],
+      "last_modified": "2025-06-16T02:07:35.177Z",
+      "size_bytes": 1171,
+      "hash": "7dfd1369",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/auth/set-session/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/auth/set-session",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/auth/set-session/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-13T22:01:44.244Z",
+      "size_bytes": 1758,
+      "hash": "2ee2e8a8",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/content/[context_key]/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/content/[context_key]",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../../lib/contentService"
+      ],
+      "last_modified": "2025-06-09T21:47:36.321Z",
+      "size_bytes": 2522,
+      "hash": "4140b8c2",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/content/[context_key]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/content/[context_key]",
+      "extension": ".ts",
+      "purpose": "✅ Get session from Supabase cookie",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/contentService",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-21T00:59:26.382Z",
+      "size_bytes": 1778,
+      "hash": "63fe04a7",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/context/[context_key]/bundle/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/context/[context_key]/bundle",
+      "extension": ".ts",
+      "purpose": "GET /api/context/[context_key]/bundle",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../../lib/batchService",
+        "../../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-18T18:38:24.097Z",
+      "size_bytes": 2721,
+      "hash": "b7c68dca",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/context/[context_key]/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/context/[context_key]",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../../lib/contextService"
+      ],
+      "last_modified": "2025-06-09T21:47:02.895Z",
+      "size_bytes": 2144,
+      "hash": "459395e8",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/context/[context_key]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/context/[context_key]",
+      "extension": ".ts",
+      "purpose": "GET /api/context/[context_key]",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/contextService",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-18T18:47:08.334Z",
+      "size_bytes": 3223,
+      "hash": "7a6512f2",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/context/list/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/context/list",
+      "extension": ".ts",
+      "purpose": "API route to return all available contexts (core.context_configs) for the authenticated user, filtered by entitlement. Used to drive the context selector in the UI. SSR/session safe, Next.js 15+ compatible.",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-18T17:53:40.795Z",
+      "size_bytes": 2296,
+      "hash": "1b5c3412",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/copilotkit/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/copilotkit",
+      "extension": ".ts",
+      "purpose": "localhost:8000\", // Local LangGraph dev server",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-19T01:39:21.137Z",
+      "size_bytes": 798,
+      "hash": "af1b2088",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/dev/apply-entitlements/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/apply-entitlements",
+      "extension": ".ts",
+      "purpose": "Use service role for admin operations",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-18T23:48:10.787Z",
+      "size_bytes": 5364,
+      "hash": "62eb9d08",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/dev/grant-basic-entitlements/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/grant-basic-entitlements",
+      "extension": ".ts",
+      "purpose": "Use service role for admin operations",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-18T23:48:12.865Z",
+      "size_bytes": 3320,
+      "hash": "48ded82a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/dev/simple-entitlements/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/simple-entitlements",
+      "extension": ".ts",
+      "purpose": "Use service role for admin operations",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-18T23:48:14.960Z",
+      "size_bytes": 2636,
+      "hash": "00501a0a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/entitlements/[user_id]/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/entitlements/[user_id]",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../../lib/entitlementService"
+      ],
+      "last_modified": "2025-06-09T21:45:05.601Z",
+      "size_bytes": 1895,
+      "hash": "fe75ce4b",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/entitlements/[user_id]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/entitlements/[user_id]",
+      "extension": ".ts",
+      "purpose": "GET /api/entitlements/[user_id]",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/entitlementService",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-21T00:59:16.138Z",
+      "size_bytes": 1457,
+      "hash": "a72ba2b1",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/entitlements/clear-cache/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/entitlements/clear-cache",
+      "extension": ".ts",
+      "purpose": "POST /api/entitlements/clear-cache",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/entitlementService"
+      ],
+      "last_modified": "2025-06-18T23:47:33.331Z",
+      "size_bytes": 970,
+      "hash": "90daa89d",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/nav/[context_key]/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/nav/[context_key]",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../../lib/navService"
+      ],
+      "last_modified": "2025-06-09T21:48:36.115Z",
+      "size_bytes": 2514,
+      "hash": "b06acab7",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/nav/[context_key]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/nav/[context_key]",
+      "extension": ".ts",
+      "purpose": "API route to return entitlement-filtered nav options for a given context. SSR/session safe, Next.js 15+ compatible.",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/navService",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-21T11:40:34.671Z",
+      "size_bytes": 3083,
+      "hash": "d8e9dbfb",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/orgs/[org_id]/entitlements/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/orgs/[org_id]/entitlements",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../../../lib/entitlementService"
+      ],
+      "last_modified": "2025-06-09T21:46:12.146Z",
+      "size_bytes": 1886,
+      "hash": "5c1b4e75",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/orgs/[org_id]/entitlements/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/orgs/[org_id]/entitlements",
+      "extension": ".ts",
+      "purpose": "GET /api/orgs/[org_id]/entitlements",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../../lib/entitlementService",
+        "../../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-21T00:59:11.708Z",
+      "size_bytes": 2061,
+      "hash": "b4cab1cb",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/provisioning/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/provisioning",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../lib/provisioningService"
+      ],
+      "last_modified": "2025-06-09T21:50:13.296Z",
+      "size_bytes": 3265,
+      "hash": "00a83fcb",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/provisioning/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/provisioning",
+      "extension": ".ts",
+      "purpose": "POST /api/provisioning",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../lib/provisioningService",
+        "../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-18T18:07:44.210Z",
+      "size_bytes": 3685,
+      "hash": "00c75143",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/tribe/content/[id]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/tribe/content/[id]",
+      "extension": ".ts",
+      "purpose": "edge.tribesocial.io';",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-21T00:59:22.243Z",
+      "size_bytes": 1594,
+      "hash": "cc54b516",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/user/[user_id]/preferences/route.test.ts",
+      "name": "route.test.ts",
+      "directory": "apps/web/app/api/user/[user_id]/preferences",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./route",
+        "../../../../lib/userService"
+      ],
+      "last_modified": "2025-06-09T21:49:27.985Z",
+      "size_bytes": 4652,
+      "hash": "96502202",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/user/[user_id]/preferences/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/user/[user_id]/preferences",
+      "extension": ".ts",
+      "purpose": "GET /api/user/[user_id]/preferences",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../../lib/userService"
+      ],
+      "last_modified": "2025-06-21T11:34:39.959Z",
+      "size_bytes": 3755,
+      "hash": "8db8657e",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/user/avatar/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/user/avatar",
+      "extension": ".ts",
+      "purpose": "SSR Auth setup with proper session hydration",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-21T07:07:28.981Z",
+      "size_bytes": 7547,
+      "hash": "b7560cea",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/copilotkit/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/copilotkit",
+      "extension": ".tsx",
+      "purpose": "🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "@copilotkit/react-core",
+        "react"
+      ],
+      "exports": [
+        "CopilotKitPage"
+      ],
+      "last_modified": "2025-06-01T09:16:52.264Z",
+      "size_bytes": 5827,
+      "hash": "2e3a961d",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/CopilotKitProvider.tsx",
+      "name": "CopilotKitProvider.tsx",
+      "directory": "apps/web/app",
+      "extension": ".tsx",
+      "purpose": "—",
+      "tags": [
+        "React",
+        "TypeScript",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "@copilotkit/react-core"
+      ],
+      "exports": [
+        "CopilotKitProvider"
+      ],
+      "last_modified": "2025-06-19T19:58:20.768Z",
+      "size_bytes": 302,
+      "hash": "38ac2445",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/dashboard/DashboardClient.tsx",
+      "name": "DashboardClient.tsx",
+      "directory": "apps/web/app/dashboard",
+      "extension": ".tsx",
+      "purpose": "—",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "../../components/SupabaseProvider",
+        "@supabase/supabase-js",
+        "../../components/DynamicContextPage"
+      ],
+      "exports": [
+        "DashboardClient"
+      ],
+      "last_modified": "2025-06-19T21:28:55.665Z",
+      "size_bytes": 819,
+      "hash": "7ac9a830",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/dashboard/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/dashboard",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/app/dashboard/page.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "security"
+      ],
+      "dependencies": [
+        "@/lib/supabaseServerClient",
+        "next/navigation",
+        "next/headers",
+        "./DashboardClient",
+        "../lib/contextService",
+        "../lib/entitlementService"
+      ],
+      "last_modified": "2025-06-21T11:47:48.850Z",
+      "size_bytes": 3588,
+      "hash": "b702c2d5",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useContentForContext.ts",
+      "name": "useContentForContext.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query hook for fetching content for a context.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query",
+        "security"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/content"
+      ],
+      "exports": [
+        "useContentForContext"
+      ],
+      "last_modified": "2025-06-09T23:06:18.650Z",
+      "size_bytes": 771,
+      "hash": "2e95708e",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useContextConfig.ts",
+      "name": "useContextConfig.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query hook for fetching context config.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query",
+        "security"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/contextConfig"
+      ],
+      "exports": [
+        "useContextConfig"
+      ],
+      "last_modified": "2025-06-10T00:49:13.897Z",
+      "size_bytes": 745,
+      "hash": "909a915b",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useNavForContext.ts",
+      "name": "useNavForContext.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query hook for fetching nav for a context.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query",
+        "security"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/nav"
+      ],
+      "exports": [
+        "useNavForContext"
+      ],
+      "last_modified": "2025-06-09T23:06:20.709Z",
+      "size_bytes": 735,
+      "hash": "33d36a73",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useOrgEntitlements.ts",
+      "name": "useOrgEntitlements.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query hook for fetching org entitlements.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query",
+        "security"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/orgEntitlements"
+      ],
+      "exports": [
+        "useOrgEntitlements"
+      ],
+      "last_modified": "2025-06-09T23:03:35.809Z",
+      "size_bytes": 634,
+      "hash": "b85f5bff",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useProvisioning.ts",
+      "name": "useProvisioning.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query mutation hook for provisioning actions.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/provisioning"
+      ],
+      "exports": [
+        "useProvisioningAction"
+      ],
+      "last_modified": "2025-06-09T23:06:25.268Z",
+      "size_bytes": 627,
+      "hash": "8b05409b",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useUserEntitlements.test.ts",
+      "name": "useUserEntitlements.test.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "./useUserEntitlements",
+        "../lib/apiClient/entitlements"
+      ],
+      "last_modified": "2025-06-09T21:55:10.296Z",
+      "size_bytes": 1821,
+      "hash": "d90e2c3d",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useUserEntitlements.ts",
+      "name": "useUserEntitlements.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query hook for fetching user entitlements.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query",
+        "security"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/entitlements"
+      ],
+      "exports": [
+        "useUserEntitlements"
+      ],
+      "last_modified": "2025-06-09T21:54:45.314Z",
+      "size_bytes": 639,
+      "hash": "6fdd3f0a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useUserPreferences.ts",
+      "name": "useUserPreferences.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React Query hook for fetching user preferences.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../lib/apiClient/userPreferences"
+      ],
+      "exports": [
+        "useUserPreferences"
+      ],
+      "last_modified": "2025-06-21T11:34:34.806Z",
+      "size_bytes": 1734,
+      "hash": "0a40314c",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/layout.tsx",
+      "name": "layout.tsx",
+      "directory": "apps/web/app",
+      "extension": ".tsx",
+      "purpose": "TODO: See enhancements-and-todos.md — move metadata export to a server component or separate file for App Router compliance.",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "./CopilotKitProvider",
+        "./QueryClientProvider",
+        "../components/SupabaseProvider",
+        "next/headers",
+        "./lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-21T00:20:20.723Z",
+      "size_bytes": 1208,
+      "hash": "60e16bb4",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/agentService.ts",
+      "name": "agentService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "AgentService - Central service for invoking agents based on type",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-06-20T10:33:42.582Z",
+      "size_bytes": 7372,
+      "hash": "19d01981",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/batch.ts",
+      "name": "batch.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Complete context data bundle returned by the optimized batch API",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "../types"
+      ],
+      "last_modified": "2025-06-18T18:38:35.649Z",
+      "size_bytes": 2902,
+      "hash": "94977994",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/content.test.tsx",
+      "name": "content.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useContentForContext",
+        "./content"
+      ],
+      "last_modified": "2025-06-09T23:07:32.477Z",
+      "size_bytes": 1900,
+      "hash": "a6ee7a52",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/content.ts",
+      "name": "content.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Fetches content for a context and user from the API.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "../types"
+      ],
+      "last_modified": "2025-06-18T17:37:57.127Z",
+      "size_bytes": 1000,
+      "hash": "b8581b84",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/contextConfig.test.tsx",
+      "name": "contextConfig.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useContextConfig",
+        "./contextConfig"
+      ],
+      "last_modified": "2025-06-09T23:07:19.156Z",
+      "size_bytes": 1785,
+      "hash": "5887af0a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/contextConfig.ts",
+      "name": "contextConfig.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Fetches context config from the API.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "../types"
+      ],
+      "last_modified": "2025-06-18T17:40:27.235Z",
+      "size_bytes": 1036,
+      "hash": "937e3aa0",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/entitlements.ts",
+      "name": "entitlements.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Fetches all entitlements for a user from the API.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "../types"
+      ],
+      "last_modified": "2025-06-18T17:39:08.983Z",
+      "size_bytes": 842,
+      "hash": "665835db",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/nav.test.tsx",
+      "name": "nav.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useNavForContext",
+        "./nav"
+      ],
+      "last_modified": "2025-06-09T23:07:43.252Z",
+      "size_bytes": 1848,
+      "hash": "f02ad3e5",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/nav.ts",
+      "name": "nav.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Fetches nav options for a context and user from the API.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "../types"
+      ],
+      "last_modified": "2025-06-18T17:41:34.774Z",
+      "size_bytes": 982,
+      "hash": "8f512b8b",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/orgEntitlements.test.tsx",
+      "name": "orgEntitlements.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useOrgEntitlements",
+        "./orgEntitlements"
+      ],
+      "last_modified": "2025-06-09T23:03:38.157Z",
+      "size_bytes": 1923,
+      "hash": "bee557df",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/orgEntitlements.ts",
+      "name": "orgEntitlements.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Fetches all entitlements for an organization from the API.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "last_modified": "2025-06-11T21:04:52.032Z",
+      "size_bytes": 795,
+      "hash": "381dab26",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/provisioning.test.tsx",
+      "name": "provisioning.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useProvisioning",
+        "./provisioning"
+      ],
+      "last_modified": "2025-06-09T23:08:21.866Z",
+      "size_bytes": 1720,
+      "hash": "c3934a38",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/provisioning.ts",
+      "name": "provisioning.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Performs a provisioning action via the API.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "last_modified": "2025-06-11T21:05:04.070Z",
+      "size_bytes": 994,
+      "hash": "8a453f1e",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/userPreferences.test.tsx",
+      "name": "userPreferences.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useUserPreferences",
+        "./userPreferences"
+      ],
+      "last_modified": "2025-06-09T23:08:09.784Z",
+      "size_bytes": 2817,
+      "hash": "b7ff37df",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/userPreferences.ts",
+      "name": "userPreferences.ts",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".ts",
+      "purpose": "Fetches user preferences from the API.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "../types"
+      ],
+      "last_modified": "2025-06-21T11:34:49.625Z",
+      "size_bytes": 1978,
+      "hash": "4cde628a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/apiClient/useUserEntitlements.test.tsx",
+      "name": "useUserEntitlements.test.tsx",
+      "directory": "apps/web/app/lib/apiClient",
+      "extension": ".tsx",
+      "purpose": "To run these tests:",
+      "tags": [
+        "React",
+        "TypeScript",
+        "utility",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "react",
+        "@testing-library/react",
+        "@tanstack/react-query",
+        "../../hooks/useUserEntitlements",
+        "./entitlements"
+      ],
+      "last_modified": "2025-06-09T23:01:33.808Z",
+      "size_bytes": 1897,
+      "hash": "c3a80f93",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/authService.ts",
+      "name": "authService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Authentication service layer - extracted from UI components",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js"
+      ],
+      "exports": [
+        "authService"
+      ],
+      "last_modified": "2025-06-20T19:05:34.996Z",
+      "size_bytes": 1492,
+      "hash": "d67bed96",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/batchService.ts",
+      "name": "batchService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Batch service for optimized data fetching with shared entitlements",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js",
+        "./entitlementService",
+        "./navService",
+        "./contentService",
+        "./contextService",
+        "./types"
+      ],
+      "exports": [
+        "batchService"
+      ],
+      "last_modified": "2025-06-18T18:38:02.173Z",
+      "size_bytes": 4703,
+      "hash": "5947817a",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/contentService.test.ts",
+      "name": "contentService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "vitest",
+        "./contentService",
+        "./supabaseClient",
+        "./entitlementService"
+      ],
+      "last_modified": "2025-06-09T21:40:52.468Z",
+      "size_bytes": 5901,
+      "hash": "03fcff1b",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/contentService.ts",
+      "name": "contentService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for content logic. All business rules and data access for content live here.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js",
+        "./entitlementService",
+        "./types"
+      ],
+      "exports": [
+        "contentService"
+      ],
+      "last_modified": "2025-06-18T18:37:39.921Z",
+      "size_bytes": 4484,
+      "hash": "7f25a072",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/contextService.test.ts",
+      "name": "contextService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./contextService",
+        "./supabaseClient"
+      ],
+      "last_modified": "2025-06-09T21:38:50.557Z",
+      "size_bytes": 3960,
+      "hash": "492a5fb6",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/contextService.ts",
+      "name": "contextService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for context configuration logic. Optimized for performance with minimal logging.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "./supabaseServerClient",
+        "next/headers",
+        "./types"
+      ],
+      "exports": [
+        "contextService"
+      ],
+      "last_modified": "2025-06-21T11:39:54.933Z",
+      "size_bytes": 2294,
+      "hash": "2efa8bb4",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/entitlementService.test.ts",
+      "name": "entitlementService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "vitest",
+        "./entitlementService",
+        "./supabaseClient"
+      ],
+      "last_modified": "2025-06-09T21:33:23.882Z",
+      "size_bytes": 4486,
+      "hash": "2350b748",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/entitlementService.ts",
+      "name": "entitlementService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for entitlement logic. All business rules for user permissions live here.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "./supabaseServerClient",
+        "next/headers",
+        "./types"
+      ],
+      "exports": [
+        "entitlementService"
+      ],
+      "last_modified": "2025-06-21T11:39:32.776Z",
+      "size_bytes": 4882,
+      "hash": "9248a379",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/index.ts",
+      "name": "index.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "New optimized batch service for performance",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "last_modified": "2025-06-18T18:37:42.634Z",
+      "size_bytes": 448,
+      "hash": "1bf21ce6",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/navService.test.ts",
+      "name": "navService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test",
+        "security"
+      ],
+      "dependencies": [
+        "vitest",
+        "./navService",
+        "./supabaseClient",
+        "./entitlementService"
+      ],
+      "last_modified": "2025-06-09T23:21:08.000Z",
+      "size_bytes": 6566,
+      "hash": "7c821bf7",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/navService.ts",
+      "name": "navService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for navigation options logic. All business rules and data access for nav options live here.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js",
+        "./entitlementService",
+        "./types"
+      ],
+      "exports": [
+        "navService"
+      ],
+      "last_modified": "2025-06-21T11:40:46.127Z",
+      "size_bytes": 5249,
+      "hash": "21cebd7c",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/organizationService.test.ts",
+      "name": "organizationService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./organizationService",
+        "./supabaseClient"
+      ],
+      "last_modified": "2025-06-09T21:35:14.382Z",
+      "size_bytes": 5192,
+      "hash": "4cec15b2",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/organizationService.ts",
+      "name": "organizationService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for organization and membership logic. All business rules and data access for organizations live here.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "./supabaseClient",
+        "./types"
+      ],
+      "exports": [
+        "organizationService"
+      ],
+      "last_modified": "2025-06-18T17:47:31.264Z",
+      "size_bytes": 3010,
+      "hash": "89c4895d",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/provisioningService.test.ts",
+      "name": "provisioningService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./provisioningService",
+        "./supabaseClient"
+      ],
+      "last_modified": "2025-06-09T21:38:00.744Z",
+      "size_bytes": 4236,
+      "hash": "a9dc22f2",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/provisioningService.ts",
+      "name": "provisioningService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for provisioning users, orgs, and entitlements. All business rules and data access for provisioning live here.",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "security"
+      ],
+      "dependencies": [
+        "./supabaseClient",
+        "./types"
+      ],
+      "exports": [
+        "provisioningService"
+      ],
+      "last_modified": "2025-06-18T17:45:43.085Z",
+      "size_bytes": 3247,
+      "hash": "eafdf1e2",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/requestDeduplication.ts",
+      "name": "requestDeduplication.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Request deduplication system to prevent multiple identical API calls.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "last_modified": "2025-06-18T18:48:29.471Z",
+      "size_bytes": 3899,
+      "hash": "1a1b68de",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/supabaseClient.ts",
+      "name": "supabaseClient.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Client-side Supabase client for auth and real-time APIs",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "@supabase/ssr"
+      ],
+      "exports": [
+        "supabase"
+      ],
+      "last_modified": "2025-06-13T20:42:07.288Z",
+      "size_bytes": 462,
+      "hash": "4c1424bc",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/supabaseServerClient.ts",
+      "name": "supabaseServerClient.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Returns a Supabase SSR client with cookie adapter",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "@supabase/ssr"
+      ],
+      "exports": [
+        "createSupabaseServerClient"
+      ],
+      "last_modified": "2025-06-16T02:17:23.153Z",
+      "size_bytes": 769,
+      "hash": "050537d9",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/types.ts",
+      "name": "types.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "apps/web/app/lib/types.ts",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-06-21T05:45:14.774Z",
+      "size_bytes": 3335,
+      "hash": "4e79ba5c",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/userService.test.ts",
+      "name": "userService.test.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "To run these tests:",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "./userService",
+        "./supabaseClient"
+      ],
+      "last_modified": "2025-06-09T21:36:48.705Z",
+      "size_bytes": 4656,
+      "hash": "9e1bec9f",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/userService.ts",
+      "name": "userService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for user profile and preferences logic. All business rules and data access for users live here.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "./supabaseServerClient",
+        "next/headers",
+        "./types"
+      ],
+      "exports": [
+        "userService"
+      ],
+      "last_modified": "2025-06-21T11:34:46.510Z",
+      "size_bytes": 6221,
+      "hash": "7ed37b17",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/utils.ts",
+      "name": "utils.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "exports": [
+        "cn"
+      ],
+      "last_modified": "2025-06-01T09:16:52.280Z",
+      "size_bytes": 169,
+      "hash": "d1f1e0d6",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/login/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/login",
+      "extension": ".tsx",
+      "purpose": "Public login page (SSR-safe). Renders Supabase Auth UI and syncs tokens to cookies.",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "next/navigation",
+        "@supabase/auth-ui-react",
+        "@supabase/auth-ui-shared",
+        "../../components/SupabaseProvider"
+      ],
+      "exports": [
+        "LoginPage"
+      ],
+      "last_modified": "2025-06-21T11:47:48.850Z",
+      "size_bytes": 2691,
+      "hash": "4e3d3bb5",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app",
+      "extension": ".tsx",
+      "purpose": "SSR Root page that redirects based on session status",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "@/lib/supabaseServerClient",
+        "next/headers",
+        "next/navigation"
+      ],
+      "last_modified": "2025-06-14T03:08:54.914Z",
+      "size_bytes": 555,
+      "hash": "e2e6c851",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/QueryClientProvider.tsx",
+      "name": "QueryClientProvider.tsx",
+      "directory": "apps/web/app",
+      "extension": ".tsx",
+      "purpose": "1 minute",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "react"
+      ],
+      "exports": [
+        "QueryClientProvider"
+      ],
+      "last_modified": "2025-06-21T00:20:19.555Z",
+      "size_bytes": 1219,
+      "hash": "d9130c8e",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components.json",
+      "name": "components.json",
+      "directory": "apps/web",
+      "extension": ".json",
+      "purpose": "ui.shadcn.com/schema.json\",",
+      "tags": [],
+      "last_modified": "2025-05-31T10:19:17.507Z",
+      "size_bytes": 444,
+      "hash": "b93fd4ca"
+    },
+    {
+      "path": "apps/web/components/ai/AIExperience.tsx",
+      "name": "AIExperience.tsx",
+      "directory": "apps/web/components/ai",
+      "extension": ".tsx",
+      "purpose": "Only render CopilotKit on client side to avoid hydration mismatch",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "@copilotkit/react-ui"
+      ],
+      "exports": [
+        "AIExperience"
+      ],
+      "last_modified": "2025-06-18T18:33:43.310Z",
+      "size_bytes": 685,
+      "hash": "615569af",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ai/ClientRoot.tsx",
+      "name": "ClientRoot.tsx",
+      "directory": "apps/web/components/ai",
+      "extension": ".tsx",
+      "purpose": "—",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "@copilotkit/react-ui"
+      ],
+      "exports": [
+        "ClientRoot"
+      ],
+      "last_modified": "2025-06-01T09:16:52.310Z",
+      "size_bytes": 486,
+      "hash": "619ba483",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ai/ComponentSchemaRenderer.tsx",
+      "name": "ComponentSchemaRenderer.tsx",
+      "directory": "apps/web/components/ai",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/ai/ComponentSchemaRenderer.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "../../../../packages/agent-core/types/ComponentSchema",
+        "next/image",
+        "react",
+        "../ui/dialog",
+        "hls.js",
+        "react",
+        "@radix-ui/react-icons"
+      ],
+      "exports": [
+        "ComponentSchemaRenderer"
+      ],
+      "last_modified": "2025-06-19T01:32:01.149Z",
+      "size_bytes": 23560,
+      "hash": "849464c9",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/DynamicContextPage.tsx",
+      "name": "DynamicContextPage.tsx",
+      "directory": "apps/web/components",
+      "extension": ".tsx",
+      "purpose": "Agent-native 3-panel layout. Pure renderer - displays only what agents return.",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "./ui/ThreePanelLayout",
+        "./ui/NavPanel",
+        "./ai/ComponentSchemaRenderer",
+        "../../../packages/agent-core/types/ComponentSchema",
+        "./SupabaseProvider",
+        "react"
+      ],
+      "last_modified": "2025-06-21T04:09:23.018Z",
+      "size_bytes": 12955,
+      "hash": "e300af95",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/SupabaseProvider.tsx",
+      "name": "SupabaseProvider.tsx",
+      "directory": "apps/web/components",
+      "extension": ".tsx",
+      "purpose": "Start with initialSession to prevent auth flash",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "@supabase/ssr",
+        "react",
+        "@supabase/supabase-js",
+        "react"
+      ],
+      "exports": [
+        "SupabaseProvider"
+      ],
+      "last_modified": "2025-06-19T21:48:22.922Z",
+      "size_bytes": 3425,
+      "hash": "a89b2dbb",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/ui/ContentPanel.tsx",
+      "name": "ContentPanel.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "—",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "exports": [
+        "ContentPanel"
+      ],
+      "last_modified": "2025-06-02T16:31:38.565Z",
+      "size_bytes": 312,
+      "hash": "2c291e49",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/ContextSelector.tsx",
+      "name": "ContextSelector.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Get icon image path",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "exports": [
+        "ContextSelector"
+      ],
+      "last_modified": "2025-06-10T21:32:18.605Z",
+      "size_bytes": 4160,
+      "hash": "81f395e4",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/ui/dialog.tsx",
+      "name": "dialog.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "—",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "@radix-ui/react-dialog",
+        "lucide-react",
+        "react"
+      ],
+      "exports": [
+        "Dialog",
+        "DialogContent"
+      ],
+      "last_modified": "2025-06-21T05:12:16.560Z",
+      "size_bytes": 1326,
+      "hash": "cf25a47c",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/legacy_course_modal.tsx",
+      "name": "legacy_course_modal.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Fetch content from Tribe API",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "@/components/ui/dialog",
+        "@/components/ui/button",
+        "lucide-react",
+        "@/lib/auth-context",
+        "@/lib/firebase",
+        "firebase/firestore"
+      ],
+      "last_modified": "2025-06-06T18:45:37.060Z",
+      "size_bytes": 5049,
+      "hash": "6ee15db5",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/ui/legacy_training_library.tsx",
+      "name": "legacy_training_library.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Transform content into our Training format",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "security"
+      ],
+      "dependencies": [
+        "react",
+        "next/navigation",
+        "@/lib/auth-context",
+        "@/lib/firebase",
+        "firebase/firestore",
+        "@/components/ui/card",
+        "@/components/ui/button",
+        "@/components/ui/input",
+        "@/components/ui/use-toast",
+        "@/components/worksheet-modal",
+        "lucide-react",
+        "@/components/ui/progress",
+        "@/lib/tribe-api",
+        "hls.js",
+        "@/components/ui/dialog"
+      ],
+      "last_modified": "2025-06-06T14:12:26.147Z",
+      "size_bytes": 18568,
+      "hash": "3f12e648",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/ui/NavPanel.test.tsx",
+      "name": "NavPanel.test.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Test component to validate database-driven navigation",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "test"
+      ],
+      "dependencies": [
+        "react",
+        "../../hooks/useNavigation"
+      ],
+      "exports": [
+        "NavPanelTest"
+      ],
+      "last_modified": "2025-06-20T21:31:48.722Z",
+      "size_bytes": 591,
+      "hash": "6aed082a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/NavPanel.tsx",
+      "name": "NavPanel.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Navigation panel for agent-native app, themed via contextConfig",
+      "owner": "Frontend team",
+      "tags": [
+        "UI",
+        "navigation",
+        "context-based",
+        "React",
+        "TypeScript",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "lucide-react",
+        "./ContextSelector",
+        "../SupabaseProvider",
+        "../../hooks/useNavigation",
+        "../../hooks/useAvatar",
+        "../../app/lib/authService",
+        "lucide-react",
+        "./UserProfileModal"
+      ],
+      "exports": [
+        "forceAvatarRefresh"
+      ],
+      "last_modified": "2025-06-21T12:09:05.814Z",
+      "size_bytes": 16503,
+      "hash": "bd3943b4",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/ui/ThemeContext.tsx",
+      "name": "ThemeContext.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Accepts the theme object (from contextConfig.json)",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "exports": [
+        "ThemeProvider",
+        "useTheme"
+      ],
+      "last_modified": "2025-06-01T09:16:52.398Z",
+      "size_bytes": 375,
+      "hash": "c1c983b8",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/ThreePanelLayout.tsx",
+      "name": "ThreePanelLayout.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "File: components/ui/ThreePanelLayout.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "./ThemeContext",
+        "../ai/AIExperience"
+      ],
+      "exports": [
+        "ThreePanelLayout"
+      ],
+      "last_modified": "2025-06-03T02:12:15.348Z",
+      "size_bytes": 2008,
+      "hash": "0cbe23ad",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/UserProfileModal.tsx",
+      "name": "UserProfileModal.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Fetch user data from API",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React Query",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "./dialog",
+        "lucide-react",
+        "@tanstack/react-query",
+        "./NavPanel"
+      ],
+      "last_modified": "2025-06-21T06:30:54.506Z",
+      "size_bytes": 16254,
+      "hash": "ec377448",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/ui/xxxChatPanel.tsx",
+      "name": "xxxChatPanel.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "—",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "exports": [
+        "xxxChatPanel"
+      ],
+      "last_modified": "2025-06-01T09:16:52.407Z",
+      "size_bytes": 334,
+      "hash": "4301a58a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/hooks/useAvatar.ts",
+      "name": "useAvatar.ts",
+      "directory": "apps/web/hooks",
+      "extension": ".ts",
+      "purpose": "Default 5 minutes cache",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query"
+      ],
+      "dependencies": [
+        "@tanstack/react-query"
+      ],
+      "exports": [
+        "useAvatar"
+      ],
+      "last_modified": "2025-06-21T07:04:41.244Z",
+      "size_bytes": 1902,
+      "hash": "defd322a",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/hooks/useContextConfig.ts",
+      "name": "useContextConfig.ts",
+      "directory": "apps/web/hooks",
+      "extension": ".ts",
+      "purpose": "Don't revalidate immediately if we have initial data",
+      "tags": [
+        "TypeScript",
+        "hooks"
+      ],
+      "dependencies": [
+        "swr"
+      ],
+      "exports": [
+        "useContextConfig"
+      ],
+      "last_modified": "2025-06-18T18:25:28.231Z",
+      "size_bytes": 537,
+      "hash": "8a053f74",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/hooks/useContextList.ts",
+      "name": "useContextList.ts",
+      "directory": "apps/web/hooks",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "swr"
+      ],
+      "exports": [
+        "useContextList"
+      ],
+      "last_modified": "2025-06-17T12:34:07.589Z",
+      "size_bytes": 883,
+      "hash": "eee259c4",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/hooks/useNavigation.ts",
+      "name": "useNavigation.ts",
+      "directory": "apps/web/hooks",
+      "extension": ".ts",
+      "purpose": "Database-driven navigation hook that transforms NavOption[] to NavPanelSchema",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "React Query",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "react",
+        "./useNavOptions",
+        "../app/lib/types",
+        "../components/ui/NavPanel",
+        "@tanstack/react-query"
+      ],
+      "last_modified": "2025-06-21T05:45:18.751Z",
+      "size_bytes": 4935,
+      "hash": "38d36cdb",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/hooks/useNavOptions.ts",
+      "name": "useNavOptions.ts",
+      "directory": "apps/web/hooks",
+      "extension": ".ts",
+      "purpose": "Custom hook to fetch entitlement-filtered nav options for a given context from the API, using SWR. Used to drive schema-driven NavPanel.",
+      "tags": [
+        "TypeScript",
+        "hooks",
+        "security"
+      ],
+      "dependencies": [
+        "swr"
+      ],
+      "exports": [
+        "useNavOptions"
+      ],
+      "last_modified": "2025-06-18T18:25:34.167Z",
+      "size_bytes": 1296,
+      "hash": "ff0fcb66",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/lib/server/loadContextConfig.ts",
+      "name": "loadContextConfig.ts",
+      "directory": "apps/web/lib/server",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "fs/promises",
+        "path"
+      ],
+      "last_modified": "2025-06-01T09:16:52.411Z",
+      "size_bytes": 277,
+      "hash": "d901b247",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/next-env.d.ts",
+      "name": "next-env.d.ts",
+      "directory": "apps/web",
+      "extension": ".ts",
+      "purpose": "/ <reference types=\"next\" />",
+      "tags": [
+        "TypeScript"
+      ],
+      "last_modified": "2025-05-27T21:40:57.456Z",
+      "size_bytes": 211,
+      "hash": "f2b3bca0",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/next.config.js",
+      "name": "next.config.js",
+      "directory": "apps/web",
+      "extension": ".js",
+      "purpose": "Root of apps/web",
+      "tags": [],
+      "last_modified": "2025-06-20T18:40:42.824Z",
+      "size_bytes": 933,
+      "hash": "d5b041ff",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/package-lock.json",
+      "name": "package-lock.json",
+      "directory": "apps/web",
+      "extension": ".json",
+      "purpose": "registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz\",",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-05-31T10:40:14.481Z",
+      "size_bytes": 497458,
+      "hash": "c70dd064"
+    },
+    {
+      "path": "apps/web/package.json",
+      "name": "package.json",
+      "directory": "apps/web",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-06-21T00:17:07.364Z",
+      "size_bytes": 986,
+      "hash": "833d96f6"
+    },
+    {
+      "path": "apps/web/postcss.config.js",
+      "name": "postcss.config.js",
+      "directory": "apps/web",
+      "extension": ".js",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-05-27T21:40:57.474Z",
+      "size_bytes": 82,
+      "hash": "251ecddd",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/tailwind.config.ts",
+      "name": "tailwind.config.ts",
+      "directory": "apps/web",
+      "extension": ".ts",
+      "purpose": "tailwind.config.ts",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "tailwindcss"
+      ],
+      "last_modified": "2025-06-01T09:16:52.418Z",
+      "size_bytes": 2169,
+      "hash": "106825e6",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/tsconfig.eslint.json",
+      "name": "tsconfig.eslint.json",
+      "directory": "apps/web",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-06-18T15:04:00.843Z",
+      "size_bytes": 184,
+      "hash": "ab7736bb"
+    },
+    {
+      "path": "apps/web/tsconfig.json",
+      "name": "tsconfig.json",
+      "directory": "apps/web",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-05-27T21:40:57.474Z",
+      "size_bytes": 732,
+      "hash": "88893567"
+    },
+    {
+      "path": "docs/agent-native-cursor-project-rules.md",
+      "name": "agent-native-cursor-project-rules.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-20T22:29:17.532Z",
+      "size_bytes": 4506,
+      "hash": "a00417bd"
+    },
+    {
+      "path": "docs/agent-native-leader-brief-presentation.md",
+      "name": "agent-native-leader-brief-presentation.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-07T02:31:01.846Z",
+      "size_bytes": 2002,
+      "hash": "5bbf598f"
+    },
+    {
+      "path": "docs/agent-native-leader-brief.md",
+      "name": "agent-native-leader-brief.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-07T10:22:05.416Z",
+      "size_bytes": 4718,
+      "hash": "d37826df"
+    },
+    {
+      "path": "docs/dev-notes/abstraction_layer.md",
+      "name": "abstraction_layer.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "apps/web/app/lib/contextService.ts",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-09T23:21:22.211Z",
+      "size_bytes": 5143,
+      "hash": "93ef4760"
+    },
+    {
+      "path": "docs/dev-notes/agent-architecture.md",
+      "name": "agent-architecture.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Grid, Card, Panel, etc.",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-20T10:57:39.304Z",
+      "size_bytes": 10733,
+      "hash": "a2af5808"
+    },
+    {
+      "path": "docs/dev-notes/agent-configuration-guide.md",
+      "name": "agent-configuration-guide.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-03T10:07:59.668Z",
+      "size_bytes": 6891,
+      "hash": "2fb781d5"
+    },
+    {
+      "path": "docs/dev-notes/agent-prompt-engineering_UPDATED.md",
+      "name": "agent-prompt-engineering_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Pattern: Reframing Problems as Opportunities",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-01T09:16:52.490Z",
+      "size_bytes": 19214,
+      "hash": "b80b1952"
+    },
+    {
+      "path": "docs/dev-notes/architecture-foundations_UPDATED.md",
+      "name": "architecture-foundations_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Each module is self-contained with clear interfaces",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-20T15:31:09.982Z",
+      "size_bytes": 18867,
+      "hash": "8baa2d36"
+    },
+    {
+      "path": "docs/dev-notes/business-rules-documentation_UPDATED.md",
+      "name": "business-rules-documentation_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Business Rule: Auto-upgrade legacy subscribers",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-20T15:31:18.370Z",
+      "size_bytes": 24628,
+      "hash": "305794e1"
+    },
+    {
+      "path": "docs/dev-notes/code_hygiene_checklist.md",
+      "name": "code_hygiene_checklist.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "pnpm.io/)",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-01T09:16:52.648Z",
+      "size_bytes": 2430,
+      "hash": "9cbf446b"
+    },
+    {
+      "path": "docs/dev-notes/component-styling-guidelines.md",
+      "name": "component-styling-guidelines.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "...etc",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-15T15:51:52.288Z",
+      "size_bytes": 4515,
+      "hash": "903c47a4"
+    },
+    {
+      "path": "docs/dev-notes/copilotkit_usage.md",
+      "name": "copilotkit_usage.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "apps/web/components/ai/AIExperience.tsx",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-01T09:16:52.667Z",
+      "size_bytes": 2817,
+      "hash": "ed0db005"
+    },
+    {
+      "path": "docs/dev-notes/database_setup_addendum_UPDATED.md",
+      "name": "database_setup_addendum_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "orm.drizzle.team/)",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-02T10:37:42.431Z",
+      "size_bytes": 42798,
+      "hash": "2e63c3ae"
+    },
+    {
+      "path": "docs/dev-notes/deployment-devops-guide_UPDATED.md",
+      "name": "deployment-devops-guide_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-01T09:16:52.747Z",
+      "size_bytes": 8281,
+      "hash": "e9d815f0"
+    },
+    {
+      "path": "docs/dev-notes/development-setup_UPDATED.md",
+      "name": "development-setup_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "github.com/your-org/leaderforge.git",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-01T09:16:52.774Z",
+      "size_bytes": 14522,
+      "hash": "58c24f33"
+    },
+    {
+      "path": "docs/dev-notes/enhancements-and-todos.md",
+      "name": "enhancements-and-todos.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-17T02:46:33.906Z",
+      "size_bytes": 5552,
+      "hash": "ca73f15c"
+    },
+    {
+      "path": "docs/dev-notes/env-config-addendum_UPDATED.md",
+      "name": "env-config-addendum_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "localhost:3000",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-01T09:16:52.805Z",
+      "size_bytes": 28966,
+      "hash": "62be70e2"
+    },
+    {
+      "path": "docs/dev-notes/feature_flags.md",
+      "name": "feature_flags.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "posthog.com) as our feature flag and analytics provider. All flag checks are abstracted through a single TypeScript service, ensuring flexibility and vendor independence.",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-01T09:16:52.820Z",
+      "size_bytes": 2717,
+      "hash": "256bd01b"
+    },
+    {
+      "path": "docs/dev-notes/langgraph_usage.md",
+      "name": "langgraph_usage.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "packages/agent-core/agents/conversationAgent.ts",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-01T09:16:52.837Z",
+      "size_bytes": 2941,
+      "hash": "dae47f8d"
+    },
+    {
+      "path": "docs/dev-notes/licensing-and-entitlement-architecture.md",
+      "name": "licensing-and-entitlement-architecture.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-10T16:25:10.330Z",
+      "size_bytes": 17653,
+      "hash": "f193505f"
+    },
+    {
+      "path": "docs/dev-notes/module_configuration_addendum_UPDATED.md",
+      "name": "module_configuration_addendum_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Module theme application",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-01T09:16:52.879Z",
+      "size_bytes": 25735,
+      "hash": "f269ccdf"
+    },
+    {
+      "path": "docs/dev-notes/navpanel-refactoring-plan.md",
+      "name": "navpanel-refactoring-plan.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Transform database nav_options to NavPanelSchema",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-21T07:02:45.262Z",
+      "size_bytes": 13656,
+      "hash": "172e1569"
+    },
+    {
+      "path": "docs/dev-notes/performance-requirements_UPDATED.md",
+      "name": "performance-requirements_UPDATED.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Time to first token streaming",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-01T09:16:52.906Z",
+      "size_bytes": 10142,
+      "hash": "c97166bd"
+    },
+    {
+      "path": "docs/dev-notes/rls-policies.sql",
+      "name": "rls-policies.sql",
+      "directory": "docs/dev-notes",
+      "extension": ".sql",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "security"
+      ],
+      "last_modified": "2025-06-09T21:12:01.874Z",
+      "size_bytes": 4061,
+      "hash": "669e1599"
+    },
+    {
+      "path": "docs/dev-notes/simplified-entitlement-system.md",
+      "name": "simplified-entitlement-system.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "Navigation click handler",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-20T15:30:54.869Z",
+      "size_bytes": 10066,
+      "hash": "6fda1fd5"
+    },
+    {
+      "path": "docs/dev-notes/supabase_core_grants.sql.md",
+      "name": "supabase_core_grants.sql.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-10T01:09:17.841Z",
+      "size_bytes": 8445,
+      "hash": "c9db900e"
+    },
+    {
+      "path": "docs/dev-notes/supabase-ssr-auth-debug.md",
+      "name": "supabase-ssr-auth-debug.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "jwt.io)), the following issue occurred:",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-13T11:24:04.634Z",
+      "size_bytes": 2383,
+      "hash": "3b8170ed"
+    },
+    {
+      "path": "docs/dev-notes/tribe-social-docs.md",
+      "name": "tribe-social-docs.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "api.tribesocial.io/api/view-data\" \\",
+      "tags": [
+        "documentation",
+        "security"
+      ],
+      "last_modified": "2025-06-01T19:01:38.088Z",
+      "size_bytes": 114724,
+      "hash": "e0f32bfa"
+    },
+    {
+      "path": "docs/dev-notes/ui-glossary-and-styling.md",
+      "name": "ui-glossary-and-styling.md",
+      "directory": "docs/dev-notes",
+      "extension": ".md",
+      "purpose": "en.json",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-01T09:16:52.918Z",
+      "size_bytes": 4581,
+      "hash": "e86d0cb0"
+    },
+    {
+      "path": "docs/file-header-template.md",
+      "name": "file-header-template.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "Brief description of what this file does and why it exists",
+      "owner": "Team or individual responsible (e.g., \"Frontend team\", \"Backend team\", \"AI team\")",
+      "tags": [
+        "comma",
+        "separated",
+        "tags (e.g.",
+        "\"UI",
+        "navigation",
+        "context-based\")",
+        "documentation",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-21T12:09:12.624Z",
+      "size_bytes": 2690,
+      "hash": "d91f6047"
+    },
+    {
+      "path": "docs/how-to-add-or-change-agents.md",
+      "name": "how-to-add-or-change-agents.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-03T12:15:58.440Z",
+      "size_bytes": 2000,
+      "hash": "9fedda61"
+    },
+    {
+      "path": "docs/how-to-add-or-change-components.md",
+      "name": "how-to-add-or-change-components.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-06T17:11:58.959Z",
+      "size_bytes": 2817,
+      "hash": "976d630b"
+    },
+    {
+      "path": "docs/how-to-add-or-change-contexts.md",
+      "name": "how-to-add-or-change-contexts.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-03T12:16:01.748Z",
+      "size_bytes": 2001,
+      "hash": "ac1b5720"
+    },
+    {
+      "path": "docs/how-to-add-or-change-langgraph-agent-orchestration.md",
+      "name": "how-to-add-or-change-langgraph-agent-orchestration.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-03T12:16:07.049Z",
+      "size_bytes": 2237,
+      "hash": "318f8942"
+    },
+    {
+      "path": "docs/how-to-add-or-change-styles.md",
+      "name": "how-to-add-or-change-styles.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-03T12:16:03.443Z",
+      "size_bytes": 1356,
+      "hash": "6952929e"
+    },
+    {
+      "path": "docs/how-to-add-or-change-themes.md",
+      "name": "how-to-add-or-change-themes.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-03T12:16:04.981Z",
+      "size_bytes": 1582,
+      "hash": "e2fe58a1"
+    },
+    {
+      "path": "docs/how-to-add-or-change-tools.md",
+      "name": "how-to-add-or-change-tools.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-06T14:03:30.641Z",
+      "size_bytes": 2261,
+      "hash": "02367c59"
+    },
+    {
+      "path": "packages/agent-core/agents/ContentLibraryAgent.ts",
+      "name": "ContentLibraryAgent.ts",
+      "directory": "packages/agent-core/agents",
+      "extension": ".ts",
+      "purpose": "NOTE: You may need to install 'langsmith' with `pnpm add langsmith` if not present.",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "@langchain/langgraph",
+        "../tools/UserProgressTool",
+        "../tools/TribeSocialContentTool",
+        "../tools/UserProgressTool"
+      ],
+      "last_modified": "2025-06-08T12:48:54.234Z",
+      "size_bytes": 1821,
+      "hash": "0dc4cf7e",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/agents/ContentSyncAgent.test.ts",
+      "name": "ContentSyncAgent.test.ts",
+      "directory": "packages/agent-core/agents",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "test"
+      ],
+      "dependencies": [
+        "./ContentSyncAgent"
+      ],
+      "last_modified": "2025-06-08T02:12:51.507Z",
+      "size_bytes": 440,
+      "hash": "7caa6416",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/agents/ContentSyncAgent.ts",
+      "name": "ContentSyncAgent.ts",
+      "directory": "packages/agent-core/agents",
+      "extension": ".ts",
+      "purpose": "ContentSyncAgent: Syncs TribeSocial content into modules.content for a given context.",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "../../../apps/web/app/lib/supabaseClient",
+        "../tools/TribeSocialContentTool",
+        "../types/ComponentSchema"
+      ],
+      "last_modified": "2025-06-08T14:21:01.190Z",
+      "size_bytes": 3169,
+      "hash": "78f7daee",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/featureFlags.ts",
+      "name": "featureFlags.ts",
+      "directory": "packages/agent-core",
+      "extension": ".ts",
+      "purpose": "app.posthog.com\";",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "posthog-node"
+      ],
+      "exports": [
+        "client"
+      ],
+      "last_modified": "2025-06-07T11:06:59.382Z",
+      "size_bytes": 938,
+      "hash": "4ac2dd1a",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/index.ts",
+      "name": "index.ts",
+      "directory": "packages/agent-core",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-07T10:52:36.244Z",
+      "size_bytes": 116,
+      "hash": "80155d83",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/package.json",
+      "name": "package.json",
+      "directory": "packages/agent-core",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-05-30T20:14:27.411Z",
+      "size_bytes": 153,
+      "hash": "a54490a1"
+    },
+    {
+      "path": "packages/agent-core/tools/ToolRegistry.ts",
+      "name": "ToolRegistry.ts",
+      "directory": "packages/agent-core/tools",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "security"
+      ],
+      "dependencies": [
+        "../featureFlags",
+        "./UserProgressTool"
+      ],
+      "exports": [
+        "echoTool"
+      ],
+      "last_modified": "2025-06-06T23:21:36.697Z",
+      "size_bytes": 2564,
+      "hash": "82986306",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/tools/TribeSocialContentTool.ts",
+      "name": "TribeSocialContentTool.ts",
+      "directory": "packages/agent-core/tools",
+      "extension": ".ts",
+      "purpose": "TribeSocialContentTool",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "../types/ComponentSchema",
+        "../../../apps/web/app/lib/supabaseClient"
+      ],
+      "last_modified": "2025-06-19T01:31:41.576Z",
+      "size_bytes": 7157,
+      "hash": "c8f1333a",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/agent-core/tools/UserProgressTool.ts",
+      "name": "UserProgressTool.ts",
+      "directory": "packages/agent-core/tools",
+      "extension": ".ts",
+      "purpose": "Agent-native, production-ready user progress tool for modular agent orchestration.",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-07T12:08:19.466Z",
+      "size_bytes": 3698,
+      "hash": "110159d5",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/agent-core/types/ComponentSchema.ts",
+      "name": "ComponentSchema.ts",
+      "directory": "packages/agent-core/types",
+      "extension": ".ts",
+      "purpose": "ComponentSchema.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "dependencies": [
+        "./contentSchema"
+      ],
+      "last_modified": "2025-06-06T18:33:45.310Z",
+      "size_bytes": 2084,
+      "hash": "84c53703",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/types/contentSchema.ts",
+      "name": "contentSchema.ts",
+      "directory": "packages/agent-core/types",
+      "extension": ".ts",
+      "purpose": "All schema types are props-wrapped. Do not use flat schemas.",
+      "tags": [
+        "TypeScript"
+      ],
+      "last_modified": "2025-06-03T11:37:39.185Z",
+      "size_bytes": 1183,
+      "hash": "02cc0e76",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/env/index.ts",
+      "name": "index.ts",
+      "directory": "packages/env",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "dotenv",
+        "path"
+      ],
+      "exports": [
+        "env"
+      ],
+      "last_modified": "2025-05-27T21:40:57.087Z",
+      "size_bytes": 271,
+      "hash": "7b37eb00",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/env/package.json",
+      "name": "package.json",
+      "directory": "packages/env",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-05-27T21:40:57.087Z",
+      "size_bytes": 90,
+      "hash": "cec35a8a"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Generate manifest before commit
+echo "🔍 Generating file manifest..."
+npm run generate-manifest
+
+# Add manifest files to commit if they changed
+git add docs/manifest.json docs/manifest.md
+
+echo "✅ Manifest updated and staged"

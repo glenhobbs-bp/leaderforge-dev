@@ -2,11 +2,12 @@
   "name": "my-turborepo",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "build": "turbo build",
+    "dev": "turbo dev --no-cache --continue",
+    "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "generate-manifest": "tsx scripts/generate-manifest.ts",
+    "test": "vitest"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
@@ -24,7 +25,8 @@
     "tsx": "^4.19.4",
     "turbo": "^2.5.3",
     "typescript": "5.8.3",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.3",
+    "@types/node": "^20"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {

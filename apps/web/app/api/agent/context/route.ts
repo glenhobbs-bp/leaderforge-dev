@@ -159,7 +159,7 @@ async function invokeContextAgent({ userId, userMessage, requestedContext, supab
   let availableContexts: ContextConfig[] = [];
   try {
     const { contextService } = await import('../../../lib/contextService');
-    const allContexts = await contextService.getAllContexts(supabase);
+    const allContexts = await contextService.getAllContextConfigs(supabase);
     availableContexts = allContexts || [];
     console.log(`[Agent] Found ${availableContexts.length} available contexts`);
   } catch (error) {
