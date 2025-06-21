@@ -17,27 +17,50 @@ export const navService = {
     contextKey: string,
     userId: string
   ): Promise<NavOption[]> {
-    const { data, error } = await supabase
-      .schema('core')
-      .from('nav_options')
-      .select('*')
-      .eq('context_key', contextKey)
-      .order('section', { ascending: true })
-      .order('order', { ascending: true });
+    try {
+      // Get all nav options for the context
+      const { data: navOptions, error } = await supabase
+        .schema('core')
+        .from('nav_options')
+        .select('*')
+        .eq('context_key', contextKey)
+        .order('section_order', { ascending: true })
+        .order('order', { ascending: true });
 
-    if (error) throw error;
-    if (!data) return [];
+      if (error) {
+        console.error('[navService] Error fetching nav options:', error);
+        return [];
+      }
 
-    // Get user entitlements (cached)
-    const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
+      // Get user entitlements once
+      const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
+      const userEntitlementNames = userEntitlements.map(e => e.entitlement?.name).filter(Boolean);
 
-    // Filter nav options by required_entitlements
-    return (data as NavOption[]).filter((nav) => {
-      if (!nav.required_entitlements || nav.required_entitlements.length === 0) return true;
-      return nav.required_entitlements.every((ent) =>
-        userEntitlements.some((ue: Entitlement) => ue.entitlement_id === ent)
-      );
-    });
+      // Filter nav options by entitlements
+      const filteredOptions = [];
+      for (const option of navOptions || []) {
+        const requiredEntitlements = option.required_entitlements || [];
+
+        if (requiredEntitlements.length === 0) {
+          // No entitlements required
+          filteredOptions.push(option);
+        } else {
+          // Check if user has required entitlements
+          const hasAccess = requiredEntitlements.every((entitlement: string) =>
+            userEntitlementNames.includes(entitlement)
+          );
+
+          if (hasAccess) {
+            filteredOptions.push(option);
+          }
+        }
+      }
+
+      return filteredOptions as NavOption[];
+    } catch (error) {
+      console.error('[navService] Error in getNavOptions:', error);
+      return [];
+    }
   },
 
   /**
@@ -78,32 +101,40 @@ export const navService = {
     navKey: string,
     userId: string
   ): Promise<NavOption | null> {
-    console.log(`[navService] Fetching nav option: ${navKey} for context: ${contextKey}, user: ${userId}`);
-    const { data, error } = await supabase
-      .schema('core')
-      .from('nav_options')
-      .select('*')
-      .eq('context_key', contextKey)
-      .eq('nav_key', navKey)
-      .single();
-    if (error) {
-      console.error(`[navService] Error fetching nav option:`, error);
-      throw error;
-    }
-    if (!data) return null;
-    // Filter by entitlement if required
-    if (data.required_entitlements && data.required_entitlements.length > 0) {
-      const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
-      const hasAll = data.required_entitlements.every((ent: string) =>
-        userEntitlements.some((ue: Entitlement) => ue.entitlement_id === ent)
-      );
-      if (!hasAll) {
-        console.log(`[navService] User does not have required entitlements for nav option: ${navKey}`);
+    try {
+      const { data, error } = await supabase
+        .schema('core')
+        .from('nav_options')
+        .select('*')
+        .eq('context_key', contextKey)
+        .eq('nav_key', navKey)
+        .single();
+
+      if (error) {
+        console.error('[navService] Error fetching nav option:', error);
         return null;
       }
+
+      // Check entitlements
+      const requiredEntitlements = data.required_entitlements || [];
+      if (requiredEntitlements.length > 0) {
+        const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
+        const userEntitlementNames = userEntitlements.map(e => e.entitlement?.name).filter(Boolean);
+
+        const hasAccess = requiredEntitlements.every((entitlement: string) =>
+          userEntitlementNames.includes(entitlement)
+        );
+
+        if (!hasAccess) {
+          return null;
+        }
+      }
+
+      return data as NavOption;
+    } catch (error) {
+      console.error('[navService] Error in getNavOption:', error);
+      return null;
     }
-    console.log(`[navService] Found nav option: ${data.nav_key}`);
-    return data as NavOption;
   },
 
   /**

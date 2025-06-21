@@ -9,32 +9,25 @@ import { entitlementService } from '../lib/entitlementService';
 export default async function DashboardPage() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
-  console.log('[dashboard/page] All cookies:', allCookies);
 
   const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-  console.log('[dashboard/page] accessToken:', accessToken);
-  console.log('[dashboard/page] refreshToken:', refreshToken);
 
   const supabase = createSupabaseServerClient(cookieStore);
 
   if (accessToken && refreshToken) {
-    const setSessionRes = await supabase.auth.setSession({
+    await supabase.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
-    console.log('[dashboard/page] setSession result:', { hasUser: !!setSessionRes.data?.user, error: setSessionRes.error });
   } else {
     console.warn('[dashboard/page] Missing access or refresh token in cookies');
   }
 
   const {
     data: { session },
-    error: sessionError,
   } = await supabase.auth.getSession();
-
-  console.log('[dashboard/page] Final session check:', { hasUser: !!session?.user, error: sessionError });
 
   if (!session?.user) {
     console.warn('[dashboard/page] No user found in session, redirecting to login');
@@ -47,12 +40,12 @@ export default async function DashboardPage() {
   let initialNavOptions = null;
 
   try {
-    let allContexts = await contextService.getAllContexts(supabase);
+    let allContexts = await contextService.getAllContextConfigs(supabase);
     // Filter by user entitlement if required_entitlements is present
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, session.user.id);
     const entitlementIds = userEntitlements.map(e => e.entitlement_id);
     initialContexts = allContexts.filter(ctx => {
-      if (!ctx.required_entitlements || ctx.required_entitlements.length === 0) return true;
+      if (!ctx.required_entitlements || !Array.isArray(ctx.required_entitlements) || ctx.required_entitlements.length === 0) return true;
       return ctx.required_entitlements.every((ent: string) => entitlementIds.includes(ent));
     });
 
@@ -63,13 +56,11 @@ export default async function DashboardPage() {
 
     // --- SSR: Pre-fetch default context configuration and nav options ---
     const defaultContextKey = initialContexts[0].context_key;
-    console.log('[dashboard/page] Pre-fetching config for default context:', defaultContextKey);
 
     try {
       // Fetch context config server-side
       const { contextService } = await import('../lib/contextService');
       initialContextConfig = await contextService.getContextConfig(supabase, defaultContextKey);
-      console.log('[dashboard/page] Pre-fetched context config:', !!initialContextConfig);
     } catch (configErr) {
       console.error('[dashboard/page] Error pre-fetching context config:', configErr);
     }
@@ -78,7 +69,6 @@ export default async function DashboardPage() {
       // Fetch nav options server-side
       const { navService } = await import('../lib/navService');
       initialNavOptions = await navService.getNavOptions(supabase, defaultContextKey, session.user.id);
-      console.log('[dashboard/page] Pre-fetched nav options:', Array.isArray(initialNavOptions) ? initialNavOptions.length : 'null');
     } catch (navErr) {
       console.error('[dashboard/page] Error pre-fetching nav options:', navErr);
     }

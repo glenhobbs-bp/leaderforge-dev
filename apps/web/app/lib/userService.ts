@@ -4,14 +4,13 @@ import type { User } from './types';
 
 /**
  * Service for user profile and preferences logic. All business rules and data access for users live here.
- * All methods are robustly logged for observability.
+ * Optimized for performance with minimal logging.
  */
 export const userService = {
     /**
    * Get a single user by ID.
    */
   async getUser(userId: string): Promise<User | null> {
-    console.log(`[userService] Fetching user: ${userId}`);
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
@@ -41,7 +40,6 @@ export const userService = {
       console.error(`[userService] Error fetching user:`, error);
       throw error;
     }
-    console.log(`[userService] Found user: ${data?.id ?? 'none'}`);
     return data as User || null;
   },
 
@@ -49,7 +47,6 @@ export const userService = {
    * Get a single user by email.
    */
   async getUserByEmail(email: string): Promise<User | null> {
-    console.log(`[userService] Fetching user by email: ${email}`);
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
     const { data, error } = await supabase
@@ -62,7 +59,6 @@ export const userService = {
       console.error(`[userService] Error fetching user by email:`, error);
       throw error;
     }
-    console.log(`[userService] Found user: ${data?.id ?? 'none'}`);
     return data as User || null;
   },
 
@@ -70,7 +66,6 @@ export const userService = {
    * Get multiple users by their IDs.
    */
   async getUsersByIds(userIds: string[]): Promise<User[]> {
-    console.log(`[userService] Fetching users by IDs: ${userIds.join(', ')}`);
     if (!userIds.length) return [];
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
@@ -83,7 +78,6 @@ export const userService = {
       console.error(`[userService] Error fetching users by IDs:`, error);
       throw error;
     }
-    console.log(`[userService] Found ${data?.length ?? 0} users`);
     return (data || []) as User[];
   },
 
@@ -91,7 +85,6 @@ export const userService = {
    * Update user preferences (partial update).
    */
   async updateUserPreferences(userId: string, preferences: Partial<User['preferences']>): Promise<User | null> {
-    console.log(`[userService] Updating preferences for user: ${userId}`);
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
     const { data, error } = await supabase
@@ -105,7 +98,6 @@ export const userService = {
       console.error(`[userService] Error updating user preferences:`, error);
       throw error;
     }
-    console.log(`[userService] Updated preferences for user: ${data?.id ?? 'none'}`);
     return data as User || null;
   },
 
@@ -113,7 +105,6 @@ export const userService = {
    * Update user profile information (first_name, last_name, full_name, etc.)
    */
   async updateUserProfile(userId: string, profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>): Promise<User | null> {
-    console.log(`[userService] Updating profile for user: ${userId}`, profile);
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
@@ -149,7 +140,6 @@ export const userService = {
       throw error;
     }
 
-    console.log(`[userService] Updated profile for user: ${data?.id ?? 'none'}`);
     return data as User || null;
   },
 
@@ -161,7 +151,6 @@ export const userService = {
     profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>,
     preferences: Partial<User['preferences']>
   ): Promise<User | null> {
-    console.log(`[userService] Updating profile and preferences for user: ${userId}`);
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
@@ -198,7 +187,6 @@ export const userService = {
       throw error;
     }
 
-    console.log(`[userService] Updated profile and preferences for user: ${data?.id ?? 'none'}`);
     return data as User || null;
-  },
+  }
 };

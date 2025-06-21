@@ -1,167 +1,158 @@
-import { SupabaseClient } from '@supabase/supabase-js';
-import type { Entitlement, ContentAccessPolicy } from './types';
+import { createSupabaseServerClient } from './supabaseServerClient';
+import { cookies } from 'next/headers';
+import type { Entitlement } from './types';
 
 /**
- * In-memory cache for user entitlements to prevent redundant DB calls
- * within the same request context
- */
-const entitlementCache = new Map<string, { data: Entitlement[]; timestamp: number }>();
-const CACHE_TTL = 30 * 1000; // 30 seconds
-
-/**
- * Service for entitlement and access logic. All business rules and data access for entitlements live here.
- * All methods are robustly logged for observability.
+ * Service for entitlement logic. All business rules for user permissions live here.
+ * Optimized for performance with minimal logging.
  */
 export const entitlementService = {
   /**
-   * Get all active entitlements for a user (context/module aware via RLS).
-   * Includes in-memory caching to prevent redundant calls.
+   * Get all entitlements for a user.
    */
-  async getUserEntitlements(
-    supabase: SupabaseClient,
-    userId: string
-  ): Promise<Entitlement[]> {
+  async getUserEntitlements(supabase: any, userId: string): Promise<Entitlement[]> {
     // Check cache first
-    const cacheKey = userId;
-    const cached = entitlementCache.get(cacheKey);
-    const now = Date.now();
-
-    if (cached && (now - cached.timestamp) < CACHE_TTL) {
-      console.log(`[entitlementService] Using cached entitlements for user: ${userId}`);
+    const cacheKey = `entitlements:${userId}`;
+    const cached = globalThis.entitlementCache?.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) { // 5 minute cache
       return cached.data;
     }
 
-    console.log(`[entitlementService] Fetching entitlements for user: ${userId}`);
-    const { data, error } = await supabase
-      .schema('core')
-      .from('user_entitlements')
-      .select('*, entitlement:entitlement_id(*)')
-      .eq('user_id', userId)
-      .is('revoked_at', null);
-    if (error) {
-      console.error(`[entitlementService] Error fetching user entitlements:`, error);
+    try {
+      const { data, error } = await supabase
+        .schema('core')
+        .from('user_entitlements')
+        .select(`
+          *,
+          entitlement:entitlements (*)
+        `)
+        .eq('user_id', userId)
+        .is('revoked_at', null);
 
-      // If it's a permission error, return empty entitlements for now
-      if (error.code === '42501' || error.message.includes('permission denied')) {
-        console.log(`[entitlementService] Permission denied - returning empty entitlements for user: ${userId}`);
+      if (error) {
+        console.error('[entitlementService] Permission denied - returning empty entitlements for user:', userId);
         return [];
       }
-      throw error;
-    }
 
-    const entitlements = (data || []) as Entitlement[];
+      const entitlements = (data || []) as Entitlement[];
 
-    // Cache the result
-    entitlementCache.set(cacheKey, { data: entitlements, timestamp: now });
-
-    console.log(`[entitlementService] Found ${entitlements.length} entitlements for user ${userId}`);
-    return entitlements;
-  },
-
-  /**
-   * Clear cache for a specific user (useful for real-time updates)
-   */
-  clearUserCache(userId: string): void {
-    entitlementCache.delete(userId);
-  },
-
-  /**
-   * Clear all cached entitlements
-   */
-  clearAllCache(): void {
-    entitlementCache.clear();
-  },
-
-  /**
-   * Get all active entitlements for an organization.
-   */
-  async getOrgEntitlements(
-    supabase: SupabaseClient,
-    orgId: string
-  ): Promise<Entitlement[]> {
-    console.log(`[entitlementService] Fetching entitlements for org: ${orgId}`);
-    const { data, error } = await supabase
-      .from('core.org_entitlements')
-      .select('*, entitlement:entitlement_id(*)')
-      .eq('org_id', orgId)
-      .eq('status', 'active');
-    if (error) {
-      console.error(`[entitlementService] Error fetching org entitlements:`, error);
-      throw error;
-    }
-    console.log(`[entitlementService] Found ${data?.length ?? 0} entitlements for org ${orgId}`);
-    return (data || []) as Entitlement[];
-  },
-
-  /**
-   * Check if a user can access a given content item (using entitlements and content access policies).
-   */
-  async canUserAccessContent(
-    supabase: SupabaseClient,
-    userId: string,
-    contentId: string
-  ): Promise<boolean> {
-    console.log(`[entitlementService] Checking access for user ${userId} to content ${contentId}`);
-    // 1. Get user entitlements
-    const entitlements = await this.getUserEntitlements(supabase, userId);
-    const entitlementIds = entitlements.map(e => e.entitlement_id);
-
-    // 2. Get content access policy
-    const { data: policies, error } = await supabase
-      .schema('core')
-      .from('content_access_policies')
-      .select('*')
-      .eq('content_id', contentId);
-    if (error) {
-      console.error(`[entitlementService] Error fetching content access policy:`, error);
-      throw error;
-    }
-    if (!policies || policies.length === 0) {
-      // No policy = open access
-      console.log(`[entitlementService] No access policy for content ${contentId}, access granted.`);
-      return true;
-    }
-    // Check if user meets any/all required entitlements (default: any)
-    const policy = policies[0] as ContentAccessPolicy;
-    const required = policy.required_entitlements || [];
-    const mode = policy.access_mode || 'any';
-    const hasAccess = mode === 'all'
-      ? required.every((id: string) => entitlementIds.includes(id))
-      : required.some((id: string) => entitlementIds.includes(id));
-    console.log(`[entitlementService] User ${userId} access to content ${contentId}: ${hasAccess}`);
-    return hasAccess;
-  },
-
-  /**
-   * Get all content in a context the user is entitled to access.
-   */
-  async getAccessibleContent(
-    supabase: SupabaseClient,
-    userId: string,
-    contextKey: string
-  ): Promise<unknown[]> {
-    console.log(`[entitlementService] Fetching accessible content for user ${userId} in context ${contextKey}`);
-    // 1. Get all content for context
-    const { data: allContent, error: contentError } = await supabase
-      .from('content')
-      .select('*')
-      .eq('context_key', contextKey);
-    if (contentError) {
-      console.error(`[entitlementService] Error fetching content for context:`, contentError);
-      throw contentError;
-    }
-    // 2. Filter by access
-    const accessible: unknown[] = [];
-    for (const item of allContent || []) {
-      try {
-        if (await this.canUserAccessContent(supabase, userId, item.id)) {
-          accessible.push(item);
-        }
-      } catch (err) {
-        console.error(`[entitlementService] Error checking access for content ${item.id}:`, err);
+      // Cache the result
+      if (!globalThis.entitlementCache) {
+        globalThis.entitlementCache = new Map();
       }
+      globalThis.entitlementCache.set(cacheKey, {
+        data: entitlements,
+        timestamp: Date.now()
+      });
+
+      return entitlements;
+    } catch (error) {
+      console.error('[entitlementService] Error fetching entitlements:', error);
+      return [];
     }
-    console.log(`[entitlementService] User ${userId} can access ${accessible.length} content items in context ${contextKey}`);
-    return accessible;
   },
+
+  /**
+   * Get all entitlements for an organization.
+   */
+  async getOrgEntitlements(supabase: any, orgId: string): Promise<any[]> {
+    const { data, error } = await supabase
+      .schema('core')
+      .from('org_entitlements')
+      .select(`
+        *,
+        entitlement:entitlements (*)
+      `)
+      .eq('org_id', orgId);
+
+    if (error) {
+      console.error('[entitlementService] Error fetching org entitlements:', error);
+      throw error;
+    }
+
+    return data || [];
+  },
+
+  /**
+   * Check if a user has access to specific content.
+   */
+  async checkContentAccess(supabase: any, userId: string, contentId: string): Promise<boolean> {
+    try {
+      // First, get the content access policy
+      const { data: policy, error: policyError } = await supabase
+        .schema('core')
+        .from('content_access_policies')
+        .select('*')
+        .eq('content_id', contentId)
+        .single();
+
+      if (policyError || !policy) {
+        // No access policy means content is freely accessible
+        return true;
+      }
+
+      // Get user entitlements
+      const userEntitlements = await this.getUserEntitlements(supabase, userId);
+      const userEntitlementIds = userEntitlements.map(e => e.entitlement_id);
+
+      // Check if user has required entitlements
+      const requiredEntitlements = policy.required_entitlements || [];
+      const accessMode = policy.access_mode || 'any';
+
+      let hasAccess = false;
+      if (accessMode === 'any') {
+        hasAccess = requiredEntitlements.some((entId: string) => userEntitlementIds.includes(entId));
+      } else {
+        hasAccess = requiredEntitlements.every((entId: string) => userEntitlementIds.includes(entId));
+      }
+
+      return hasAccess;
+    } catch (error) {
+      console.error('[entitlementService] Error checking content access:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Get all content accessible to a user in a given context.
+   */
+  async getAccessibleContent(supabase: any, userId: string, contextKey: string): Promise<any[]> {
+    try {
+      // Get all content for the context
+      const { data: allContent, error: contentError } = await supabase
+        .schema('core')
+        .from('content')
+        .select('*')
+        .eq('context_key', contextKey);
+
+      if (contentError) {
+        console.error('[entitlementService] Error fetching content:', contentError);
+        return [];
+      }
+
+      // Get user entitlements once
+      const userEntitlements = await this.getUserEntitlements(supabase, userId);
+      const userEntitlementIds = userEntitlements.map(e => e.entitlement_id);
+
+      // Filter content based on access policies
+      const accessible = [];
+      for (const content of allContent || []) {
+        if (!content.required_entitlements || content.required_entitlements.length === 0) {
+          accessible.push(content);
+        } else {
+          const hasAccess = content.required_entitlements.every((entId: string) =>
+            userEntitlementIds.includes(entId)
+          );
+          if (hasAccess) {
+            accessible.push(content);
+          }
+        }
+      }
+
+      return accessible;
+    } catch (error) {
+      console.error('[entitlementService] Error getting accessible content:', error);
+      return [];
+    }
+  }
 };

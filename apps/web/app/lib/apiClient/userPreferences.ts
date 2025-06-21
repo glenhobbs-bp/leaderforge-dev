@@ -2,20 +2,27 @@ import type { User } from '../types';
 
 /**
  * Fetches user preferences from the API.
+ * Optimized with better caching and error handling.
  * @param userId - The user ID to fetch preferences for.
  * @returns Promise of preferences object.
  * @throws Error if the API call fails.
  */
 export async function fetchUserPreferences(userId: string): Promise<User['preferences'] | undefined> {
-  console.log(`[apiClient] Fetching preferences for user: ${userId}`);
-  const res = await fetch(`/api/user/${userId}/preferences`, { credentials: 'include' });
+  const res = await fetch(`/api/user/${userId}/preferences`, {
+    credentials: 'include',
+    // Add cache headers for browser-level caching
+    headers: {
+      'Cache-Control': 'max-age=300', // 5 minutes browser cache
+    }
+  });
+
   if (!res.ok) {
-    const error = await res.json();
+    const error = await res.json().catch(() => ({ error: 'Network error' }));
     console.error('[apiClient] Error:', error);
     throw new Error(error.error || 'Failed to fetch user preferences');
   }
+
   const data = await res.json();
-  console.log(`[apiClient] Got preferences for user ${userId}`);
   return data as User['preferences'];
 }
 
@@ -26,21 +33,27 @@ export async function fetchUserPreferences(userId: string): Promise<User['prefer
  * @returns Promise of updated preferences object.
  * @throws Error if the API call fails.
  */
-export async function updateUserPreferences(userId: string, prefs: Partial<User['preferences']>): Promise<User['preferences'] | undefined> {
-  console.log(`[apiClient] Updating preferences for user: ${userId}`);
+export async function updateUserPreferences(
+  userId: string,
+  prefs: Partial<User['preferences']>
+): Promise<User['preferences'] | undefined> {
   const res = await fetch(`/api/user/${userId}/preferences`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    method: 'PUT', // Use PUT instead of PATCH for consistency with API
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache', // Don't cache updates
+    },
     body: JSON.stringify(prefs),
     credentials: 'include',
   });
+
   if (!res.ok) {
-    const error = await res.json();
+    const error = await res.json().catch(() => ({ error: 'Network error' }));
     console.error('[apiClient] Error:', error);
     throw new Error(error.error || 'Failed to update user preferences');
   }
+
   const data = await res.json();
-  console.log(`[apiClient] Updated preferences for user ${userId}`);
   return data as User['preferences'];
 }
 

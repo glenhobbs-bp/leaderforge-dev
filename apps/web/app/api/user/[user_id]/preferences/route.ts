@@ -4,6 +4,7 @@ import { userService } from '../../../../lib/userService';
 /**
  * GET /api/user/[user_id]/preferences
  * Fetches user profile and preferences data.
+ * Optimized with caching headers for better performance.
  */
 export async function GET(
   request: NextRequest,
@@ -11,7 +12,6 @@ export async function GET(
 ) {
   try {
     const { user_id } = await params;
-    console.log(`[GET /api/user/${user_id}/preferences] Fetching user data`);
 
     const user = await userService.getUser(user_id);
     if (!user) {
@@ -19,7 +19,7 @@ export async function GET(
     }
 
     // Return both user profile and preferences
-    return NextResponse.json({
+    const response = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -30,6 +30,13 @@ export async function GET(
       },
       preferences: user.preferences || {}
     });
+
+    // Add caching headers for performance (5 minutes cache)
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    response.headers.set('CDN-Cache-Control', 'public, max-age=300');
+    response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=300');
+
+    return response;
   } catch (error) {
     console.error('[GET /api/user/preferences] Error:', error);
     return NextResponse.json(
@@ -50,12 +57,11 @@ export async function PUT(
   try {
     const { user_id } = await params;
     const body = await request.json();
-    console.log(`[PUT /api/user/${user_id}/preferences] Updating user data:`, body);
 
     // Separate profile fields from preferences
     const { first_name, last_name, full_name, avatar_url, ...preferences } = body;
 
-    const profileFields: any = {};
+    const profileFields: Record<string, string> = {};
     if (first_name !== undefined) profileFields.first_name = first_name;
     if (last_name !== undefined) profileFields.last_name = last_name;
     if (full_name !== undefined) profileFields.full_name = full_name;
@@ -77,8 +83,8 @@ export async function PUT(
       return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
     }
 
-    // Return updated user data
-    return NextResponse.json({
+    // Return updated user data with no-cache headers (data was just modified)
+    const response = NextResponse.json({
       user: {
         id: updatedUser.id,
         email: updatedUser.email,
@@ -89,6 +95,11 @@ export async function PUT(
       },
       preferences: updatedUser.preferences || {}
     });
+
+    // No caching for updated data
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+    return response;
   } catch (error) {
     console.error('[PUT /api/user/preferences] Error:', error);
     return NextResponse.json(

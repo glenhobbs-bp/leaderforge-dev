@@ -16,8 +16,6 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
   const startTime = Date.now();
   const { context_key } = await context.params;
 
-  console.log(`[API] GET /api/nav/${context_key} - optimized request`);
-
   const cookieStore = await cookies();
   const supabase = createSupabaseServerClient(cookieStore);
 
@@ -27,22 +25,17 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
 
   // SSR Auth: get cookies and hydrate session (same pattern as avatar API)
   const allCookies = cookieStore.getAll();
-  console.log('[API/nav] Incoming cookies:', allCookies.length, 'cookies');
 
   const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-  console.log('[API/nav] Extracted tokens:', { hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
 
   // Hydrate session manually (if tokens found)
   if (accessToken && refreshToken) {
-    const setSessionRes = await supabase.auth.setSession({
+    await supabase.auth.setSession({
       access_token: accessToken,
       refresh_token: refreshToken,
     });
-    console.log('[API/nav] setSession result:', { hasUser: !!setSessionRes.data?.user, error: setSessionRes.error });
-  } else {
-    console.warn('[API/nav] Missing access or refresh token in cookies. SSR auth will likely fail.');
   }
 
   // Get session from Supabase
@@ -59,7 +52,6 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
   const userId = session?.user?.id;
 
   if (!userId) {
-    console.warn('[API/nav] Not authenticated after setSession');
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
@@ -68,8 +60,6 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
 
     const endTime = Date.now();
     const duration = endTime - startTime;
-
-    console.log(`[API/nav] Returning ${navOptions.length} nav options for user ${userId} in context ${context_key} (${duration}ms)`);
 
     // Return with aggressive caching headers for performance
     return NextResponse.json(navOptions, {
@@ -85,10 +75,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     });
   } catch (err) {
     const error = err as Error;
-    const endTime = Date.now();
-    const duration = endTime - startTime;
-
-    console.error(`[API/nav] Error fetching nav options for ${context_key} (${duration}ms):`, error);
+    console.error(`[API/nav] Error fetching nav options:`, error);
     return NextResponse.json({ error: error.message || 'Failed to fetch nav options' }, { status: 500 });
   }
 }

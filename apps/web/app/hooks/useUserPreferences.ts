@@ -3,6 +3,7 @@ import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/us
 
 /**
  * React Query hook for fetching user preferences.
+ * Optimized with caching for better performance.
  * @param userId - The user ID to fetch preferences for.
  */
 export function useUserPreferences(userId: string) {
@@ -10,6 +11,13 @@ export function useUserPreferences(userId: string) {
     queryKey: ['user-preferences', userId],
     queryFn: () => fetchUserPreferences(userId),
     enabled: !!userId,
+    // Optimize caching similar to avatar hook
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
+    retry: 1, // Reduce retries for faster fallback
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
+    networkMode: 'offlineFirst', // Support offline-first
   });
 }
 
@@ -20,10 +28,14 @@ export function useUserPreferences(userId: string) {
 export function useUpdateUserPreferences(userId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (prefs: any) => updateUserPreferences(userId, prefs),
+    mutationFn: (prefs: Record<string, unknown>) => updateUserPreferences(userId, prefs),
     onSuccess: (data) => {
-      console.log('[hook] useUpdateUserPreferences success:', data);
+      // Invalidate and refetch user preferences
       queryClient.invalidateQueries({ queryKey: ['user-preferences', userId] });
+      // Also invalidate avatar cache if avatar_url was updated
+      if (data && 'avatar_url' in data) {
+        queryClient.invalidateQueries({ queryKey: ['avatar', userId] });
+      }
     },
     onError: (err) => console.error('[hook] useUpdateUserPreferences error:', err),
   });

@@ -18,7 +18,6 @@ export default function LoginPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        console.log('[login/page] Signed in. Syncing tokens to cookie...');
         try {
           const response = await fetch('/api/auth/set-session', {
             method: 'POST',
@@ -31,10 +30,9 @@ export default function LoginPage() {
           });
 
           if (!response.ok) {
-            throw new Error(`[login/page] Cookie sync failed: ${response.statusText}`);
+            throw new Error(`Cookie sync failed: ${response.statusText}`);
           }
 
-          console.log('[login/page] Token sync successful. Redirecting to /dashboard...');
           window.location.href = '/dashboard';
         } catch (error) {
           console.error('[login/page] Error syncing tokens:', error);
@@ -76,7 +74,7 @@ export default function LoginPage() {
               },
             },
           }}
-           providers={[]} // Uncomment to enable Google sign-in
+          providers={[]} // Uncomment to enable Google sign-in
           theme="light"
         />
       </div>
