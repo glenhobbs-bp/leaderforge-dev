@@ -5,26 +5,13 @@ import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import ContextSelector from "./ContextSelector";
 import { useSupabase } from '../SupabaseProvider';
 import { useNavigation } from '../../hooks/useNavigation';
+import { useAvatar } from '../../hooks/useAvatar';
 import { authService } from '../../app/lib/authService';
 import * as LucideIcons from "lucide-react";
 import { UserProfileModal } from "./UserProfileModal";
 
-// Global avatar cache to persist across component remounts
-const globalAvatarCache = new Map<string, string>();
-
-// Export function to clear avatar cache for a specific user
-export function clearAvatarCache(userId: string) {
-  globalAvatarCache.delete(userId);
-  globalAvatarCache.delete(`loading_${userId}`);
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[NavPanel] Cleared avatar cache for user:', userId);
-    console.log('[NavPanel] Remaining cache keys:', Array.from(globalAvatarCache.keys()));
-  }
-}
-
-// Export function to force avatar refresh for a user
+// Export function to force avatar refresh for a user (now uses React Query)
 export function forceAvatarRefresh(userId: string) {
-  clearAvatarCache(userId);
   // Trigger a custom event that NavPanel can listen to
   window.dispatchEvent(new CustomEvent('avatarUpdated', { detail: { userId } }));
   if (process.env.NODE_ENV === 'development') {
@@ -86,7 +73,7 @@ interface NavPanelProps {
   userId?: string | null;
 }
 
-export default function NavPanelDatabaseDriven({
+export default function NavPanel({
   contextKey,
   contextOptions = [],
   contextValue,
@@ -101,111 +88,35 @@ export default function NavPanelDatabaseDriven({
   }
 
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [, setIsLoadingAvatar] = useState<boolean>(false);
   const { supabase } = useSupabase();
 
   // Database-driven navigation using the context key
   const { navSchema, loading, error } = useNavigation(contextKey, userId);
 
+  // Avatar fetching with React Query
+  const { data: avatarUrl = "/icons/default-avatar.svg" } = useAvatar(userId);
+
+  // Listen for avatar update events and refetch when needed
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] useEffect: userId changed to:', userId);
-    }
+    if (!userId) return;
 
-    // Reset avatar if no userId
-    if (!userId) {
-      setAvatarUrl(null);
-      setIsLoadingAvatar(false);
-      return;
-    }
-
-    // Initial avatar fetch (use cache)
-    fetchAvatarForUser(userId, false);
-
-    // Listen for avatar update events
     const handleAvatarUpdate = (event: CustomEvent) => {
       if (event.detail.userId === userId) {
         if (process.env.NODE_ENV === 'development') {
           console.log('[NavPanel] Avatar update event received for user:', userId);
         }
-        // Force refetch avatar (bypass cache)
-        fetchAvatarForUser(userId, true);
+        // The useAvatar hook will handle the refetch through React Query
+        window.dispatchEvent(new CustomEvent('refetchAvatar', { detail: { userId } }));
       }
     };
 
     window.addEventListener('avatarUpdated', handleAvatarUpdate as EventListener);
 
-    // Cleanup event listener
     return () => {
       window.removeEventListener('avatarUpdated', handleAvatarUpdate as EventListener);
     };
   }, [userId]);
-
-  // Normal function to fetch avatar (with cache)
-  const fetchAvatarForUser = (targetUserId: string, forceRefresh: boolean = false) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] fetchAvatarForUser called for:', targetUserId, 'forceRefresh:', forceRefresh);
-    }
-
-    // Check global cache first (unless forcing refresh)
-    if (!forceRefresh) {
-      const cachedUrl = globalAvatarCache.get(targetUserId);
-      if (cachedUrl) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[NavPanel] Using cached avatar URL for user:', targetUserId);
-        }
-        setAvatarUrl(cachedUrl);
-        return;
-      }
-    } else {
-      // Clear cache only when forcing refresh
-      globalAvatarCache.delete(targetUserId);
-      globalAvatarCache.delete(`loading_${targetUserId}`);
-    }
-
-    // Check if we're already loading this specific user to prevent duplicate API calls
-    const loadingKey = `loading_${targetUserId}`;
-    if (globalAvatarCache.has(loadingKey)) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Avatar already being fetched for user:', targetUserId);
-      }
-      return;
-    }
-
-    // Mark as loading to prevent duplicate requests
-    globalAvatarCache.set(loadingKey, 'true');
-    setIsLoadingAvatar(true);
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] Fetching avatar for userId:', targetUserId);
-    }
-
-    fetch(`/api/user/avatar?userId=${targetUserId}`)
-      .then(res => res.json())
-      .then(data => {
-        const url = data.url || "/icons/default-avatar.svg";
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[NavPanel] Avatar API response:', data);
-        }
-
-        // Cache the result globally for this user
-        globalAvatarCache.set(targetUserId, url);
-        setAvatarUrl(url);
-      })
-      .catch((err) => {
-        console.error('[NavPanel] Avatar API error:', err);
-        const defaultUrl = "/icons/default-avatar.svg";
-        globalAvatarCache.set(targetUserId, defaultUrl);
-        setAvatarUrl(defaultUrl);
-      })
-      .finally(() => {
-        // Remove loading flag
-        globalAvatarCache.delete(loadingKey);
-        setIsLoadingAvatar(false);
-      });
-  };
 
 
 
@@ -428,9 +339,9 @@ export default function NavPanelDatabaseDriven({
             {navSchema.props.footer.profile && !isCollapsed && (
               <div className="flex items-center gap-2 mb-0.5">
                 <img
-                  src={avatarUrl || "/icons/default-avatar.svg"}
+                  src={avatarUrl}
                   alt="Profile avatar"
-                  className="rounded-full w-6 h-6 object-cover border border-gray-200 shadow-sm"
+                  className="rounded-full w-7 h-7 object-cover border border-gray-200 shadow-sm"
                 />
                 <span className="text-xs font-normal text-gray-700 opacity-80">{navSchema.props.footer.profile.name}</span>
               </div>
@@ -446,11 +357,9 @@ export default function NavPanelDatabaseDriven({
                 style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
               >
                 <img
-                  src={avatarUrl || "/icons/default-avatar.svg"}
+                  src={avatarUrl}
                   alt="Profile"
-                  width={14}
-                  height={14}
-                  className="shrink-0 rounded-full"
+                  className="shrink-0 rounded-full w-7 h-7 object-cover border border-gray-200 shadow-sm"
                 />
                 {!isCollapsed && <span className="text-[13px]">My Profile</span>}
               </button>
