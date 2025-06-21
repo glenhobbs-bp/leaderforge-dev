@@ -359,7 +359,7 @@ export default function NavPanel({
                 <img
                   src={avatarUrl}
                   alt="Profile"
-                  className="shrink-0 rounded-full w-7 h-7 object-cover border border-gray-200 shadow-sm"
+                  className="shrink-0 rounded-full w-4 h-4 object-cover border border-gray-200 shadow-sm mr-1"
                 />
                 {!isCollapsed && <span className="text-[13px]">My Profile</span>}
               </button>
