@@ -1,33 +1,57 @@
 {
   "metadata": {
-    "generated_at": "2025-06-21T12:09:13.648Z",
+    "generated_at": "2025-06-21T12:23:56.622Z",
     "generator_version": "1.0.0",
-    "total_files": 171,
-    "total_size_bytes": 1334579,
+    "total_files": 173,
+    "total_size_bytes": 1463452,
     "file_types": {
       ".ts": 89,
-      ".json": 12,
+      ".json": 13,
       ".tsx": 31,
       ".js": 2,
-      ".md": 36,
+      ".md": 37,
       ".sql": 1
     },
     "tags": {
       "TypeScript": 120,
       "API": 31,
-      "AI agent": 47,
+      "AI agent": 49,
       "React": 31,
-      "React hooks": 14,
+      "React hooks": 17,
       "Next.js API": 22,
-      "security": 58,
+      "security": 60,
       "test": 24,
+      "user management": 2,
+      "preferences": 1,
+      "caching": 4,
+      "performance": 3,
+      "Next.js page": 1,
+      "SSR": 1,
+      "entitlements": 2,
+      "context management": 1,
       "hooks": 13,
       "React Query": 10,
+      "user preferences": 2,
+      "cross-invalidation": 1,
       "utility": 39,
+      "API client": 1,
+      "error handling": 1,
+      "authentication": 2,
+      "Supabase": 2,
+      "service layer": 2,
+      "session management": 1,
+      "performance optimization": 1,
+      "Supabase Auth UI": 1,
+      "login": 1,
+      "client component": 2,
       "UI": 16,
-      "navigation": 2,
+      "navigation": 3,
       "context-based": 1,
-      "documentation": 37,
+      "layout": 1,
+      "theme": 1,
+      "avatar": 1,
+      "database-driven": 1,
+      "documentation": 39,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -724,19 +748,24 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/user/[user_id]/preferences",
       "extension": ".ts",
-      "purpose": "GET /api/user/[user_id]/preferences",
+      "purpose": "User preferences API with performance optimizations and caching",
+      "owner": "Backend team",
       "tags": [
-        "TypeScript",
         "API",
+        "user management",
+        "preferences",
+        "caching",
+        "performance",
+        "TypeScript",
         "Next.js API"
       ],
       "dependencies": [
         "next/server",
         "../../../../lib/userService"
       ],
-      "last_modified": "2025-06-21T11:34:39.959Z",
-      "size_bytes": 3755,
-      "hash": "8db8657e",
+      "last_modified": "2025-06-21T12:17:30.413Z",
+      "size_bytes": 3982,
+      "hash": "80dac275",
       "complexity": "medium"
     },
     {
@@ -835,8 +864,14 @@
       "name": "page.tsx",
       "directory": "apps/web/app/dashboard",
       "extension": ".tsx",
-      "purpose": "File: apps/web/app/dashboard/page.tsx",
+      "purpose": "Server-side dashboard page with SSR optimization and entitlement filtering",
+      "owner": "Frontend team",
       "tags": [
+        "Next.js page",
+        "SSR",
+        "entitlements",
+        "context management",
+        "performance",
         "React",
         "TypeScript",
         "security"
@@ -849,10 +884,10 @@
         "../lib/contextService",
         "../lib/entitlementService"
       ],
-      "last_modified": "2025-06-21T11:47:48.850Z",
-      "size_bytes": 3588,
-      "hash": "b702c2d5",
-      "complexity": "low"
+      "last_modified": "2025-06-21T12:21:30.975Z",
+      "size_bytes": 3773,
+      "hash": "bbd6cd9c",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/hooks/useContentForContext.ts",
@@ -1025,11 +1060,16 @@
       "name": "useUserPreferences.ts",
       "directory": "apps/web/app/hooks",
       "extension": ".ts",
-      "purpose": "React Query hook for fetching user preferences.",
+      "purpose": "React Query hooks for user preferences with optimized caching",
+      "owner": "Frontend team",
       "tags": [
+        "React hooks",
+        "React Query",
+        "user preferences",
+        "caching",
+        "cross-invalidation",
         "TypeScript",
-        "hooks",
-        "React Query"
+        "hooks"
       ],
       "dependencies": [
         "@tanstack/react-query",
@@ -1038,9 +1078,9 @@
       "exports": [
         "useUserPreferences"
       ],
-      "last_modified": "2025-06-21T11:34:34.806Z",
-      "size_bytes": 1734,
-      "hash": "0a40314c",
+      "last_modified": "2025-06-21T12:17:56.430Z",
+      "size_bytes": 1964,
+      "hash": "0285a93b",
       "complexity": "low"
     },
     {
@@ -1359,17 +1399,22 @@
       "name": "userPreferences.ts",
       "directory": "apps/web/app/lib/apiClient",
       "extension": ".ts",
-      "purpose": "Fetches user preferences from the API.",
+      "purpose": "API client for user preferences with caching and error handling",
+      "owner": "Frontend team",
       "tags": [
+        "API client",
+        "user preferences",
+        "caching",
+        "error handling",
         "TypeScript",
         "utility"
       ],
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-21T11:34:49.625Z",
-      "size_bytes": 1978,
-      "hash": "4cde628a",
+      "last_modified": "2025-06-21T12:17:54.430Z",
+      "size_bytes": 2197,
+      "hash": "10c21d3d",
       "complexity": "low"
     },
     {
@@ -1403,7 +1448,12 @@
       "directory": "apps/web/app/lib",
       "extension": ".ts",
       "purpose": "Authentication service layer - extracted from UI components",
+      "owner": "Backend team",
       "tags": [
+        "authentication",
+        "Supabase",
+        "service layer",
+        "session management",
         "TypeScript",
         "utility"
       ],
@@ -1413,9 +1463,9 @@
       "exports": [
         "authService"
       ],
-      "last_modified": "2025-06-20T19:05:34.996Z",
-      "size_bytes": 1492,
-      "hash": "d67bed96",
+      "last_modified": "2025-06-21T12:17:19.447Z",
+      "size_bytes": 1504,
+      "hash": "801d4098",
       "complexity": "low"
     },
     {
@@ -1835,8 +1885,13 @@
       "name": "userService.ts",
       "directory": "apps/web/app/lib",
       "extension": ".ts",
-      "purpose": "Service for user profile and preferences logic. All business rules and data access for users live here.",
+      "purpose": "User service layer with optimized database operations and caching",
+      "owner": "Backend team",
       "tags": [
+        "service layer",
+        "user management",
+        "Supabase",
+        "performance optimization",
         "TypeScript",
         "utility"
       ],
@@ -1848,9 +1903,9 @@
       "exports": [
         "userService"
       ],
-      "last_modified": "2025-06-21T11:34:46.510Z",
-      "size_bytes": 6221,
-      "hash": "7ed37b17",
+      "last_modified": "2025-06-21T12:17:33.667Z",
+      "size_bytes": 6440,
+      "hash": "97e4dfa9",
       "complexity": "medium"
     },
     {
@@ -1880,8 +1935,13 @@
       "name": "page.tsx",
       "directory": "apps/web/app/login",
       "extension": ".tsx",
-      "purpose": "Public login page (SSR-safe). Renders Supabase Auth UI and syncs tokens to cookies.",
+      "purpose": "Public login page with styled Supabase Auth UI and token synchronization",
+      "owner": "Frontend team",
       "tags": [
+        "authentication",
+        "Supabase Auth UI",
+        "login",
+        "client component",
         "React",
         "TypeScript",
         "React hooks"
@@ -1896,9 +1956,9 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-06-21T11:47:48.850Z",
-      "size_bytes": 2691,
-      "hash": "4e3d3bb5",
+      "last_modified": "2025-06-21T12:22:57.542Z",
+      "size_bytes": 2771,
+      "hash": "5a479eef",
       "complexity": "low"
     },
     {
@@ -2266,9 +2326,9 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-21T12:09:05.814Z",
+      "last_modified": "2025-06-21T12:15:31.944Z",
       "size_bytes": 16503,
-      "hash": "bd3943b4",
+      "hash": "3697648f",
       "complexity": "high"
     },
     {
@@ -2299,11 +2359,15 @@
       "name": "ThreePanelLayout.tsx",
       "directory": "apps/web/components/ui",
       "extension": ".tsx",
-      "purpose": "File: components/ui/ThreePanelLayout.tsx",
+      "purpose": "Three-panel layout component with theme context and collapsible navigation",
+      "owner": "Frontend team",
       "tags": [
-        "React",
-        "TypeScript",
         "UI",
+        "layout",
+        "theme",
+        "React",
+        "client component",
+        "TypeScript",
         "React hooks"
       ],
       "dependencies": [
@@ -2311,12 +2375,9 @@
         "./ThemeContext",
         "../ai/AIExperience"
       ],
-      "exports": [
-        "ThreePanelLayout"
-      ],
-      "last_modified": "2025-06-03T02:12:15.348Z",
-      "size_bytes": 2008,
-      "hash": "0cbe23ad",
+      "last_modified": "2025-06-21T12:23:32.890Z",
+      "size_bytes": 2388,
+      "hash": "663b87ec",
       "complexity": "low"
     },
     {
@@ -2368,11 +2429,16 @@
       "name": "useAvatar.ts",
       "directory": "apps/web/hooks",
       "extension": ".ts",
-      "purpose": "Default 5 minutes cache",
+      "purpose": "React Query hook for optimized avatar fetching with caching",
+      "owner": "Frontend team",
       "tags": [
+        "React hooks",
+        "React Query",
+        "avatar",
+        "performance",
+        "caching",
         "TypeScript",
-        "hooks",
-        "React Query"
+        "hooks"
       ],
       "dependencies": [
         "@tanstack/react-query"
@@ -2380,9 +2446,9 @@
       "exports": [
         "useAvatar"
       ],
-      "last_modified": "2025-06-21T07:04:41.244Z",
-      "size_bytes": 1902,
-      "hash": "defd322a",
+      "last_modified": "2025-06-21T12:17:14.939Z",
+      "size_bytes": 2100,
+      "hash": "fb74cfc0",
       "complexity": "low"
     },
     {
@@ -2435,10 +2501,15 @@
       "directory": "apps/web/hooks",
       "extension": ".ts",
       "purpose": "Database-driven navigation hook that transforms NavOption[] to NavPanelSchema",
+      "owner": "Frontend team",
       "tags": [
+        "React hooks",
+        "navigation",
+        "database-driven",
+        "entitlements",
+        "React Query",
         "TypeScript",
         "hooks",
-        "React Query",
         "AI agent",
         "security"
       ],
@@ -2449,9 +2520,9 @@
         "../components/ui/NavPanel",
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-06-21T05:45:18.751Z",
-      "size_bytes": 4935,
-      "hash": "38d36cdb",
+      "last_modified": "2025-06-21T12:16:55.133Z",
+      "size_bytes": 4958,
+      "hash": "7efa67ac",
       "complexity": "medium"
     },
     {
@@ -3031,9 +3102,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T12:09:12.624Z",
-      "size_bytes": 2690,
-      "hash": "d91f6047"
+      "last_modified": "2025-06-21T12:23:46.240Z",
+      "size_bytes": 2955,
+      "hash": "878235ec"
     },
     {
       "path": "docs/how-to-add-or-change-agents.md",
@@ -3129,6 +3200,36 @@
       "last_modified": "2025-06-06T14:03:30.641Z",
       "size_bytes": 2261,
       "hash": "02367c59"
+    },
+    {
+      "path": "docs/manifest.json",
+      "name": "manifest.json",
+      "directory": "docs",
+      "extension": ".json",
+      "purpose": "Local LangGraph dev server\",",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-21T12:19:39.164Z",
+      "size_bytes": 92855,
+      "hash": "36bb4d08"
+    },
+    {
+      "path": "docs/manifest.md",
+      "name": "manifest.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "Local LangGraph dev server",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-21T12:19:39.174Z",
+      "size_bytes": 33980,
+      "hash": "6d4fd15c"
     },
     {
       "path": "packages/agent-core/agents/ContentLibraryAgent.ts",

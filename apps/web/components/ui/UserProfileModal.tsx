@@ -235,15 +235,6 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
             <DialogTitle className="text-base font-semibold text-slate-800 tracking-tight">
               Profile Settings
             </DialogTitle>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-white/50 rounded-lg transition-all duration-200 border border-slate-200/50 hover:border-slate-300/50"
-              >
-                <Edit3 className="w-3 h-3" />
-                Edit
-              </button>
-            )}
           </div>
 
           {/* Avatar Section */}
@@ -287,6 +278,16 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                 onChange={handleAvatarUpload}
                 disabled={!isEditing}
               />
+              {/* Edit Profile Button */}
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white bg-slate-600 hover:bg-slate-700 group-hover:scale-110"
+                  aria-label="Edit profile"
+                >
+                  <Edit3 className="w-3 h-3 text-white" />
+                </button>
+              )}
             </div>
             <div className="mt-2 text-center">
               <p className="text-xs font-medium text-slate-700">

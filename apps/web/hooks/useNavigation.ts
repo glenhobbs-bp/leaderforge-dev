@@ -1,6 +1,7 @@
 // File: apps/web/hooks/useNavigation.ts
 // Purpose: Database-driven navigation hook that transforms NavOption[] to NavPanelSchema
-// Replaces arbitrary navSchema props with entitlement-based database queries
+// Owner: Frontend team
+// Tags: React hooks, navigation, database-driven, entitlements, React Query
 
 import { useMemo } from 'react';
 import { useNavOptions } from './useNavOptions';
@@ -95,7 +96,7 @@ export function useNavigation(contextKey: string, userId?: string) {
       return {
         title: sectionTitle === 'default' ? null : sectionTitle,
         items: sortedOptions.map((option) => ({
-          id: option.nav_key,
+          id: option.id, // Use database ID, not nav_key
           label: option.label,
           icon: option.icon,
           href: option.href,
@@ -151,7 +152,7 @@ export function useNavigation(contextKey: string, userId?: string) {
  */
 export function transformNavOption(option: NavOption) {
   return {
-    id: option.nav_key,
+    id: option.id, // Use database ID, not nav_key
     label: option.label,
     icon: option.icon,
     href: option.href,

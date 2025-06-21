@@ -1,3 +1,8 @@
+// File: agent/src/index.ts
+// Purpose: LangGraph HTTP API agent for LeaderForge content library
+// Owner: AI team
+// Tags: LangGraph, agent, content library, TribeSocial integration
+
 import "dotenv/config";
 import { StateGraph, END, START, Annotation } from "@langchain/langgraph";
 import { BaseMessage } from "@langchain/core/messages";
@@ -63,6 +68,8 @@ async function fetchContent(state: ContentState): Promise<Partial<ContentState>>
       }
     };
 
+    console.log('[ContentAgent] Generated schema with', schema.props.items.length, 'items');
+
     return {
       contentList,
       schema
@@ -77,7 +84,15 @@ async function fetchContent(state: ContentState): Promise<Partial<ContentState>>
         type: 'Grid',
         props: {
           columns: 3,
-          items: []
+          items: [{
+            type: 'Card',
+            props: {
+              title: 'Content Unavailable',
+              description: 'Unable to fetch content at this time. Please try again later.',
+              image: '/placeholder.png',
+              actions: []
+            }
+          }]
         }
       }
     };

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx src/index.ts",
+    "server": "tsx src/server.ts",
     "start": "npx @langchain/langgraph-api@latest serve --port 8000"
   },
   "keywords": [],
@@ -13,8 +14,9 @@
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.52.0",
-    "@langchain/core": "^0.3.57",
+    "@langchain/core": "^0.3.61",
     "@langchain/langgraph": "^0.2.74",
+    "@langchain/langgraph-api": "^0.0.40",
     "openai": "^5.0.1"
   },
   "devDependencies": {

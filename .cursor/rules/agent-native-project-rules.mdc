@@ -60,6 +60,8 @@ alwaysApply: true
 - [ ] Feature is observable in LangSmith or equivalent.
 - [ ] Code review confirms architectural purity.
 - [ ] Themes (colors, typography, etc.) are managed as configuration and dynamic.
+- [ ] All files include standardized header comments (Purpose, Owner, Tags).
+- [ ] File manifest updated via `npm run generate-manifest` after changes.
 
 ---
 

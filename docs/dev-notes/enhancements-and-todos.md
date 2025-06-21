@@ -14,12 +14,14 @@
   - Plan for future webhook support from TribeSocial for real-time sync.
 
 ### 2. LangGraph Agent Orchestration
-- [ ] Restore LangGraph-based ContentLibraryAgent (currently replaced with a plain function).
-  - Upgrade to the latest LangGraph version.
-  - Ensure state propagation between nodes works (no more state loss).
-  - Add comprehensive tests for state flow.
-  - Use pure node functions and correct channel definitions.
-  - Remove any hardcoded defaults or workarounds.
+- [x] Restore LangGraph-based ContentLibraryAgent (currently replaced with a plain function).
+  - [x] Upgrade to the latest LangGraph version.
+  - [x] Ensure state propagation between nodes works (no more state loss).
+  - [x] Use pure node functions and correct channel definitions.
+  - [x] Remove any hardcoded defaults or workarounds.
+  - [x] Create leaderforgeContentLibrary agent in database
+  - [x] Update nav_options with agent_id references
+  - [ ] Add comprehensive tests for state flow.
 
 ### 3. Error Handling
 - [ ] Fix periodic errors on load.

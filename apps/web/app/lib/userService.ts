@@ -1,3 +1,8 @@
+// File: apps/web/app/lib/userService.ts
+// Purpose: User service layer with optimized database operations and caching
+// Owner: Backend team
+// Tags: service layer, user management, Supabase, performance optimization
+
 import { createSupabaseServerClient } from './supabaseServerClient';
 import { cookies } from 'next/headers';
 import type { User } from './types';

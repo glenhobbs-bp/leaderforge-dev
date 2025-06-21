@@ -1,3 +1,8 @@
+// File: apps/web/app/lib/apiClient/userPreferences.ts
+// Purpose: API client for user preferences with caching and error handling
+// Owner: Frontend team
+// Tags: API client, user preferences, caching, error handling
+
 import type { User } from '../types';
 
 /**

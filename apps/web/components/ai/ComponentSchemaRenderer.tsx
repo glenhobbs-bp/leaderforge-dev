@@ -212,26 +212,26 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
 
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-3xl w-full p-0">
-          <div className="border border-[#E3DDC9]" style={{ boxShadow: '0 4px 32px 0 rgba(0,0,0,0.12)' }}>
+        <DialogContent className="sm:max-w-3xl w-full p-0 rounded-xl overflow-hidden">
+          <div className="border border-[var(--bg-neutral)]/30 rounded-xl overflow-hidden" style={{ boxShadow: '0 8px 40px 0 rgba(0,0,0,0.15)' }}>
             <DialogTitle className="sr-only">{title || 'Video Player'}</DialogTitle>
             <DialogDescription className="sr-only">
               {description || (title ? `Watch ${title}` : 'Video player')}
             </DialogDescription>
 
-            <div className="aspect-video w-full bg-black rounded-t-lg overflow-hidden relative">
+            <div className="aspect-video w-full bg-black rounded-t-xl overflow-hidden relative">
               {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70">
+                  <div className="animate-spin rounded-full h-12 w-12 border-2 border-white/20 border-t-white"></div>
                 </div>
               )}
 
               {error ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-4">
-                  <p className="text-red-400 mb-2">{error}</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-white p-6">
+                  <p className="text-red-300 mb-4 text-center">{error}</p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-md"
+                    className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 font-medium"
                   >
                     Try Again
                   </button>
@@ -255,7 +255,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
                 )
               )}
             </div>
-            <div className="p-4 bg-white flex flex-col gap-2 rounded-b-lg">
+            <div className="p-6 bg-[var(--card-bg)] flex flex-col gap-3 rounded-b-xl">
               {title && <DialogTitle>{title}</DialogTitle>}
               {description && <DialogDescription>{description}</DialogDescription>}
               {pills && pills.length > 0 && (
@@ -266,9 +266,9 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
                 </div>
               )}
               {typeof progress === "number" && (
-                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-2">
+                <div className="w-full bg-[var(--bg-neutral)] rounded-full h-2 mb-3">
                   <div
-                    className="bg-[var(--primary)] h-1.5 rounded-full transition-all"
+                    className="bg-[var(--primary)] h-2 rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -297,7 +297,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
               </div>
               {onCompleteAction && (
                 <button
-                  className="mt-2 px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
+                  className="mt-2 px-3 py-1.5 rounded-full bg-[var(--primary)] text-white text-xs hover:bg-[var(--secondary)] transition-all duration-200 font-medium shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   onClick={async () => {
                     if (onCompleteAction.action && onCompleteAction.contentId) {
                       await handleProgressUpdate(onCompleteAction.contentId, onCompleteAction.progress || { progress_percentage: 100, completed_at: new Date().toISOString() });
@@ -325,7 +325,7 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
         <div className="text-gray-700 mb-3">{message}</div>
         {onRetry && (
           <button
-            className="px-4 py-2 rounded bg-[var(--primary)] text-white text-sm hover:bg-[var(--accent)] transition font-normal"
+            className="px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-sm hover:bg-[var(--secondary)] transition-all duration-200 font-medium shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
             onClick={onRetry}
           >
             Retry
@@ -516,10 +516,10 @@ export function ComponentSchemaRenderer({ schema }: { schema: ComponentSchema })
                   key={i}
                   onClick={() => handleAction(action)}
                   className={
-                    `px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-150 ` +
+                    `px-3 py-1.5 rounded-full font-medium text-xs transition-all duration-200 shadow-sm ` +
                     (action.label.toLowerCase().includes('watch')
-                      ? 'bg-[var(--primary)] text-white hover:bg-[var(--accent)]'
-                      : 'bg-gray-900 text-white hover:bg-gray-700')
+                      ? 'bg-[var(--primary)] text-white hover:bg-[var(--secondary)] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]'
+                      : 'bg-white text-[var(--primary)] border border-[var(--primary)]/30 hover:bg-[var(--primary)] hover:text-white hover:shadow-md hover:scale-[1.02] active:scale-[0.98]')
                   }
                 >
                   {action.label}

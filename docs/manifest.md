@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/21/2025, 8:09:13 AM*
+*Generated on 6/21/2025, 8:23:56 AM*
 
 ## Overview
 
-- **Total Files**: 171
-- **Total Size**: 1.27 MB
+- **Total Files**: 173
+- **Total Size**: 1.40 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
 - **.ts**: 89 files
-- **.md**: 36 files
+- **.md**: 37 files
 - **.tsx**: 31 files
-- **.json**: 12 files
+- **.json**: 13 files
 - **.js**: 2 files
 - **.sql**: 1 files
 
 ## Most Common Tags
 
 - **TypeScript**: 120 files
-- **security**: 58 files
-- **AI agent**: 47 files
+- **security**: 60 files
+- **AI agent**: 49 files
 - **utility**: 39 files
-- **documentation**: 37 files
+- **documentation**: 39 files
 - **API**: 31 files
 - **React**: 31 files
 - **test**: 24 files
 - **Next.js API**: 22 files
-- **UI**: 16 files
+- **React hooks**: 17 files
 
 ## File Inventory
 
@@ -340,10 +340,10 @@ To run these tests:
 
 ### `apps/web/app/api/user/[user_id]/preferences/route.ts`
 
-GET /api/user/[user_id]/preferences
+User preferences API with performance optimizations and caching
 
-**Complexity**: medium • **Size**: 3.7KB
-**Tags**: `TypeScript`, `API`, `Next.js API`
+**Owner**: Backend team • **Complexity**: medium • **Size**: 3.9KB
+**Tags**: `API`, `user management`, `preferences`, `caching`, `performance`, `TypeScript`, `Next.js API`
 **Modified**: 6/21/2025
 
 
@@ -385,10 +385,10 @@ SSR Auth setup with proper session hydration
 
 ### `apps/web/app/dashboard/page.tsx`
 
-File: apps/web/app/dashboard/page.tsx
+Server-side dashboard page with SSR optimization and entitlement filtering
 
-**Complexity**: low • **Size**: 3.5KB
-**Tags**: `React`, `TypeScript`, `security`
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 3.7KB
+**Tags**: `Next.js page`, `SSR`, `entitlements`, `context management`, `performance`, `React`, `TypeScript`, `security`
 **Modified**: 6/21/2025
 
 
@@ -457,10 +457,10 @@ React Query hook for fetching user entitlements.
 
 ### `apps/web/app/hooks/useUserPreferences.ts`
 
-React Query hook for fetching user preferences.
+React Query hooks for user preferences with optimized caching
 
-**Complexity**: low • **Size**: 1.7KB
-**Tags**: `TypeScript`, `hooks`, `React Query`
+**Owner**: Frontend team • **Complexity**: low • **Size**: 1.9KB
+**Tags**: `React hooks`, `React Query`, `user preferences`, `caching`, `cross-invalidation`, `TypeScript`, `hooks`
 **Modified**: 6/21/2025
 
 
@@ -601,10 +601,10 @@ To run these tests:
 
 ### `apps/web/app/lib/apiClient/userPreferences.ts`
 
-Fetches user preferences from the API.
+API client for user preferences with caching and error handling
 
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `TypeScript`, `utility`
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.1KB
+**Tags**: `API client`, `user preferences`, `caching`, `error handling`, `TypeScript`, `utility`
 **Modified**: 6/21/2025
 
 
@@ -621,9 +621,9 @@ To run these tests:
 
 Authentication service layer - extracted from UI components
 
-**Complexity**: low • **Size**: 1.5KB
-**Tags**: `TypeScript`, `utility`
-**Modified**: 6/20/2025
+**Owner**: Backend team • **Complexity**: low • **Size**: 1.5KB
+**Tags**: `authentication`, `Supabase`, `service layer`, `session management`, `TypeScript`, `utility`
+**Modified**: 6/21/2025
 
 
 ### `apps/web/app/lib/batchService.ts`
@@ -799,10 +799,10 @@ To run these tests:
 
 ### `apps/web/app/lib/userService.ts`
 
-Service for user profile and preferences logic. All business rules and data access for users live here.
+User service layer with optimized database operations and caching
 
-**Complexity**: medium • **Size**: 6.1KB
-**Tags**: `TypeScript`, `utility`
+**Owner**: Backend team • **Complexity**: medium • **Size**: 6.3KB
+**Tags**: `service layer`, `user management`, `Supabase`, `performance optimization`, `TypeScript`, `utility`
 **Modified**: 6/21/2025
 
 
@@ -817,10 +817,10 @@ Service for user profile and preferences logic. All business rules and data acce
 
 ### `apps/web/app/login/page.tsx`
 
-Public login page (SSR-safe). Renders Supabase Auth UI and syncs tokens to cookies.
+Public login page with styled Supabase Auth UI and token synchronization
 
-**Complexity**: low • **Size**: 2.6KB
-**Tags**: `React`, `TypeScript`, `React hooks`
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.7KB
+**Tags**: `authentication`, `Supabase Auth UI`, `login`, `client component`, `React`, `TypeScript`, `React hooks`
 **Modified**: 6/21/2025
 
 
@@ -970,11 +970,11 @@ Accepts the theme object (from contextConfig.json)
 
 ### `apps/web/components/ui/ThreePanelLayout.tsx`
 
-File: components/ui/ThreePanelLayout.tsx
+Three-panel layout component with theme context and collapsible navigation
 
-**Complexity**: low • **Size**: 2.0KB
-**Tags**: `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 6/2/2025
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.3KB
+**Tags**: `UI`, `layout`, `theme`, `React`, `client component`, `TypeScript`, `React hooks`
+**Modified**: 6/21/2025
 
 
 ### `apps/web/components/ui/UserProfileModal.tsx`
@@ -997,10 +997,10 @@ Fetch user data from API
 
 ### `apps/web/hooks/useAvatar.ts`
 
-Default 5 minutes cache
+React Query hook for optimized avatar fetching with caching
 
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `TypeScript`, `hooks`, `React Query`
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.1KB
+**Tags**: `React hooks`, `React Query`, `avatar`, `performance`, `caching`, `TypeScript`, `hooks`
 **Modified**: 6/21/2025
 
 
@@ -1026,8 +1026,8 @@ Don't revalidate immediately if we have initial data
 
 Database-driven navigation hook that transforms NavOption[] to NavPanelSchema
 
-**Complexity**: medium • **Size**: 4.8KB
-**Tags**: `TypeScript`, `hooks`, `React Query`, `AI agent`, `security`
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 4.8KB
+**Tags**: `React hooks`, `navigation`, `database-driven`, `entitlements`, `React Query`, `TypeScript`, `hooks`, `AI agent`, `security`
 **Modified**: 6/21/2025
 
 
@@ -1386,7 +1386,7 @@ en.json
 
 Brief description of what this file does and why it exists
 
-**Owner**: Team or individual responsible (e.g., "Frontend team", "Backend team", "AI team") • **Size**: 2.6KB
+**Owner**: Team or individual responsible (e.g., "Frontend team", "Backend team", "AI team") • **Size**: 2.9KB
 **Tags**: `comma`, `separated`, `tags (e.g.`, `"UI`, `navigation`, `context-based")`, `documentation`, `Next.js API`, `AI agent`, `security`
 **Modified**: 6/21/2025
 
@@ -1452,6 +1452,24 @@ Brief description of what this file does and why it exists
 **Size**: 2.2KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/6/2025
+
+
+### `docs/manifest.json`
+
+Local LangGraph dev server",
+
+**Size**: 90.7KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/21/2025
+
+
+### `docs/manifest.md`
+
+Local LangGraph dev server
+
+**Size**: 33.2KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/21/2025
 
 
 ### `packages/agent-core/agents/ContentLibraryAgent.ts`

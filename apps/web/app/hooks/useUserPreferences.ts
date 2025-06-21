@@ -1,3 +1,8 @@
+// File: apps/web/app/hooks/useUserPreferences.ts
+// Purpose: React Query hooks for user preferences with optimized caching
+// Owner: Frontend team
+// Tags: React hooks, React Query, user preferences, caching, cross-invalidation
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/userPreferences';
 

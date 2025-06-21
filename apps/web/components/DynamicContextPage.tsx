@@ -12,30 +12,11 @@ import React from "react";
 // Diagnostic: Track module load
 console.log('[DynamicContextPage] Module loaded - Database-driven mode');
 
-// Basic types for agent schema (pure - no transformation logic)
+// Agent schema types - pure content_schema responses only
 interface AgentSchema {
-  type: string;
-  schema?: {
-    contextKey: string;
-    contextName: string;
-    theme: {
-      primary: string;
-      secondary: string;
-      accent: string;
-      bg_light: string;
-      bg_neutral: string;
-      text_primary: string;
-    };
-    navigation: Array<unknown>; // Let agents define structure
-    content: {
-      recommendations: Array<unknown>; // Let agents define structure
-    };
-    chat: {
-      heading: string;
-      message: string;
-    };
-  };
-  content?: unknown; // For content_schema responses
+  type: 'content_schema' | 'no_agent' | 'error';
+  content?: unknown; // ComponentSchema or simple content objects
+  message?: string; // For no_agent responses
   metadata?: {
     threadId?: string;
     runId?: string;
@@ -125,7 +106,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
         };
 
         const welcomeSchema: AgentSchema = {
-          type: 'context_schema',
+          type: 'content_schema',
           content: {
             type: 'welcome',
             title: contextNames[currentContext] || currentContext.charAt(0).toUpperCase() + currentContext.slice(1),
@@ -161,25 +142,90 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     setCurrentContext(contextKey);
   };
 
-  // 🗄️ DATABASE-DRIVEN: Navigation selection - no agent calls
+  // 🤖 AGENT-NATIVE: Navigation selection with agent invocation
   const handleNavSelect = async (navId: string) => {
     if (!session?.user?.id) {
       console.error('[DynamicContextPage] No user session for navigation');
       return;
     }
 
-    console.log('[DynamicContextPage] Database-driven navigation - showing placeholder for:', navId);
+    console.log('[DynamicContextPage] Agent-native navigation - invoking agent for:', navId);
 
-    // 🗄️ DATABASE-DRIVEN: Simple placeholder content without agent calls
-    setAgentSchema({
-      type: 'context_schema',
-      content: {
-        type: 'welcome',
-        title: 'Feature Coming Soon',
-        description: `The ${navId} feature is being prepared for you.`,
-        action: 'Check back soon!'
+    try {
+      // Call the agent content API
+      const response = await fetch('/api/agent/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: session.user.id,
+          contextKey: currentContext,
+          navOptionId: navId,
+          intent: {
+            message: `Show me content for navigation option ${navId}`
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('[DynamicContextPage] Agent API error:', errorData);
+
+        // Show error state
+        setAgentSchema({
+          type: 'error',
+          content: {
+            type: 'error',
+            title: 'Unable to Load Content',
+            description: errorData.message || 'Please try again later.',
+            action: 'Retry'
+          }
+        });
+        return;
       }
-    });
+
+      const agentResponse = await response.json();
+      console.log('[DynamicContextPage] Agent response:', agentResponse);
+
+      // Handle different response types
+      if (agentResponse.type === 'no_agent') {
+        // No agent assigned - show placeholder
+        setAgentSchema({
+          type: 'content_schema',
+          content: {
+            type: 'welcome',
+            title: 'Feature Coming Soon',
+            description: agentResponse.message || `The ${navId} feature is being prepared for you.`,
+            action: 'Check back soon!'
+          }
+        });
+      } else if (agentResponse.type === 'content_schema' || agentResponse.schema) {
+        // Agent returned content schema
+        setAgentSchema(agentResponse);
+      } else {
+        // Transform agent response to expected format
+        setAgentSchema({
+          type: 'content_schema',
+          content: agentResponse
+        });
+      }
+
+    } catch (error) {
+      console.error('[DynamicContextPage] Network error calling agent:', error);
+
+      // Show network error state
+      setAgentSchema({
+        type: 'error',
+        content: {
+          type: 'error',
+          title: 'Connection Error',
+          description: 'Unable to connect to the server. Please check your connection.',
+          action: 'Retry'
+        }
+      });
+    }
   };
 
   // Show loading state while waiting for auth or schema
@@ -187,7 +233,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderBottomColor: 'var(--primary, #667eea)' }}></div>
           <p className="text-gray-600">
             {!session ? 'Authenticating...' : 'Loading your personalized experience...'}
           </p>
@@ -206,7 +252,17 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
+                        style={{
+              background: 'var(--primary, #667eea)',
+              color: 'white'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--secondary, #764ba2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--primary, #667eea)';
+            }}
           >
             Retry
           </button>
@@ -231,27 +287,47 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
 
   // Handle different response types
   console.log('[DynamicContextPage] Checking agentSchema type:', agentSchema.type, 'has content:', !!agentSchema.content);
-  if (agentSchema.type === 'context_schema' && agentSchema.content) {
+  if ((agentSchema.type === 'content_schema' || agentSchema.type === 'error') && agentSchema.content) {
     console.log('[DynamicContextPage] Handling content_schema response');
-    console.log('[DynamicContextPage] props.initialNavOptions type:', typeof props.initialNavOptions);
-    console.log('[DynamicContextPage] props.initialNavOptions length:', Array.isArray(props.initialNavOptions) ? props.initialNavOptions.length : 'not array');
+    console.log('[DynamicContextPage] agentSchema.content:', agentSchema.content);
 
-    // 🗄️ DATABASE-DRIVEN: Simple welcome content without ComponentSchemaRenderer
-    const content = agentSchema.content as { type: string; title: string; description: string; action: string };
-    const contentComponent = content.type === 'welcome' ? (
+    // 🤖 AGENT-NATIVE: Handle ComponentSchema from agent
+    const content = agentSchema.content as ComponentSchema | { type: string; title?: string; description?: string; action?: string; message?: string };
+
+    // Check if it's a ComponentSchema (Grid, Card, etc.) or simple content
+    const isComponentSchema = content && typeof content === 'object' && 'type' in content &&
+      (content.type === 'Grid' || content.type === 'Card' || 'props' in content);
+
+    const isWelcomeContent = content && typeof content === 'object' && 'type' in content && (content.type === 'welcome' || content.type === 'error');
+
+    const contentComponent = isComponentSchema ? (
+      <div className="p-6">
+        <ComponentSchemaRenderer schema={content as ComponentSchema} />
+      </div>
+    ) : isWelcomeContent ? (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center max-w-md">
-          <div className="text-blue-500 mb-4 text-4xl">✨</div>
-          <h2 className="text-2xl font-semibold mb-4">{content.title}</h2>
-          <p className="text-gray-600 mb-6">{content.description}</p>
-          <div className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg inline-block">
-            {content.action}
+          <div className="mb-4 text-4xl" style={{ color: 'var(--primary, #667eea)' }}>✨</div>
+          <h2 className="text-2xl font-semibold mb-4">
+            {'title' in content ? content.title : 'Welcome'}
+          </h2>
+          <p className="text-gray-600 mb-6">
+            {'description' in content ? content.description : 'Loading content...'}
+          </p>
+          <div className="px-4 py-2 rounded-lg inline-block" style={{ backgroundColor: 'var(--bg-neutral, #e8f4f8)', color: 'var(--primary, #667eea)' }}>
+            {'action' in content ? content.action : 'Please wait'}
           </div>
         </div>
       </div>
     ) : (
       <div className="p-6">
-        <ComponentSchemaRenderer schema={agentSchema.content as ComponentSchema} />
+        <div className="text-center">
+          <div className="text-gray-500 mb-4">📄</div>
+          <p className="text-gray-600">
+            {typeof content === 'string' ? content :
+             (content && typeof content === 'object' && 'message' in content ? content.message : 'Content loaded successfully')}
+          </p>
+        </div>
       </div>
     );
 
@@ -278,27 +354,41 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
       );
     };
 
+            // Use the proper context-specific theme from database
+    const contextConfig = props.initialContexts?.find(ctx => ctx.context_key === currentContext) || props.initialContextConfig;
+    const defaultTheme = {
+      primary: '#667eea',
+      secondary: '#764ba2',
+      accent: '#4ecdc4',
+      bg_light: '#f8f9ff',
+      bg_neutral: '#e8f4f8',
+      text_primary: '#333333',
+      bg_gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    };
+    const theme = (contextConfig && typeof contextConfig === 'object' && 'theme' in contextConfig ? contextConfig.theme as typeof defaultTheme : null) || defaultTheme;
+
     return (
       <div style={{
-        '--primary': '#1e40af',
-        '--secondary': '#64748b',
-        '--accent': '#0ea5e9',
-        '--bg-light': '#f8fafc',
-        '--bg-neutral': '#f1f5f9',
-        '--text-primary': '#1e293b',
-        '--card-bg': '#ffffff'
+        '--primary': theme.primary,
+        '--secondary': theme.secondary,
+        '--accent': theme.accent,
+        '--bg-light': theme.bg_light,
+        '--bg-neutral': theme.bg_neutral,
+        '--text-primary': theme.text_primary,
+        '--card-bg': theme.bg_light || '#ffffff'
       } as React.CSSProperties}>
         <ThreePanelLayout
           nav={<NavComponent />}
           content={contentComponent}
           contextConfig={{
             theme: {
-              primary: '#1e40af',
-              secondary: '#64748b',
-              accent: '#0ea5e9',
-              bg_light: '#f8fafc',
-              bg_neutral: '#f1f5f9',
-              text_primary: '#1e293b'
+              primary: theme.primary,
+              secondary: theme.secondary,
+              accent: theme.accent,
+              bg_light: theme.bg_light,
+              bg_neutral: theme.bg_neutral,
+              text_primary: theme.text_primary,
+              bg_gradient: theme.bg_gradient
             }
           }}
         />
@@ -306,77 +396,30 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     );
   }
 
-  // Handle legacy schema response
-  const schema = agentSchema?.schema;
-  console.log('[DynamicContextPage] Legacy schema check - schema exists:', !!schema);
-  console.log('[DynamicContextPage] agentSchema.type:', agentSchema.type);
-  if (!schema) {
-    console.log('[DynamicContextPage] No legacy schema found - showing invalid response error');
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">⚠️</div>
-          <p>Invalid agent response - please refresh</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 🤖 AGENT-NATIVE: Pure rendering - navigation now database-driven
-
-  // Context options for context selector
-  const contextOptions = props.initialContexts?.map(ctx => ({
-    id: ctx.context_key,
-    title: ctx.display_name,
-    subtitle: ctx.description || 'AI-Powered Experience',
-    icon: 'star'
-  })) || [{
-    id: schema.contextKey,
-    title: schema.contextName,
-    subtitle: 'AI-Powered Experience',
-    icon: 'star'
-  }];
-
-  // Create nav component using database-driven approach
-  const NavComponent = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
-    return (
-      <NavPanel
-        contextKey={currentContext}
-        contextOptions={contextOptions}
-        contextValue={currentContext}
-        onContextChange={handleContextChange}
-        onNavSelect={handleNavSelect}
-        isCollapsed={isCollapsed}
-        onToggleCollapse={onToggleCollapse}
-        userId={session?.user?.id}
-      />
-    );
-  };
-
-  const navComponent = <NavComponent />;
-
-  // 🤖 AGENT-NATIVE: Pure content rendering - no frontend business logic
-  const contentComponent = (
-    <div className="p-6">
-      {schema.content.recommendations.map((rec: { type: string; [key: string]: unknown }, index: number) => {
-        // Let ComponentSchemaRenderer handle all schema types
-        return (
-          <div key={index} className="mb-8">
-            {/* @ts-expect-error - Agent-provided schema structure */}
-            <ComponentSchemaRenderer schema={rec} />
-          </div>
-        );
-      })}
-    </div>
-  );
-
+  // 🚨 SHOULD NEVER REACH HERE - All valid responses handled above
+  console.error('[DynamicContextPage] Unhandled agentSchema type:', agentSchema.type);
   return (
-    <ThreePanelLayout
-      nav={navComponent}
-      content={contentComponent}
-      contextConfig={{
-        theme: schema.theme
-      }}
-    />
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="text-red-500 mb-4">⚠️</div>
+        <p>Unhandled response type: {agentSchema.type}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            background: 'var(--primary, #667eea)',
+            color: 'white'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--secondary, #764ba2)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'var(--primary, #667eea)';
+          }}
+        >
+          Refresh
+        </button>
+      </div>
+    </div>
   );
 }

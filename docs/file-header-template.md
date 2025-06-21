@@ -20,12 +20,24 @@ import statements...
 
 ## Example Headers
 
-### React Component
+### React Component (Client)
 ```typescript
+"use client";
+
 // File: apps/web/components/ui/NavPanel.tsx
 // Purpose: Navigation panel for agent-native app, themed via contextConfig
 // Owner: Frontend team
 // Tags: UI, navigation, context-based, React
+
+import React from 'react';
+```
+
+### React Component (Server)
+```typescript
+// File: apps/web/components/ServerComponent.tsx
+// Purpose: Server-side rendered component for initial data loading
+// Owner: Frontend team
+// Tags: UI, SSR, React
 
 import React from 'react';
 ```

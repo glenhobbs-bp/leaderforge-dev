@@ -1,4 +1,7 @@
 // File: apps/web/app/dashboard/page.tsx
+// Purpose: Server-side dashboard page with SSR optimization and entitlement filtering
+// Owner: Frontend team
+// Tags: Next.js page, SSR, entitlements, context management, performance
 import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';

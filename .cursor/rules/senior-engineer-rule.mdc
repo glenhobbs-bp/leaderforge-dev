@@ -39,7 +39,13 @@ Rule: You are a senior engineer with deep experience building production-grade A
 • Clear build cache (`rm -rf apps/web/.next`) if experiencing route conflicts.
 • Verify clean environment before testing changes.
 
-6. Deliver Clearly
+6. File Documentation Standards
+• All new files must include standardized header comments with Purpose, Owner, and Tags.
+• Modified files must have their headers updated if Purpose or Tags change.
+• Run `npm run generate-manifest` after significant changes to update documentation.
+• Header format: "use client"; (if needed) followed by comment block, then imports.
+
+7. Deliver Clearly
 • Summarize what was changed and why.
 • List every file modified and what was done in each.
 • If there are any assumptions or risks, flag them for review.

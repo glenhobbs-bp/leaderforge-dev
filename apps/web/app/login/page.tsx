@@ -1,7 +1,9 @@
-// File: app/login/page.tsx
-// Purpose: Public login page (SSR-safe). Renders Supabase Auth UI and syncs tokens to cookies.
-
 'use client';
+
+// File: app/login/page.tsx
+// Purpose: Public login page with styled Supabase Auth UI and token synchronization
+// Owner: Frontend team
+// Tags: authentication, Supabase Auth UI, login, client component
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';

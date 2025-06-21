@@ -1,15 +1,31 @@
-// File: components/ui/ThreePanelLayout.tsx
 "use client";
+
+// File: components/ui/ThreePanelLayout.tsx
+// Purpose: Three-panel layout component with theme context and collapsible navigation
+// Owner: Frontend team
+// Tags: UI, layout, theme, React, client component
 
 import React, { ReactElement, useState } from "react";
 import { ThemeProvider } from "./ThemeContext";
 import AIExperience from "../ai/AIExperience";
 
+interface ContextConfig {
+  theme: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    bg_light: string;
+    bg_neutral: string;
+    text_primary: string;
+    bg_gradient: string;
+  };
+}
+
 interface ThreePanelLayoutProps {
   nav: ReactElement;
   content: React.ReactNode;
   chat?: React.ReactNode;
-  contextConfig: any;
+  contextConfig: ContextConfig;
 }
 
 export default function ThreePanelLayout({
@@ -31,6 +47,7 @@ export default function ThreePanelLayout({
             "--bg-neutral": contextConfig.theme.bg_neutral,
             "--text-primary": contextConfig.theme.text_primary,
             "--bg-gradient": contextConfig.theme.bg_gradient,
+            "--card-bg": contextConfig.theme.bg_light, // Use bg_light for card backgrounds
             background: "var(--bg-light)",
           } as React.CSSProperties
         }

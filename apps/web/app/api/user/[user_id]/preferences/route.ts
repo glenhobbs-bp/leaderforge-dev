@@ -1,3 +1,8 @@
+// File: apps/web/app/api/user/[user_id]/preferences/route.ts
+// Purpose: User preferences API with performance optimizations and caching
+// Owner: Backend team
+// Tags: API, user management, preferences, caching, performance
+
 import { NextRequest, NextResponse } from 'next/server';
 import { userService } from '../../../../lib/userService';
 

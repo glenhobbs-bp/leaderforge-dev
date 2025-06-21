@@ -1,3 +1,8 @@
+// File: apps/web/hooks/useAvatar.ts
+// Purpose: React Query hook for optimized avatar fetching with caching
+// Owner: Frontend team
+// Tags: React hooks, React Query, avatar, performance, caching
+
 import { useQuery, QueryClient } from '@tanstack/react-query';
 
 interface UseAvatarOptions {

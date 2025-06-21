@@ -1,6 +1,7 @@
 // File: apps/web/app/lib/authService.ts
 // Purpose: Authentication service layer - extracted from UI components
-// Handles sign out and session management according to architecture principles
+// Owner: Backend team
+// Tags: authentication, Supabase, service layer, session management
 
 import { SupabaseClient } from '@supabase/supabase-js';
 
