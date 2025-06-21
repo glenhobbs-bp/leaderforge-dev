@@ -202,6 +202,22 @@ export const userService = {
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
+    // SSR Auth: extract tokens from cookies and set session
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    } else {
+      console.error('[userService] Missing access or refresh token in cookies');
+      throw new Error('Authentication required');
+    }
+
     // Get current preferences
     const user = await this.getUser(userId);
     const currentPrefs = user?.preferences || {};
@@ -233,6 +249,22 @@ export const userService = {
   async updateVideoProgress(userId: string, contentId: string, progress: Partial<VideoProgress>): Promise<void> {
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
+
+    // SSR Auth: extract tokens from cookies and set session
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    } else {
+      console.error('[userService] Missing access or refresh token in cookies');
+      throw new Error('Authentication required');
+    }
 
     // Get current preferences
     const user = await this.getUser(userId);

@@ -8,11 +8,12 @@ import { userService } from '../../../../lib/userService';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { user_id: string } }
+  { params }: { params: Promise<{ user_id: string }> }
 ) {
   try {
     const { contextKey, navOptionId } = await request.json();
-    const userId = params.user_id;
+    const resolvedParams = await params;
+    const userId = resolvedParams.user_id;
 
     if (!userId || !contextKey || !navOptionId) {
       return NextResponse.json(
