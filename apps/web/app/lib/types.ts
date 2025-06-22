@@ -84,7 +84,14 @@ export interface User {
 }
 
 export interface UserPreferences {
-  // Navigation state
+  // Navigation state - FIX: Match field names used in userService
+  navigationState?: {
+    lastContext?: string;      // Changed from lastContextKey
+    lastNavOption?: string;    // Changed from lastNavOptionId
+    lastUpdated?: string;      // Added to match userService
+  };
+
+  // Legacy navigation field (deprecated, kept for backwards compatibility)
   navigation?: {
     lastContextKey?: string;
     lastNavOptionId?: string;

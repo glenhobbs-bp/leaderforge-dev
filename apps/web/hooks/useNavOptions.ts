@@ -16,15 +16,22 @@ async function fetchWithCredentials(url: string) {
   return data;
 }
 
-export function useNavOptions(contextKey: string, initialData?: any) {
+export function useNavOptions(contextKey: string, initialData?: unknown) {
   const shouldFetch = !!contextKey;
   const { data, error, isLoading } = useSWR(
     shouldFetch ? `/api/nav/${contextKey}` : null,
     fetchWithCredentials,
     {
       fallbackData: initialData,
-      // Don't revalidate immediately if we have initial data
+      // Aggressive caching for performance
       revalidateOnMount: !initialData,
+      revalidateOnFocus: false, // Don't refetch on window focus
+      revalidateOnReconnect: false, // Don't refetch on reconnect
+      dedupingInterval: 10 * 60 * 1000, // 10 minutes deduping
+      focusThrottleInterval: 5 * 60 * 1000, // 5 minutes focus throttle
+      // Cache for 10 minutes
+      errorRetryInterval: 30 * 1000, // 30 seconds retry on error
+      errorRetryCount: 2, // Only retry twice
     }
   );
 

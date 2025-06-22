@@ -36,10 +36,10 @@ export async function GET(
       preferences: user.preferences || {}
     });
 
-    // Add caching headers for performance (5 minutes cache)
-    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
-    response.headers.set('CDN-Cache-Control', 'public, max-age=300');
-    response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=300');
+    // Add caching headers for performance (30 seconds cache to avoid navigation state staleness)
+    response.headers.set('Cache-Control', 'public, max-age=30, s-maxage=30');
+    response.headers.set('CDN-Cache-Control', 'public, max-age=30');
+    response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=30');
 
     return response;
   } catch (error) {

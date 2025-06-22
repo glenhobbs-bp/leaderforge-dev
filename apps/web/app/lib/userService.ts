@@ -7,6 +7,36 @@ import { createSupabaseServerClient } from './supabaseServerClient';
 import { cookies } from 'next/headers';
 import type { User, VideoProgress } from './types';
 
+// Optimized session setup helper
+async function getAuthenticatedSupabase() {
+  const cookieStore = await cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
+
+  // Try to get session directly first
+  let session = (await supabase.auth.getSession()).data.session;
+
+  // If no session, try manual hydration once
+  if (!session?.user?.id) {
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      session = (await supabase.auth.getSession()).data.session;
+    }
+  }
+
+  if (!session?.user?.id) {
+    throw new Error('Authentication required');
+  }
+
+  return { supabase, session };
+}
+
 /**
  * Service for user profile and preferences logic. All business rules and data access for users live here.
  * Optimized for performance with minimal logging.
@@ -16,36 +46,26 @@ export const userService = {
    * Get a single user by ID.
    */
   async getUser(userId: string): Promise<User | null> {
-    const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    try {
+      const { supabase } = await getAuthenticatedSupabase();
 
-    // SSR Auth: extract tokens from cookies and set session (same pattern as nav API)
-    const allCookies = cookieStore.getAll();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+      const { data, error } = await supabase
+        .schema('core')
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
-    if (accessToken && refreshToken) {
-      await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-    } else {
-      console.error('[userService] Missing access or refresh token in cookies');
-      throw new Error('Authentication required');
-    }
+      if (error) {
+        console.error(`[userService] Error fetching user:`, error);
+        throw error;
+      }
 
-    const { data, error } = await supabase
-      .schema('core')
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    if (error) {
-      console.error(`[userService] Error fetching user:`, error);
+      return data as User || null;
+    } catch (error) {
+      console.error(`[userService] getUser failed:`, error);
       throw error;
     }
-    return data as User || null;
   },
 
   /**
@@ -110,42 +130,30 @@ export const userService = {
    * Update user profile information (first_name, last_name, full_name, etc.)
    */
   async updateUserProfile(userId: string, profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>): Promise<User | null> {
-    const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    try {
+      const { supabase } = await getAuthenticatedSupabase();
 
-    // SSR Auth: extract tokens from cookies and set session
-    const allCookies = cookieStore.getAll();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+      const { data, error } = await supabase
+        .schema('core')
+        .from('users')
+        .update({
+          ...profile,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId)
+        .select()
+        .single();
 
-    if (accessToken && refreshToken) {
-      await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-    } else {
-      console.error('[userService] Missing access or refresh token in cookies');
-      throw new Error('Authentication required');
-    }
+      if (error) {
+        console.error(`[userService] Error updating user profile:`, error);
+        throw error;
+      }
 
-    const { data, error } = await supabase
-      .schema('core')
-      .from('users')
-      .update({
-        ...profile,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error(`[userService] Error updating user profile:`, error);
+      return data as User || null;
+    } catch (error) {
+      console.error(`[userService] updateUserProfile failed:`, error);
       throw error;
     }
-
-    return data as User || null;
   },
 
   /**
@@ -199,47 +207,36 @@ export const userService = {
    * Update user navigation state (optimized for frequent updates)
    */
   async updateNavigationState(userId: string, contextKey: string, navOptionId: string): Promise<void> {
-    const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    try {
+      const { supabase } = await getAuthenticatedSupabase();
 
-    // SSR Auth: extract tokens from cookies and set session
-    const allCookies = cookieStore.getAll();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+      // Update user preferences with navigation state
+      const user = await this.getUser(userId);
+      const currentPrefs = user?.preferences || {};
 
-    if (accessToken && refreshToken) {
-      await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-    } else {
-      console.error('[userService] Missing access or refresh token in cookies');
-      throw new Error('Authentication required');
-    }
+      const updatedPrefs = {
+        ...currentPrefs,
+        navigationState: {
+          ...currentPrefs.navigationState,
+          lastContext: contextKey,
+          lastNavOption: navOptionId,
+          lastUpdated: new Date().toISOString()
+        }
+      };
 
-    // Get current preferences
-    const user = await this.getUser(userId);
-    const currentPrefs = user?.preferences || {};
+      const { error } = await supabase
+        .schema('core')
+        .from('users')
+        .update({ preferences: updatedPrefs })
+        .eq('id', userId);
 
-    const updatedPrefs = {
-      ...currentPrefs,
-      navigation: {
-        lastContextKey: contextKey,
-        lastNavOptionId: navOptionId,
-        lastVisitedAt: new Date().toISOString()
+      if (error) {
+        console.warn(`[userService] Navigation state update failed: ${error.message}`);
+        // Don't throw - this is not critical
       }
-    };
-
-    const { error } = await supabase
-      .schema('core')
-      .from('users')
-      .update({ preferences: updatedPrefs })
-      .eq('id', userId);
-
-    if (error) {
-      console.error(`[userService] Error updating navigation state:`, error);
-      throw error;
+    } catch (error) {
+      console.warn('[userService] Navigation state update error:', error);
+      // Don't throw - this is not critical for user experience
     }
   },
 
@@ -247,53 +244,41 @@ export const userService = {
    * Update video progress (optimized for frequent updates)
    */
   async updateVideoProgress(userId: string, contentId: string, progress: Partial<VideoProgress>): Promise<void> {
-    const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    try {
+      const { supabase } = await getAuthenticatedSupabase();
 
-    // SSR Auth: extract tokens from cookies and set session
-    const allCookies = cookieStore.getAll();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+      // Get current preferences
+      const user = await this.getUser(userId);
+      const currentPrefs = user?.preferences || {};
+      const currentVideoProgress = currentPrefs.videoProgress || {};
 
-    if (accessToken && refreshToken) {
-      await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-    } else {
-      console.error('[userService] Missing access or refresh token in cookies');
-      throw new Error('Authentication required');
-    }
+      const updatedProgress = {
+        ...currentVideoProgress[contentId],
+        ...progress,
+        contentId,
+        lastWatchedAt: new Date().toISOString()
+      };
 
-    // Get current preferences
-    const user = await this.getUser(userId);
-    const currentPrefs = user?.preferences || {};
-    const currentVideoProgress = currentPrefs.videoProgress || {};
+      const updatedPrefs = {
+        ...currentPrefs,
+        videoProgress: {
+          ...currentVideoProgress,
+          [contentId]: updatedProgress
+        }
+      };
 
-    const updatedProgress = {
-      ...currentVideoProgress[contentId],
-      ...progress,
-      contentId,
-      lastWatchedAt: new Date().toISOString()
-    };
+      const { error } = await supabase
+        .schema('core')
+        .from('users')
+        .update({ preferences: updatedPrefs })
+        .eq('id', userId);
 
-    const updatedPrefs = {
-      ...currentPrefs,
-      videoProgress: {
-        ...currentVideoProgress,
-        [contentId]: updatedProgress
+      if (error) {
+        console.error(`[userService] Error updating video progress:`, error);
+        throw error;
       }
-    };
-
-    const { error } = await supabase
-      .schema('core')
-      .from('users')
-      .update({ preferences: updatedPrefs })
-      .eq('id', userId);
-
-    if (error) {
-      console.error(`[userService] Error updating video progress:`, error);
+    } catch (error) {
+      console.error(`[userService] updateVideoProgress failed:`, error);
       throw error;
     }
   }

@@ -16,11 +16,11 @@ export function useUserPreferences(userId: string) {
     queryKey: ['user-preferences', userId],
     queryFn: () => fetchUserPreferences(userId),
     enabled: !!userId,
-    // Optimize caching similar to avatar hook
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 15 * 60 * 1000, // 15 minutes
+    // Reduce stale time to prevent navigation state staleness
+    staleTime: 30 * 1000, // 30 seconds (matches API cache)
+    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
     retry: 1, // Reduce retries for faster fallback
-    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnWindowFocus: true, // Refetch on window focus to get latest navigation state
     refetchOnReconnect: false, // Don't refetch on reconnect
     networkMode: 'offlineFirst', // Support offline-first
   });

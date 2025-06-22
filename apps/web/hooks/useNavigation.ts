@@ -28,7 +28,7 @@ interface NavigationSection {
 export function useNavigation(contextKey: string, userId?: string) {
   const { navOptions, loading, error } = useNavOptions(contextKey);
 
-  // Fetch user data for personalized greeting
+  // Fetch user data for personalized greeting (with optimized caching)
   const { data: userData } = useQuery({
     queryKey: ['userData', userId],
     queryFn: async () => {
@@ -38,7 +38,11 @@ export function useNavigation(contextKey: string, userId?: string) {
       return response.json();
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 15 * 60 * 1000, // Cache for 15 minutes
+    gcTime: 60 * 60 * 1000, // Keep in cache for 1 hour
+    retry: 1, // Reduce retries
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const navSchema: NavPanelSchema | null = useMemo(() => {
@@ -93,15 +97,31 @@ export function useNavigation(contextKey: string, userId?: string) {
         return a.label.localeCompare(b.label);
       });
 
-      return {
-        title: sectionTitle === 'default' ? null : sectionTitle,
-        items: sortedOptions.map((option) => ({
-          id: option.id, // Use database ID, not nav_key
+      const sectionItems = sortedOptions.map((option) => {
+        const itemId = option.nav_key || option.id;
+
+        // Debug: Log ID mapping for troubleshooting
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[useNavigation] ID mapping:', {
+            label: option.label,
+            nav_key: option.nav_key,
+            database_id: option.id,
+            final_id: itemId
+          });
+        }
+
+        return {
+          id: itemId, // FIX: Use nav_key to match agent API, fallback to database ID
           label: option.label,
           icon: option.icon,
           href: option.href,
           description: typeof option.description === 'string' ? option.description : undefined,
-        }))
+        };
+      });
+
+      return {
+        title: sectionTitle === 'default' ? null : sectionTitle,
+        items: sectionItems
       };
     });
 
@@ -116,9 +136,9 @@ export function useNavigation(contextKey: string, userId?: string) {
       }]
     });
 
-    // Create personalized greeting
+    // Create personalized greeting with fallback
     const firstName = userData?.user?.first_name;
-    const greeting = firstName ? `Welcome ${firstName}` : "Welcome back";
+    const greeting = firstName ? `Welcome ${firstName}` : "Welcome";
 
     return {
       type: "NavPanel" as const,
@@ -152,7 +172,7 @@ export function useNavigation(contextKey: string, userId?: string) {
  */
 export function transformNavOption(option: NavOption) {
   return {
-    id: option.id, // Use database ID, not nav_key
+    id: option.nav_key || option.id, // FIX: Use nav_key to match agent API, fallback to database ID
     label: option.label,
     icon: option.icon,
     href: option.href,

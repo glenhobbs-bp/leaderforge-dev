@@ -77,6 +77,7 @@ interface NavPanelProps {
   isCollapsed?: boolean;
   onToggleCollapse?: () => void;
   userId?: string | null;
+  selectedNavOptionId?: string | null;
 }
 
 export default function NavPanel({
@@ -88,12 +89,14 @@ export default function NavPanel({
   isCollapsed = false,
   onToggleCollapse,
   userId,
+  selectedNavOptionId,
 }: NavPanelProps) {
   if (process.env.NODE_ENV === 'development') {
     console.log('[NavPanel] RENDER - Database-driven with contextKey:', contextKey);
   }
 
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false); // Track user interaction
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const { supabase } = useSupabase();
 
@@ -103,7 +106,7 @@ export default function NavPanel({
   // Avatar fetching with React Query
   const { data: avatarUrl = "/icons/default-avatar.svg" } = useAvatar(userId);
 
-  // Navigation state persistence
+  // Navigation state persistence (temporarily disabled for performance)
   const {
     lastNavOptionId,
     updateNavigationState
@@ -111,6 +114,8 @@ export default function NavPanel({
     userId: userId || '',
     contextKey
   });
+
+  // Navigation state persistence restored with optimizations
 
   // Listen for avatar update events and refetch when needed
   useEffect(() => {
@@ -145,27 +150,63 @@ export default function NavPanel({
     if (process.env.NODE_ENV === 'development') {
       console.log('[NavPanel] contextValue changed:', contextValue);
     }
+    // Reset user interaction flag when context changes to allow restoration
+    setHasUserInteracted(false);
+    setSelectedNav(null); // Clear selection for new context
   }, [contextValue]);
 
-  // Initialize selected nav from persisted state
+  // Initialize selected nav from persisted state only on first load and if user hasn't interacted
   useEffect(() => {
-    if (lastNavOptionId && !selectedNav) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] Navigation state restoration check:', {
+        lastNavOptionId,
+        selectedNav,
+        hasUserInteracted,
+        contextKey,
+        shouldRestore: lastNavOptionId && !selectedNav && !hasUserInteracted
+      });
+    }
+
+    if (lastNavOptionId && !selectedNav && !hasUserInteracted) {
       setSelectedNav(lastNavOptionId);
       if (process.env.NODE_ENV === 'development') {
         console.log('[NavPanel] Restored navigation state:', lastNavOptionId);
       }
     }
-  }, [lastNavOptionId, selectedNav]);
+  }, [lastNavOptionId, hasUserInteracted, contextKey]); // Track user interaction to prevent override
+
+  // Update selected nav when selectedNavOptionId prop changes (from parent component)
+  useEffect(() => {
+    if (selectedNavOptionId && selectedNavOptionId !== selectedNav) {
+      setSelectedNav(selectedNavOptionId);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[NavPanel] Updated selected nav from prop:', selectedNavOptionId);
+      }
+    }
+  }, [selectedNavOptionId, selectedNav]);
 
   const handleNavClick = (navOptionId: string) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] handleNavClick:', navOptionId);
+      console.log('[NavPanel] handleNavClick:', {
+        navOptionId,
+        contextKey,
+        userId,
+        previousSelection: selectedNav
+      });
     }
+
+    // Mark that user has interacted to prevent restoration override
+    setHasUserInteracted(true);
+
+    // Always update local state immediately for responsive UI
     setSelectedNav(navOptionId);
 
-    // Persist navigation state
-    if (userId) {
+    // Persist navigation state (async, non-blocking)
+    if (userId && contextKey) {
       updateNavigationState(navOptionId);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[NavPanel] Persisting navigation state:', { contextKey, navOptionId });
+      }
     }
 
     if (onNavSelect) {
@@ -249,6 +290,17 @@ export default function NavPanel({
   const mainSections = navSchema.props.sections.filter(
     (s) => !s.items.some((i) => i.position === "bottom")
   );
+
+  // Debug: Log navigation items and current selection
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[NavPanel] Rendering navigation items:', {
+      contextKey,
+      selectedNav,
+      lastNavOptionId,
+      allItems: mainSections.flatMap(s => s.items.map(i => ({ id: i.id, label: i.label }))),
+      sectionsCount: mainSections.length
+    });
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] my-4">

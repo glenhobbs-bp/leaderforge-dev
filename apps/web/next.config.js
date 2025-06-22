@@ -16,6 +16,10 @@ const nextConfig = {
       "@lib": path.resolve(__dirname, "lib"),              // For @lib/loadContextConfig
       "@components": path.resolve(__dirname, "components") // For @components/ui/...
     };
+
+    // Temporarily remove complex bundle splitting to fix vendors.js syntax error
+    // TODO: Re-enable optimized splitting once syntax error is resolved
+
     return config;
   },
   async rewrites() {

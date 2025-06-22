@@ -13,18 +13,12 @@ export default function QueryClientProvider({ children }: QueryClientProviderPro
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minute
-            gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
-            retry: (failureCount, error) => {
-              // Don't retry on 4xx errors except 408, 429
-              if (error && typeof error === 'object' && 'status' in error) {
-                const status = (error as any).status;
-                if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
-                  return false;
-                }
-              }
-              return failureCount < 3;
-            },
+            staleTime: 5 * 60 * 1000, // 5 minutes - more aggressive caching
+            gcTime: 30 * 60 * 1000, // 30 minutes - keep data longer
+            refetchOnWindowFocus: false, // Don't refetch on focus
+            refetchOnReconnect: false, // Don't refetch on reconnect
+            retry: 1, // Reduce retries for faster failures
+            retryDelay: 1000, // Fixed 1 second delay
           },
           mutations: {
             retry: false,

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
 
+// Simple in-memory cache for avatar URLs
+const avatarCache = new Map<string, { url: string; timestamp: number }>();
+const AVATAR_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get('userId');
@@ -10,39 +14,41 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
   }
 
+  // Check cache first
+  const cached = avatarCache.get(userId);
+  if (cached && Date.now() - cached.timestamp < AVATAR_CACHE_DURATION) {
+    return NextResponse.json({ url: cached.url }, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, max-age=1800, stale-while-revalidate=3600',
+        'X-Cache': 'HIT',
+      }
+    });
+  }
+
   try {
-    // SSR Auth setup with proper session hydration
     const cookieStore = await nextCookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
-    // Get auth tokens from cookies for session hydration
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+    // Simplified auth: try session first, then hydrate if needed
+    let session = (await supabase.auth.getSession()).data.session;
 
-    // Hydrate session if tokens exist
-    if (accessToken && refreshToken) {
-      const { error: setSessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+    if (!session?.user?.id) {
+      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+      const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
+      const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
 
-      if (setSessionError) {
-        console.warn('[AVATAR API] Session hydration failed:', setSessionError.message);
-        return NextResponse.json({ error: 'Session expired' }, { status: 401 });
+      if (accessToken && refreshToken) {
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+        session = (await supabase.auth.getSession()).data.session;
       }
     }
 
-    // Check session after hydration
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user?.id) {
-      console.warn('[AVATAR API] No session after hydration');
+    if (!session?.user?.id || session.user.id !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Security check
-    if (session.user.id !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Fetch user avatar from database
@@ -68,9 +74,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ url: '/icons/default-avatar.svg' }, { status: 200 });
     }
 
-    // Add cache headers for performance
+    // Cache the result
+    avatarCache.set(userId, { url: data.signedUrl, timestamp: Date.now() });
+
+    // Add aggressive cache headers for performance
     const response = NextResponse.json({ url: data.signedUrl }, { status: 200 });
-    response.headers.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60'); // 5min cache
+    response.headers.set('Cache-Control', 'public, max-age=1800, stale-while-revalidate=3600'); // 30min cache
+    response.headers.set('X-Cache', 'MISS');
     return response;
 
   } catch (error) {

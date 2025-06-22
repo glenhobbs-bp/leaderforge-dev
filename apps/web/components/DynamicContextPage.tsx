@@ -8,6 +8,9 @@ import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
 import { ComponentSchema } from "../../../packages/agent-core/types/ComponentSchema";
 import { useSupabase } from './SupabaseProvider';
 import React from "react";
+import { useUserPreferences } from '../app/hooks/useUserPreferences';
+import { useQueryClient } from '@tanstack/react-query';
+import type { UserPreferences } from '../app/lib/types';
 
 // Diagnostic: Track module load
 console.log('[DynamicContextPage] Module loaded - Database-driven mode');
@@ -41,21 +44,100 @@ type DynamicContextPageProps = {
 export default function DynamicContextPage(props: DynamicContextPageProps) {
   console.log('[DynamicContextPage] RENDER - Database-driven', props);
 
-  // Core state
-  const hasMounted = useRef(false);
-  const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentContext, setCurrentContext] = useState(props.defaultContextKey || 'brilliant');
-
-  // Navigation is now handled directly by NavPanel component
-
   // Auth context
   const { session, loading: authLoading } = useSupabase();
 
-  // Navigation loading is now handled directly by NavPanel component
+  // React Query client for cache invalidation
+  const queryClient = useQueryClient();
 
-  // Navigation loading is now handled by NavPanel internally
+  // Get user preferences for context restoration
+  const { data: userPrefs } = useUserPreferences(session?.user?.id || '');
+
+  // Core state
+  const hasMounted = useRef(false);
+  const [hasRestoredContext, setHasRestoredContext] = useState(false);
+  const [currentContext, setCurrentContext] = useState<string>(
+    props.defaultContextKey || props.initialContexts?.[0]?.context_key || 'brilliant'
+  );
+  const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [contentLoading, setContentLoading] = useState(false); // New loading state for content
+  const [error, setError] = useState<string | null>(null);
+  const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
+
+  // Navigation is now handled directly by NavPanel component
+
+    // Context restoration effect - restore last visited context
+  useEffect(() => {
+    if (!session?.user?.id || !userPrefs || hasRestoredContext) return;
+
+    const preferences = userPrefs.preferences as UserPreferences;
+    const navigationState = preferences?.navigationState;
+    const lastContext = navigationState?.lastContext;
+
+    console.log('[DynamicContextPage] Context restoration:', {
+      lastContext,
+      currentContext,
+      hasRestoredContext
+    });
+
+    // Restore context if different
+    if (lastContext && lastContext !== currentContext) {
+      console.log('[DynamicContextPage] Restoring last context:', lastContext);
+      setCurrentContext(lastContext);
+    }
+
+    setHasRestoredContext(true);
+  }, [session?.user?.id, userPrefs, hasRestoredContext, currentContext]);
+
+  // Navigation option restoration effect - runs after context is restored
+  useEffect(() => {
+    console.log('[DynamicContextPage] 🔄 Navigation restoration effect triggered:', {
+      hasSession: !!session?.user?.id,
+      hasUserPrefs: !!userPrefs,
+      hasRestoredContext,
+      currentContext
+    });
+
+    if (!session?.user?.id || !userPrefs || !hasRestoredContext) return;
+
+    const preferences = userPrefs.preferences as UserPreferences;
+    const navigationState = preferences?.navigationState;
+    const lastContext = navigationState?.lastContext;
+    const lastNavOption = navigationState?.lastNavOption;
+
+    console.log('[DynamicContextPage] 📊 Navigation restoration data:', {
+      navigationState,
+      lastContext,
+      lastNavOption,
+      currentContext,
+      shouldRestore: lastNavOption && lastContext === currentContext
+    });
+
+    // Only restore navigation option if we're in the correct context and have a saved option
+    if (lastNavOption && lastContext === currentContext) {
+      console.log('[DynamicContextPage] ✅ RESTORING navigation state:', {
+        lastNavOption,
+        lastContext,
+        currentContext,
+        timestamp: navigationState?.lastUpdated
+      });
+      setSelectedNavOptionId(lastNavOption);
+
+      // Trigger content loading for the restored navigation option
+      setTimeout(() => {
+        console.log('[DynamicContextPage] ⏳ Triggering content load for restored nav option:', lastNavOption);
+        loadContentForNavOption(lastNavOption, false); // Don't update selection since it's already set
+      }, 200); // Small delay to ensure context is fully set
+    } else {
+      console.log('[DynamicContextPage] ❌ NOT restoring navigation state:', {
+        hasLastNavOption: !!lastNavOption,
+        lastContext,
+        currentContext,
+        contextMatch: lastContext === currentContext
+      });
+    }
+  }, [session?.user?.id, userPrefs, hasRestoredContext, currentContext]);
 
   // Debug session state
   useEffect(() => {
@@ -134,22 +216,52 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     fetchAgentSchema();
   }, [session?.user?.id, currentContext, authLoading]);
 
-  // Handle context change
+  // Handle context change - also persist the change
   const handleContextChange = (contextKey: string) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('[DynamicContextPage] Context changed to:', contextKey);
     }
     setCurrentContext(contextKey);
+
+    // Clear selected navigation when context changes
+    setSelectedNavOptionId(null);
+
+    // Persist context change to user preferences
+    if (session?.user?.id) {
+      fetch(`/api/user/${session.user.id}/navigation-state`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contextKey,
+          navOptionId: null // Clear nav selection when changing context
+        })
+      }).catch(error => {
+        console.warn('[DynamicContextPage] Failed to persist context change:', error);
+      });
+    }
   };
 
-  // 🤖 AGENT-NATIVE: Navigation selection with agent invocation
-  const handleNavSelect = async (navId: string) => {
+  // Helper function to load content for a navigation option
+  const loadContentForNavOption = async (navId: string, updateSelection: boolean = true) => {
     if (!session?.user?.id) {
       console.error('[DynamicContextPage] No user session for navigation');
       return;
     }
 
-    console.log('[DynamicContextPage] Agent-native navigation - invoking agent for:', navId);
+    console.log('[DynamicContextPage] 🚀 LOADING content for navigation option:', {
+      navId,
+      updateSelection,
+      currentContext,
+      userId: session.user.id
+    });
+
+    // Update selected navigation option if requested
+    if (updateSelection) {
+      setSelectedNavOptionId(navId);
+    }
+
+    // Show loading state while fetching content
+    setContentLoading(true);
 
     try {
       // Call the agent content API
@@ -173,6 +285,9 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
         const errorData = await response.json();
         console.error('[DynamicContextPage] Agent API error:', errorData);
 
+        // Clear loading state
+        setContentLoading(false);
+
         // Show error state
         setAgentSchema({
           type: 'error',
@@ -188,6 +303,9 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
 
       const agentResponse = await response.json();
       console.log('[DynamicContextPage] Agent response:', agentResponse);
+
+      // Clear loading state
+      setContentLoading(false);
 
       // Handle different response types
       if (agentResponse.type === 'no_agent') {
@@ -205,15 +323,39 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
         // Agent returned content schema
         setAgentSchema(agentResponse);
       } else {
-        // Transform agent response to expected format
-        setAgentSchema({
-          type: 'content_schema',
-          content: agentResponse
-        });
-      }
+              // Transform agent response to expected format
+      setAgentSchema({
+        type: 'content_schema',
+        content: agentResponse
+      });
+    }
 
-    } catch (error) {
+    // Persist navigation state to database (always persist when content loads successfully)
+    if (session?.user?.id) {
+      try {
+        await fetch(`/api/user/${session.user.id}/navigation-state`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contextKey: currentContext,
+            navOptionId: navId
+          })
+        });
+        console.log('[DynamicContextPage] ✅ Navigation state persisted:', { contextKey: currentContext, navOptionId: navId });
+
+        // Invalidate user preferences cache to ensure fresh data on next load
+        queryClient.invalidateQueries({ queryKey: ['user-preferences', session.user.id] });
+        console.log('[DynamicContextPage] 🔄 User preferences cache invalidated');
+      } catch (error) {
+        console.warn('[DynamicContextPage] ⚠️ Failed to persist navigation state:', error);
+      }
+    }
+
+  } catch (error) {
       console.error('[DynamicContextPage] Network error calling agent:', error);
+
+      // Clear loading state
+      setContentLoading(false);
 
       // Show network error state
       setAgentSchema({
@@ -228,15 +370,35 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     }
   };
 
+  // 🤖 AGENT-NATIVE: Navigation selection with agent invocation
+  const handleNavSelect = async (navId: string) => {
+    // Update selection and load content
+    setSelectedNavOptionId(navId);
+    await loadContentForNavOption(navId, false); // Don't update selection again
+  };
+
   // Show loading state while waiting for auth or schema
   if (!session || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderBottomColor: 'var(--primary, #667eea)' }}></div>
-          <p className="text-gray-600">
-            {!session ? 'Authenticating...' : 'Loading your personalized experience...'}
-          </p>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          </div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
+            <p className="text-sm font-medium text-gray-800 mb-2">
+              {!session ? 'Authenticating...' : 'Loading Experience'}
+            </p>
+            <p className="text-xs text-gray-600 text-center">
+              {!session ? 'Verifying your credentials...' : 'Setting up your personalized experience...'}
+            </p>
+            <div className="mt-4 flex space-x-1">
+              <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -245,27 +407,22 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   // Show error state - no fallback schema
   if (error && !agentSchema) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center max-w-md">
-          <div className="text-red-500 mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold mb-2">Agent Unavailable</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                        style={{
-              background: 'var(--primary, #667eea)',
-              color: 'white'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--secondary, #764ba2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--primary, #667eea)';
-            }}
-          >
-            Retry
-          </button>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          </div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="text-red-500 mb-4 text-2xl">⚠️</div>
+            <p className="text-sm font-medium text-gray-800 mb-2">Response Error</p>
+            <p className="text-xs text-gray-600 text-center mb-6">Invalid agent response - please refresh</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-[#3E5E17] text-white text-sm rounded-xl hover:bg-[#2d4511] transition-colors"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -276,23 +433,60 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     console.log('[DynamicContextPage] No agentSchema found - showing invalid response error');
     console.log('[DynamicContextPage] Current state:', { agentSchema, loading, error, authLoading });
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">⚠️</div>
-          <p>Invalid agent response - please refresh</p>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          </div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="text-red-500 mb-4 text-2xl">⚠️</div>
+            <p className="text-sm font-medium text-gray-800 mb-2">Response Error</p>
+            <p className="text-xs text-gray-600 text-center mb-6">Invalid agent response - please refresh</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-[#3E5E17] text-white text-sm rounded-xl hover:bg-[#2d4511] transition-colors"
+            >
+              Refresh
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Handle different response types
-  console.log('[DynamicContextPage] Checking agentSchema type:', agentSchema.type, 'has content:', !!agentSchema.content);
-  if ((agentSchema.type === 'content_schema' || agentSchema.type === 'error') && agentSchema.content) {
-    console.log('[DynamicContextPage] Handling content_schema response');
-    console.log('[DynamicContextPage] agentSchema.content:', agentSchema.content);
+  // Create loading content component for content panel
+  const createLoadingContent = () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+        </div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
+          <p className="text-sm font-medium text-gray-800 mb-2">Loading Content</p>
+          <p className="text-xs text-gray-600 text-center">
+            Just a moment while we fetch your content...
+          </p>
+          <div className="mt-4 flex space-x-1">
+            <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Handle different response types OR show loading content with navigation
+  console.log('[DynamicContextPage] Checking agentSchema type:', agentSchema?.type, 'has content:', !!agentSchema?.content, 'contentLoading:', contentLoading);
+
+  // If we're loading content or have content, show the layout with navigation
+  if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error') && agentSchema.content)) {
+    console.log('[DynamicContextPage] Handling content_schema response or loading state');
+    console.log('[DynamicContextPage] agentSchema.content:', agentSchema?.content);
 
     // 🤖 AGENT-NATIVE: Handle ComponentSchema from agent
-    const content = agentSchema.content as ComponentSchema | { type: string; title?: string; description?: string; action?: string; message?: string };
+    const content = agentSchema?.content as ComponentSchema | { type: string; title?: string; description?: string; action?: string; message?: string } | undefined;
 
     // Check if it's a ComponentSchema (Grid, Card, etc.) or simple content
     const isComponentSchema = content && typeof content === 'object' && 'type' in content &&
@@ -300,35 +494,38 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
 
     const isWelcomeContent = content && typeof content === 'object' && 'type' in content && (content.type === 'welcome' || content.type === 'error');
 
-    const contentComponent = isComponentSchema ? (
-      <div className="p-6">
-        <ComponentSchemaRenderer schema={content as ComponentSchema} />
-      </div>
-    ) : isWelcomeContent ? (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center max-w-md">
-          <div className="mb-4 text-4xl" style={{ color: 'var(--primary, #667eea)' }}>✨</div>
-          <h2 className="text-2xl font-semibold mb-4">
-            {'title' in content ? content.title : 'Welcome'}
-          </h2>
-          <p className="text-gray-600 mb-6">
-            {'description' in content ? content.description : 'Loading content...'}
-          </p>
-          <div className="px-4 py-2 rounded-lg inline-block" style={{ backgroundColor: 'var(--bg-neutral, #e8f4f8)', color: 'var(--primary, #667eea)' }}>
-            {'action' in content ? content.action : 'Please wait'}
+    // Show loading content if contentLoading is true, otherwise show actual content
+    const contentComponent = contentLoading ? createLoadingContent() : (
+      isComponentSchema ? (
+        <div className="p-6">
+          <ComponentSchemaRenderer schema={content as ComponentSchema} />
+        </div>
+      ) : isWelcomeContent ? (
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center max-w-md">
+            <div className="mb-4 text-4xl" style={{ color: 'var(--primary, #667eea)' }}>✨</div>
+            <h2 className="text-2xl font-semibold mb-4">
+              {'title' in content ? content.title : 'Welcome'}
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {'description' in content ? content.description : 'Loading content...'}
+            </p>
+            <div className="px-4 py-2 rounded-lg inline-block" style={{ backgroundColor: 'var(--bg-neutral, #e8f4f8)', color: 'var(--primary, #667eea)' }}>
+              {'action' in content ? content.action : 'Please wait'}
+            </div>
           </div>
         </div>
-      </div>
-    ) : (
-      <div className="p-6">
-        <div className="text-center">
-          <div className="text-gray-500 mb-4">📄</div>
-          <p className="text-gray-600">
-            {typeof content === 'string' ? content :
-             (content && typeof content === 'object' && 'message' in content ? content.message : 'Content loaded successfully')}
-          </p>
+      ) : (
+        <div className="p-6">
+          <div className="text-center">
+            <div className="text-gray-500 mb-4">📄</div>
+            <p className="text-gray-600">
+              {typeof content === 'string' ? content :
+               (content && typeof content === 'object' && 'message' in content ? content.message : 'Content loaded successfully')}
+            </p>
+          </div>
         </div>
-      </div>
+      )
     );
 
     // Navigation is now handled by NavPanel's database-driven approach
@@ -350,6 +547,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
           isCollapsed={isCollapsed}
           onToggleCollapse={onToggleCollapse}
           userId={session?.user?.id}
+          selectedNavOptionId={selectedNavOptionId}
         />
       );
     };
@@ -399,26 +597,22 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   // 🚨 SHOULD NEVER REACH HERE - All valid responses handled above
   console.error('[DynamicContextPage] Unhandled agentSchema type:', agentSchema.type);
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="text-red-500 mb-4">⚠️</div>
-        <p>Unhandled response type: {agentSchema.type}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            background: 'var(--primary, #667eea)',
-            color: 'white'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--secondary, #764ba2)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--primary, #667eea)';
-          }}
-        >
-          Refresh
-        </button>
+    <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+        </div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="text-red-500 mb-4 text-2xl">⚠️</div>
+          <p className="text-sm font-medium text-gray-800 mb-2">System Error</p>
+          <p className="text-xs text-gray-600 text-center mb-6">Unhandled response type: {agentSchema.type}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-[#3E5E17] text-white text-sm rounded-xl hover:bg-[#2d4511] transition-colors"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
     </div>
   );

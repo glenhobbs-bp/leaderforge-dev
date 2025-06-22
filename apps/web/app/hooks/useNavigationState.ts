@@ -26,16 +26,21 @@ export function useNavigationState({ userId, contextKey }: UseNavigationStatePro
   const { data: userPrefs } = useUserPreferences(userId);
   const queryClient = useQueryClient();
 
-    // Get last navigation state
+  // Get last navigation state - FIX: Use correct field names that match userService
   const preferences = userPrefs?.preferences as UserPreferences;
-  const navigationState = preferences?.navigation;
-  const lastNavOptionId = navigationState?.lastContextKey === contextKey
-    ? navigationState.lastNavOptionId || null
+  const navigationState = preferences?.navigationState; // Changed from 'navigation' to 'navigationState'
+  const lastNavOptionId = navigationState?.lastContext === contextKey // Changed from 'lastContextKey' to 'lastContext'
+    ? navigationState.lastNavOption || null // Changed from 'lastNavOptionId' to 'lastNavOption'
     : null;
 
-  // Mutation for updating navigation state
+  // Debounced mutation to update navigation state (reduce database calls)
   const updateNavStateMutation = useMutation({
     mutationFn: async (navOptionId: string) => {
+      // Only update if different from current state
+      if (lastNavOptionId === navOptionId) {
+        return { success: true };
+      }
+
       const response = await fetch(`/api/user/${userId}/navigation-state`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -43,17 +48,20 @@ export function useNavigationState({ userId, contextKey }: UseNavigationStatePro
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update navigation state');
+        // Don't throw error for navigation state - it's not critical
+        console.warn('Navigation state update failed, continuing...');
+        return { success: false };
       }
 
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate user preferences to sync with server
+      // Invalidate user preferences to sync with server (but don't block UI)
       queryClient.invalidateQueries({ queryKey: ['user-preferences', userId] });
     },
     onError: (error) => {
-      console.error('Failed to update navigation state:', error);
+      // Don't block UI for navigation state errors
+      console.warn('Navigation state update failed:', error);
     }
   });
 

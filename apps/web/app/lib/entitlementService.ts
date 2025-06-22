@@ -1,20 +1,22 @@
-import { createSupabaseServerClient } from './supabaseServerClient';
-import { cookies } from 'next/headers';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Entitlement } from './types';
+
+// In-memory cache for entitlements (server-side only)
+const entitlementCache = new Map<string, { data: Entitlement[]; timestamp: number }>();
 
 /**
  * Service for entitlement logic. All business rules for user permissions live here.
- * Optimized for performance with minimal logging.
+ * Optimized for performance with persistent caching.
  */
 export const entitlementService = {
   /**
-   * Get all entitlements for a user.
+   * Get all entitlements for a user with aggressive caching.
    */
-  async getUserEntitlements(supabase: any, userId: string): Promise<Entitlement[]> {
-    // Check cache first
+  async getUserEntitlements(supabase: SupabaseClient, userId: string): Promise<Entitlement[]> {
+    // Check persistent cache first
     const cacheKey = `entitlements:${userId}`;
-    const cached = globalThis.entitlementCache?.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) { // 5 minute cache
+    const cached = entitlementCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < 10 * 60 * 1000) { // 10 minute cache
       return cached.data;
     }
 
@@ -30,17 +32,19 @@ export const entitlementService = {
         .is('revoked_at', null);
 
       if (error) {
-        console.error('[entitlementService] Permission denied - returning empty entitlements for user:', userId);
-        return [];
+        // Return empty array for permission errors, but cache it to avoid repeated calls
+        const emptyResult: Entitlement[] = [];
+        entitlementCache.set(cacheKey, {
+          data: emptyResult,
+          timestamp: Date.now()
+        });
+        return emptyResult;
       }
 
       const entitlements = (data || []) as Entitlement[];
 
-      // Cache the result
-      if (!globalThis.entitlementCache) {
-        globalThis.entitlementCache = new Map();
-      }
-      globalThis.entitlementCache.set(cacheKey, {
+      // Cache the result in persistent cache
+      entitlementCache.set(cacheKey, {
         data: entitlements,
         timestamp: Date.now()
       });
@@ -48,14 +52,20 @@ export const entitlementService = {
       return entitlements;
     } catch (error) {
       console.error('[entitlementService] Error fetching entitlements:', error);
-      return [];
+      // Return and cache empty result to prevent repeated failures
+      const emptyResult: Entitlement[] = [];
+      entitlementCache.set(cacheKey, {
+        data: emptyResult,
+        timestamp: Date.now()
+      });
+      return emptyResult;
     }
   },
 
   /**
    * Get all entitlements for an organization.
    */
-  async getOrgEntitlements(supabase: any, orgId: string): Promise<any[]> {
+  async getOrgEntitlements(supabase: SupabaseClient, orgId: string): Promise<any[]> {
     const { data, error } = await supabase
       .schema('core')
       .from('org_entitlements')
@@ -76,7 +86,7 @@ export const entitlementService = {
   /**
    * Check if a user has access to specific content.
    */
-  async checkContentAccess(supabase: any, userId: string, contentId: string): Promise<boolean> {
+  async checkContentAccess(supabase: SupabaseClient, userId: string, contentId: string): Promise<boolean> {
     try {
       // First, get the content access policy
       const { data: policy, error: policyError } = await supabase
@@ -116,7 +126,7 @@ export const entitlementService = {
   /**
    * Get all content accessible to a user in a given context.
    */
-  async getAccessibleContent(supabase: any, userId: string, contextKey: string): Promise<any[]> {
+  async getAccessibleContent(supabase: SupabaseClient, userId: string, contextKey: string): Promise<any[]> {
     try {
       // Get all content for the context
       const { data: allContent, error: contentError } = await supabase

@@ -4,17 +4,38 @@ import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { createClient } from '@supabase/supabase-js';
 import { AgentService } from '../../../lib/agentService';
 
+// In-memory cache for agent responses (simple optimization)
+const responseCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes cache
+
 /**
  * POST /api/agent/content
  * Agent-native: Thin API that looks up the agent from navigation and invokes it.
  * Follows the architectural principle: APIs only invoke agents and return their schema.
  */
 export async function POST(req: NextRequest) {
+  const startTime = Date.now();
+
   try {
     const body = await req.json();
     const { userId, contextKey, navOptionId, intent } = body;
 
     console.log('[API/agent/content] Request:', { userId, contextKey, navOptionId, intent });
+
+    // Create cache key for this request
+    const cacheKey = `${contextKey}:${navOptionId}:${userId}`;
+
+    // Check cache first
+    const cached = responseCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
+      console.log(`[API/agent/content] Cache hit for ${cacheKey}, returning cached response`);
+      return NextResponse.json(cached.data, {
+        headers: {
+          'X-Cache': 'HIT',
+          'X-Response-Time': `${Date.now() - startTime}ms`
+        }
+      });
+    }
 
     // Get user session for authentication (using same method as avatar API)
     const cookieStore = await nextCookies();
@@ -137,7 +158,16 @@ export async function POST(req: NextRequest) {
       });
 
       console.log('[API/agent/content] Agent response:', agentResponse);
-      return NextResponse.json(agentResponse);
+
+      // Cache the response
+      responseCache.set(cacheKey, { data: agentResponse, timestamp: Date.now() });
+
+      return NextResponse.json(agentResponse, {
+        headers: {
+          'X-Cache': 'MISS',
+          'X-Response-Time': `${Date.now() - startTime}ms`
+        }
+      });
 
     } catch (agentError) {
       console.error('[API/agent/content] Agent invocation error:', agentError);
