@@ -16,12 +16,19 @@ export interface WidgetDispatcherProps extends Omit<BaseWidgetProps, 'schema'> {
     type: string;
     props: Record<string, unknown>;
   };
+  // For layout widgets that need recursive rendering
+  onProgressUpdate?: () => void;
+  ComponentSchemaRenderer?: React.ComponentType<{
+    schema: { type: string; props: Record<string, unknown> };
+    userId?: string;
+    onProgressUpdate?: () => void;
+  }>;
 }
 
 /**
  * Dispatches widget rendering based on schema type
  */
-export function WidgetDispatcher({ schema, ...props }: WidgetDispatcherProps) {
+export function WidgetDispatcher({ schema, ComponentSchemaRenderer, onProgressUpdate, ...props }: WidgetDispatcherProps) {
   // Map schema type to widget ID (for now, simple lowercase mapping)
   const getWidgetId = (schemaType: string): string => {
     return schemaType.toLowerCase();
@@ -41,7 +48,12 @@ export function WidgetDispatcher({ schema, ...props }: WidgetDispatcherProps) {
     );
   }
 
-  const widgetProps = { schema, ...props };
+  const widgetProps = {
+    schema,
+    ComponentSchemaRenderer,
+    onProgressUpdate,
+    ...props
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return React.createElement(WidgetComponent as React.ComponentType<any>, widgetProps);
 }

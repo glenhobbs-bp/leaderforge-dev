@@ -811,6 +811,16 @@ export function ComponentSchemaRenderer({ schema, userId, onProgressUpdate }: {
 
   switch (schema.type) {
     case "Panel":
+      // Use WidgetDispatcher for extracted widgets
+      if (isWidgetTypeAvailable(schema.type)) {
+        return <WidgetDispatcher
+          schema={schema}
+          userId={userId}
+          onProgressUpdate={onProgressUpdate}
+          ComponentSchemaRenderer={ComponentSchemaRenderer}
+        />;
+      }
+      // Fallback to original implementation if widget not available
       return (
         <div>
           <h2>{schema.props.heading}</h2>
@@ -878,6 +888,47 @@ export function ComponentSchemaRenderer({ schema, userId, onProgressUpdate }: {
         </div>
       );
     case "Grid":
+      // Use WidgetDispatcher for extracted widgets
+      if (isWidgetTypeAvailable(schema.type)) {
+        return (
+          <>
+            <WidgetDispatcher
+              schema={schema}
+              userId={userId}
+              onProgressUpdate={onProgressUpdate}
+              ComponentSchemaRenderer={ComponentSchemaRenderer}
+            />
+            {/* Video Modal - Always rendered when videoModal state exists */}
+            {videoModal && (
+              <VideoPlayerModal
+                open={!!videoModal}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setVideoModal(null);
+                    // Trigger content refresh when modal closes to update card progress
+                    if (onProgressUpdate) {
+                      console.log('[ComponentSchemaRenderer] Video modal closed, triggering progress update');
+                      onProgressUpdate();
+                    }
+                  }
+                }}
+                videoUrl={videoModal.videoUrl}
+                title={videoModal.title}
+                poster={videoModal.poster}
+                progress={videoModal.progress}
+                pills={videoModal.pills}
+                videoWatched={videoModal.videoWatched}
+                worksheetSubmitted={videoModal.worksheetSubmitted}
+                onCompleteAction={videoModal.onCompleteAction}
+                description={videoModal.description}
+                contentId={videoModal.title}
+                userId={userId}
+              />
+            )}
+          </>
+        );
+      }
+      // Fallback to original implementation if widget not available
       return (
         <>
           <div className="max-w-screen-2xl mx-auto p-6">

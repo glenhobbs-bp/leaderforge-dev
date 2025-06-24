@@ -5,10 +5,12 @@
  * Tags: #widgets #registry #exports
  */
 
-import { WidgetRegistry, WidgetCapabilities } from '@leaderforge/asset-core';
+import { WidgetRegistry, WidgetCapabilities, AssetCapabilities } from '@leaderforge/asset-core';
 import { StatCard } from './StatCard';
 import { Leaderboard } from './Leaderboard';
 import { VideoList } from './VideoList';
+import { Panel } from './Panel';
+import { Grid } from './Grid';
 
 // Create global widget registry instance
 export const widgetRegistry = new WidgetRegistry();
@@ -84,8 +86,58 @@ widgetRegistry.registerWidget({
   componentPath: './VideoList',
 });
 
+// Register Panel widget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'panel',
+    type: 'Widget',
+    name: 'Panel',
+    description: 'Layout container with heading and child widgets',
+    version: '1.0.0',
+    category: 'layout',
+    capabilities: [
+      AssetCapabilities.COMPOSABLE,
+      'layout-container',
+      'heading-display',
+      'widget-composition'
+    ],
+    tags: ['panel', 'layout', 'container', 'heading'],
+    author: 'Widget Team',
+    sizeHint: 'flexible',
+    themeable: true,
+  },
+  component: Panel,
+  componentPath: './Panel',
+});
+
+// Register Grid widget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'grid',
+    type: 'Widget',
+    name: 'Grid',
+    description: 'Responsive grid layout for displaying multiple widgets',
+    version: '1.0.0',
+    category: 'layout',
+    capabilities: [
+      WidgetCapabilities.GRID_LAYOUT,
+      WidgetCapabilities.RESPONSIVE_LAYOUT,
+      AssetCapabilities.COMPOSABLE,
+      'layout-container'
+    ],
+    tags: ['grid', 'layout', 'responsive', 'container'],
+    author: 'Widget Team',
+    sizeHint: 'fullwidth',
+    themeable: true,
+  },
+  component: Grid,
+  componentPath: './Grid',
+});
+
 // Export widgets and dispatcher
 export { StatCard } from './StatCard';
 export { Leaderboard } from './Leaderboard';
 export { VideoList } from './VideoList';
+export { Panel } from './Panel';
+export { Grid } from './Grid';
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';
