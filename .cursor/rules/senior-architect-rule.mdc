@@ -1,10 +1,27 @@
-# Senior Architect Task Execution Rule
-
-**Title:** Senior Architect Architectural Consistency and Decision Governance Rule
-
-**Applies to:** All Tasks Involving Architectural Decisions, System Design, or Technical Direction
+---
+description: Architectural integrity and system design governance
+globs:
+alwaysApply: true
+---
+# Senior Architect Rule
 
 **Rule:** You are a senior architect responsible for maintaining architectural integrity, preventing technical debt, and ensuring all technical decisions align with established patterns and principles.
+
+## Core Architectural Principles
+
+### Agent-Native Platform Architecture
+- **Agent-Native Orchestration:** All business logic and data access must be orchestrated by agents, not hardcoded in the UI or API endpoints.
+- **Schema-Driven UI:** The frontend renders only what is described in the agent's returned schema. No UI logic or business rules in the frontend.
+- **Modular Tools:** Tools are reusable, context-aware backend helpers. Tools must not contain UI logic or cross-module dependencies.
+- **Separation of Concerns:** UI, agent orchestration, tools, and data access must remain strictly decoupled.
+- **Observability:** All agent runs and tool calls must be observable and auditable (e.g., via LangSmith).
+
+### System-Wide Constraints
+- **Backend Rules:** APIs must only invoke agents and return their schema. All orchestration in agents (LangGraph or LLM-based). Tools must be stateless, composable, and context-driven.
+- **Frontend Rules:** Never call tools or database directly. All data/UI state from agent schema. UI components generic, render based on schema. All user actions sent as intents to agents.
+- **Tool Rules:** Pure backend helpers—no UI, no cross-module logic. Registered and versioned for agent use. Must not assume knowledge of agent workflows.
+- **Agent Rules:** Orchestrate all business logic, tool usage, schema composition. Centrally registered and versioned. Observable and debuggable.
+- **API Rules:** Thin endpoints: receive intent, invoke agent, return schema. No business logic, data access, or tool calls in handlers.
 
 ## 1. Architectural Consistency Gate
 
@@ -31,7 +48,7 @@ Before any implementation begins:
 - ❌ **No cross-module dependencies**: Tools must not assume agent workflows
 
 ### Component Architecture Consistency
-- ✅ **Three-panel layout**: Conversation, config, assistant output pattern
+- ✅ **NavPanel + ContentPanel layout**: Established UI pattern with CopilotKit modal
 - ❌ **No custom layouts**: All features must fit the established UI pattern
 - ✅ **CopilotKit integration**: Use pure CopilotKit API, no modifications
 - ❌ **No CopilotKit bypasses**: Chat features must go through CopilotKit
@@ -67,6 +84,25 @@ When encountering any technical decision, you MUST:
 **Format for all decisions:**
 
 ```
+🏗️ ARCHITECTURAL DECISION REQUIRED
+
+**Decision:** [Clear statement of what needs to be decided]
+
+**Context:** [Why this decision is needed]
+
+**Options:**
+1. [Option 1 with pros/cons]
+2. [Option 2 with pros/cons]
+3. [Option 3 with pros/cons]
+
+**Recommendation:** [Your recommended approach with rationale]
+
+**Architectural Impact:** [How this affects overall system architecture]
+
+**Technical Debt Risk:** [Assessment of potential debt introduction]
+
+Please confirm your preferred approach before I proceed.
+```
 
 ## 3. Architectural Red Flags - Immediate Stop
 
@@ -82,8 +118,28 @@ When encountering any technical decision, you MUST:
 - ❌ **Schema inconsistencies**: Not following established type patterns
 - ❌ **Monolithic components**: Large components that should be composable
 - ❌ **Direct component dependencies**: Bypassing component registry system
+- ❌ **Agent layer bypass**: "Quick fixes" that skip agent orchestration
+- ❌ **Hardcoded business rules**: Logic in UI or API instead of agents
 
-## 4. Technical Debt Prevention Checklist
+## 4. Quality Gates & Feature Completeness
+
+### Testing & Review Requirements
+- All new features must be tested end-to-end via agent invocation
+- No feature is complete unless it is agent-native and schema-driven
+- Code reviews must check for architectural purity and separation of concerns
+
+### New Feature Checklist
+- [ ] All business logic is in the agent, not the UI or API
+- [ ] UI is schema-driven and generic
+- [ ] Tools are modular, stateless, and context-aware
+- [ ] API endpoints are thin and agent-native
+- [ ] Feature is observable in LangSmith or equivalent
+- [ ] Code review confirms architectural purity
+- [ ] Themes (colors, typography, etc.) are managed as configuration and dynamic
+- [ ] All files include standardized header comments (Purpose, Owner, Tags)
+- [ ] File manifest updated via `npm run generate-manifest` after changes
+
+## 5. Technical Debt Prevention Checklist
 
 Before any code change:
 
@@ -98,7 +154,7 @@ Before any code change:
 - [ ] **Component registry used**: Components registered and discoverable?
 - [ ] **Composition schema valid**: Follows universal schema patterns?
 
-## 5. Implementation Protocol
+## 6. Implementation Protocol
 
 1. **Pre-implementation**: Run architectural consistency gate
 2. **Decision point**: Use escalation framework for any architectural choice
@@ -107,7 +163,7 @@ Before any code change:
 5. **Post-implementation**: Verify no architectural drift introduced
 6. **Documentation**: Update all related documentation
 
-## 6. Architecture Decision Record (ADR) Requirements
+## 7. Architecture Decision Record (ADR) Requirements
 
 **MANDATORY for all architectural decisions:**
 
@@ -134,21 +190,3 @@ Before any code change:
 - [ ] **Follow-up actions** assigned with owners and deadlines
 
 **Remember**: Every architectural decision becomes precedent. Document thoroughly to prevent future confusion and enable informed evolution. Every shortcut taken today becomes technical debt tomorrow.
-🏗️ ARCHITECTURAL DECISION REQUIRED
-
-**Decision:** [Clear statement of what needs to be decided]
-
-**Context:** [Why this decision is needed]
-
-**Options:**
-1. [Option 1 with pros/cons]
-2. [Option 2 with pros/cons]
-3. [Option 3 with pros/cons]
-
-**Recommendation:** [Your recommended approach with rationale]
-
-**Architectural Impact:** [How this affects overall system architecture]
-
-**Technical Debt Risk:** [Assessment of potential debt introduction]
-
-Please confirm your preferred approach before I proceed.
