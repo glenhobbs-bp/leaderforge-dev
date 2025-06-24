@@ -835,6 +835,11 @@ export function ComponentSchemaRenderer({ schema, userId, onProgressUpdate }: {
         </div>
       );
     case "Leaderboard":
+      // Use WidgetDispatcher for extracted widgets
+      if (isWidgetTypeAvailable(schema.type)) {
+        return <WidgetDispatcher schema={schema} userId={userId} />;
+      }
+      // Fallback to original implementation if widget not available
       return (
         <div className="rounded-lg shadow bg-white p-4 mb-4">
           <h3 className="font-semibold text-lg mb-2">{schema.props.title}</h3>
@@ -849,6 +854,11 @@ export function ComponentSchemaRenderer({ schema, userId, onProgressUpdate }: {
         </div>
       );
     case "VideoList":
+      // Use WidgetDispatcher for extracted widgets
+      if (isWidgetTypeAvailable(schema.type)) {
+        return <WidgetDispatcher schema={schema} userId={userId} />;
+      }
+      // Fallback to original implementation if widget not available
       return (
         <div className="mb-8">
           <h3 className="font-semibold text-lg mb-2">{schema.props.title}</h3>

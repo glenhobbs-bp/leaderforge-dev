@@ -7,6 +7,8 @@
 
 import { WidgetRegistry, WidgetCapabilities } from '@leaderforge/asset-core';
 import { StatCard } from './StatCard';
+import { Leaderboard } from './Leaderboard';
+import { VideoList } from './VideoList';
 
 // Create global widget registry instance
 export const widgetRegistry = new WidgetRegistry();
@@ -34,6 +36,56 @@ widgetRegistry.registerWidget({
   componentPath: './StatCard',
 });
 
+// Register Leaderboard widget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'leaderboard',
+    type: 'Widget',
+    name: 'Leaderboard',
+    description: 'Displays a ranked list of items with scores',
+    version: '1.0.0',
+    category: 'data',
+    capabilities: [
+      WidgetCapabilities.LEADERBOARD_DISPLAY,
+      'leaderboard-display',
+      'ranking',
+      'data-visualization'
+    ],
+    tags: ['leaderboard', 'ranking', 'data', 'list'],
+    author: 'Widget Team',
+    sizeHint: 'medium',
+    themeable: true,
+  },
+  component: Leaderboard,
+  componentPath: './Leaderboard',
+});
+
+// Register VideoList widget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'videolist',
+    type: 'Widget',
+    name: 'Video List',
+    description: 'Displays a grid of video thumbnails with titles',
+    version: '1.0.0',
+    category: 'content',
+    capabilities: [
+      WidgetCapabilities.VIDEO_PLAYBACK,
+      'video-list',
+      'content-display',
+      'grid-layout'
+    ],
+    tags: ['video', 'list', 'content', 'grid'],
+    author: 'Widget Team',
+    sizeHint: 'large',
+    themeable: true,
+  },
+  component: VideoList,
+  componentPath: './VideoList',
+});
+
 // Export widgets and dispatcher
 export { StatCard } from './StatCard';
+export { Leaderboard } from './Leaderboard';
+export { VideoList } from './VideoList';
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';
