@@ -11,3 +11,4 @@ export * from './types/WidgetSchema';
 
 // Registries
 export * from './registries/AssetRegistry';
+export * from './registries/WidgetRegistry';
