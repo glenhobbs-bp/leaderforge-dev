@@ -1,8 +1,8 @@
 /**
  * File: apps/web/components/widgets/Panel.tsx
- * Purpose: Extracted Panel widget from ComponentSchemaRenderer
+ * Purpose: Extracted Panel widget from UniversalSchemaRenderer
  * Owner: Widget Team
- * Tags: #widget #panel #layout #container
+ * Tags: #panel #layout #widgets
  */
 
 "use client";
@@ -10,52 +10,50 @@
 import React from 'react';
 import { BaseWidgetProps } from '@leaderforge/asset-core';
 
-// Schema type for recursive rendering
-type SchemaType = {
-  type: string;
-  props: Record<string, unknown>;
-};
+interface PanelSchema {
+  type: 'Panel';
+  props: {
+    heading: string;
+    description?: string;
+    widgets?: Array<{ type: string; props: Record<string, unknown> }>;
+  };
+}
 
-// We need to import ComponentSchemaRenderer for recursive rendering
-// This creates a circular dependency that we'll resolve with dynamic import
-type ComponentSchemaRenderer = React.ComponentType<{
-  schema: SchemaType;
+// UniversalSchemaRenderer type for recursive rendering
+type UniversalSchemaRenderer = React.ComponentType<{
+  schema: { type: string; props: Record<string, unknown> };
   userId?: string;
   onProgressUpdate?: () => void;
 }>;
 
-export interface PanelProps extends BaseWidgetProps {
-  schema: {
-    type: 'Panel';
-    props: {
-      heading: string;
-      description?: string;
-      widgets?: Array<SchemaType>;
-    };
-  };
-  // Panel needs access to ComponentSchemaRenderer for recursive rendering
-  ComponentSchemaRenderer?: ComponentSchemaRenderer;
+interface PanelProps extends BaseWidgetProps {
+  schema: PanelSchema;
 }
 
-export function Panel({ schema, userId, onProgressUpdate, ComponentSchemaRenderer }: PanelProps & {
+// Panel-specific props that extend base widget props
+export interface PanelWidgetProps extends PanelProps {
+  // Panel needs access to UniversalSchemaRenderer for recursive rendering
+  UniversalSchemaRenderer?: UniversalSchemaRenderer;
+}
+
+export function Panel({ schema, userId, onProgressUpdate, UniversalSchemaRenderer }: PanelProps & {
+  userId?: string;
   onProgressUpdate?: () => void;
-  ComponentSchemaRenderer?: ComponentSchemaRenderer;
+  UniversalSchemaRenderer?: UniversalSchemaRenderer;
 }) {
-  if (schema.type !== 'Panel') {
-    return null;
-  }
+  if (schema.type !== 'Panel') return null;
 
   const { heading, description, widgets } = schema.props;
 
   return (
     <div>
-      <h2>{heading}</h2>
-      {description && <p>{description}</p>}
-      {widgets && ComponentSchemaRenderer &&
-        widgets.map((w, i) => (
-          <ComponentSchemaRenderer
+      <h2 className="text-xl font-bold mb-2">{heading}</h2>
+      {description && <p className="text-gray-600 mb-4">{description}</p>}
+      {widgets && UniversalSchemaRenderer &&
+        widgets.map((widget, i) => (
+          <UniversalSchemaRenderer
             key={i}
-            schema={w}
+            schema={widget}
             userId={userId}
             onProgressUpdate={onProgressUpdate}
           />

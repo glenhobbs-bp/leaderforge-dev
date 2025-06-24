@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-06-24T15:40:10.092Z",
+    "generated_at": "2025-06-24T22:30:00.962Z",
     "generator_version": "1.0.0",
-    "total_files": 208,
-    "total_size_bytes": 1859893,
+    "total_files": 227,
+    "total_size_bytes": 1937721,
     "file_types": {
-      ".ts": 95,
-      ".json": 14,
-      ".tsx": 24,
+      ".ts": 101,
+      ".json": 16,
+      ".tsx": 33,
       ".js": 2,
-      ".md": 72,
+      ".md": 74,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 119,
+      "TypeScript": 134,
       "API": 34,
-      "AI agent": 87,
-      "React": 24,
-      "React hooks": 21,
+      "AI agent": 93,
+      "React": 33,
+      "React hooks": 22,
       "Next.js API": 33,
-      "security": 56,
+      "security": 58,
       "test": 10,
       "API endpoint": 2,
       "navigation state": 2,
@@ -49,7 +49,7 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 16,
+      "UI": 25,
       "navigation": 3,
       "context-based": 1,
       "UI component": 1,
@@ -61,7 +61,7 @@
       "dashboard": 1,
       "batched queries": 1,
       "database-driven": 1,
-      "documentation": 74,
+      "documentation": 76,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -941,9 +941,9 @@
         "../../components/SupabaseProvider",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-22T08:19:05.283Z",
-      "size_bytes": 2974,
-      "hash": "21cbbfcf",
+      "last_modified": "2025-06-24T22:28:27.045Z",
+      "size_bytes": 2953,
+      "hash": "5c9e8543",
       "complexity": "medium"
     },
     {
@@ -1870,6 +1870,28 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/test-widgets/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/test-widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/app/test-widgets/page.tsx",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "react",
+        "../../components/widgets"
+      ],
+      "exports": [
+        "TestWidgetsPage"
+      ],
+      "last_modified": "2025-06-24T21:19:49.207Z",
+      "size_bytes": 7891,
+      "hash": "786ba30f",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/components.json",
       "name": "components.json",
       "directory": "apps/web",
@@ -1927,11 +1949,11 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/components/ai/ComponentSchemaRenderer.tsx",
-      "name": "ComponentSchemaRenderer.tsx",
+      "path": "apps/web/components/ai/UniversalSchemaRenderer.tsx",
+      "name": "UniversalSchemaRenderer.tsx",
       "directory": "apps/web/components/ai",
       "extension": ".tsx",
-      "purpose": "File: apps/web/components/ai/ComponentSchemaRenderer.tsx",
+      "purpose": "File: apps/web/components/ai/UniversalSchemaRenderer.tsx",
       "tags": [
         "React",
         "TypeScript",
@@ -1940,23 +1962,20 @@
         "AI agent"
       ],
       "dependencies": [
+        "react",
         "../../../../packages/agent-core/types/ComponentSchema",
-        "next/image",
-        "react",
-        "../ui/dialog",
-        "hls.js",
-        "react",
         "@radix-ui/react-icons",
-        "../../app/hooks/useUniversalProgress"
+        "../widgets",
+        "../widgets/VideoPlayerModal"
       ],
-      "last_modified": "2025-06-24T10:29:11.692Z",
-      "size_bytes": 39339,
-      "hash": "279d7dcd",
-      "complexity": "high"
+      "last_modified": "2025-06-24T22:11:16.047Z",
+      "size_bytes": 6493,
+      "hash": "ce05097e",
+      "complexity": "medium"
     },
     {
-      "path": "apps/web/components/DynamicContextPage.tsx",
-      "name": "DynamicContextPage.tsx",
+      "path": "apps/web/components/DynamicTenantPage.tsx",
+      "name": "DynamicTenantPage.tsx",
       "directory": "apps/web/components",
       "extension": ".tsx",
       "purpose": "Agent-native 3-panel layout. Pure renderer - displays only what agents return.",
@@ -1972,7 +1991,7 @@
         "react",
         "./ui/ThreePanelLayout",
         "./ui/NavPanel",
-        "./ai/ComponentSchemaRenderer",
+        "./ai/UniversalSchemaRenderer",
         "../../../packages/agent-core/types/ComponentSchema",
         "./SupabaseProvider",
         "react",
@@ -1980,9 +1999,9 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-24T10:29:17.148Z",
-      "size_bytes": 25583,
-      "hash": "0ed2854c",
+      "last_modified": "2025-06-24T22:29:27.134Z",
+      "size_bytes": 25495,
+      "hash": "5acd9b0c",
       "complexity": "high"
     },
     {
@@ -2167,9 +2186,9 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-22T09:40:47.587Z",
-      "size_bytes": 19286,
-      "hash": "be1ec4a5",
+      "last_modified": "2025-06-24T22:29:34.047Z",
+      "size_bytes": 19332,
+      "hash": "dcf0f5b7",
       "complexity": "high"
     },
     {
@@ -2287,6 +2306,202 @@
       "size_bytes": 334,
       "hash": "4301a58a",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/Grid.tsx",
+      "name": "Grid.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/Grid.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react",
+        "@leaderforge/asset-core"
+      ],
+      "last_modified": "2025-06-24T22:11:22.733Z",
+      "size_bytes": 1907,
+      "hash": "7fa7e534",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/index.ts",
+      "name": "index.ts",
+      "directory": "apps/web/components/widgets",
+      "extension": ".ts",
+      "purpose": "File: apps/web/components/widgets/index.ts",
+      "tags": [
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "@leaderforge/asset-core",
+        "./StatCard",
+        "./Leaderboard",
+        "./VideoList",
+        "./Panel",
+        "./Grid",
+        "./LeaderForgeCard",
+        "./VideoPlayerModal"
+      ],
+      "exports": [
+        "widgetRegistry"
+      ],
+      "last_modified": "2025-06-24T21:19:41.031Z",
+      "size_bytes": 5608,
+      "hash": "42b9e8e8",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/widgets/Leaderboard.tsx",
+      "name": "Leaderboard.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/Leaderboard.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react",
+        "@leaderforge/asset-core"
+      ],
+      "last_modified": "2025-06-24T20:51:58.164Z",
+      "size_bytes": 1125,
+      "hash": "314300c6",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/LeaderForgeCard.tsx",
+      "name": "LeaderForgeCard.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "LeaderForgeCard.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "next/image",
+        "../../../../packages/agent-core/types/ComponentSchema"
+      ],
+      "last_modified": "2025-06-24T21:05:47.276Z",
+      "size_bytes": 6656,
+      "hash": "0511a62f",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/widgets/Panel.tsx",
+      "name": "Panel.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/Panel.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react",
+        "@leaderforge/asset-core"
+      ],
+      "last_modified": "2025-06-24T22:11:19.002Z",
+      "size_bytes": 1747,
+      "hash": "12c08556",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/StatCard.tsx",
+      "name": "StatCard.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/StatCard.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react",
+        "@leaderforge/asset-core"
+      ],
+      "last_modified": "2025-06-24T20:44:43.991Z",
+      "size_bytes": 956,
+      "hash": "f6697c79",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/VideoList.tsx",
+      "name": "VideoList.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/VideoList.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react",
+        "@leaderforge/asset-core"
+      ],
+      "last_modified": "2025-06-24T20:51:59.805Z",
+      "size_bytes": 1420,
+      "hash": "4d47953c",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/VideoPlayerModal.tsx",
+      "name": "VideoPlayerModal.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "VideoPlayerModal.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../ui/dialog",
+        "hls.js",
+        "../../app/hooks/useUniversalProgress",
+        "../../../../packages/agent-core/types/ComponentSchema"
+      ],
+      "last_modified": "2025-06-24T21:32:39.119Z",
+      "size_bytes": 12082,
+      "hash": "f53a12ee",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/widgets/WidgetDispatcher.tsx",
+      "name": "WidgetDispatcher.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/WidgetDispatcher.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "dependencies": [
+        "react",
+        "@leaderforge/asset-core",
+        "./index"
+      ],
+      "last_modified": "2025-06-24T22:11:12.211Z",
+      "size_bytes": 3030,
+      "hash": "9dec1eb8",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/hooks/useAvatar.ts",
@@ -2503,9 +2718,9 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-06-21T00:17:07.364Z",
-      "size_bytes": 986,
-      "hash": "833d96f6"
+      "last_modified": "2025-06-24T20:44:48.292Z",
+      "size_bytes": 1032,
+      "hash": "d21600b4"
     },
     {
       "path": "apps/web/postcss.config.js",
@@ -3211,7 +3426,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:40:04.928Z",
+      "last_modified": "2025-06-24T15:43:36.020Z",
       "size_bytes": 6003,
       "hash": "1bbc7e0a"
     },
@@ -3382,6 +3597,20 @@
       "hash": "0b72a540"
     },
     {
+      "path": "docs/architecture/directory-structure.md",
+      "name": "directory-structure.md",
+      "directory": "docs/architecture",
+      "extension": ".md",
+      "purpose": "apps/web/components/widgets/content/Card/Card.tsx",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T19:58:48.347Z",
+      "size_bytes": 11252,
+      "hash": "f5e41ce8"
+    },
+    {
       "path": "docs/architecture/overview/agent-native-composition-architecture.md",
       "name": "agent-native-composition-architecture.md",
       "directory": "docs/architecture/overview",
@@ -3424,6 +3653,21 @@
       "hash": "af4b897c"
     },
     {
+      "path": "docs/engineering/implementation-plans/asset-system-refactor-plan.md",
+      "name": "asset-system-refactor-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-24T19:58:55.653Z",
+      "size_bytes": 25488,
+      "hash": "37f45659"
+    },
+    {
       "path": "docs/engineering/implementation-plans/component-system-refactor-plan.md",
       "name": "component-system-refactor-plan.md",
       "directory": "docs/engineering/implementation-plans",
@@ -3462,9 +3706,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:39:49.969Z",
-      "size_bytes": 5870,
-      "hash": "36dc5ad8"
+      "last_modified": "2025-06-24T15:49:21.501Z",
+      "size_bytes": 5990,
+      "hash": "63efeaee"
     },
     {
       "path": "docs/governance/README.md",
@@ -3475,9 +3719,9 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T15:39:57.819Z",
-      "size_bytes": 3978,
-      "hash": "bea6c157"
+      "last_modified": "2025-06-24T15:49:21.501Z",
+      "size_bytes": 5705,
+      "hash": "d026c8b0"
     },
     {
       "path": "docs/governance/universal-glossary.md",
@@ -3503,7 +3747,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T15:36:33.592Z",
+      "last_modified": "2025-06-24T15:43:31.236Z",
       "size_bytes": 4777,
       "hash": "dd2a7e41"
     },
@@ -3518,9 +3762,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T15:35:39.353Z",
-      "size_bytes": 107962,
-      "hash": "f549c44f"
+      "last_modified": "2025-06-24T21:47:07.567Z",
+      "size_bytes": 117413,
+      "hash": "4d081087"
     },
     {
       "path": "docs/manifest.md",
@@ -3533,9 +3777,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T15:35:39.378Z",
-      "size_bytes": 40725,
-      "hash": "787cd10e"
+      "last_modified": "2025-06-24T21:47:07.574Z",
+      "size_bytes": 44080,
+      "hash": "0cb6543d"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -3602,7 +3846,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:36:03.033Z",
+      "last_modified": "2025-06-24T15:43:29.586Z",
       "size_bytes": 6514,
       "hash": "4e1e780f"
     },
@@ -3887,6 +4131,125 @@
       "size_bytes": 9159,
       "hash": "97a6b1e4",
       "complexity": "high"
+    },
+    {
+      "path": "packages/asset-core/package.json",
+      "name": "package.json",
+      "directory": "packages/asset-core",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T19:59:49.249Z",
+      "size_bytes": 685,
+      "hash": "5c5082e2"
+    },
+    {
+      "path": "packages/asset-core/src/index.ts",
+      "name": "index.ts",
+      "directory": "packages/asset-core/src",
+      "extension": ".ts",
+      "purpose": "File: packages/asset-core/src/index.ts",
+      "tags": [
+        "TypeScript"
+      ],
+      "last_modified": "2025-06-24T20:44:53.010Z",
+      "size_bytes": 353,
+      "hash": "26ceae40",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/asset-core/src/registries/AssetRegistry.ts",
+      "name": "AssetRegistry.ts",
+      "directory": "packages/asset-core/src/registries",
+      "extension": ".ts",
+      "purpose": "File: packages/asset-core/src/registries/AssetRegistry.ts",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "../types/AssetMetadata"
+      ],
+      "last_modified": "2025-06-24T20:40:49.139Z",
+      "size_bytes": 5937,
+      "hash": "14590503",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/asset-core/src/registries/WidgetRegistry.ts",
+      "name": "WidgetRegistry.ts",
+      "directory": "packages/asset-core/src/registries",
+      "extension": ".ts",
+      "purpose": "File: packages/asset-core/src/registries/WidgetRegistry.ts",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "./AssetRegistry",
+        "../types/WidgetSchema"
+      ],
+      "exports": [
+        "WidgetRegistry"
+      ],
+      "last_modified": "2025-06-24T20:44:50.059Z",
+      "size_bytes": 2798,
+      "hash": "1465046e",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/asset-core/src/types/AssetMetadata.ts",
+      "name": "AssetMetadata.ts",
+      "directory": "packages/asset-core/src/types",
+      "extension": ".ts",
+      "purpose": "File: packages/asset-core/src/types/AssetMetadata.ts",
+      "tags": [
+        "TypeScript"
+      ],
+      "dependencies": [
+        "zod"
+      ],
+      "exports": [
+        "BaseAssetMetadataSchema"
+      ],
+      "last_modified": "2025-06-24T20:40:34.102Z",
+      "size_bytes": 3018,
+      "hash": "541e7c96",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/asset-core/src/types/WidgetSchema.ts",
+      "name": "WidgetSchema.ts",
+      "directory": "packages/asset-core/src/types",
+      "extension": ".ts",
+      "purpose": "File: packages/asset-core/src/types/WidgetSchema.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "zod",
+        "./AssetMetadata"
+      ],
+      "exports": [
+        "WidgetMetadataSchema"
+      ],
+      "last_modified": "2025-06-24T20:40:42.849Z",
+      "size_bytes": 3576,
+      "hash": "df5537ea",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/asset-core/tsconfig.json",
+      "name": "tsconfig.json",
+      "directory": "packages/asset-core",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-06-24T19:59:52.985Z",
+      "size_bytes": 509,
+      "hash": "0c8892f2"
     },
     {
       "path": "packages/env/index.ts",

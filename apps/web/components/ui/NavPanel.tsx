@@ -64,7 +64,7 @@ export interface NavPanelSchema {
 }
 
 interface NavPanelProps {
-  contextKey: string; // Database-driven: context key for navigation query
+  tenantKey: string; // Database-driven: tenant key for navigation query
   contextOptions?: {
     id: string;
     title: string;
@@ -81,7 +81,7 @@ interface NavPanelProps {
 }
 
 export default function NavPanel({
-  contextKey,
+  tenantKey,
   contextOptions = [],
   contextValue,
   onContextChange,
@@ -92,7 +92,7 @@ export default function NavPanel({
   selectedNavOptionId,
 }: NavPanelProps) {
   if (process.env.NODE_ENV === 'development') {
-    console.log('[NavPanel] RENDER - Database-driven with contextKey:', contextKey);
+    console.log('[NavPanel] RENDER - Database-driven with tenantKey:', tenantKey);
   }
 
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
@@ -100,8 +100,8 @@ export default function NavPanel({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const { supabase } = useSupabase();
 
-  // Database-driven navigation using the context key
-  const { navSchema, loading, error } = useNavigation(contextKey, userId);
+  // Database-driven navigation using the tenant key
+  const { navSchema, loading, error } = useNavigation(tenantKey, userId);
 
   // Avatar fetching with React Query
   const { data: avatarUrl = "/icons/default-avatar.svg" } = useAvatar(userId);
@@ -112,7 +112,7 @@ export default function NavPanel({
     updateNavigationState
   } = useNavigationState({
     userId: userId || '',
-    contextKey
+    contextKey: tenantKey
   });
 
   // Navigation state persistence restored with optimizations
@@ -162,7 +162,7 @@ export default function NavPanel({
         lastNavOptionId,
         selectedNav,
         hasUserInteracted,
-        contextKey,
+        contextKey: tenantKey,
         shouldRestore: lastNavOptionId && !selectedNav && !hasUserInteracted
       });
     }
@@ -173,7 +173,7 @@ export default function NavPanel({
         console.log('[NavPanel] Restored navigation state:', lastNavOptionId);
       }
     }
-  }, [lastNavOptionId, hasUserInteracted, contextKey]); // Track user interaction to prevent override
+  }, [lastNavOptionId, hasUserInteracted, tenantKey]); // Track user interaction to prevent override
 
   // Update selected nav when selectedNavOptionId prop changes (from parent component)
   useEffect(() => {
@@ -189,7 +189,7 @@ export default function NavPanel({
     if (process.env.NODE_ENV === 'development') {
       console.log('[NavPanel] handleNavClick:', {
         navOptionId,
-        contextKey,
+        contextKey: tenantKey,
         userId,
         previousSelection: selectedNav
       });
@@ -202,10 +202,10 @@ export default function NavPanel({
     setSelectedNav(navOptionId);
 
     // Persist navigation state (async, non-blocking)
-    if (userId && contextKey) {
+    if (userId && tenantKey) {
       updateNavigationState(navOptionId);
       if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Persisting navigation state:', { contextKey, navOptionId });
+        console.log('[NavPanel] Persisting navigation state:', { contextKey: tenantKey, navOptionId });
       }
     }
 
@@ -294,7 +294,7 @@ export default function NavPanel({
   // Debug: Log navigation items and current selection
   if (process.env.NODE_ENV === 'development') {
     console.log('[NavPanel] Rendering navigation items:', {
-      contextKey,
+      contextKey: tenantKey,
       selectedNav,
       lastNavOptionId,
       allItems: mainSections.flatMap(s => s.items.map(i => ({ id: i.id, label: i.label }))),

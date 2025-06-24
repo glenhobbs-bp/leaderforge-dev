@@ -1,8 +1,8 @@
 /**
  * File: apps/web/components/widgets/Grid.tsx
- * Purpose: Extracted Grid widget from ComponentSchemaRenderer
+ * Purpose: Extracted Grid widget from UniversalSchemaRenderer
  * Owner: Widget Team
- * Tags: #widget #grid #layout #container
+ * Tags: #grid #layout #widgets
  */
 
 "use client";
@@ -10,53 +10,56 @@
 import React from 'react';
 import { BaseWidgetProps } from '@leaderforge/asset-core';
 
-// Schema type for recursive rendering
-type SchemaType = {
-  type: string;
-  props: Record<string, unknown>;
-};
+interface GridSchema {
+  type: 'Grid';
+  props: {
+    items: Array<{ type: string; props: Record<string, unknown> }>;
+  };
+}
 
-// ComponentSchemaRenderer type for recursive rendering
-type ComponentSchemaRenderer = React.ComponentType<{
-  schema: SchemaType;
+// UniversalSchemaRenderer type for recursive rendering
+type UniversalSchemaRenderer = React.ComponentType<{
+  schema: { type: string; props: Record<string, unknown> };
   userId?: string;
   onProgressUpdate?: () => void;
 }>;
 
-export interface GridProps extends BaseWidgetProps {
-  schema: {
-    type: 'Grid';
-    props: {
-      items: Array<SchemaType>;
-    };
-  };
-  // Grid needs access to ComponentSchemaRenderer for recursive rendering
-  ComponentSchemaRenderer?: ComponentSchemaRenderer;
+interface GridProps extends BaseWidgetProps {
+  schema: GridSchema;
 }
 
-export function Grid({ schema, userId, onProgressUpdate, ComponentSchemaRenderer }: GridProps & {
+// Grid-specific props that extend base widget props
+export interface GridWidgetProps extends GridProps {
+  // Grid needs access to UniversalSchemaRenderer for recursive rendering
+  UniversalSchemaRenderer?: UniversalSchemaRenderer;
+}
+
+export function Grid({ schema, userId, onProgressUpdate, UniversalSchemaRenderer }: GridProps & {
+  userId?: string;
   onProgressUpdate?: () => void;
-  ComponentSchemaRenderer?: ComponentSchemaRenderer;
+  UniversalSchemaRenderer?: UniversalSchemaRenderer;
 }) {
-  if (schema.type !== 'Grid') {
-    return null;
-  }
+  if (schema.type !== 'Grid') return null;
 
   const { items } = schema.props;
 
   return (
     <div className="max-w-screen-2xl mx-auto p-6">
       <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
-        {items.map((item, i) => (
-          ComponentSchemaRenderer ? (
-            <ComponentSchemaRenderer
+        {items.map((item, i) =>
+          UniversalSchemaRenderer ? (
+            <UniversalSchemaRenderer
               key={i}
               schema={item}
               userId={userId}
               onProgressUpdate={onProgressUpdate}
             />
-          ) : null
-        ))}
+          ) : (
+            <div key={i} className="p-4 border border-gray-200 bg-gray-50 rounded-lg">
+              <p className="text-gray-600 text-sm">Grid item cannot be rendered without UniversalSchemaRenderer</p>
+            </div>
+          )
+        )}
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 "use client";
-// File: apps/web/components/DynamicContextPage.tsx
+// File: apps/web/components/DynamicTenantPage.tsx
 // Purpose: Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 import { useState, useEffect, useRef, useMemo } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
-import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
+import { UniversalSchemaRenderer } from "./ai/UniversalSchemaRenderer";
 import { ComponentSchema } from "../../../packages/agent-core/types/ComponentSchema";
 import { useSupabase } from './SupabaseProvider';
 import React from "react";
@@ -13,7 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import type { UserPreferences } from '../app/lib/types';
 
 // Diagnostic: Track module load
-console.log('[DynamicContextPage] Module loaded - Database-driven mode');
+console.log('[DynamicTenantPage] Module loaded - Database-driven mode');
 
 // Agent schema types - pure content_schema responses only
 interface AgentSchema {
@@ -28,21 +28,21 @@ interface AgentSchema {
   };
 }
 
-type DynamicContextPageProps = {
-  // Props for context management
-  initialContexts?: Array<{
+type DynamicTenantPageProps = {
+  // Props for tenant management
+  initialTenants?: Array<{
     id: string;
-    context_key: string;
+    tenant_key: string;
     display_name: string;
     description?: string;
   }>;
-  initialContextConfig?: unknown;
+  initialTenantConfig?: unknown;
   initialNavOptions?: unknown;
-  defaultContextKey?: string;
+  defaultTenantKey?: string;
 };
 
-export default function DynamicContextPage(props: DynamicContextPageProps) {
-  console.log('[DynamicContextPage] RENDER - Database-driven', props);
+export default function DynamicTenantPage(props: DynamicTenantPageProps) {
+  console.log('[DynamicTenantPage] RENDER - Database-driven', props);
 
   // Auth context
   const { session, loading: authLoading } = useSupabase();
@@ -56,8 +56,8 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   // Core state
   const hasMounted = useRef(false);
   const [hasRestoredContext, setHasRestoredContext] = useState(false);
-  const [currentContext, setCurrentContext] = useState<string>(
-    props.defaultContextKey || props.initialContexts?.[0]?.context_key || 'brilliant'
+  const [currentTenant, setCurrentTenant] = useState<string>(
+    props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'brilliant'
   );
   const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,28 +75,28 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     const navigationState = preferences?.navigationState;
     const lastContext = navigationState?.lastContext;
 
-    console.log('[DynamicContextPage] Context restoration:', {
+    console.log('[DynamicTenantPage] Tenant restoration:', {
       lastContext,
-      currentContext,
+      currentTenant,
       hasRestoredContext
     });
 
-    // Restore context if different
-    if (lastContext && lastContext !== currentContext) {
-      console.log('[DynamicContextPage] Restoring last context:', lastContext);
-      setCurrentContext(lastContext);
-    }
+          // Restore tenant if different
+      if (lastContext && lastContext !== currentTenant) {
+        console.log('[DynamicTenantPage] Restoring last tenant:', lastContext);
+        setCurrentTenant(lastContext);
+      }
 
     setHasRestoredContext(true);
-  }, [session?.user?.id, userPrefs, hasRestoredContext, currentContext]);
+  }, [session?.user?.id, userPrefs, hasRestoredContext, currentTenant]);
 
   // Navigation option restoration effect - runs after context is restored
   useEffect(() => {
-    console.log('[DynamicContextPage] 🔄 Navigation restoration effect triggered:', {
+    console.log('[DynamicTenantPage] 🔄 Navigation restoration effect triggered:', {
       hasSession: !!session?.user?.id,
       hasUserPrefs: !!userPrefs,
       hasRestoredContext,
-      currentContext
+      currentTenant
     });
 
     if (!session?.user?.id || !userPrefs || !hasRestoredContext) return;
@@ -106,42 +106,42 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     const lastContext = navigationState?.lastContext;
     const lastNavOption = navigationState?.lastNavOption;
 
-    console.log('[DynamicContextPage] 📊 Navigation restoration data:', {
+    console.log('[DynamicTenantPage] 📊 Navigation restoration data:', {
       navigationState,
       lastContext,
       lastNavOption,
-      currentContext,
-      shouldRestore: lastNavOption && lastContext === currentContext
+      currentTenant,
+      shouldRestore: lastNavOption && lastContext === currentTenant
     });
 
-    // Only restore navigation option if we're in the correct context and have a saved option
-    if (lastNavOption && lastContext === currentContext) {
-      console.log('[DynamicContextPage] ✅ RESTORING navigation state:', {
+    // Only restore navigation option if we're in the correct tenant and have a saved option
+    if (lastNavOption && lastContext === currentTenant) {
+      console.log('[DynamicTenantPage] ✅ RESTORING navigation state:', {
         lastNavOption,
         lastContext,
-        currentContext,
+        currentTenant,
         timestamp: navigationState?.lastUpdated
       });
       setSelectedNavOptionId(lastNavOption);
 
       // Trigger content loading for the restored navigation option
       setTimeout(() => {
-        console.log('[DynamicContextPage] ⏳ Triggering content load for restored nav option:', lastNavOption);
+        console.log('[DynamicTenantPage] ⏳ Triggering content load for restored nav option:', lastNavOption);
         loadContentForNavOption(lastNavOption, false); // Don't update selection since it's already set
       }, 200); // Small delay to ensure context is fully set
     } else {
-      console.log('[DynamicContextPage] ❌ NOT restoring navigation state:', {
+      console.log('[DynamicTenantPage] ❌ NOT restoring navigation state:', {
         hasLastNavOption: !!lastNavOption,
         lastContext,
-        currentContext,
-        contextMatch: lastContext === currentContext
+        currentTenant,
+        tenantMatch: lastContext === currentTenant
       });
     }
-  }, [session?.user?.id, userPrefs, hasRestoredContext, currentContext]);
+  }, [session?.user?.id, userPrefs, hasRestoredContext, currentTenant]);
 
   // Debug session state
   useEffect(() => {
-    console.log('[DynamicContextPage] Session state:', {
+    console.log('[DynamicTenantPage] Session state:', {
       hasSession: !!session,
       userId: session?.user?.id,
       authLoading,
@@ -154,7 +154,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     if (!hasMounted.current) {
       hasMounted.current = true;
       if (process.env.NODE_ENV === 'development') {
-        console.log('[DynamicContextPage] Component mounted - Database-driven mode');
+        console.log('[DynamicTenantPage] Component mounted - Database-driven mode');
       }
     }
   }, []);
@@ -205,7 +205,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     }
 
     if (isComponentSchema) {
-      console.log('[DynamicContextPage] Rendering ComponentSchemaRenderer with userId:', {
+      console.log('[DynamicTenantPage] Rendering UniversalSchemaRenderer with userId:', {
         session: !!session,
         userId: session?.user?.id,
         authLoading,
@@ -213,13 +213,13 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
       });
       return (
         <div className="p-6">
-          <ComponentSchemaRenderer
+          <UniversalSchemaRenderer
             schema={content as ComponentSchema}
             userId={session?.user?.id}
             onProgressUpdate={() => {
               // Refresh content when video progress is updated
               if (selectedNavOptionId) {
-                console.log('[DynamicContextPage] Refreshing content after progress update');
+                console.log('[DynamicTenantPage] Refreshing content after progress update');
                 loadContentForNavOption(selectedNavOptionId, false);
               }
             }}
@@ -278,7 +278,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
 
       try {
         if (process.env.NODE_ENV === 'development') {
-          console.log('[DynamicContextPage] Database-driven mode - creating welcome schema for context:', currentContext);
+          console.log('[DynamicTenantPage] Database-driven mode - creating welcome schema for tenant:', currentTenant);
         }
 
         // 🗄️ DATABASE-DRIVEN: Create simple welcome schema without agent calls
@@ -292,22 +292,22 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
           type: 'content_schema',
           content: {
             type: 'welcome',
-            title: contextNames[currentContext] || currentContext.charAt(0).toUpperCase() + currentContext.slice(1),
+            title: contextNames[currentTenant] || currentTenant.charAt(0).toUpperCase() + currentTenant.slice(1),
             description: 'Select an option from the navigation to get started.',
             action: 'Browse Navigation'
           }
         };
 
         if (process.env.NODE_ENV === 'development') {
-          console.log('[DynamicContextPage] Database-driven welcome schema created:', welcomeSchema);
+          console.log('[DynamicTenantPage] Database-driven welcome schema created:', welcomeSchema);
         }
 
         setAgentSchema(welcomeSchema);
         setError(null);
-        console.log('[DynamicContextPage] Welcome schema set successfully:', welcomeSchema);
+        console.log('[DynamicTenantPage] Welcome schema set successfully:', welcomeSchema);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        console.error('[DynamicContextPage] Welcome schema creation failed:', errorMessage);
+        console.error('[DynamicTenantPage] Welcome schema creation failed:', errorMessage);
         setError(errorMessage);
       } finally {
         setLoading(false);
@@ -315,14 +315,14 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     };
 
     fetchAgentSchema();
-  }, [session?.user?.id, currentContext, authLoading]);
+  }, [session?.user?.id, currentTenant, authLoading]);
 
-  // Handle context change - also persist the change
-  const handleContextChange = (contextKey: string) => {
+  // Handle tenant change - also persist the change
+  const handleTenantChange = (tenantKey: string) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[DynamicContextPage] Context changed to:', contextKey);
+      console.log('[DynamicTenantPage] Tenant changed to:', tenantKey);
     }
-    setCurrentContext(contextKey);
+    setCurrentTenant(tenantKey);
 
     // Clear selected navigation when context changes
     setSelectedNavOptionId(null);
@@ -333,11 +333,11 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contextKey,
-          navOptionId: null // Clear nav selection when changing context
+          tenantKey,
+          navOptionId: null // Clear nav selection when changing tenant
         })
       }).catch(error => {
-        console.warn('[DynamicContextPage] Failed to persist context change:', error);
+        console.warn('[DynamicTenantPage] Failed to persist context change:', error);
       });
     }
   };
@@ -345,14 +345,14 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   // Helper function to load content for a navigation option
   const loadContentForNavOption = async (navId: string, updateSelection: boolean = true) => {
     if (!session?.user?.id) {
-      console.error('[DynamicContextPage] No user session for navigation');
+      console.error('[DynamicTenantPage] No user session for navigation');
       return;
     }
 
-    console.log('[DynamicContextPage] 🚀 LOADING content for navigation option:', {
+    console.log('[DynamicTenantPage] 🚀 LOADING content for navigation option:', {
       navId,
       updateSelection,
-      currentContext,
+      currentTenant,
       userId: session.user.id
     });
 
@@ -374,7 +374,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
         credentials: 'include',
         body: JSON.stringify({
           userId: session.user.id,
-          contextKey: currentContext,
+          tenantKey: currentTenant,
           navOptionId: navId,
           intent: {
             message: `Show me content for navigation option ${navId}`
@@ -384,7 +384,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('[DynamicContextPage] Agent API error:', errorData);
+        console.error('[DynamicTenantPage] Agent API error:', errorData);
 
         // Clear loading state
         setContentLoading(false);
@@ -403,7 +403,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
       }
 
       const agentResponse = await response.json();
-      console.log('[DynamicContextPage] Agent response:', agentResponse);
+      console.log('[DynamicTenantPage] Agent response:', agentResponse);
 
       // Clear loading state
       setContentLoading(false);
@@ -438,22 +438,22 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contextKey: currentContext,
+            tenantKey: currentTenant,
             navOptionId: navId
           })
         });
-        console.log('[DynamicContextPage] ✅ Navigation state persisted:', { contextKey: currentContext, navOptionId: navId });
+        console.log('[DynamicTenantPage] ✅ Navigation state persisted:', { tenantKey: currentTenant, navOptionId: navId });
 
         // Invalidate user preferences cache to ensure fresh data on next load
         queryClient.invalidateQueries({ queryKey: ['user-preferences', session.user.id] });
-        console.log('[DynamicContextPage] 🔄 User preferences cache invalidated');
+        console.log('[DynamicTenantPage] 🔄 User preferences cache invalidated');
       } catch (error) {
-        console.warn('[DynamicContextPage] ⚠️ Failed to persist navigation state:', error);
+        console.warn('[DynamicTenantPage] ⚠️ Failed to persist navigation state:', error);
       }
     }
 
   } catch (error) {
-      console.error('[DynamicContextPage] Network error calling agent:', error);
+      console.error('[DynamicTenantPage] Network error calling agent:', error);
 
       // Clear loading state
       setContentLoading(false);
@@ -531,8 +531,8 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
 
   // Check for valid agent response based on type
   if (!agentSchema) {
-    console.log('[DynamicContextPage] No agentSchema found - showing invalid response error');
-    console.log('[DynamicContextPage] Current state:', { agentSchema, loading, error, authLoading });
+    console.log('[DynamicTenantPage] No agentSchema found - showing invalid response error');
+    console.log('[DynamicTenantPage] Current state:', { agentSchema, loading, error, authLoading });
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
@@ -556,12 +556,12 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   }
 
   // Handle different response types OR show loading content with navigation
-  console.log('[DynamicContextPage] Checking agentSchema type:', agentSchema?.type, 'has content:', !!agentSchema?.content, 'contentLoading:', contentLoading);
+  console.log('[DynamicTenantPage] Checking agentSchema type:', agentSchema?.type, 'has content:', !!agentSchema?.content, 'contentLoading:', contentLoading);
 
   // If we're loading content or have content, show the layout with navigation
   if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error') && agentSchema.content)) {
-    console.log('[DynamicContextPage] Handling content_schema response or loading state');
-    console.log('[DynamicContextPage] agentSchema.content:', agentSchema?.content);
+    console.log('[DynamicTenantPage] Handling content_schema response or loading state');
+    console.log('[DynamicTenantPage] agentSchema.content:', agentSchema?.content);
 
     // Navigation is now handled by NavPanel's database-driven approach
 
@@ -569,15 +569,15 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     const NavComponent = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
       return (
         <NavPanel
-          contextKey={currentContext}
-          contextOptions={props.initialContexts?.map(ctx => ({
-            id: ctx.context_key,
+          tenantKey={currentTenant}
+          contextOptions={props.initialTenants?.map(ctx => ({
+            id: ctx.tenant_key,
             title: ctx.display_name,
             subtitle: ctx.description || 'AI-Powered Experience',
             icon: 'star'
           })) || []}
-          contextValue={currentContext}
-          onContextChange={handleContextChange}
+          contextValue={currentTenant}
+          onContextChange={handleTenantChange}
           onNavSelect={handleNavSelect}
           isCollapsed={isCollapsed}
           onToggleCollapse={onToggleCollapse}
@@ -587,8 +587,8 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
       );
     };
 
-            // Use the proper context-specific theme from database
-    const contextConfig = props.initialContexts?.find(ctx => ctx.context_key === currentContext) || props.initialContextConfig;
+            // Use the proper tenant-specific theme from database
+    const tenantConfig = props.initialTenants?.find(ctx => ctx.tenant_key === currentTenant) || props.initialTenantConfig;
     const defaultTheme = {
       primary: '#667eea',
       secondary: '#764ba2',
@@ -598,7 +598,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
       text_primary: '#333333',
       bg_gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     };
-    const theme = (contextConfig && typeof contextConfig === 'object' && 'theme' in contextConfig ? contextConfig.theme as typeof defaultTheme : null) || defaultTheme;
+    const theme = (tenantConfig && typeof tenantConfig === 'object' && 'theme' in tenantConfig ? tenantConfig.theme as typeof defaultTheme : null) || defaultTheme;
 
     return (
       <div style={{
@@ -630,7 +630,7 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   }
 
   // 🚨 SHOULD NEVER REACH HERE - All valid responses handled above
-  console.error('[DynamicContextPage] Unhandled agentSchema type:', agentSchema.type);
+  console.error('[DynamicTenantPage] Unhandled agentSchema type:', agentSchema.type);
   return (
     <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">

@@ -11,6 +11,8 @@ import { Leaderboard } from './Leaderboard';
 import { VideoList } from './VideoList';
 import { Panel } from './Panel';
 import { Grid } from './Grid';
+import { LeaderForgeCard } from './LeaderForgeCard';
+import { VideoPlayerModal } from './VideoPlayerModal';
 
 // Create global widget registry instance
 export const widgetRegistry = new WidgetRegistry();
@@ -134,10 +136,67 @@ widgetRegistry.registerWidget({
   componentPath: './Grid',
 });
 
+// Register LeaderForgeCard widget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'leaderforge-card',
+    type: 'Widget',
+    name: 'LeaderForge Card',
+    description: 'Specialized content card for LeaderForge platform with video modals, progress tracking, and worksheet status',
+    version: '1.0.0',
+    category: 'content',
+    capabilities: [
+      WidgetCapabilities.VIDEO_PLAYBACK,
+      WidgetCapabilities.PROGRESS_TRACKING,
+      'content-display',
+      'video-modal',
+      'progress-indicator',
+      'action-handling',
+      'platform-specific'
+    ],
+    tags: ['card', 'video', 'progress', 'leaderforge', 'content', 'modal'],
+    author: 'Widget Team',
+    sizeHint: 'medium',
+    themeable: true,
+  },
+  component: LeaderForgeCard,
+  componentPath: './LeaderForgeCard',
+});
+
+// Register VideoPlayerModal widget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'videoplayer-modal',
+    type: 'Widget',
+    name: 'Video Player Modal',
+    description: 'Advanced video player modal with HLS support, progress tracking, and platform compatibility',
+    version: '1.0.0',
+    category: 'content',
+    capabilities: [
+      WidgetCapabilities.VIDEO_PLAYBACK,
+      WidgetCapabilities.PROGRESS_TRACKING,
+      WidgetCapabilities.MODAL_DISPLAY,
+      'hls-support',
+      'video-modal',
+      'progress-tracking',
+      'platform-compatibility',
+      'video-player'
+    ],
+    tags: ['video', 'modal', 'player', 'hls', 'progress', 'streaming'],
+    author: 'Widget Team',
+    sizeHint: 'fullwidth',
+    themeable: true,
+  },
+  component: VideoPlayerModal,
+  componentPath: './VideoPlayerModal',
+});
+
 // Export widgets and dispatcher
 export { StatCard } from './StatCard';
 export { Leaderboard } from './Leaderboard';
 export { VideoList } from './VideoList';
 export { Panel } from './Panel';
 export { Grid } from './Grid';
+export { LeaderForgeCard } from './LeaderForgeCard';
+export { VideoPlayerModal } from './VideoPlayerModal';
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';

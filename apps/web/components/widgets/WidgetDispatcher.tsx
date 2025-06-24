@@ -18,7 +18,7 @@ export interface WidgetDispatcherProps extends Omit<BaseWidgetProps, 'schema'> {
   };
   // For layout widgets that need recursive rendering
   onProgressUpdate?: () => void;
-  ComponentSchemaRenderer?: React.ComponentType<{
+  UniversalSchemaRenderer?: React.ComponentType<{
     schema: { type: string; props: Record<string, unknown> };
     userId?: string;
     onProgressUpdate?: () => void;
@@ -28,10 +28,20 @@ export interface WidgetDispatcherProps extends Omit<BaseWidgetProps, 'schema'> {
 /**
  * Dispatches widget rendering based on schema type
  */
-export function WidgetDispatcher({ schema, ComponentSchemaRenderer, onProgressUpdate, ...props }: WidgetDispatcherProps) {
-  // Map schema type to widget ID (for now, simple lowercase mapping)
+export function WidgetDispatcher({ schema, UniversalSchemaRenderer, onProgressUpdate, ...props }: WidgetDispatcherProps) {
+  // Map schema type to widget ID (handle specific mappings for extracted widgets)
   const getWidgetId = (schemaType: string): string => {
-    return schemaType.toLowerCase();
+    const mappings: Record<string, string> = {
+      'Card': 'leaderforge-card', // Map Card to LeaderForgeCard for platform-specific implementation
+      'StatCard': 'statcard',
+      'Leaderboard': 'leaderboard',
+      'VideoList': 'videolist',
+      'Panel': 'panel',
+      'Grid': 'grid',
+      'VideoPlayer': 'videoplayer-modal', // Map VideoPlayer to VideoPlayerModal widget
+    };
+
+    return mappings[schemaType] || schemaType.toLowerCase();
   };
 
   const widgetId = getWidgetId(schema.type);
@@ -50,7 +60,7 @@ export function WidgetDispatcher({ schema, ComponentSchemaRenderer, onProgressUp
 
   const widgetProps = {
     schema,
-    ComponentSchemaRenderer,
+    UniversalSchemaRenderer,
     onProgressUpdate,
     ...props
   };
@@ -69,6 +79,20 @@ export function getAvailableWidgetTypes(): string[] {
  * Check if a widget type is available
  */
 export function isWidgetTypeAvailable(schemaType: string): boolean {
-  const widgetId = schemaType.toLowerCase();
+  const getWidgetId = (schemaType: string): string => {
+    const mappings: Record<string, string> = {
+      'Card': 'leaderforge-card',
+      'StatCard': 'statcard',
+      'Leaderboard': 'leaderboard',
+      'VideoList': 'videolist',
+      'Panel': 'panel',
+      'Grid': 'grid',
+      'VideoPlayer': 'videoplayer-modal',
+    };
+
+    return mappings[schemaType] || schemaType.toLowerCase();
+  };
+
+  const widgetId = getWidgetId(schemaType);
   return !!widgetRegistry.getWidgetComponent(widgetId);
 }

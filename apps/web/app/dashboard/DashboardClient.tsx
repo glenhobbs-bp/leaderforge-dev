@@ -4,8 +4,8 @@ import SupabaseProvider from '../../components/SupabaseProvider';
 import { Session } from '@supabase/supabase-js';
 
 // Type definitions
-interface Context {
-  context_key: string;
+interface Tenant {
+  tenant_key: string;
   display_name: string;
   theme: Record<string, string>;
   i18n: Record<string, string>;
@@ -19,7 +19,7 @@ interface Context {
 
 interface NavOption {
   id: string;
-  context_key: string;
+  tenant_key: string;
   label: string;
   icon: string;
   description: string;
@@ -35,8 +35,8 @@ interface NavOption {
   section_order: number;
 }
 
-// Lazy load the heavy DynamicContextPage component
-const DynamicContextPage = lazy(() => import('../../components/DynamicContextPage'));
+// Lazy load the heavy DynamicTenantPage component
+const DynamicTenantPage = lazy(() => import('../../components/DynamicTenantPage'));
 
 // Enhanced loading component - standardized to match login modal
 function DashboardLoader() {
@@ -65,25 +65,25 @@ function DashboardLoader() {
 
 export default function DashboardClient({
   initialSession,
-  initialContexts,
-  initialContextConfig,
+  initialTenants,
+  initialTenantConfig,
   initialNavOptions,
-  defaultContextKey,
+  defaultTenantKey,
 }: {
   initialSession: Session | null;
-  initialContexts: Context[];
-  initialContextConfig?: Context;
+  initialTenants: Tenant[];
+  initialTenantConfig?: Tenant;
   initialNavOptions?: NavOption[];
-  defaultContextKey?: string;
+  defaultTenantKey?: string;
 }) {
   return (
     <SupabaseProvider initialSession={initialSession}>
       <Suspense fallback={<DashboardLoader />}>
-        <DynamicContextPage
-          initialContexts={initialContexts}
-          initialContextConfig={initialContextConfig}
+        <DynamicTenantPage
+          initialTenants={initialTenants}
+          initialTenantConfig={initialTenantConfig}
           initialNavOptions={initialNavOptions}
-          defaultContextKey={defaultContextKey}
+          defaultTenantKey={defaultTenantKey}
         />
       </Suspense>
     </SupabaseProvider>

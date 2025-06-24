@@ -62,6 +62,28 @@ export default function TestWidgetsPage() {
     }
   };
 
+  const videoPlayerSchema = {
+    type: 'VideoPlayer',
+    props: {
+      videoUrl: 'https://example.com/sample-video.mp4',
+      title: 'Sample Training Video',
+      description: 'This is a demo video player modal widget',
+      progress: 25,
+      videoWatched: false,
+      worksheetSubmitted: false,
+      pills: [
+        { label: 'Training', color: '#3b82f6' },
+        { label: 'Demo', color: '#10b981' }
+      ]
+    }
+  };
+
+  // Type the action parameter
+  const handleCardAction = (action: { action: string; label: string; [key: string]: unknown }) => {
+    console.log('Card action triggered:', action);
+    alert(`Action: ${action.action} - ${action.label}`);
+  };
+
   return (
     <div className="container mx-auto p-8 max-w-6xl">
       <h1 className="text-3xl font-bold mb-8">Widget Testing Dashboard</h1>
@@ -112,6 +134,89 @@ export default function TestWidgetsPage() {
           <WidgetDispatcher schema={videoListSchema} />
         </section>
 
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">LeaderForge Card Widget</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <WidgetDispatcher
+              schema={{
+                type: 'Card',
+                props: {
+                  title: 'Leadership Fundamentals',
+                  description: 'Master the core principles of effective leadership in this comprehensive course.',
+                  image: '/thumb1.png',
+                  videoUrl: 'https://example.com/video.mp4',
+                  progress: 45,
+                  videoWatched: false,
+                  worksheetSubmitted: false,
+                  pills: [
+                    { label: 'Leadership', color: '#3b82f6' },
+                    { label: 'Beginner', color: '#10b981' }
+                  ],
+                  actions: [
+                    { label: 'Watch Video', action: 'openVideoModal' },
+                    { label: 'Download Worksheet', action: 'downloadWorksheet' }
+                  ]
+                }
+              }}
+              onAction={handleCardAction}
+            />
+            <WidgetDispatcher
+              schema={{
+                type: 'Card',
+                props: {
+                  title: 'Team Building Strategies',
+                  description: 'Learn proven techniques for building high-performing teams.',
+                  image: '/thumb2.png',
+                  videoUrl: 'https://example.com/video2.mp4',
+                  progress: 100,
+                  videoWatched: true,
+                  worksheetSubmitted: true,
+                  pills: [
+                    { label: 'Team Building', color: '#8b5cf6' },
+                    { label: 'Intermediate', color: '#f59e0b' }
+                  ],
+                  actions: [
+                    { label: 'Rewatch', action: 'openVideoModal' },
+                    { label: 'View Certificate', action: 'viewCertificate' }
+                  ]
+                }
+              }}
+              onAction={handleCardAction}
+            />
+            <WidgetDispatcher
+              schema={{
+                type: 'Card',
+                props: {
+                  title: 'Communication Excellence',
+                  description: 'Develop advanced communication skills for leadership success.',
+                  image: '/thumb3.png',
+                  videoUrl: 'https://example.com/video3.mp4',
+                  progress: 0,
+                  videoWatched: false,
+                  worksheetSubmitted: false,
+                  pills: [
+                    { label: 'Communication', color: '#ef4444' }
+                  ],
+                  actions: [
+                    { label: 'Start Course', action: 'openVideoModal' }
+                  ]
+                }
+              }}
+              onAction={handleCardAction}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Video Player Modal Widget</h2>
+          <div className="max-w-lg mx-auto">
+            <p className="text-sm text-gray-600 mb-4">
+              Basic VideoPlayerModal widget structure (video functionality will be added incrementally)
+            </p>
+            <WidgetDispatcher schema={videoPlayerSchema} />
+          </div>
+        </section>
+
         <section className="border-t pt-8">
           <h2 className="text-2xl font-semibold mb-4">Widget Registry Info</h2>
           <div className="bg-gray-50 p-4 rounded-lg">
@@ -120,6 +225,9 @@ export default function TestWidgetsPage() {
               {' '}using the extracted widget registry system. This demonstrates that the ComponentSchemaRenderer
               refactor is working correctly.
             </p>
+            <div className="mt-2 text-xs text-gray-500">
+              <strong>Progress:</strong> 7 of 7 widget types now registered in the system
+            </div>
           </div>
         </section>
       </div>

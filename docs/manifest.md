@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/24/2025, 11:40:10 AM*
+*Generated on 6/24/2025, 6:30:00 PM*
 
 ## Overview
 
-- **Total Files**: 208
-- **Total Size**: 1.77 MB
+- **Total Files**: 227
+- **Total Size**: 1.85 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 95 files
-- **.md**: 72 files
-- **.tsx**: 24 files
-- **.json**: 14 files
+- **.ts**: 101 files
+- **.md**: 74 files
+- **.tsx**: 33 files
+- **.json**: 16 files
 - **.js**: 2 files
 - **.sql**: 1 files
 
 ## Most Common Tags
 
-- **TypeScript**: 119 files
-- **AI agent**: 87 files
-- **documentation**: 74 files
-- **security**: 56 files
+- **TypeScript**: 134 files
+- **AI agent**: 93 files
+- **documentation**: 76 files
+- **security**: 58 files
 - **API**: 34 files
+- **React**: 33 files
 - **Next.js API**: 33 files
 - **utility**: 28 files
-- **React**: 24 files
-- **React hooks**: 21 files
-- **hooks**: 16 files
+- **UI**: 25 files
+- **React hooks**: 22 files
 
 ## File Inventory
 
@@ -407,7 +407,7 @@ Type definitions
 
 **Complexity**: medium • **Size**: 2.9KB
 **Tags**: `React`, `TypeScript`, `AI agent`, `security`
-**Modified**: 6/22/2025
+**Modified**: 6/24/2025
 
 
 ### `apps/web/app/dashboard/page.tsx`
@@ -788,6 +788,15 @@ SSR Root page that redirects based on session status
 **Modified**: 6/22/2025
 
 
+### `apps/web/app/test-widgets/page.tsx`
+
+File: apps/web/app/test-widgets/page.tsx
+
+**Complexity**: medium • **Size**: 7.7KB
+**Tags**: `React`, `TypeScript`
+**Modified**: 6/24/2025
+
+
 ### `apps/web/components.json`
 
 ui.shadcn.com/schema.json",
@@ -815,20 +824,20 @@ Only render CopilotKit on client side to avoid hydration mismatch
 **Modified**: 6/1/2025
 
 
-### `apps/web/components/ai/ComponentSchemaRenderer.tsx`
+### `apps/web/components/ai/UniversalSchemaRenderer.tsx`
 
-File: apps/web/components/ai/ComponentSchemaRenderer.tsx
+File: apps/web/components/ai/UniversalSchemaRenderer.tsx
 
-**Complexity**: high • **Size**: 38.4KB
+**Complexity**: medium • **Size**: 6.3KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 6/24/2025
 
 
-### `apps/web/components/DynamicContextPage.tsx`
+### `apps/web/components/DynamicTenantPage.tsx`
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 25.0KB
+**Complexity**: high • **Size**: 24.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`, `AI agent`
 **Modified**: 6/24/2025
 
@@ -891,9 +900,9 @@ Transform content into our Training format
 
 Navigation panel for agent-native app, themed via contextConfig
 
-**Owner**: Frontend team • **Complexity**: high • **Size**: 18.8KB
+**Owner**: Frontend team • **Complexity**: high • **Size**: 18.9KB
 **Tags**: `UI`, `navigation`, `context-based`, `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 6/22/2025
+**Modified**: 6/24/2025
 
 
 ### `apps/web/components/ui/ProgressBar.tsx`
@@ -939,6 +948,87 @@ Fetch user data from API
 **Complexity**: low • **Size**: 0.3KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/1/2025
+
+
+### `apps/web/components/widgets/Grid.tsx`
+
+File: apps/web/components/widgets/Grid.tsx
+
+**Complexity**: low • **Size**: 1.9KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/index.ts`
+
+File: apps/web/components/widgets/index.ts
+
+**Complexity**: medium • **Size**: 5.5KB
+**Tags**: `TypeScript`, `UI`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/Leaderboard.tsx`
+
+File: apps/web/components/widgets/Leaderboard.tsx
+
+**Complexity**: low • **Size**: 1.1KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/LeaderForgeCard.tsx`
+
+LeaderForgeCard.tsx
+
+**Complexity**: medium • **Size**: 6.5KB
+**Tags**: `React`, `TypeScript`, `UI`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/Panel.tsx`
+
+File: apps/web/components/widgets/Panel.tsx
+
+**Complexity**: low • **Size**: 1.7KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/StatCard.tsx`
+
+File: apps/web/components/widgets/StatCard.tsx
+
+**Complexity**: low • **Size**: 0.9KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/VideoList.tsx`
+
+File: apps/web/components/widgets/VideoList.tsx
+
+**Complexity**: low • **Size**: 1.4KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/VideoPlayerModal.tsx`
+
+VideoPlayerModal.tsx
+
+**Complexity**: high • **Size**: 11.8KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `apps/web/components/widgets/WidgetDispatcher.tsx`
+
+File: apps/web/components/widgets/WidgetDispatcher.tsx
+
+**Complexity**: medium • **Size**: 3.0KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 6/24/2025
 
 
 ### `apps/web/hooks/useAvatar.ts`
@@ -1037,7 +1127,7 @@ registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz",
 
 **Size**: 1.0KB
 **Tags**: `AI agent`
-**Modified**: 6/20/2025
+**Modified**: 6/24/2025
 
 
 ### `apps/web/postcss.config.js`
@@ -1598,6 +1688,15 @@ Content processing jobs
 **Modified**: 6/24/2025
 
 
+### `docs/architecture/directory-structure.md`
+
+apps/web/components/widgets/content/Card/Card.tsx
+
+**Size**: 11.0KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
 ### `docs/architecture/overview/agent-native-composition-architecture.md`
 
 Examples of base components
@@ -1625,6 +1724,15 @@ Examples of base components
 **Modified**: 6/24/2025
 
 
+### `docs/engineering/implementation-plans/asset-system-refactor-plan.md`
+
+—
+
+**Size**: 24.9KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/24/2025
+
+
 ### `docs/engineering/implementation-plans/component-system-refactor-plan.md`
 
 —
@@ -1647,7 +1755,7 @@ Register agent with proper typing
 
 —
 
-**Size**: 5.7KB
+**Size**: 5.8KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/24/2025
 
@@ -1656,7 +1764,7 @@ Register agent with proper typing
 
 —
 
-**Size**: 3.9KB
+**Size**: 5.6KB
 **Tags**: `documentation`
 **Modified**: 6/24/2025
 
@@ -1683,7 +1791,7 @@ Register agent with proper typing
 
 Local LangGraph dev server",
 
-**Size**: 105.4KB
+**Size**: 114.7KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/24/2025
 
@@ -1692,7 +1800,7 @@ Local LangGraph dev server",
 
 Local LangGraph dev server
 
-**Size**: 39.8KB
+**Size**: 43.0KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/24/2025
 
@@ -1884,6 +1992,69 @@ Progress Schema Types - Schema Integration for Universal Progress Tool
 **Complexity**: high • **Size**: 8.9KB
 **Tags**: `TypeScript`, `AI agent`
 **Modified**: 6/22/2025
+
+
+### `packages/asset-core/package.json`
+
+—
+
+**Size**: 0.7KB
+**Tags**: `AI agent`
+**Modified**: 6/24/2025
+
+
+### `packages/asset-core/src/index.ts`
+
+File: packages/asset-core/src/index.ts
+
+**Complexity**: low • **Size**: 0.3KB
+**Tags**: `TypeScript`
+**Modified**: 6/24/2025
+
+
+### `packages/asset-core/src/registries/AssetRegistry.ts`
+
+File: packages/asset-core/src/registries/AssetRegistry.ts
+
+**Complexity**: medium • **Size**: 5.8KB
+**Tags**: `TypeScript`
+**Modified**: 6/24/2025
+
+
+### `packages/asset-core/src/registries/WidgetRegistry.ts`
+
+File: packages/asset-core/src/registries/WidgetRegistry.ts
+
+**Complexity**: medium • **Size**: 2.7KB
+**Tags**: `TypeScript`
+**Modified**: 6/24/2025
+
+
+### `packages/asset-core/src/types/AssetMetadata.ts`
+
+File: packages/asset-core/src/types/AssetMetadata.ts
+
+**Complexity**: medium • **Size**: 2.9KB
+**Tags**: `TypeScript`
+**Modified**: 6/24/2025
+
+
+### `packages/asset-core/src/types/WidgetSchema.ts`
+
+File: packages/asset-core/src/types/WidgetSchema.ts
+
+**Complexity**: medium • **Size**: 3.5KB
+**Tags**: `TypeScript`, `AI agent`, `security`
+**Modified**: 6/24/2025
+
+
+### `packages/asset-core/tsconfig.json`
+
+—
+
+**Size**: 0.5KB
+**Tags**: None
+**Modified**: 6/24/2025
 
 
 ### `packages/env/index.ts`
