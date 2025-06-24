@@ -1,0 +1,235 @@
+# Senior QA Engineer Rule
+
+**File:** docs/governance/senior-qa-rule.md
+**Purpose:** Comprehensive QA standards and processes
+**Owner:** QA Team Lead
+**Tags:** qa, quality-assurance, testing, security, performance, documentation
+**Last Updated:** 2024-01-15
+
+## Overview
+
+As a Senior QA Engineer, you are responsible for ensuring the highest quality standards across all aspects of the LeaderForge platform. This includes functional testing, documentation quality, codebase hygiene, security validation, and performance optimization.
+
+## Core QA Responsibilities
+
+### 1. Functional Quality Assurance
+
+#### Test Planning & Execution
+- **Agent Testing** - Validate all agent workflows and responses
+- **UI Testing** - Ensure widgets render correctly across all tenants
+- **Integration Testing** - Verify API endpoints and external service connections
+- **Cross-Tenant Testing** - Validate functionality across LeaderForge and Brilliant Movement
+- **Regression Testing** - Ensure new changes don't break existing functionality
+
+#### Test Automation
+- **Unit Tests** - Validate individual functions and components
+- **Integration Tests** - Test agent-to-tool and API interactions
+- **E2E Tests** - Full user journey testing across both tenants
+- **Performance Tests** - Load testing and response time validation
+- **Security Tests** - Automated vulnerability scanning
+
+### 2. Documentation Quality Assurance
+
+#### Documentation Discipline
+Every QA cycle must verify:
+
+- [ ] **File Headers** - All files have standardized headers with Purpose, Owner, Tags
+- [ ] **Up-to-Date Content** - Documentation reflects current implementation
+- [ ] **Terminology Consistency** - All documents use [Universal Glossary](universal-glossary.md) terms
+- [ ] **Cross-References** - Links between documents are valid and current
+- [ ] **Ownership** - Each document has clear owner and maintenance responsibility
+
+#### Documentation Testing Process
+1. **Content Review** - Verify technical accuracy against implementation
+2. **Link Validation** - Check all internal and external links work
+3. **Terminology Audit** - Ensure consistent use of approved terms
+4. **Navigation Testing** - Verify documentation structure and findability
+5. **Stakeholder Review** - Confirm documentation meets user needs
+
+#### Documentation Standards Enforcement
+- **File Naming** - kebab-case for files, PascalCase for components
+- **Header Requirements** - Purpose, Owner, Tags must be present and accurate
+- **Maintenance Tracking** - Last updated dates and review cycles followed
+- **Quality Gates** - Documentation review required before feature release
+
+### 3. Codebase Hygiene
+
+#### Unused File Cleanup
+Regular audits to identify and remove:
+
+- [ ] **Unused Icons** - Remove pre-Lucide icon files no longer referenced
+- [ ] **Legacy Components** - Identify obsolete widgets and remove
+- [ ] **Test Files** - Clean up temporary or outdated test files
+- [ ] **Build Artifacts** - Remove generated files not in .gitignore
+- [ ] **Dead Code** - Identify and remove unreferenced functions/components
+
+#### Cleanup Process
+1. **Scan for References** - Use grep/IDE search to find file usage
+2. **Dependency Analysis** - Check import/export chains
+3. **Git History Review** - Confirm files aren't part of active development
+4. **Stakeholder Confirmation** - Verify with team before deletion
+5. **Safe Removal** - Archive or soft-delete before permanent removal
+
+#### File Organization Standards
+- **Consistent Structure** - Verify files follow established patterns
+- **Proper Categorization** - Components, hooks, utilities in correct directories
+- **Clear Naming** - Files named according to their purpose and content
+- **Import Efficiency** - Remove unused imports and optimize dependency chains
+
+### 4. Security Quality Assurance
+
+#### Security Testing Requirements
+- [ ] **Authentication Testing** - Verify login/logout flows and session management
+- [ ] **Authorization Testing** - Confirm entitlement and role-based access controls
+- [ ] **Input Validation** - Test all forms and API inputs for injection attacks
+- [ ] **Data Protection** - Verify sensitive data encryption and secure storage
+- [ ] **API Security** - Test rate limiting, CORS, and endpoint protection
+
+#### Security Audit Process
+1. **Automated Scanning** - Run security tools on every build
+2. **Manual Testing** - Test authentication flows and edge cases
+3. **Dependency Auditing** - Check for vulnerable packages
+4. **Configuration Review** - Verify secure deployment settings
+5. **Incident Response** - Have plan for security issues discovery
+
+#### Security Standards
+- **OWASP Compliance** - Follow OWASP Top 10 security guidelines
+- **Data Privacy** - Ensure GDPR/privacy regulation compliance
+- **Secure Coding** - Review code for security anti-patterns
+- **Access Controls** - Verify proper entitlement and tenant isolation
+
+### 5. Performance Quality Assurance
+
+#### Performance Testing Standards
+- [ ] **Load Testing** - Verify system handles expected user volumes
+- [ ] **Response Time** - API endpoints respond within acceptable limits
+- [ ] **Bundle Size** - Frontend assets stay within performance budgets
+- [ ] **Memory Usage** - No memory leaks in long-running sessions
+- [ ] **Database Performance** - Query optimization and index effectiveness
+
+#### Performance Metrics
+- **API Response Time** - < 200ms for most endpoints
+- **Page Load Time** - < 2 seconds for initial load
+- **Bundle Size** - < 500KB for critical path JavaScript
+- **Lighthouse Score** - > 90 for Performance, Accessibility, Best Practices
+- **Core Web Vitals** - LCP < 2.5s, FID < 100ms, CLS < 0.1
+
+#### Performance Testing Process
+1. **Baseline Measurement** - Establish performance benchmarks
+2. **Regression Testing** - Ensure new features don't degrade performance
+3. **Load Testing** - Test system under realistic and peak loads
+4. **Optimization Review** - Identify and implement performance improvements
+5. **Monitoring Setup** - Configure alerts for performance degradation
+
+### 6. Quality Gate Process
+
+#### Pre-Release Checklist
+- [ ] **Functional Testing** - All features work as specified
+- [ ] **Documentation Review** - All documentation current and accurate
+- [ ] **Security Scan** - No high-severity vulnerabilities
+- [ ] **Performance Test** - Meets or exceeds performance standards
+- [ ] **Codebase Hygiene** - No unused files or dead code
+- [ ] **Cross-Tenant Testing** - Works correctly in both LeaderForge and Brilliant
+- [ ] **Agent Testing** - All agent workflows validated
+- [ ] **Accessibility Testing** - WCAG 2.1 AA compliance verified
+
+#### Release Quality Standards
+- **Zero Critical Bugs** - No critical issues in release candidate
+- **Documentation Complete** - All new features documented
+- **Performance Maintained** - No regression in key performance metrics
+- **Security Validated** - Security review passed
+- **Accessibility Verified** - Accessibility audit completed
+
+## Testing Methodologies
+
+### Agent-Native Testing
+- **Schema Validation** - Test agent response schemas match widget expectations
+- **Workflow Testing** - Verify complex agent orchestration scenarios
+- **Context Testing** - Ensure agents respond appropriately to tenant context
+- **Tool Integration** - Validate agent-tool communication and error handling
+
+### Tenant-Aware Testing
+- **Theme Testing** - Verify visual consistency across tenant themes
+- **Content Testing** - Ensure tenant-specific content displays correctly
+- **Navigation Testing** - Validate tenant switching and context preservation
+- **Branding Testing** - Confirm logos, colors, and typography render properly
+
+### Progressive Enhancement Testing
+- **JavaScript Disabled** - Core functionality works without JavaScript
+- **Network Conditions** - Test under slow/unreliable network conditions
+- **Device Testing** - Verify functionality across device types and screen sizes
+- **Browser Testing** - Cross-browser compatibility validation
+
+## Quality Metrics & KPIs
+
+### Testing Coverage
+- **Unit Test Coverage** - > 80% for critical business logic
+- **Integration Test Coverage** - All API endpoints tested
+- **E2E Test Coverage** - All major user workflows covered
+- **Security Test Coverage** - All authentication and authorization paths tested
+
+### Quality Indicators
+- **Bug Escape Rate** - < 5% of bugs found in production
+- **Documentation Accuracy** - > 95% of documentation current and correct
+- **Performance Compliance** - 100% of releases meet performance standards
+- **Security Compliance** - Zero high-severity security issues in production
+
+### Continuous Improvement
+- **Testing Efficiency** - Reduce time to complete full QA cycle
+- **Automation Coverage** - Increase percentage of automated vs manual testing
+- **Quality Feedback Loop** - Faster identification and resolution of quality issues
+- **Team Collaboration** - Improved communication between QA and development teams
+
+## Tools & Resources
+
+### Testing Tools
+- **Automated Testing** - Jest, Playwright, Cypress for functional testing
+- **Performance Testing** - Lighthouse, WebPageTest, custom load testing
+- **Security Testing** - OWASP ZAP, Snyk, custom security scanning
+- **Accessibility Testing** - axe-core, WAVE, manual accessibility review
+
+### Documentation Tools
+- **Link Checking** - Automated link validation tools
+- **Spell Checking** - Grammar and spelling validation
+- **Terminology Checking** - Custom tools to validate glossary compliance
+- **Structure Validation** - Automated header and format checking
+
+### Quality Management
+- **Issue Tracking** - Comprehensive bug and issue management
+- **Test Management** - Test case organization and execution tracking
+- **Reporting** - Quality metrics dashboards and reports
+- **Communication** - Clear channels for quality issues and improvements
+
+## Escalation & Communication
+
+### Quality Issues
+- **Critical Issues** - Immediate escalation to development team and product owner
+- **Security Issues** - Direct escalation to security team and stakeholders
+- **Performance Issues** - Coordination with engineering team for optimization
+- **Documentation Issues** - Work with content owners for rapid resolution
+
+### Regular Reporting
+- **Daily** - Critical issue status and blocker communication
+- **Weekly** - Quality metrics summary and trend analysis
+- **Monthly** - Comprehensive quality report with improvement recommendations
+- **Quarterly** - Quality process review and methodology updates
+
+## Success Criteria
+
+### Quality Excellence
+- **Zero Production Issues** - No critical bugs reach production
+- **Documentation Currency** - All documentation accurate and up-to-date
+- **Performance Standards** - Consistent performance across all releases
+- **Security Posture** - Strong security with proactive vulnerability management
+
+### Team Effectiveness
+- **Efficient Testing** - Rapid but thorough quality validation
+- **Collaborative Approach** - Strong partnership with development and product teams
+- **Continuous Learning** - Regular skill development and process improvement
+- **Quality Culture** - Team-wide commitment to quality excellence
+
+---
+
+**Remember**: Quality is not just about finding bugs—it's about ensuring the entire LeaderForge platform delivers exceptional user experiences while maintaining security, performance, and reliability standards.
+
+**Quality Mindset**: Every interaction, every feature, every line of code should contribute to user success and business objectives. We are the guardians of quality and user trust.

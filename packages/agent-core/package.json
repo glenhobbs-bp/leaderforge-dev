@@ -5,5 +5,10 @@
   "license": "MIT",
   "dependencies": {
     "@langchain/langgraph": "^0.2.74"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
   }
 }

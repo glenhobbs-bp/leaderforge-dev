@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/21/2025, 8:23:56 AM*
+*Generated on 6/24/2025, 11:40:10 AM*
 
 ## Overview
 
-- **Total Files**: 173
-- **Total Size**: 1.40 MB
+- **Total Files**: 208
+- **Total Size**: 1.77 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 89 files
-- **.md**: 37 files
-- **.tsx**: 31 files
-- **.json**: 13 files
+- **.ts**: 95 files
+- **.md**: 72 files
+- **.tsx**: 24 files
+- **.json**: 14 files
 - **.js**: 2 files
 - **.sql**: 1 files
 
 ## Most Common Tags
 
-- **TypeScript**: 120 files
-- **security**: 60 files
-- **AI agent**: 49 files
-- **utility**: 39 files
-- **documentation**: 39 files
-- **API**: 31 files
-- **React**: 31 files
-- **test**: 24 files
-- **Next.js API**: 22 files
-- **React hooks**: 17 files
+- **TypeScript**: 119 files
+- **AI agent**: 87 files
+- **documentation**: 74 files
+- **security**: 56 files
+- **API**: 34 files
+- **Next.js API**: 33 files
+- **utility**: 28 files
+- **React**: 24 files
+- **React hooks**: 21 files
+- **hooks**: 16 files
 
 ## File Inventory
 
@@ -117,9 +117,9 @@ aka.ms/tsconfig to read more about this file */
 
 POST /api/agent/content
 
-**Complexity**: medium • **Size**: 5.9KB
+**Complexity**: medium • **Size**: 6.9KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/20/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/api/agent/context/route.ts`
@@ -149,15 +149,6 @@ File: apps/web/app/api/auth/set-session/route.ts
 **Modified**: 6/13/2025
 
 
-### `apps/web/app/api/content/[context_key]/route.test.ts`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 2.5KB
-**Tags**: `TypeScript`, `API`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/api/content/[context_key]/route.ts`
 
 ✅ Get session from Supabase cookie
@@ -174,15 +165,6 @@ GET /api/context/[context_key]/bundle
 **Complexity**: low • **Size**: 2.7KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
 **Modified**: 6/18/2025
-
-
-### `apps/web/app/api/context/[context_key]/route.test.ts`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 2.1KB
-**Tags**: `TypeScript`, `API`, `test`
-**Modified**: 6/9/2025
 
 
 ### `apps/web/app/api/context/[context_key]/route.ts`
@@ -239,15 +221,6 @@ Use service role for admin operations
 **Modified**: 6/18/2025
 
 
-### `apps/web/app/api/entitlements/[user_id]/route.test.ts`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `TypeScript`, `API`, `test`, `security`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/api/entitlements/[user_id]/route.ts`
 
 GET /api/entitlements/[user_id]
@@ -266,31 +239,13 @@ POST /api/entitlements/clear-cache
 **Modified**: 6/18/2025
 
 
-### `apps/web/app/api/nav/[context_key]/route.test.ts`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 2.5KB
-**Tags**: `TypeScript`, `API`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/api/nav/[context_key]/route.ts`
 
 API route to return entitlement-filtered nav options for a given context. SSR/session safe, Next.js 15+ compatible.
 
-**Complexity**: low • **Size**: 3.0KB
+**Complexity**: medium • **Size**: 3.6KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/21/2025
-
-
-### `apps/web/app/api/orgs/[org_id]/entitlements/route.test.ts`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.8KB
-**Tags**: `TypeScript`, `API`, `test`, `security`
-**Modified**: 6/9/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/api/orgs/[org_id]/entitlements/route.ts`
@@ -302,15 +257,6 @@ GET /api/orgs/[org_id]/entitlements
 **Modified**: 6/20/2025
 
 
-### `apps/web/app/api/provisioning/route.test.ts`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 3.2KB
-**Tags**: `TypeScript`, `API`, `test`, `security`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/api/provisioning/route.ts`
 
 POST /api/provisioning
@@ -318,6 +264,69 @@ POST /api/provisioning
 **Complexity**: low • **Size**: 3.6KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
 **Modified**: 6/18/2025
+
+
+### `apps/web/app/api/test/create-table/route.ts`
+
+Create Table API
+
+**Complexity**: medium • **Size**: 4.6KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`, `security`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/api/test/db-check/route.ts`
+
+Database Check API
+
+**Complexity**: low • **Size**: 1.8KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/api/test/db-debug/route.ts`
+
+Database Debug API - Test RLS Policies
+
+**Complexity**: medium • **Size**: 3.3KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`
+**Modified**: 6/23/2025
+
+
+### `apps/web/app/api/test/schema-check/route.ts`
+
+Test 1: Try core.user_progress (our target)
+
+**Complexity**: medium • **Size**: 2.9KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`, `security`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/api/test/table-access/route.ts`
+
+Test 1: Check if user_progress view exists
+
+**Complexity**: medium • **Size**: 2.6KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/api/test/universal-progress-auth/route.ts`
+
+Get authenticated supabase client
+
+**Complexity**: low • **Size**: 2.0KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/api/test/universal-progress/route.ts`
+
+Universal Progress Tool Integration Test API
+
+**Complexity**: low • **Size**: 2.3KB
+**Tags**: `TypeScript`, `API`, `test`, `Next.js API`
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/api/tribe/content/[id]/route.ts`
@@ -329,13 +338,22 @@ edge.tribesocial.io';
 **Modified**: 6/20/2025
 
 
-### `apps/web/app/api/user/[user_id]/preferences/route.test.ts`
+### `apps/web/app/api/universal-progress/route.ts`
 
-To run these tests:
+Universal Progress API - Authenticated Endpoint
 
-**Complexity**: medium • **Size**: 4.5KB
-**Tags**: `TypeScript`, `API`, `test`
-**Modified**: 6/9/2025
+**Complexity**: medium • **Size**: 6.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `apps/web/app/api/user/[user_id]/navigation-state/route.ts`
+
+API endpoint for updating user navigation state
+
+**Owner**: Backend team • **Complexity**: low • **Size**: 1.1KB
+**Tags**: `API endpoint`, `navigation state`, `user preferences`, `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/21/2025
 
 
 ### `apps/web/app/api/user/[user_id]/preferences/route.ts`
@@ -344,16 +362,25 @@ User preferences API with performance optimizations and caching
 
 **Owner**: Backend team • **Complexity**: medium • **Size**: 3.9KB
 **Tags**: `API`, `user management`, `preferences`, `caching`, `performance`, `TypeScript`, `Next.js API`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/api/user/[user_id]/video-progress/route.ts`
+
+API endpoint for updating user video progress
+
+**Owner**: Backend team • **Complexity**: low • **Size**: 1.1KB
+**Tags**: `API endpoint`, `video progress`, `user preferences`, `TypeScript`, `API`, `Next.js API`
 **Modified**: 6/21/2025
 
 
 ### `apps/web/app/api/user/avatar/route.ts`
 
-SSR Auth setup with proper session hydration
+Simple in-memory cache for avatar URLs
 
-**Complexity**: medium • **Size**: 7.4KB
+**Complexity**: medium • **Size**: 7.6KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/21/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
@@ -376,11 +403,11 @@ SSR Auth setup with proper session hydration
 
 ### `apps/web/app/dashboard/DashboardClient.tsx`
 
-—
+Type definitions
 
-**Complexity**: low • **Size**: 0.8KB
-**Tags**: `React`, `TypeScript`
-**Modified**: 6/19/2025
+**Complexity**: medium • **Size**: 2.9KB
+**Tags**: `React`, `TypeScript`, `AI agent`, `security`
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/dashboard/page.tsx`
@@ -419,6 +446,15 @@ React Query hook for fetching nav for a context.
 **Modified**: 6/9/2025
 
 
+### `apps/web/app/hooks/useNavigationState.ts`
+
+React hook for persisting navigation state with optimistic updates
+
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.7KB
+**Tags**: `React hooks`, `navigation state`, `user preferences`, `TypeScript`, `hooks`, `React Query`
+**Modified**: 6/22/2025
+
+
 ### `apps/web/app/hooks/useOrgEntitlements.ts`
 
 React Query hook for fetching org entitlements.
@@ -437,13 +473,13 @@ React Query mutation hook for provisioning actions.
 **Modified**: 6/9/2025
 
 
-### `apps/web/app/hooks/useUserEntitlements.test.ts`
+### `apps/web/app/hooks/useUniversalProgress.ts`
 
-To run these tests:
+Universal Progress Hook
 
-**Complexity**: low • **Size**: 1.8KB
-**Tags**: `TypeScript`, `hooks`, `test`, `security`
-**Modified**: 6/9/2025
+**Complexity**: high • **Size**: 9.0KB
+**Tags**: `TypeScript`, `hooks`, `React hooks`, `AI agent`
+**Modified**: 6/23/2025
 
 
 ### `apps/web/app/hooks/useUserEntitlements.ts`
@@ -459,8 +495,17 @@ React Query hook for fetching user entitlements.
 
 React Query hooks for user preferences with optimized caching
 
-**Owner**: Frontend team • **Complexity**: low • **Size**: 1.9KB
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.0KB
 **Tags**: `React hooks`, `React Query`, `user preferences`, `caching`, `cross-invalidation`, `TypeScript`, `hooks`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/hooks/useVideoProgress.ts`
+
+React hook for video progress tracking with optimistic updates
+
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 4.5KB
+**Tags**: `React hooks`, `video progress`, `debouncing`, `optimistic updates`, `TypeScript`, `hooks`, `React Query`
 **Modified**: 6/21/2025
 
 
@@ -477,9 +522,9 @@ TODO: See enhancements-and-todos.md — move metadata export to a server compone
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: medium • **Size**: 7.2KB
+**Complexity**: high • **Size**: 10.4KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 6/20/2025
+**Modified**: 6/24/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -491,15 +536,6 @@ Complete context data bundle returned by the optimized batch API
 **Modified**: 6/18/2025
 
 
-### `apps/web/app/lib/apiClient/content.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/apiClient/content.ts`
 
 Fetches content for a context and user from the API.
@@ -507,15 +543,6 @@ Fetches content for a context and user from the API.
 **Complexity**: low • **Size**: 1.0KB
 **Tags**: `TypeScript`, `utility`, `security`
 **Modified**: 6/18/2025
-
-
-### `apps/web/app/lib/apiClient/contextConfig.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.7KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
 
 
 ### `apps/web/app/lib/apiClient/contextConfig.ts`
@@ -536,15 +563,6 @@ Fetches all entitlements for a user from the API.
 **Modified**: 6/18/2025
 
 
-### `apps/web/app/lib/apiClient/nav.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.8KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/apiClient/nav.ts`
 
 Fetches nav options for a context and user from the API.
@@ -552,15 +570,6 @@ Fetches nav options for a context and user from the API.
 **Complexity**: low • **Size**: 1.0KB
 **Tags**: `TypeScript`, `utility`, `security`
 **Modified**: 6/18/2025
-
-
-### `apps/web/app/lib/apiClient/orgEntitlements.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`, `security`
-**Modified**: 6/9/2025
 
 
 ### `apps/web/app/lib/apiClient/orgEntitlements.ts`
@@ -572,15 +581,6 @@ Fetches all entitlements for an organization from the API.
 **Modified**: 6/11/2025
 
 
-### `apps/web/app/lib/apiClient/provisioning.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.7KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/apiClient/provisioning.ts`
 
 Performs a provisioning action via the API.
@@ -590,15 +590,6 @@ Performs a provisioning action via the API.
 **Modified**: 6/11/2025
 
 
-### `apps/web/app/lib/apiClient/userPreferences.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 2.8KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/apiClient/userPreferences.ts`
 
 API client for user preferences with caching and error handling
@@ -606,15 +597,6 @@ API client for user preferences with caching and error handling
 **Owner**: Frontend team • **Complexity**: low • **Size**: 2.1KB
 **Tags**: `API client`, `user preferences`, `caching`, `error handling`, `TypeScript`, `utility`
 **Modified**: 6/21/2025
-
-
-### `apps/web/app/lib/apiClient/useUserEntitlements.test.tsx`
-
-To run these tests:
-
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `React`, `TypeScript`, `utility`, `test`, `security`
-**Modified**: 6/9/2025
 
 
 ### `apps/web/app/lib/authService.ts`
@@ -635,15 +617,6 @@ Batch service for optimized data fetching with shared entitlements
 **Modified**: 6/18/2025
 
 
-### `apps/web/app/lib/contentService.test.ts`
-
-To run these tests:
-
-**Complexity**: medium • **Size**: 5.8KB
-**Tags**: `TypeScript`, `utility`, `test`, `security`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/contentService.ts`
 
 Service for content logic. All business rules and data access for content live here.
@@ -651,15 +624,6 @@ Service for content logic. All business rules and data access for content live h
 **Complexity**: medium • **Size**: 4.4KB
 **Tags**: `TypeScript`, `utility`, `security`
 **Modified**: 6/18/2025
-
-
-### `apps/web/app/lib/contextService.test.ts`
-
-To run these tests:
-
-**Complexity**: medium • **Size**: 3.9KB
-**Tags**: `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
 
 
 ### `apps/web/app/lib/contextService.ts`
@@ -671,20 +635,11 @@ Service for context configuration logic. Optimized for performance with minimal 
 **Modified**: 6/21/2025
 
 
-### `apps/web/app/lib/entitlementService.test.ts`
-
-To run these tests:
-
-**Complexity**: medium • **Size**: 4.4KB
-**Tags**: `TypeScript`, `utility`, `test`, `security`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/entitlementService.ts`
 
 Service for entitlement logic. All business rules for user permissions live here.
 
-**Complexity**: medium • **Size**: 4.8KB
+**Complexity**: medium • **Size**: 5.2KB
 **Tags**: `TypeScript`, `utility`, `security`
 **Modified**: 6/21/2025
 
@@ -698,15 +653,6 @@ New optimized batch service for performance
 **Modified**: 6/18/2025
 
 
-### `apps/web/app/lib/navService.test.ts`
-
-To run these tests:
-
-**Complexity**: medium • **Size**: 6.4KB
-**Tags**: `TypeScript`, `utility`, `test`, `security`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/navService.ts`
 
 Service for navigation options logic. All business rules and data access for nav options live here.
@@ -716,15 +662,6 @@ Service for navigation options logic. All business rules and data access for nav
 **Modified**: 6/21/2025
 
 
-### `apps/web/app/lib/organizationService.test.ts`
-
-To run these tests:
-
-**Complexity**: medium • **Size**: 5.1KB
-**Tags**: `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
-
-
 ### `apps/web/app/lib/organizationService.ts`
 
 Service for organization and membership logic. All business rules and data access for organizations live here.
@@ -732,15 +669,6 @@ Service for organization and membership logic. All business rules and data acces
 **Complexity**: low • **Size**: 2.9KB
 **Tags**: `TypeScript`, `utility`
 **Modified**: 6/18/2025
-
-
-### `apps/web/app/lib/provisioningService.test.ts`
-
-To run these tests:
-
-**Complexity**: medium • **Size**: 4.1KB
-**Tags**: `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
 
 
 ### `apps/web/app/lib/provisioningService.ts`
@@ -783,27 +711,45 @@ Returns a Supabase SSR client with cookie adapter
 
 apps/web/app/lib/types.ts
 
-**Complexity**: medium • **Size**: 3.3KB
+**Complexity**: medium • **Size**: 4.2KB
 **Tags**: `TypeScript`, `utility`, `AI agent`, `security`
-**Modified**: 6/21/2025
+**Modified**: 6/22/2025
 
 
-### `apps/web/app/lib/userService.test.ts`
+### `apps/web/app/lib/types/progress.ts`
 
-To run these tests:
+Client-side Progress Types
 
-**Complexity**: medium • **Size**: 4.5KB
-**Tags**: `TypeScript`, `utility`, `test`
-**Modified**: 6/9/2025
+**Complexity**: low • **Size**: 2.3KB
+**Tags**: `TypeScript`, `utility`, `AI agent`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/lib/userProgressService.client.ts`
+
+User Progress Service - Client Side
+
+**Complexity**: high • **Size**: 7.3KB
+**Tags**: `TypeScript`, `utility`, `AI agent`
+**Modified**: 6/22/2025
+
+
+### `apps/web/app/lib/userProgressService.ts`
+
+User Progress Service - Web App Integration
+
+**Complexity**: medium • **Size**: 5.1KB
+**Tags**: `TypeScript`, `utility`, `AI agent`
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/lib/userService.ts`
 
 User service layer with optimized database operations and caching
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 6.3KB
+**Owner**: Backend team • **Complexity**: medium • **Size**: 8.4KB
 **Tags**: `service layer`, `user management`, `Supabase`, `performance optimization`, `TypeScript`, `utility`
-**Modified**: 6/21/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/lib/utils.ts`
@@ -819,9 +765,9 @@ User service layer with optimized database operations and caching
 
 Public login page with styled Supabase Auth UI and token synchronization
 
-**Owner**: Frontend team • **Complexity**: low • **Size**: 2.7KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.7KB
 **Tags**: `authentication`, `Supabase Auth UI`, `login`, `client component`, `React`, `TypeScript`, `React hooks`
-**Modified**: 6/21/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/app/page.tsx`
@@ -835,11 +781,11 @@ SSR Root page that redirects based on session status
 
 ### `apps/web/app/QueryClientProvider.tsx`
 
-1 minute
+5 minutes - more aggressive caching
 
-**Complexity**: low • **Size**: 1.2KB
+**Complexity**: low • **Size**: 1.0KB
 **Tags**: `React`, `TypeScript`, `React hooks`
-**Modified**: 6/20/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/components.json`
@@ -873,18 +819,18 @@ Only render CopilotKit on client side to avoid hydration mismatch
 
 File: apps/web/components/ai/ComponentSchemaRenderer.tsx
 
-**Complexity**: high • **Size**: 23.0KB
+**Complexity**: high • **Size**: 38.4KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 6/18/2025
+**Modified**: 6/24/2025
 
 
 ### `apps/web/components/DynamicContextPage.tsx`
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 12.7KB
-**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 6/21/2025
+**Complexity**: high • **Size**: 25.0KB
+**Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`, `AI agent`
+**Modified**: 6/24/2025
 
 
 ### `apps/web/components/SupabaseProvider.tsx`
@@ -918,18 +864,18 @@ Get icon image path
 
 —
 
-**Complexity**: low • **Size**: 1.3KB
+**Complexity**: low • **Size**: 1.6KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/21/2025
 
 
 ### `apps/web/components/ui/legacy_course_modal.tsx`
 
-Fetch content from Tribe API
+Simple Button component
 
-**Complexity**: medium • **Size**: 4.9KB
+**Complexity**: medium • **Size**: 6.8KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 6/6/2025
+**Modified**: 6/23/2025
 
 
 ### `apps/web/components/ui/legacy_training_library.tsx`
@@ -941,21 +887,21 @@ Transform content into our Training format
 **Modified**: 6/6/2025
 
 
-### `apps/web/components/ui/NavPanel.test.tsx`
-
-Test component to validate database-driven navigation
-
-**Complexity**: low • **Size**: 0.6KB
-**Tags**: `React`, `TypeScript`, `UI`, `test`
-**Modified**: 6/20/2025
-
-
 ### `apps/web/components/ui/NavPanel.tsx`
 
 Navigation panel for agent-native app, themed via contextConfig
 
-**Owner**: Frontend team • **Complexity**: high • **Size**: 16.1KB
+**Owner**: Frontend team • **Complexity**: high • **Size**: 18.8KB
 **Tags**: `UI`, `navigation`, `context-based`, `React`, `TypeScript`, `React hooks`, `AI agent`
+**Modified**: 6/22/2025
+
+
+### `apps/web/components/ui/ProgressBar.tsx`
+
+Progress bar component for video and content tracking
+
+**Owner**: Frontend team • **Complexity**: low • **Size**: 1.0KB
+**Tags**: `UI component`, `progress tracking`, `video`, `React`, `TypeScript`, `UI`
 **Modified**: 6/21/2025
 
 
@@ -972,7 +918,7 @@ Accepts the theme object (from contextConfig.json)
 
 Three-panel layout component with theme context and collapsible navigation
 
-**Owner**: Frontend team • **Complexity**: low • **Size**: 2.3KB
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.4KB
 **Tags**: `UI`, `layout`, `theme`, `React`, `client component`, `TypeScript`, `React hooks`
 **Modified**: 6/21/2025
 
@@ -1022,22 +968,31 @@ Don't revalidate immediately if we have initial data
 **Modified**: 6/17/2025
 
 
+### `apps/web/hooks/useDashboardData.ts`
+
+Optimized dashboard data hook - fetches all data in single API call
+
+**Owner**: Frontend team • **Complexity**: low • **Size**: 1.7KB
+**Tags**: `React hooks`, `performance optimization`, `dashboard`, `batched queries`, `TypeScript`, `hooks`, `React Query`
+**Modified**: 6/22/2025
+
+
 ### `apps/web/hooks/useNavigation.ts`
 
 Database-driven navigation hook that transforms NavOption[] to NavPanelSchema
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 4.8KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.6KB
 **Tags**: `React hooks`, `navigation`, `database-driven`, `entitlements`, `React Query`, `TypeScript`, `hooks`, `AI agent`, `security`
-**Modified**: 6/21/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/hooks/useNavOptions.ts`
 
 Custom hook to fetch entitlement-filtered nav options for a given context from the API, using SWR. Used to drive schema-driven NavPanel.
 
-**Complexity**: low • **Size**: 1.3KB
+**Complexity**: low • **Size**: 1.7KB
 **Tags**: `TypeScript`, `hooks`, `security`
-**Modified**: 6/18/2025
+**Modified**: 6/21/2025
 
 
 ### `apps/web/lib/server/loadContextConfig.ts`
@@ -1062,9 +1017,9 @@ Custom hook to fetch entitlement-filtered nav options for a given context from t
 
 Root of apps/web
 
-**Complexity**: low • **Size**: 0.9KB
+**Complexity**: low • **Size**: 1.1KB
 **Tags**: None
-**Modified**: 6/20/2025
+**Modified**: 6/22/2025
 
 
 ### `apps/web/package-lock.json`
@@ -1121,7 +1076,34 @@ tailwind.config.ts
 **Modified**: 5/27/2025
 
 
-### `docs/agent-native-cursor-project-rules.md`
+### `docs/.legacy/adr-template.md`
+
+—
+
+**Size**: 3.6KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/agent-framework-deployment-guide.md`
+
+localhost:3000
+
+**Size**: 6.5KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/21/2025
+
+
+### `docs/.legacy/agent-native-composition-architecture.md`
+
+Examples of base components
+
+**Size**: 10.7KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/agent-native-cursor-project-rules.md`
 
 —
 
@@ -1130,7 +1112,7 @@ tailwind.config.ts
 **Modified**: 6/20/2025
 
 
-### `docs/agent-native-leader-brief-presentation.md`
+### `docs/.legacy/agent-native-leader-brief-presentation.md`
 
 —
 
@@ -1139,7 +1121,7 @@ tailwind.config.ts
 **Modified**: 6/6/2025
 
 
-### `docs/agent-native-leader-brief.md`
+### `docs/.legacy/agent-native-leader-brief.md`
 
 —
 
@@ -1148,7 +1130,25 @@ tailwind.config.ts
 **Modified**: 6/7/2025
 
 
-### `docs/dev-notes/abstraction_layer.md`
+### `docs/.legacy/component-system-refactor-plan.md`
+
+—
+
+**Size**: 3.1KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/design-system-reorganization-summary.md`
+
+—
+
+**Size**: 7.5KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/dev-notes/abstraction_layer.md`
 
 apps/web/app/lib/contextService.ts
 
@@ -1157,7 +1157,7 @@ apps/web/app/lib/contextService.ts
 **Modified**: 6/9/2025
 
 
-### `docs/dev-notes/agent-architecture.md`
+### `docs/.legacy/dev-notes/agent-architecture.md`
 
 Grid, Card, Panel, etc.
 
@@ -1166,7 +1166,7 @@ Grid, Card, Panel, etc.
 **Modified**: 6/20/2025
 
 
-### `docs/dev-notes/agent-configuration-guide.md`
+### `docs/.legacy/dev-notes/agent-configuration-guide.md`
 
 —
 
@@ -1175,7 +1175,7 @@ Grid, Card, Panel, etc.
 **Modified**: 6/3/2025
 
 
-### `docs/dev-notes/agent-prompt-engineering_UPDATED.md`
+### `docs/.legacy/dev-notes/agent-prompt-engineering_UPDATED.md`
 
 Pattern: Reframing Problems as Opportunities
 
@@ -1184,7 +1184,7 @@ Pattern: Reframing Problems as Opportunities
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/architecture-foundations_UPDATED.md`
+### `docs/.legacy/dev-notes/architecture-foundations_UPDATED.md`
 
 Each module is self-contained with clear interfaces
 
@@ -1193,7 +1193,7 @@ Each module is self-contained with clear interfaces
 **Modified**: 6/20/2025
 
 
-### `docs/dev-notes/business-rules-documentation_UPDATED.md`
+### `docs/.legacy/dev-notes/business-rules-documentation_UPDATED.md`
 
 Business Rule: Auto-upgrade legacy subscribers
 
@@ -1202,7 +1202,7 @@ Business Rule: Auto-upgrade legacy subscribers
 **Modified**: 6/20/2025
 
 
-### `docs/dev-notes/code_hygiene_checklist.md`
+### `docs/.legacy/dev-notes/code_hygiene_checklist.md`
 
 pnpm.io/)
 
@@ -1211,7 +1211,7 @@ pnpm.io/)
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/component-styling-guidelines.md`
+### `docs/.legacy/dev-notes/component-styling-guidelines.md`
 
 ...etc
 
@@ -1220,7 +1220,7 @@ pnpm.io/)
 **Modified**: 6/15/2025
 
 
-### `docs/dev-notes/copilotkit_usage.md`
+### `docs/.legacy/dev-notes/copilotkit_usage.md`
 
 apps/web/components/ai/AIExperience.tsx
 
@@ -1229,7 +1229,7 @@ apps/web/components/ai/AIExperience.tsx
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/database_setup_addendum_UPDATED.md`
+### `docs/.legacy/dev-notes/database_setup_addendum_UPDATED.md`
 
 orm.drizzle.team/)
 
@@ -1238,7 +1238,7 @@ orm.drizzle.team/)
 **Modified**: 6/2/2025
 
 
-### `docs/dev-notes/deployment-devops-guide_UPDATED.md`
+### `docs/.legacy/dev-notes/deployment-devops-guide_UPDATED.md`
 
 raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 
@@ -1247,7 +1247,7 @@ raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/development-setup_UPDATED.md`
+### `docs/.legacy/dev-notes/development-setup_UPDATED.md`
 
 github.com/your-org/leaderforge.git
 
@@ -1256,16 +1256,16 @@ github.com/your-org/leaderforge.git
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/enhancements-and-todos.md`
+### `docs/.legacy/dev-notes/enhancements-and-todos.md`
 
 —
 
-**Size**: 5.4KB
+**Size**: 5.5KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/16/2025
+**Modified**: 6/21/2025
 
 
-### `docs/dev-notes/env-config-addendum_UPDATED.md`
+### `docs/.legacy/dev-notes/env-config-addendum_UPDATED.md`
 
 localhost:3000
 
@@ -1274,7 +1274,7 @@ localhost:3000
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/feature_flags.md`
+### `docs/.legacy/dev-notes/feature_flags.md`
 
 posthog.com) as our feature flag and analytics provider. All flag checks are abstracted through a single TypeScript service, ensuring flexibility and vendor independence.
 
@@ -1283,7 +1283,7 @@ posthog.com) as our feature flag and analytics provider. All flag checks are abs
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/langgraph_usage.md`
+### `docs/.legacy/dev-notes/langgraph_usage.md`
 
 packages/agent-core/agents/conversationAgent.ts
 
@@ -1292,7 +1292,7 @@ packages/agent-core/agents/conversationAgent.ts
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/licensing-and-entitlement-architecture.md`
+### `docs/.legacy/dev-notes/licensing-and-entitlement-architecture.md`
 
 —
 
@@ -1301,7 +1301,7 @@ packages/agent-core/agents/conversationAgent.ts
 **Modified**: 6/10/2025
 
 
-### `docs/dev-notes/module_configuration_addendum_UPDATED.md`
+### `docs/.legacy/dev-notes/module_configuration_addendum_UPDATED.md`
 
 Module theme application
 
@@ -1310,7 +1310,7 @@ Module theme application
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/navpanel-refactoring-plan.md`
+### `docs/.legacy/dev-notes/navpanel-refactoring-plan.md`
 
 Transform database nav_options to NavPanelSchema
 
@@ -1319,7 +1319,7 @@ Transform database nav_options to NavPanelSchema
 **Modified**: 6/21/2025
 
 
-### `docs/dev-notes/performance-requirements_UPDATED.md`
+### `docs/.legacy/dev-notes/performance-requirements_UPDATED.md`
 
 Time to first token streaming
 
@@ -1328,7 +1328,7 @@ Time to first token streaming
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/rls-policies.sql`
+### `docs/.legacy/dev-notes/rls-policies.sql`
 
 —
 
@@ -1337,7 +1337,7 @@ Time to first token streaming
 **Modified**: 6/9/2025
 
 
-### `docs/dev-notes/simplified-entitlement-system.md`
+### `docs/.legacy/dev-notes/simplified-entitlement-system.md`
 
 Navigation click handler
 
@@ -1346,7 +1346,7 @@ Navigation click handler
 **Modified**: 6/20/2025
 
 
-### `docs/dev-notes/supabase_core_grants.sql.md`
+### `docs/.legacy/dev-notes/supabase_core_grants.sql.md`
 
 —
 
@@ -1355,7 +1355,7 @@ Navigation click handler
 **Modified**: 6/9/2025
 
 
-### `docs/dev-notes/supabase-ssr-auth-debug.md`
+### `docs/.legacy/dev-notes/supabase-ssr-auth-debug.md`
 
 jwt.io)), the following issue occurred:
 
@@ -1364,7 +1364,7 @@ jwt.io)), the following issue occurred:
 **Modified**: 6/13/2025
 
 
-### `docs/dev-notes/tribe-social-docs.md`
+### `docs/.legacy/dev-notes/tribe-social-docs.md`
 
 api.tribesocial.io/api/view-data" \
 
@@ -1373,7 +1373,7 @@ api.tribesocial.io/api/view-data" \
 **Modified**: 6/1/2025
 
 
-### `docs/dev-notes/ui-glossary-and-styling.md`
+### `docs/.legacy/dev-notes/ui-glossary-and-styling.md`
 
 en.json
 
@@ -1382,7 +1382,25 @@ en.json
 **Modified**: 6/1/2025
 
 
-### `docs/file-header-template.md`
+### `docs/.legacy/documentation-restructure-plan.md`
+
+—
+
+**Size**: 11.1KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/documentation-restructure-summary.md`
+
+—
+
+**Size**: 8.2KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/file-header-template.md`
 
 Brief description of what this file does and why it exists
 
@@ -1391,7 +1409,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/21/2025
 
 
-### `docs/how-to-add-or-change-agents.md`
+### `docs/.legacy/how-to-add-or-change-agents.md`
 
 —
 
@@ -1400,7 +1418,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/3/2025
 
 
-### `docs/how-to-add-or-change-components.md`
+### `docs/.legacy/how-to-add-or-change-components.md`
 
 —
 
@@ -1409,7 +1427,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/6/2025
 
 
-### `docs/how-to-add-or-change-contexts.md`
+### `docs/.legacy/how-to-add-or-change-contexts.md`
 
 —
 
@@ -1418,7 +1436,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/3/2025
 
 
-### `docs/how-to-add-or-change-langgraph-agent-orchestration.md`
+### `docs/.legacy/how-to-add-or-change-langgraph-agent-orchestration.md`
 
 —
 
@@ -1427,7 +1445,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/3/2025
 
 
-### `docs/how-to-add-or-change-styles.md`
+### `docs/.legacy/how-to-add-or-change-styles.md`
 
 —
 
@@ -1436,7 +1454,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/3/2025
 
 
-### `docs/how-to-add-or-change-themes.md`
+### `docs/.legacy/how-to-add-or-change-themes.md`
 
 —
 
@@ -1445,7 +1463,7 @@ Brief description of what this file does and why it exists
 **Modified**: 6/3/2025
 
 
-### `docs/how-to-add-or-change-tools.md`
+### `docs/.legacy/how-to-add-or-change-tools.md`
 
 —
 
@@ -1454,22 +1472,274 @@ Brief description of what this file does and why it exists
 **Modified**: 6/6/2025
 
 
+### `docs/.legacy/prd-agent-native-composition-system.md`
+
+—
+
+**Size**: 3.2KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/README.md`
+
+—
+
+**Size**: 5.9KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/senior-architect-rule.md`
+
+—
+
+**Size**: 6.9KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/senior-product-manager-rule.md`
+
+Every feature must be accessible via conversation
+
+**Size**: 9.1KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/.legacy/universal-progress-tool-architecture.md`
+
+0-100 percentage or custom metric
+
+**Size**: 9.1KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/22/2025
+
+
+### `docs/architecture/adr/0001-agent-native-composition-system.md`
+
+—
+
+**Size**: 9.6KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/0002-modular-monolith-architecture.md`
+
+—
+
+**Size**: 8.9KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/0003-separate-asset-registries.md`
+
+—
+
+**Size**: 8.4KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/0004-database-backed-compositions.md`
+
+—
+
+**Size**: 8.9KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/0005-hybrid-communication-pattern.md`
+
+—
+
+**Size**: 9.5KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/0006-bullmq-message-queue.md`
+
+Content processing jobs
+
+**Size**: 9.1KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/0007-api-route-organization.md`
+
+—
+
+**Size**: 9.3KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/adr-template.md`
+
+—
+
+**Size**: 3.6KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/adr/README.md`
+
+—
+
+**Size**: 3.3KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/overview/agent-native-composition-architecture.md`
+
+Examples of base components
+
+**Size**: 10.7KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/architecture/README.md`
+
+—
+
+**Size**: 6.7KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/engineering/how-to/README.md`
+
+—
+
+**Size**: 2.6KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/engineering/implementation-plans/component-system-refactor-plan.md`
+
+—
+
+**Size**: 3.1KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/engineering/README.md`
+
+Register agent with proper typing
+
+**Size**: 9.6KB
+**Tags**: `documentation`, `Next.js API`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/governance/cursor-rules-reference.md`
+
+—
+
+**Size**: 5.7KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/governance/README.md`
+
+—
+
+**Size**: 3.9KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
+### `docs/governance/universal-glossary.md`
+
+—
+
+**Size**: 11.0KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/24/2025
+
+
+### `docs/legacy-migration-summary.md`
+
+—
+
+**Size**: 4.7KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
 ### `docs/manifest.json`
 
 Local LangGraph dev server",
 
-**Size**: 90.7KB
+**Size**: 105.4KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/21/2025
+**Modified**: 6/24/2025
 
 
 ### `docs/manifest.md`
 
 Local LangGraph dev server
 
-**Size**: 33.2KB
+**Size**: 39.8KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/21/2025
+**Modified**: 6/24/2025
+
+
+### `docs/product-design/design-system.md`
+
+React component example
+
+**Size**: 21.4KB
+**Tags**: `documentation`
+**Modified**: 6/24/2025
+
+
+### `docs/product-design/README.md`
+
+—
+
+**Size**: 8.2KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/product-management/prds/agent-native-composition-system.md`
+
+—
+
+**Size**: 3.2KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/product-management/README.md`
+
+—
+
+**Size**: 8.5KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
+
+
+### `docs/README.md`
+
+—
+
+**Size**: 6.4KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/24/2025
 
 
 ### `packages/agent-core/agents/ContentLibraryAgent.ts`
@@ -1481,15 +1751,6 @@ NOTE: You may need to install 'langsmith' with `pnpm add langsmith` if not prese
 **Modified**: 6/8/2025
 
 
-### `packages/agent-core/agents/ContentSyncAgent.test.ts`
-
-—
-
-**Complexity**: low • **Size**: 0.4KB
-**Tags**: `TypeScript`, `test`
-**Modified**: 6/7/2025
-
-
 ### `packages/agent-core/agents/ContentSyncAgent.ts`
 
 ContentSyncAgent: Syncs TribeSocial content into modules.content for a given context.
@@ -1497,6 +1758,15 @@ ContentSyncAgent: Syncs TribeSocial content into modules.content for a given con
 **Complexity**: low • **Size**: 3.1KB
 **Tags**: `TypeScript`
 **Modified**: 6/8/2025
+
+
+### `packages/agent-core/agents/ProgressAwareAgent.ts`
+
+Progress-Aware Agent - Agent Integration for Universal Progress Tool
+
+**Complexity**: high • **Size**: 10.2KB
+**Tags**: `TypeScript`, `AI agent`
+**Modified**: 6/22/2025
 
 
 ### `packages/agent-core/featureFlags.ts`
@@ -1521,18 +1791,45 @@ app.posthog.com";
 
 —
 
-**Size**: 0.1KB
+**Size**: 0.3KB
 **Tags**: `AI agent`
-**Modified**: 5/30/2025
+**Modified**: 6/22/2025
+
+
+### `packages/agent-core/tools/__tests__/ProgressAwareAgent.test.ts`
+
+Progress-Aware Agent Tests - Agent Integration Testing
+
+**Complexity**: high • **Size**: 12.3KB
+**Tags**: `TypeScript`, `test`, `AI agent`
+**Modified**: 6/22/2025
+
+
+### `packages/agent-core/tools/__tests__/UserProgressTool.simple.test.ts`
+
+Simple tests for Universal Progress Tool
+
+**Complexity**: medium • **Size**: 5.6KB
+**Tags**: `TypeScript`, `test`
+**Modified**: 6/22/2025
+
+
+### `packages/agent-core/tools/__tests__/UserProgressTool.test.ts`
+
+Tests for Universal Progress Tool
+
+**Complexity**: high • **Size**: 11.6KB
+**Tags**: `TypeScript`, `test`, `AI agent`
+**Modified**: 6/22/2025
 
 
 ### `packages/agent-core/tools/ToolRegistry.ts`
 
-—
+Note: This tool registry will be initialized with proper supabase client by the app
 
-**Complexity**: low • **Size**: 2.5KB
+**Complexity**: medium • **Size**: 5.6KB
 **Tags**: `TypeScript`, `security`
-**Modified**: 6/6/2025
+**Modified**: 6/22/2025
 
 
 ### `packages/agent-core/tools/TribeSocialContentTool.ts`
@@ -1548,9 +1845,18 @@ TribeSocialContentTool
 
 Agent-native, production-ready user progress tool for modular agent orchestration.
 
-**Complexity**: medium • **Size**: 3.6KB
+**Complexity**: high • **Size**: 16.2KB
 **Tags**: `TypeScript`, `AI agent`
-**Modified**: 6/7/2025
+**Modified**: 6/24/2025
+
+
+### `packages/agent-core/tsconfig.json`
+
+—
+
+**Size**: 0.3KB
+**Tags**: None
+**Modified**: 6/22/2025
 
 
 ### `packages/agent-core/types/ComponentSchema.ts`
@@ -1569,6 +1875,15 @@ All schema types are props-wrapped. Do not use flat schemas.
 **Complexity**: low • **Size**: 1.2KB
 **Tags**: `TypeScript`
 **Modified**: 6/3/2025
+
+
+### `packages/agent-core/types/ProgressSchema.ts`
+
+Progress Schema Types - Schema Integration for Universal Progress Tool
+
+**Complexity**: high • **Size**: 8.9KB
+**Tags**: `TypeScript`, `AI agent`
+**Modified**: 6/22/2025
 
 
 ### `packages/env/index.ts`

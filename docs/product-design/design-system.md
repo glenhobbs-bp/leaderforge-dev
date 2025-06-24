@@ -1,9 +1,11 @@
 # LeaderForge Design System
 
-**Version:** 1.0.0
-**Last Updated:** June 22, 2025
-**Owner:** Frontend Team
-**Tags:** Design System, UI/UX, Branding, Components
+**File:** docs/product-design/design-system.md
+**Purpose:** Complete design system specification for UI widgets, themes, and visual standards
+**Owner:** Product Design Team
+**Tags:** design-system, widgets, theming, visual-design
+**Version:** 2.0.0
+**Last Updated:** 2024-01-15
 
 ## Table of Contents
 
@@ -23,9 +25,9 @@
 
 ### Core Principles
 
-1. **Agent-Native Design** - All components support dynamic theming and schema-driven rendering
-2. **Context Awareness** - Components adapt to the active context (LeaderForge, Brilliant, etc.)
-3. **Accessibility First** - WCAG 2.1 AA compliance across all components
+1. **Agent-Native Design** - All widgets support dynamic theming and schema-driven rendering
+2. **Tenant Awareness** - Widgets adapt to the active tenant (LeaderForge, Brilliant Movement, etc.)
+3. **Accessibility First** - WCAG 2.1 AA compliance across all widgets
 4. **Performance Optimized** - Minimal bundle size, efficient animations
 5. **Mobile-First** - Responsive design starting from 320px width
 
@@ -99,11 +101,11 @@ interface DesignTokens {
 }
 ```
 
-### Context-Specific Color Variables
+### Tenant-Specific Color Variables
 
-#### LeaderForge Theme
+#### LeaderForge Tenant
 ```css
-.context-leaderforge {
+.tenant-leaderforge {
   --primary: #1e40af;        /* Professional Blue */
   --primary-hover: #1d4ed8;
   --primary-light: #dbeafe;
@@ -118,9 +120,9 @@ interface DesignTokens {
 }
 ```
 
-#### Brilliant Movement Theme
+#### Brilliant Movement Tenant
 ```css
-.context-brilliant {
+.tenant-brilliant {
   --primary: #3e5e17;        /* Earth Green */
   --primary-hover: #4d7c1f;
   --primary-light: #f0f7e8;
@@ -379,9 +381,9 @@ interface DesignTokens {
 
 ---
 
-## Component Library
+## Widget Library
 
-### Button Components
+### Button Widgets
 
 #### Base Button Styles
 ```css
@@ -472,7 +474,7 @@ interface DesignTokens {
 }
 ```
 
-### Card Components
+### Card Widgets
 
 ```css
 .card {
@@ -521,7 +523,7 @@ interface DesignTokens {
 }
 ```
 
-### Input Components
+### Input Widgets
 
 ```css
 .input {
@@ -575,7 +577,7 @@ interface DesignTokens {
 }
 ```
 
-### Navigation Components
+### Navigation Widgets
 
 ```css
 .nav-panel {
@@ -803,13 +805,13 @@ interface DesignTokens {
 
 ---
 
-## Context Branding
+## Tenant Branding
 
-### LeaderForge Context
+### LeaderForge Tenant
 
 #### Brand Colors
 ```css
-.context-leaderforge {
+.tenant-leaderforge {
   --primary: #1e40af;        /* Professional Blue */
   --primary-hover: #1d4ed8;
   --primary-light: #dbeafe;
@@ -835,11 +837,11 @@ interface DesignTokens {
 - **Body Text**: Inter (primary font)
 - **Code**: JetBrains Mono
 
-### Brilliant Movement Context
+### Brilliant Movement Tenant
 
 #### Brand Colors
 ```css
-.context-brilliant {
+.tenant-brilliant {
   --primary: #3e5e17;        /* Earth Green */
   --primary-hover: #4d7c1f;
   --primary-light: #f0f7e8;

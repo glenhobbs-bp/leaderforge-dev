@@ -3,6 +3,7 @@
   "include": [
     "apps/web/**/*",
     "apps/api/**/*",
-    "packages/agent-core/**/*"
+    "packages/agent-core/**/*",
+    "agent/**/*"
   ]
 }

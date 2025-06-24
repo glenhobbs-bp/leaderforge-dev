@@ -1,57 +1,67 @@
 {
   "metadata": {
-    "generated_at": "2025-06-21T12:23:56.622Z",
+    "generated_at": "2025-06-24T15:40:10.092Z",
     "generator_version": "1.0.0",
-    "total_files": 173,
-    "total_size_bytes": 1463452,
+    "total_files": 208,
+    "total_size_bytes": 1859893,
     "file_types": {
-      ".ts": 89,
-      ".json": 13,
-      ".tsx": 31,
+      ".ts": 95,
+      ".json": 14,
+      ".tsx": 24,
       ".js": 2,
-      ".md": 37,
+      ".md": 72,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 120,
-      "API": 31,
-      "AI agent": 49,
-      "React": 31,
-      "React hooks": 17,
-      "Next.js API": 22,
-      "security": 60,
-      "test": 24,
+      "TypeScript": 119,
+      "API": 34,
+      "AI agent": 87,
+      "React": 24,
+      "React hooks": 21,
+      "Next.js API": 33,
+      "security": 56,
+      "test": 10,
+      "API endpoint": 2,
+      "navigation state": 2,
+      "user preferences": 5,
       "user management": 2,
       "preferences": 1,
       "caching": 4,
       "performance": 3,
+      "video progress": 2,
       "Next.js page": 1,
       "SSR": 1,
       "entitlements": 2,
       "context management": 1,
-      "hooks": 13,
-      "React Query": 10,
-      "user preferences": 2,
+      "hooks": 16,
+      "React Query": 14,
       "cross-invalidation": 1,
-      "utility": 39,
+      "debouncing": 1,
+      "optimistic updates": 1,
+      "utility": 28,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
       "Supabase": 2,
       "service layer": 2,
       "session management": 1,
-      "performance optimization": 1,
+      "performance optimization": 2,
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
       "UI": 16,
       "navigation": 3,
       "context-based": 1,
+      "UI component": 1,
+      "progress tracking": 1,
+      "video": 1,
       "layout": 1,
       "theme": 1,
       "avatar": 1,
+      "dashboard": 1,
+      "batched queries": 1,
       "database-driven": 1,
-      "documentation": 39,
+      "documentation": 74,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -216,9 +226,9 @@
         "@supabase/supabase-js",
         "../../../lib/agentService"
       ],
-      "last_modified": "2025-06-20T10:37:08.005Z",
-      "size_bytes": 6079,
-      "hash": "6a216606",
+      "last_modified": "2025-06-22T08:49:26.074Z",
+      "size_bytes": 7069,
+      "hash": "7dfdec6a",
       "complexity": "medium"
     },
     {
@@ -287,27 +297,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/content/[context_key]/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/content/[context_key]",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "API",
-        "test"
-      ],
-      "dependencies": [
-        "vitest",
-        "./route",
-        "../../../lib/contentService"
-      ],
-      "last_modified": "2025-06-09T21:47:36.321Z",
-      "size_bytes": 2522,
-      "hash": "4140b8c2",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/api/content/[context_key]/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/content/[context_key]",
@@ -351,27 +340,6 @@
       "last_modified": "2025-06-18T18:38:24.097Z",
       "size_bytes": 2721,
       "hash": "b7c68dca",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/api/context/[context_key]/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/context/[context_key]",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "API",
-        "test"
-      ],
-      "dependencies": [
-        "vitest",
-        "./route",
-        "../../../lib/contextService"
-      ],
-      "last_modified": "2025-06-09T21:47:02.895Z",
-      "size_bytes": 2144,
-      "hash": "459395e8",
       "complexity": "low"
     },
     {
@@ -502,28 +470,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/entitlements/[user_id]/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/entitlements/[user_id]",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "API",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "vitest",
-        "./route",
-        "../../../lib/entitlementService"
-      ],
-      "last_modified": "2025-06-09T21:45:05.601Z",
-      "size_bytes": 1895,
-      "hash": "fe75ce4b",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/api/entitlements/[user_id]/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/entitlements/[user_id]",
@@ -569,27 +515,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/nav/[context_key]/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/nav/[context_key]",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "API",
-        "test"
-      ],
-      "dependencies": [
-        "vitest",
-        "./route",
-        "../../../lib/navService"
-      ],
-      "last_modified": "2025-06-09T21:48:36.115Z",
-      "size_bytes": 2514,
-      "hash": "b06acab7",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/api/nav/[context_key]/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/nav/[context_key]",
@@ -608,32 +533,10 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-21T11:40:34.671Z",
-      "size_bytes": 3083,
-      "hash": "d8e9dbfb",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/api/orgs/[org_id]/entitlements/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/orgs/[org_id]/entitlements",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "API",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "vitest",
-        "./route",
-        "../../../../lib/entitlementService"
-      ],
-      "last_modified": "2025-06-09T21:46:12.146Z",
-      "size_bytes": 1886,
-      "hash": "5c1b4e75",
-      "complexity": "low"
+      "last_modified": "2025-06-22T05:53:35.406Z",
+      "size_bytes": 3638,
+      "hash": "e87d7d4b",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/orgs/[org_id]/entitlements/route.ts",
@@ -656,28 +559,6 @@
       "last_modified": "2025-06-21T00:59:11.708Z",
       "size_bytes": 2061,
       "hash": "b4cab1cb",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/api/provisioning/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/provisioning",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "API",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "vitest",
-        "./route",
-        "../../lib/provisioningService"
-      ],
-      "last_modified": "2025-06-09T21:50:13.296Z",
-      "size_bytes": 3265,
-      "hash": "00a83fcb",
       "complexity": "low"
     },
     {
@@ -704,6 +585,162 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/api/test/create-table/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/create-table",
+      "extension": ".ts",
+      "purpose": "Create Table API",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-22T16:43:56.982Z",
+      "size_bytes": 4710,
+      "hash": "ed4b9b12",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/test/db-check/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/db-check",
+      "extension": ".ts",
+      "purpose": "Database Check API",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-22T16:25:08.814Z",
+      "size_bytes": 1886,
+      "hash": "e003a35b",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/test/db-debug/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/db-debug",
+      "extension": ".ts",
+      "purpose": "Database Debug API - Test RLS Policies",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-23T21:00:00.373Z",
+      "size_bytes": 3376,
+      "hash": "63cd5046",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/test/schema-check/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/schema-check",
+      "extension": ".ts",
+      "purpose": "Test 1: Try core.user_progress (our target)",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "@supabase/ssr",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-22T20:19:48.840Z",
+      "size_bytes": 2949,
+      "hash": "82916d92",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/test/table-access/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/table-access",
+      "extension": ".ts",
+      "purpose": "Test 1: Check if user_progress view exists",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "@supabase/ssr",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-22T20:14:16.035Z",
+      "size_bytes": 2630,
+      "hash": "5fb385f7",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/test/universal-progress-auth/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/universal-progress-auth",
+      "extension": ".ts",
+      "purpose": "Get authenticated supabase client",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/userProgressService",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-22T20:45:27.253Z",
+      "size_bytes": 2012,
+      "hash": "853fdec1",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/test/universal-progress/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/test/universal-progress",
+      "extension": ".ts",
+      "purpose": "Universal Progress Tool Integration Test API",
+      "tags": [
+        "TypeScript",
+        "API",
+        "test",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/userProgressService"
+      ],
+      "last_modified": "2025-06-23T02:29:40.951Z",
+      "size_bytes": 2391,
+      "hash": "50da16ab",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/api/tribe/content/[id]/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/tribe/content/[id]",
@@ -723,25 +760,51 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/user/[user_id]/preferences/route.test.ts",
-      "name": "route.test.ts",
-      "directory": "apps/web/app/api/user/[user_id]/preferences",
+      "path": "apps/web/app/api/universal-progress/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/universal-progress",
       "extension": ".ts",
-      "purpose": "To run these tests:",
+      "purpose": "Universal Progress API - Authenticated Endpoint",
       "tags": [
         "TypeScript",
         "API",
-        "test"
+        "Next.js API",
+        "AI agent"
       ],
       "dependencies": [
-        "vitest",
-        "./route",
+        "next/server",
+        "next/headers",
+        "../../lib/supabaseServerClient",
+        "../../../../../packages/agent-core/tools/UserProgressTool"
+      ],
+      "last_modified": "2025-06-24T09:43:51.063Z",
+      "size_bytes": 6684,
+      "hash": "715acc4d",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/user/[user_id]/navigation-state/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/user/[user_id]/navigation-state",
+      "extension": ".ts",
+      "purpose": "API endpoint for updating user navigation state",
+      "owner": "Backend team",
+      "tags": [
+        "API endpoint",
+        "navigation state",
+        "user preferences",
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
         "../../../../lib/userService"
       ],
-      "last_modified": "2025-06-09T21:49:27.985Z",
-      "size_bytes": 4652,
-      "hash": "96502202",
-      "complexity": "medium"
+      "last_modified": "2025-06-21T16:37:14.450Z",
+      "size_bytes": 1094,
+      "hash": "7241c0c9",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/api/user/[user_id]/preferences/route.ts",
@@ -763,17 +826,42 @@
         "next/server",
         "../../../../lib/userService"
       ],
-      "last_modified": "2025-06-21T12:17:30.413Z",
-      "size_bytes": 3982,
-      "hash": "80dac275",
+      "last_modified": "2025-06-22T11:41:56.167Z",
+      "size_bytes": 4015,
+      "hash": "b5761a93",
       "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/user/[user_id]/video-progress/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/user/[user_id]/video-progress",
+      "extension": ".ts",
+      "purpose": "API endpoint for updating user video progress",
+      "owner": "Backend team",
+      "tags": [
+        "API endpoint",
+        "video progress",
+        "user preferences",
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../../lib/userService",
+        "../../../../lib/types"
+      ],
+      "last_modified": "2025-06-21T16:37:22.881Z",
+      "size_bytes": 1156,
+      "hash": "986cafa6",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/api/user/avatar/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/user/avatar",
       "extension": ".ts",
-      "purpose": "SSR Auth setup with proper session hydration",
+      "purpose": "Simple in-memory cache for avatar URLs",
       "tags": [
         "TypeScript",
         "API",
@@ -784,9 +872,9 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-21T07:07:28.981Z",
-      "size_bytes": 7547,
-      "hash": "b7560cea",
+      "last_modified": "2025-06-22T05:53:37.988Z",
+      "size_bytes": 7823,
+      "hash": "da04f551",
       "complexity": "medium"
     },
     {
@@ -841,23 +929,22 @@
       "name": "DashboardClient.tsx",
       "directory": "apps/web/app/dashboard",
       "extension": ".tsx",
-      "purpose": "—",
+      "purpose": "Type definitions",
       "tags": [
         "React",
-        "TypeScript"
+        "TypeScript",
+        "AI agent",
+        "security"
       ],
       "dependencies": [
+        "react",
         "../../components/SupabaseProvider",
-        "@supabase/supabase-js",
-        "../../components/DynamicContextPage"
+        "@supabase/supabase-js"
       ],
-      "exports": [
-        "DashboardClient"
-      ],
-      "last_modified": "2025-06-19T21:28:55.665Z",
-      "size_bytes": 819,
-      "hash": "7ac9a830",
-      "complexity": "low"
+      "last_modified": "2025-06-22T08:19:05.283Z",
+      "size_bytes": 2974,
+      "hash": "21cbbfcf",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/dashboard/page.tsx",
@@ -962,6 +1049,32 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/hooks/useNavigationState.ts",
+      "name": "useNavigationState.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React hook for persisting navigation state with optimistic updates",
+      "owner": "Frontend team",
+      "tags": [
+        "React hooks",
+        "navigation state",
+        "user preferences",
+        "TypeScript",
+        "hooks",
+        "React Query"
+      ],
+      "dependencies": [
+        "react",
+        "@tanstack/react-query",
+        "./useUserPreferences",
+        "../lib/types"
+      ],
+      "last_modified": "2025-06-22T09:09:28.544Z",
+      "size_bytes": 2810,
+      "hash": "d93120d0",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/hooks/useOrgEntitlements.ts",
       "name": "useOrgEntitlements.ts",
       "directory": "apps/web/app/hooks",
@@ -1009,27 +1122,25 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/hooks/useUserEntitlements.test.ts",
-      "name": "useUserEntitlements.test.ts",
+      "path": "apps/web/app/hooks/useUniversalProgress.ts",
+      "name": "useUniversalProgress.ts",
       "directory": "apps/web/app/hooks",
       "extension": ".ts",
-      "purpose": "To run these tests:",
+      "purpose": "Universal Progress Hook",
       "tags": [
         "TypeScript",
         "hooks",
-        "test",
-        "security"
+        "React hooks",
+        "AI agent"
       ],
       "dependencies": [
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "./useUserEntitlements",
-        "../lib/apiClient/entitlements"
+        "react",
+        "../lib/userProgressService.client"
       ],
-      "last_modified": "2025-06-09T21:55:10.296Z",
-      "size_bytes": 1821,
-      "hash": "d90e2c3d",
-      "complexity": "low"
+      "last_modified": "2025-06-23T15:04:24.195Z",
+      "size_bytes": 9208,
+      "hash": "08ddea84",
+      "complexity": "high"
     },
     {
       "path": "apps/web/app/hooks/useUserEntitlements.ts",
@@ -1078,10 +1189,37 @@
       "exports": [
         "useUserPreferences"
       ],
-      "last_modified": "2025-06-21T12:17:56.430Z",
-      "size_bytes": 1964,
-      "hash": "0285a93b",
+      "last_modified": "2025-06-22T11:41:56.165Z",
+      "size_bytes": 2038,
+      "hash": "97ecb3c5",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/hooks/useVideoProgress.ts",
+      "name": "useVideoProgress.ts",
+      "directory": "apps/web/app/hooks",
+      "extension": ".ts",
+      "purpose": "React hook for video progress tracking with optimistic updates",
+      "owner": "Frontend team",
+      "tags": [
+        "React hooks",
+        "video progress",
+        "debouncing",
+        "optimistic updates",
+        "TypeScript",
+        "hooks",
+        "React Query"
+      ],
+      "dependencies": [
+        "react",
+        "@tanstack/react-query",
+        "./useUserPreferences",
+        "../lib/types"
+      ],
+      "last_modified": "2025-06-21T16:28:19.833Z",
+      "size_bytes": 4614,
+      "hash": "2c8c5c48",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/layout.tsx",
@@ -1117,12 +1255,13 @@
         "AI agent"
       ],
       "dependencies": [
-        "@supabase/supabase-js"
+        "@supabase/supabase-js",
+        "../../../../packages/agent-core/tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-20T10:33:42.582Z",
-      "size_bytes": 7372,
-      "hash": "19d01981",
-      "complexity": "medium"
+      "last_modified": "2025-06-24T10:04:28.642Z",
+      "size_bytes": 10603,
+      "hash": "177ec516",
+      "complexity": "high"
     },
     {
       "path": "apps/web/app/lib/apiClient/batch.ts",
@@ -1144,30 +1283,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/lib/apiClient/content.test.tsx",
-      "name": "content.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useContentForContext",
-        "./content"
-      ],
-      "last_modified": "2025-06-09T23:07:32.477Z",
-      "size_bytes": 1900,
-      "hash": "a6ee7a52",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/lib/apiClient/content.ts",
       "name": "content.ts",
       "directory": "apps/web/app/lib/apiClient",
@@ -1184,30 +1299,6 @@
       "last_modified": "2025-06-18T17:37:57.127Z",
       "size_bytes": 1000,
       "hash": "b8581b84",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/lib/apiClient/contextConfig.test.tsx",
-      "name": "contextConfig.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useContextConfig",
-        "./contextConfig"
-      ],
-      "last_modified": "2025-06-09T23:07:19.156Z",
-      "size_bytes": 1785,
-      "hash": "5887af0a",
       "complexity": "low"
     },
     {
@@ -1248,30 +1339,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/lib/apiClient/nav.test.tsx",
-      "name": "nav.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useNavForContext",
-        "./nav"
-      ],
-      "last_modified": "2025-06-09T23:07:43.252Z",
-      "size_bytes": 1848,
-      "hash": "f02ad3e5",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/lib/apiClient/nav.ts",
       "name": "nav.ts",
       "directory": "apps/web/app/lib/apiClient",
@@ -1291,31 +1358,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/lib/apiClient/orgEntitlements.test.tsx",
-      "name": "orgEntitlements.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useOrgEntitlements",
-        "./orgEntitlements"
-      ],
-      "last_modified": "2025-06-09T23:03:38.157Z",
-      "size_bytes": 1923,
-      "hash": "bee557df",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/lib/apiClient/orgEntitlements.ts",
       "name": "orgEntitlements.ts",
       "directory": "apps/web/app/lib/apiClient",
@@ -1332,30 +1374,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/lib/apiClient/provisioning.test.tsx",
-      "name": "provisioning.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useProvisioning",
-        "./provisioning"
-      ],
-      "last_modified": "2025-06-09T23:08:21.866Z",
-      "size_bytes": 1720,
-      "hash": "c3934a38",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/lib/apiClient/provisioning.ts",
       "name": "provisioning.ts",
       "directory": "apps/web/app/lib/apiClient",
@@ -1368,30 +1386,6 @@
       "last_modified": "2025-06-11T21:05:04.070Z",
       "size_bytes": 994,
       "hash": "8a453f1e",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/lib/apiClient/userPreferences.test.tsx",
-      "name": "userPreferences.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useUserPreferences",
-        "./userPreferences"
-      ],
-      "last_modified": "2025-06-09T23:08:09.784Z",
-      "size_bytes": 2817,
-      "hash": "b7ff37df",
       "complexity": "low"
     },
     {
@@ -1415,31 +1409,6 @@
       "last_modified": "2025-06-21T12:17:54.430Z",
       "size_bytes": 2197,
       "hash": "10c21d3d",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/lib/apiClient/useUserEntitlements.test.tsx",
-      "name": "useUserEntitlements.test.tsx",
-      "directory": "apps/web/app/lib/apiClient",
-      "extension": ".tsx",
-      "purpose": "To run these tests:",
-      "tags": [
-        "React",
-        "TypeScript",
-        "utility",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "react",
-        "@testing-library/react",
-        "@tanstack/react-query",
-        "../../hooks/useUserEntitlements",
-        "./entitlements"
-      ],
-      "last_modified": "2025-06-09T23:01:33.808Z",
-      "size_bytes": 1897,
-      "hash": "c3a80f93",
       "complexity": "low"
     },
     {
@@ -1496,29 +1465,6 @@
       "complexity": "medium"
     },
     {
-      "path": "apps/web/app/lib/contentService.test.ts",
-      "name": "contentService.test.ts",
-      "directory": "apps/web/app/lib",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "utility",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "vitest",
-        "./contentService",
-        "./supabaseClient",
-        "./entitlementService"
-      ],
-      "last_modified": "2025-06-09T21:40:52.468Z",
-      "size_bytes": 5901,
-      "hash": "03fcff1b",
-      "complexity": "medium"
-    },
-    {
       "path": "apps/web/app/lib/contentService.ts",
       "name": "contentService.ts",
       "directory": "apps/web/app/lib",
@@ -1540,27 +1486,6 @@
       "last_modified": "2025-06-18T18:37:39.921Z",
       "size_bytes": 4484,
       "hash": "7f25a072",
-      "complexity": "medium"
-    },
-    {
-      "path": "apps/web/app/lib/contextService.test.ts",
-      "name": "contextService.test.ts",
-      "directory": "apps/web/app/lib",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "vitest",
-        "./contextService",
-        "./supabaseClient"
-      ],
-      "last_modified": "2025-06-09T21:38:50.557Z",
-      "size_bytes": 3960,
-      "hash": "492a5fb6",
       "complexity": "medium"
     },
     {
@@ -1587,28 +1512,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/lib/entitlementService.test.ts",
-      "name": "entitlementService.test.ts",
-      "directory": "apps/web/app/lib",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "utility",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "vitest",
-        "./entitlementService",
-        "./supabaseClient"
-      ],
-      "last_modified": "2025-06-09T21:33:23.882Z",
-      "size_bytes": 4486,
-      "hash": "2350b748",
-      "complexity": "medium"
-    },
-    {
       "path": "apps/web/app/lib/entitlementService.ts",
       "name": "entitlementService.ts",
       "directory": "apps/web/app/lib",
@@ -1620,16 +1523,15 @@
         "security"
       ],
       "dependencies": [
-        "./supabaseServerClient",
-        "next/headers",
+        "@supabase/supabase-js",
         "./types"
       ],
       "exports": [
         "entitlementService"
       ],
-      "last_modified": "2025-06-21T11:39:32.776Z",
-      "size_bytes": 4882,
-      "hash": "9248a379",
+      "last_modified": "2025-06-22T01:48:18.978Z",
+      "size_bytes": 5334,
+      "hash": "15cdc28a",
       "complexity": "medium"
     },
     {
@@ -1647,29 +1549,6 @@
       "size_bytes": 448,
       "hash": "1bf21ce6",
       "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/lib/navService.test.ts",
-      "name": "navService.test.ts",
-      "directory": "apps/web/app/lib",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "utility",
-        "test",
-        "security"
-      ],
-      "dependencies": [
-        "vitest",
-        "./navService",
-        "./supabaseClient",
-        "./entitlementService"
-      ],
-      "last_modified": "2025-06-09T23:21:08.000Z",
-      "size_bytes": 6566,
-      "hash": "7c821bf7",
-      "complexity": "medium"
     },
     {
       "path": "apps/web/app/lib/navService.ts",
@@ -1696,27 +1575,6 @@
       "complexity": "medium"
     },
     {
-      "path": "apps/web/app/lib/organizationService.test.ts",
-      "name": "organizationService.test.ts",
-      "directory": "apps/web/app/lib",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "vitest",
-        "./organizationService",
-        "./supabaseClient"
-      ],
-      "last_modified": "2025-06-09T21:35:14.382Z",
-      "size_bytes": 5192,
-      "hash": "4cec15b2",
-      "complexity": "medium"
-    },
-    {
       "path": "apps/web/app/lib/organizationService.ts",
       "name": "organizationService.ts",
       "directory": "apps/web/app/lib",
@@ -1737,27 +1595,6 @@
       "size_bytes": 3010,
       "hash": "89c4895d",
       "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/lib/provisioningService.test.ts",
-      "name": "provisioningService.test.ts",
-      "directory": "apps/web/app/lib",
-      "extension": ".ts",
-      "purpose": "To run these tests:",
-      "tags": [
-        "TypeScript",
-        "utility",
-        "test"
-      ],
-      "dependencies": [
-        "vitest",
-        "./provisioningService",
-        "./supabaseClient"
-      ],
-      "last_modified": "2025-06-09T21:38:00.744Z",
-      "size_bytes": 4236,
-      "hash": "a9dc22f2",
-      "complexity": "medium"
     },
     {
       "path": "apps/web/app/lib/provisioningService.ts",
@@ -1854,30 +1691,61 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-21T05:45:14.774Z",
-      "size_bytes": 3335,
-      "hash": "4e79ba5c",
+      "last_modified": "2025-06-22T09:09:31.979Z",
+      "size_bytes": 4304,
+      "hash": "41f6b564",
       "complexity": "medium"
     },
     {
-      "path": "apps/web/app/lib/userService.test.ts",
-      "name": "userService.test.ts",
-      "directory": "apps/web/app/lib",
+      "path": "apps/web/app/lib/types/progress.ts",
+      "name": "progress.ts",
+      "directory": "apps/web/app/lib/types",
       "extension": ".ts",
-      "purpose": "To run these tests:",
+      "purpose": "Client-side Progress Types",
       "tags": [
         "TypeScript",
         "utility",
-        "test"
+        "AI agent"
+      ],
+      "last_modified": "2025-06-23T02:13:10.304Z",
+      "size_bytes": 2323,
+      "hash": "d0fd83c7",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/lib/userProgressService.client.ts",
+      "name": "userProgressService.client.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "User Progress Service - Client Side",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-23T02:29:49.341Z",
+      "size_bytes": 7447,
+      "hash": "972bba22",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/app/lib/userProgressService.ts",
+      "name": "userProgressService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "User Progress Service - Web App Integration",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent"
       ],
       "dependencies": [
-        "vitest",
-        "./userService",
-        "./supabaseClient"
+        "./supabaseServerClient",
+        "next/headers"
       ],
-      "last_modified": "2025-06-09T21:36:48.705Z",
-      "size_bytes": 4656,
-      "hash": "9e1bec9f",
+      "last_modified": "2025-06-22T20:45:30.111Z",
+      "size_bytes": 5224,
+      "hash": "82eca00e",
       "complexity": "medium"
     },
     {
@@ -1900,12 +1768,9 @@
         "next/headers",
         "./types"
       ],
-      "exports": [
-        "userService"
-      ],
-      "last_modified": "2025-06-21T12:17:33.667Z",
-      "size_bytes": 6440,
-      "hash": "97e4dfa9",
+      "last_modified": "2025-06-22T05:53:32.928Z",
+      "size_bytes": 8588,
+      "hash": "2a464406",
       "complexity": "medium"
     },
     {
@@ -1956,10 +1821,10 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-06-21T12:22:57.542Z",
-      "size_bytes": 2771,
-      "hash": "5a479eef",
-      "complexity": "low"
+      "last_modified": "2025-06-22T05:53:48.886Z",
+      "size_bytes": 5877,
+      "hash": "ed489e69",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/page.tsx",
@@ -1986,7 +1851,7 @@
       "name": "QueryClientProvider.tsx",
       "directory": "apps/web/app",
       "extension": ".tsx",
-      "purpose": "1 minute",
+      "purpose": "5 minutes - more aggressive caching",
       "tags": [
         "React",
         "TypeScript",
@@ -1999,9 +1864,9 @@
       "exports": [
         "QueryClientProvider"
       ],
-      "last_modified": "2025-06-21T00:20:19.555Z",
-      "size_bytes": 1219,
-      "hash": "d9130c8e",
+      "last_modified": "2025-06-22T05:16:45.727Z",
+      "size_bytes": 1051,
+      "hash": "c04a4448",
       "complexity": "low"
     },
     {
@@ -2081,14 +1946,12 @@
         "../ui/dialog",
         "hls.js",
         "react",
-        "@radix-ui/react-icons"
+        "@radix-ui/react-icons",
+        "../../app/hooks/useUniversalProgress"
       ],
-      "exports": [
-        "ComponentSchemaRenderer"
-      ],
-      "last_modified": "2025-06-19T01:32:01.149Z",
-      "size_bytes": 23560,
-      "hash": "849464c9",
+      "last_modified": "2025-06-24T10:29:11.692Z",
+      "size_bytes": 39339,
+      "hash": "279d7dcd",
       "complexity": "high"
     },
     {
@@ -2101,6 +1964,7 @@
         "React",
         "TypeScript",
         "UI",
+        "React Query",
         "React hooks",
         "AI agent"
       ],
@@ -2111,11 +1975,14 @@
         "./ai/ComponentSchemaRenderer",
         "../../../packages/agent-core/types/ComponentSchema",
         "./SupabaseProvider",
-        "react"
+        "react",
+        "../app/hooks/useUserPreferences",
+        "@tanstack/react-query",
+        "../app/lib/types"
       ],
-      "last_modified": "2025-06-21T04:09:23.018Z",
-      "size_bytes": 12955,
-      "hash": "e300af95",
+      "last_modified": "2025-06-24T10:29:17.148Z",
+      "size_bytes": 25583,
+      "hash": "0ed2854c",
       "complexity": "high"
     },
     {
@@ -2206,9 +2073,9 @@
         "Dialog",
         "DialogContent"
       ],
-      "last_modified": "2025-06-21T05:12:16.560Z",
-      "size_bytes": 1326,
-      "hash": "cf25a47c",
+      "last_modified": "2025-06-21T16:25:41.911Z",
+      "size_bytes": 1609,
+      "hash": "fab13ee4",
       "complexity": "low"
     },
     {
@@ -2216,7 +2083,7 @@
       "name": "legacy_course_modal.tsx",
       "directory": "apps/web/components/ui",
       "extension": ".tsx",
-      "purpose": "Fetch content from Tribe API",
+      "purpose": "Simple Button component",
       "tags": [
         "React",
         "TypeScript",
@@ -2225,16 +2092,13 @@
       ],
       "dependencies": [
         "react",
-        "@/components/ui/dialog",
-        "@/components/ui/button",
+        "./dialog",
         "lucide-react",
-        "@/lib/auth-context",
-        "@/lib/firebase",
-        "firebase/firestore"
+        "../../app/hooks/useVideoProgress"
       ],
-      "last_modified": "2025-06-06T18:45:37.060Z",
-      "size_bytes": 5049,
-      "hash": "6ee15db5",
+      "last_modified": "2025-06-23T10:59:56.648Z",
+      "size_bytes": 6961,
+      "hash": "dd1da36d",
       "complexity": "medium"
     },
     {
@@ -2273,30 +2137,6 @@
       "complexity": "high"
     },
     {
-      "path": "apps/web/components/ui/NavPanel.test.tsx",
-      "name": "NavPanel.test.tsx",
-      "directory": "apps/web/components/ui",
-      "extension": ".tsx",
-      "purpose": "Test component to validate database-driven navigation",
-      "tags": [
-        "React",
-        "TypeScript",
-        "UI",
-        "test"
-      ],
-      "dependencies": [
-        "react",
-        "../../hooks/useNavigation"
-      ],
-      "exports": [
-        "NavPanelTest"
-      ],
-      "last_modified": "2025-06-20T21:31:48.722Z",
-      "size_bytes": 591,
-      "hash": "6aed082a",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/components/ui/NavPanel.tsx",
       "name": "NavPanel.tsx",
       "directory": "apps/web/components/ui",
@@ -2319,6 +2159,7 @@
         "../SupabaseProvider",
         "../../hooks/useNavigation",
         "../../hooks/useAvatar",
+        "../../app/hooks/useNavigationState",
         "../../app/lib/authService",
         "lucide-react",
         "./UserProfileModal"
@@ -2326,10 +2167,33 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-21T12:15:31.944Z",
-      "size_bytes": 16503,
-      "hash": "3697648f",
+      "last_modified": "2025-06-22T09:40:47.587Z",
+      "size_bytes": 19286,
+      "hash": "be1ec4a5",
       "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/ui/ProgressBar.tsx",
+      "name": "ProgressBar.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Progress bar component for video and content tracking",
+      "owner": "Frontend team",
+      "tags": [
+        "UI component",
+        "progress tracking",
+        "video",
+        "React",
+        "TypeScript",
+        "UI"
+      ],
+      "exports": [
+        "ProgressBar"
+      ],
+      "last_modified": "2025-06-21T16:30:29.431Z",
+      "size_bytes": 1016,
+      "hash": "761f054f",
+      "complexity": "low"
     },
     {
       "path": "apps/web/components/ui/ThemeContext.tsx",
@@ -2375,9 +2239,9 @@
         "./ThemeContext",
         "../ai/AIExperience"
       ],
-      "last_modified": "2025-06-21T12:23:32.890Z",
-      "size_bytes": 2388,
-      "hash": "663b87ec",
+      "last_modified": "2025-06-21T14:56:31.973Z",
+      "size_bytes": 2480,
+      "hash": "8395c1fe",
       "complexity": "low"
     },
     {
@@ -2400,9 +2264,9 @@
         "@tanstack/react-query",
         "./NavPanel"
       ],
-      "last_modified": "2025-06-21T06:30:54.506Z",
-      "size_bytes": 16254,
-      "hash": "ec377448",
+      "last_modified": "2025-06-21T12:41:04.190Z",
+      "size_bytes": 16332,
+      "hash": "c39cc2ab",
       "complexity": "high"
     },
     {
@@ -2496,6 +2360,31 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/hooks/useDashboardData.ts",
+      "name": "useDashboardData.ts",
+      "directory": "apps/web/hooks",
+      "extension": ".ts",
+      "purpose": "Optimized dashboard data hook - fetches all data in single API call",
+      "owner": "Frontend team",
+      "tags": [
+        "React hooks",
+        "performance optimization",
+        "dashboard",
+        "batched queries",
+        "TypeScript",
+        "hooks",
+        "React Query"
+      ],
+      "dependencies": [
+        "@tanstack/react-query",
+        "../app/lib/types"
+      ],
+      "last_modified": "2025-06-22T06:20:24.635Z",
+      "size_bytes": 1721,
+      "hash": "926105ec",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/hooks/useNavigation.ts",
       "name": "useNavigation.ts",
       "directory": "apps/web/hooks",
@@ -2520,9 +2409,9 @@
         "../components/ui/NavPanel",
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-06-21T12:16:55.133Z",
-      "size_bytes": 4958,
-      "hash": "7efa67ac",
+      "last_modified": "2025-06-22T09:25:07.959Z",
+      "size_bytes": 5720,
+      "hash": "4720be01",
       "complexity": "medium"
     },
     {
@@ -2542,9 +2431,9 @@
       "exports": [
         "useNavOptions"
       ],
-      "last_modified": "2025-06-18T18:25:34.167Z",
-      "size_bytes": 1296,
-      "hash": "ff0fcb66",
+      "last_modified": "2025-06-22T01:51:44.260Z",
+      "size_bytes": 1690,
+      "hash": "6dd85206",
       "complexity": "low"
     },
     {
@@ -2587,9 +2476,9 @@
       "extension": ".js",
       "purpose": "Root of apps/web",
       "tags": [],
-      "last_modified": "2025-06-20T18:40:42.824Z",
-      "size_bytes": 933,
-      "hash": "d5b041ff",
+      "last_modified": "2025-06-22T06:20:42.646Z",
+      "size_bytes": 1090,
+      "hash": "ef5c4975",
       "complexity": "low"
     },
     {
@@ -2670,9 +2559,50 @@
       "hash": "88893567"
     },
     {
-      "path": "docs/agent-native-cursor-project-rules.md",
+      "path": "docs/.legacy/adr-template.md",
+      "name": "adr-template.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T13:57:44.897Z",
+      "size_bytes": 3637,
+      "hash": "85366393"
+    },
+    {
+      "path": "docs/.legacy/agent-framework-deployment-guide.md",
+      "name": "agent-framework-deployment-guide.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "localhost:3000",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-21T13:40:02.935Z",
+      "size_bytes": 6608,
+      "hash": "f26b9d2e"
+    },
+    {
+      "path": "docs/.legacy/agent-native-composition-architecture.md",
+      "name": "agent-native-composition-architecture.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "Examples of base components",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T11:32:06.383Z",
+      "size_bytes": 10926,
+      "hash": "59e7402f"
+    },
+    {
+      "path": "docs/.legacy/agent-native-cursor-project-rules.md",
       "name": "agent-native-cursor-project-rules.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -2684,9 +2614,9 @@
       "hash": "a00417bd"
     },
     {
-      "path": "docs/agent-native-leader-brief-presentation.md",
+      "path": "docs/.legacy/agent-native-leader-brief-presentation.md",
       "name": "agent-native-leader-brief-presentation.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -2698,9 +2628,9 @@
       "hash": "5bbf598f"
     },
     {
-      "path": "docs/agent-native-leader-brief.md",
+      "path": "docs/.legacy/agent-native-leader-brief.md",
       "name": "agent-native-leader-brief.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -2712,9 +2642,37 @@
       "hash": "d37826df"
     },
     {
-      "path": "docs/dev-notes/abstraction_layer.md",
+      "path": "docs/.legacy/component-system-refactor-plan.md",
+      "name": "component-system-refactor-plan.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T13:57:55.708Z",
+      "size_bytes": 3133,
+      "hash": "34397f6c"
+    },
+    {
+      "path": "docs/.legacy/design-system-reorganization-summary.md",
+      "name": "design-system-reorganization-summary.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T15:30:56.229Z",
+      "size_bytes": 7678,
+      "hash": "e06eeff5"
+    },
+    {
+      "path": "docs/.legacy/dev-notes/abstraction_layer.md",
       "name": "abstraction_layer.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "apps/web/app/lib/contextService.ts",
       "tags": [
@@ -2728,9 +2686,9 @@
       "hash": "93ef4760"
     },
     {
-      "path": "docs/dev-notes/agent-architecture.md",
+      "path": "docs/.legacy/dev-notes/agent-architecture.md",
       "name": "agent-architecture.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Grid, Card, Panel, etc.",
       "tags": [
@@ -2742,9 +2700,9 @@
       "hash": "a2af5808"
     },
     {
-      "path": "docs/dev-notes/agent-configuration-guide.md",
+      "path": "docs/.legacy/dev-notes/agent-configuration-guide.md",
       "name": "agent-configuration-guide.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -2756,9 +2714,9 @@
       "hash": "2fb781d5"
     },
     {
-      "path": "docs/dev-notes/agent-prompt-engineering_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/agent-prompt-engineering_UPDATED.md",
       "name": "agent-prompt-engineering_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Pattern: Reframing Problems as Opportunities",
       "tags": [
@@ -2770,9 +2728,9 @@
       "hash": "b80b1952"
     },
     {
-      "path": "docs/dev-notes/architecture-foundations_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/architecture-foundations_UPDATED.md",
       "name": "architecture-foundations_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Each module is self-contained with clear interfaces",
       "tags": [
@@ -2785,9 +2743,9 @@
       "hash": "8baa2d36"
     },
     {
-      "path": "docs/dev-notes/business-rules-documentation_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/business-rules-documentation_UPDATED.md",
       "name": "business-rules-documentation_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Business Rule: Auto-upgrade legacy subscribers",
       "tags": [
@@ -2800,9 +2758,9 @@
       "hash": "305794e1"
     },
     {
-      "path": "docs/dev-notes/code_hygiene_checklist.md",
+      "path": "docs/.legacy/dev-notes/code_hygiene_checklist.md",
       "name": "code_hygiene_checklist.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "pnpm.io/)",
       "tags": [
@@ -2813,9 +2771,9 @@
       "hash": "9cbf446b"
     },
     {
-      "path": "docs/dev-notes/component-styling-guidelines.md",
+      "path": "docs/.legacy/dev-notes/component-styling-guidelines.md",
       "name": "component-styling-guidelines.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "...etc",
       "tags": [
@@ -2826,9 +2784,9 @@
       "hash": "903c47a4"
     },
     {
-      "path": "docs/dev-notes/copilotkit_usage.md",
+      "path": "docs/.legacy/dev-notes/copilotkit_usage.md",
       "name": "copilotkit_usage.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "apps/web/components/ai/AIExperience.tsx",
       "tags": [
@@ -2841,9 +2799,9 @@
       "hash": "ed0db005"
     },
     {
-      "path": "docs/dev-notes/database_setup_addendum_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/database_setup_addendum_UPDATED.md",
       "name": "database_setup_addendum_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "orm.drizzle.team/)",
       "tags": [
@@ -2856,9 +2814,9 @@
       "hash": "2e63c3ae"
     },
     {
-      "path": "docs/dev-notes/deployment-devops-guide_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/deployment-devops-guide_UPDATED.md",
       "name": "deployment-devops-guide_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash",
       "tags": [
@@ -2870,9 +2828,9 @@
       "hash": "e9d815f0"
     },
     {
-      "path": "docs/dev-notes/development-setup_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/development-setup_UPDATED.md",
       "name": "development-setup_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "github.com/your-org/leaderforge.git",
       "tags": [
@@ -2884,9 +2842,9 @@
       "hash": "58c24f33"
     },
     {
-      "path": "docs/dev-notes/enhancements-and-todos.md",
+      "path": "docs/.legacy/dev-notes/enhancements-and-todos.md",
       "name": "enhancements-and-todos.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -2894,14 +2852,14 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-17T02:46:33.906Z",
-      "size_bytes": 5552,
-      "hash": "ca73f15c"
+      "last_modified": "2025-06-21T13:40:00.317Z",
+      "size_bytes": 5683,
+      "hash": "d8beacd5"
     },
     {
-      "path": "docs/dev-notes/env-config-addendum_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/env-config-addendum_UPDATED.md",
       "name": "env-config-addendum_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "localhost:3000",
       "tags": [
@@ -2912,9 +2870,9 @@
       "hash": "62be70e2"
     },
     {
-      "path": "docs/dev-notes/feature_flags.md",
+      "path": "docs/.legacy/dev-notes/feature_flags.md",
       "name": "feature_flags.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "posthog.com) as our feature flag and analytics provider. All flag checks are abstracted through a single TypeScript service, ensuring flexibility and vendor independence.",
       "tags": [
@@ -2926,9 +2884,9 @@
       "hash": "256bd01b"
     },
     {
-      "path": "docs/dev-notes/langgraph_usage.md",
+      "path": "docs/.legacy/dev-notes/langgraph_usage.md",
       "name": "langgraph_usage.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "packages/agent-core/agents/conversationAgent.ts",
       "tags": [
@@ -2941,9 +2899,9 @@
       "hash": "dae47f8d"
     },
     {
-      "path": "docs/dev-notes/licensing-and-entitlement-architecture.md",
+      "path": "docs/.legacy/dev-notes/licensing-and-entitlement-architecture.md",
       "name": "licensing-and-entitlement-architecture.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -2956,9 +2914,9 @@
       "hash": "f193505f"
     },
     {
-      "path": "docs/dev-notes/module_configuration_addendum_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/module_configuration_addendum_UPDATED.md",
       "name": "module_configuration_addendum_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Module theme application",
       "tags": [
@@ -2971,9 +2929,9 @@
       "hash": "f269ccdf"
     },
     {
-      "path": "docs/dev-notes/navpanel-refactoring-plan.md",
+      "path": "docs/.legacy/dev-notes/navpanel-refactoring-plan.md",
       "name": "navpanel-refactoring-plan.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Transform database nav_options to NavPanelSchema",
       "tags": [
@@ -2986,9 +2944,9 @@
       "hash": "172e1569"
     },
     {
-      "path": "docs/dev-notes/performance-requirements_UPDATED.md",
+      "path": "docs/.legacy/dev-notes/performance-requirements_UPDATED.md",
       "name": "performance-requirements_UPDATED.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Time to first token streaming",
       "tags": [
@@ -3000,9 +2958,9 @@
       "hash": "c97166bd"
     },
     {
-      "path": "docs/dev-notes/rls-policies.sql",
+      "path": "docs/.legacy/dev-notes/rls-policies.sql",
       "name": "rls-policies.sql",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".sql",
       "purpose": "—",
       "tags": [
@@ -3014,9 +2972,9 @@
       "hash": "669e1599"
     },
     {
-      "path": "docs/dev-notes/simplified-entitlement-system.md",
+      "path": "docs/.legacy/dev-notes/simplified-entitlement-system.md",
       "name": "simplified-entitlement-system.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "Navigation click handler",
       "tags": [
@@ -3029,9 +2987,9 @@
       "hash": "6fda1fd5"
     },
     {
-      "path": "docs/dev-notes/supabase_core_grants.sql.md",
+      "path": "docs/.legacy/dev-notes/supabase_core_grants.sql.md",
       "name": "supabase_core_grants.sql.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3044,9 +3002,9 @@
       "hash": "c9db900e"
     },
     {
-      "path": "docs/dev-notes/supabase-ssr-auth-debug.md",
+      "path": "docs/.legacy/dev-notes/supabase-ssr-auth-debug.md",
       "name": "supabase-ssr-auth-debug.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "jwt.io)), the following issue occurred:",
       "tags": [
@@ -3057,9 +3015,9 @@
       "hash": "3b8170ed"
     },
     {
-      "path": "docs/dev-notes/tribe-social-docs.md",
+      "path": "docs/.legacy/dev-notes/tribe-social-docs.md",
       "name": "tribe-social-docs.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "api.tribesocial.io/api/view-data\" \\",
       "tags": [
@@ -3071,9 +3029,9 @@
       "hash": "e0f32bfa"
     },
     {
-      "path": "docs/dev-notes/ui-glossary-and-styling.md",
+      "path": "docs/.legacy/dev-notes/ui-glossary-and-styling.md",
       "name": "ui-glossary-and-styling.md",
-      "directory": "docs/dev-notes",
+      "directory": "docs/.legacy/dev-notes",
       "extension": ".md",
       "purpose": "en.json",
       "tags": [
@@ -3084,9 +3042,37 @@
       "hash": "e86d0cb0"
     },
     {
-      "path": "docs/file-header-template.md",
+      "path": "docs/.legacy/documentation-restructure-plan.md",
+      "name": "documentation-restructure-plan.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:00:02.400Z",
+      "size_bytes": 11331,
+      "hash": "d4401db7"
+    },
+    {
+      "path": "docs/.legacy/documentation-restructure-summary.md",
+      "name": "documentation-restructure-summary.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:40:12.533Z",
+      "size_bytes": 8352,
+      "hash": "14b0c725"
+    },
+    {
+      "path": "docs/.legacy/file-header-template.md",
       "name": "file-header-template.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "Brief description of what this file does and why it exists",
       "owner": "Team or individual responsible (e.g., \"Frontend team\", \"Backend team\", \"AI team\")",
@@ -3102,14 +3088,14 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T12:23:46.240Z",
+      "last_modified": "2025-06-21T12:24:56.779Z",
       "size_bytes": 2955,
       "hash": "878235ec"
     },
     {
-      "path": "docs/how-to-add-or-change-agents.md",
+      "path": "docs/.legacy/how-to-add-or-change-agents.md",
       "name": "how-to-add-or-change-agents.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3121,9 +3107,9 @@
       "hash": "9fedda61"
     },
     {
-      "path": "docs/how-to-add-or-change-components.md",
+      "path": "docs/.legacy/how-to-add-or-change-components.md",
       "name": "how-to-add-or-change-components.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3135,9 +3121,9 @@
       "hash": "976d630b"
     },
     {
-      "path": "docs/how-to-add-or-change-contexts.md",
+      "path": "docs/.legacy/how-to-add-or-change-contexts.md",
       "name": "how-to-add-or-change-contexts.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3148,9 +3134,9 @@
       "hash": "ac1b5720"
     },
     {
-      "path": "docs/how-to-add-or-change-langgraph-agent-orchestration.md",
+      "path": "docs/.legacy/how-to-add-or-change-langgraph-agent-orchestration.md",
       "name": "how-to-add-or-change-langgraph-agent-orchestration.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3162,9 +3148,9 @@
       "hash": "318f8942"
     },
     {
-      "path": "docs/how-to-add-or-change-styles.md",
+      "path": "docs/.legacy/how-to-add-or-change-styles.md",
       "name": "how-to-add-or-change-styles.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3175,9 +3161,9 @@
       "hash": "6952929e"
     },
     {
-      "path": "docs/how-to-add-or-change-themes.md",
+      "path": "docs/.legacy/how-to-add-or-change-themes.md",
       "name": "how-to-add-or-change-themes.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3188,9 +3174,9 @@
       "hash": "e2fe58a1"
     },
     {
-      "path": "docs/how-to-add-or-change-tools.md",
+      "path": "docs/.legacy/how-to-add-or-change-tools.md",
       "name": "how-to-add-or-change-tools.md",
-      "directory": "docs",
+      "directory": "docs/.legacy",
       "extension": ".md",
       "purpose": "—",
       "tags": [
@@ -3200,6 +3186,326 @@
       "last_modified": "2025-06-06T14:03:30.641Z",
       "size_bytes": 2261,
       "hash": "02367c59"
+    },
+    {
+      "path": "docs/.legacy/prd-agent-native-composition-system.md",
+      "name": "prd-agent-native-composition-system.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T13:57:51.641Z",
+      "size_bytes": 3234,
+      "hash": "4db59066"
+    },
+    {
+      "path": "docs/.legacy/README.md",
+      "name": "README.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T15:40:04.928Z",
+      "size_bytes": 6003,
+      "hash": "1bbc7e0a"
+    },
+    {
+      "path": "docs/.legacy/senior-architect-rule.md",
+      "name": "senior-architect-rule.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T13:58:02.549Z",
+      "size_bytes": 7052,
+      "hash": "6f5f39e2"
+    },
+    {
+      "path": "docs/.legacy/senior-product-manager-rule.md",
+      "name": "senior-product-manager-rule.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "Every feature must be accessible via conversation",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T13:57:48.757Z",
+      "size_bytes": 9303,
+      "hash": "6338b74f"
+    },
+    {
+      "path": "docs/.legacy/universal-progress-tool-architecture.md",
+      "name": "universal-progress-tool-architecture.md",
+      "directory": "docs/.legacy",
+      "extension": ".md",
+      "purpose": "0-100 percentage or custom metric",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-22T20:45:47.921Z",
+      "size_bytes": 9348,
+      "hash": "a48f13f5"
+    },
+    {
+      "path": "docs/architecture/adr/0001-agent-native-composition-system.md",
+      "name": "0001-agent-native-composition-system.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:00:27.360Z",
+      "size_bytes": 9792,
+      "hash": "5eff0ed0"
+    },
+    {
+      "path": "docs/architecture/adr/0002-modular-monolith-architecture.md",
+      "name": "0002-modular-monolith-architecture.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:00:33.163Z",
+      "size_bytes": 9158,
+      "hash": "bd8c92be"
+    },
+    {
+      "path": "docs/architecture/adr/0003-separate-asset-registries.md",
+      "name": "0003-separate-asset-registries.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:25:14.374Z",
+      "size_bytes": 8632,
+      "hash": "7be5a34d"
+    },
+    {
+      "path": "docs/architecture/adr/0004-database-backed-compositions.md",
+      "name": "0004-database-backed-compositions.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-24T14:25:16.367Z",
+      "size_bytes": 9096,
+      "hash": "fd52f086"
+    },
+    {
+      "path": "docs/architecture/adr/0005-hybrid-communication-pattern.md",
+      "name": "0005-hybrid-communication-pattern.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T14:25:18.141Z",
+      "size_bytes": 9686,
+      "hash": "e1712d8c"
+    },
+    {
+      "path": "docs/architecture/adr/0006-bullmq-message-queue.md",
+      "name": "0006-bullmq-message-queue.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "Content processing jobs",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T14:25:20.806Z",
+      "size_bytes": 9350,
+      "hash": "c0f3f432"
+    },
+    {
+      "path": "docs/architecture/adr/0007-api-route-organization.md",
+      "name": "0007-api-route-organization.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:25:22.414Z",
+      "size_bytes": 9554,
+      "hash": "542419f9"
+    },
+    {
+      "path": "docs/architecture/adr/adr-template.md",
+      "name": "adr-template.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T14:07:44.505Z",
+      "size_bytes": 3637,
+      "hash": "85366393"
+    },
+    {
+      "path": "docs/architecture/adr/README.md",
+      "name": "README.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:00:11.457Z",
+      "size_bytes": 3404,
+      "hash": "0b72a540"
+    },
+    {
+      "path": "docs/architecture/overview/agent-native-composition-architecture.md",
+      "name": "agent-native-composition-architecture.md",
+      "directory": "docs/architecture/overview",
+      "extension": ".md",
+      "purpose": "Examples of base components",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:07:36.792Z",
+      "size_bytes": 10926,
+      "hash": "59e7402f"
+    },
+    {
+      "path": "docs/architecture/README.md",
+      "name": "README.md",
+      "directory": "docs/architecture",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:27:01.955Z",
+      "size_bytes": 6822,
+      "hash": "731030f2"
+    },
+    {
+      "path": "docs/engineering/how-to/README.md",
+      "name": "README.md",
+      "directory": "docs/engineering/how-to",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:40:10.050Z",
+      "size_bytes": 2668,
+      "hash": "af4b897c"
+    },
+    {
+      "path": "docs/engineering/implementation-plans/component-system-refactor-plan.md",
+      "name": "component-system-refactor-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:25:04.372Z",
+      "size_bytes": 3133,
+      "hash": "34397f6c"
+    },
+    {
+      "path": "docs/engineering/README.md",
+      "name": "README.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "Register agent with proper typing",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:40:06.118Z",
+      "size_bytes": 9844,
+      "hash": "a3af7bc8"
+    },
+    {
+      "path": "docs/governance/cursor-rules-reference.md",
+      "name": "cursor-rules-reference.md",
+      "directory": "docs/governance",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T15:39:49.969Z",
+      "size_bytes": 5870,
+      "hash": "36dc5ad8"
+    },
+    {
+      "path": "docs/governance/README.md",
+      "name": "README.md",
+      "directory": "docs/governance",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T15:39:57.819Z",
+      "size_bytes": 3978,
+      "hash": "bea6c157"
+    },
+    {
+      "path": "docs/governance/universal-glossary.md",
+      "name": "universal-glossary.md",
+      "directory": "docs/governance",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-24T15:21:51.408Z",
+      "size_bytes": 11283,
+      "hash": "bc9d5528"
+    },
+    {
+      "path": "docs/legacy-migration-summary.md",
+      "name": "legacy-migration-summary.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T15:36:33.592Z",
+      "size_bytes": 4777,
+      "hash": "dd2a7e41"
     },
     {
       "path": "docs/manifest.json",
@@ -3212,9 +3518,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T12:19:39.164Z",
-      "size_bytes": 92855,
-      "hash": "36bb4d08"
+      "last_modified": "2025-06-24T15:35:39.353Z",
+      "size_bytes": 107962,
+      "hash": "f549c44f"
     },
     {
       "path": "docs/manifest.md",
@@ -3227,9 +3533,78 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T12:19:39.174Z",
-      "size_bytes": 33980,
-      "hash": "6d4fd15c"
+      "last_modified": "2025-06-24T15:35:39.378Z",
+      "size_bytes": 40725,
+      "hash": "787cd10e"
+    },
+    {
+      "path": "docs/product-design/design-system.md",
+      "name": "design-system.md",
+      "directory": "docs/product-design",
+      "extension": ".md",
+      "purpose": "React component example",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-24T15:24:45.433Z",
+      "size_bytes": 21874,
+      "hash": "2b058f02"
+    },
+    {
+      "path": "docs/product-design/README.md",
+      "name": "README.md",
+      "directory": "docs/product-design",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T15:29:28.340Z",
+      "size_bytes": 8383,
+      "hash": "5434584f"
+    },
+    {
+      "path": "docs/product-management/prds/agent-native-composition-system.md",
+      "name": "agent-native-composition-system.md",
+      "directory": "docs/product-management/prds",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:24:57.597Z",
+      "size_bytes": 3234,
+      "hash": "4db59066"
+    },
+    {
+      "path": "docs/product-management/README.md",
+      "name": "README.md",
+      "directory": "docs/product-management",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T14:40:01.795Z",
+      "size_bytes": 8697,
+      "hash": "d45062de"
+    },
+    {
+      "path": "docs/README.md",
+      "name": "README.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-24T15:36:03.033Z",
+      "size_bytes": 6514,
+      "hash": "4e1e780f"
     },
     {
       "path": "packages/agent-core/agents/ContentLibraryAgent.ts",
@@ -3252,24 +3627,6 @@
       "complexity": "low"
     },
     {
-      "path": "packages/agent-core/agents/ContentSyncAgent.test.ts",
-      "name": "ContentSyncAgent.test.ts",
-      "directory": "packages/agent-core/agents",
-      "extension": ".ts",
-      "purpose": "—",
-      "tags": [
-        "TypeScript",
-        "test"
-      ],
-      "dependencies": [
-        "./ContentSyncAgent"
-      ],
-      "last_modified": "2025-06-08T02:12:51.507Z",
-      "size_bytes": 440,
-      "hash": "7caa6416",
-      "complexity": "low"
-    },
-    {
       "path": "packages/agent-core/agents/ContentSyncAgent.ts",
       "name": "ContentSyncAgent.ts",
       "directory": "packages/agent-core/agents",
@@ -3287,6 +3644,25 @@
       "size_bytes": 3169,
       "hash": "78f7daee",
       "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/agents/ProgressAwareAgent.ts",
+      "name": "ProgressAwareAgent.ts",
+      "directory": "packages/agent-core/agents",
+      "extension": ".ts",
+      "purpose": "Progress-Aware Agent - Agent Integration for Universal Progress Tool",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "dependencies": [
+        "../tools/ToolRegistry",
+        "../tools/UserProgressTool"
+      ],
+      "last_modified": "2025-06-22T20:45:33.741Z",
+      "size_bytes": 10461,
+      "hash": "bd3d998c",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/featureFlags.ts",
@@ -3332,16 +3708,76 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-05-30T20:14:27.411Z",
-      "size_bytes": 153,
-      "hash": "a54490a1"
+      "last_modified": "2025-06-22T15:48:20.132Z",
+      "size_bytes": 262,
+      "hash": "16e21e5f"
+    },
+    {
+      "path": "packages/agent-core/tools/__tests__/ProgressAwareAgent.test.ts",
+      "name": "ProgressAwareAgent.test.ts",
+      "directory": "packages/agent-core/tools/__tests__",
+      "extension": ".ts",
+      "purpose": "Progress-Aware Agent Tests - Agent Integration Testing",
+      "tags": [
+        "TypeScript",
+        "test",
+        "AI agent"
+      ],
+      "dependencies": [
+        "vitest",
+        "../../agents/ProgressAwareAgent",
+        "../ToolRegistry",
+        "../UserProgressTool"
+      ],
+      "last_modified": "2025-06-22T20:46:22.731Z",
+      "size_bytes": 12591,
+      "hash": "c777622a",
+      "complexity": "high"
+    },
+    {
+      "path": "packages/agent-core/tools/__tests__/UserProgressTool.simple.test.ts",
+      "name": "UserProgressTool.simple.test.ts",
+      "directory": "packages/agent-core/tools/__tests__",
+      "extension": ".ts",
+      "purpose": "Simple tests for Universal Progress Tool",
+      "tags": [
+        "TypeScript",
+        "test"
+      ],
+      "dependencies": [
+        "vitest",
+        "../UserProgressTool"
+      ],
+      "last_modified": "2025-06-22T16:13:19.249Z",
+      "size_bytes": 5711,
+      "hash": "b3b70c1f",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/agent-core/tools/__tests__/UserProgressTool.test.ts",
+      "name": "UserProgressTool.test.ts",
+      "directory": "packages/agent-core/tools/__tests__",
+      "extension": ".ts",
+      "purpose": "Tests for Universal Progress Tool",
+      "tags": [
+        "TypeScript",
+        "test",
+        "AI agent"
+      ],
+      "dependencies": [
+        "vitest"
+      ],
+      "last_modified": "2025-06-22T21:05:48.617Z",
+      "size_bytes": 11859,
+      "hash": "4fb402dc",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/tools/ToolRegistry.ts",
       "name": "ToolRegistry.ts",
       "directory": "packages/agent-core/tools",
       "extension": ".ts",
-      "purpose": "—",
+      "purpose": "Note: This tool registry will be initialized with proper supabase client by the app",
       "tags": [
         "TypeScript",
         "security"
@@ -3353,10 +3789,10 @@
       "exports": [
         "echoTool"
       ],
-      "last_modified": "2025-06-06T23:21:36.697Z",
-      "size_bytes": 2564,
-      "hash": "82986306",
-      "complexity": "low"
+      "last_modified": "2025-06-22T16:13:33.406Z",
+      "size_bytes": 5715,
+      "hash": "3e6bf8c0",
+      "complexity": "medium"
     },
     {
       "path": "packages/agent-core/tools/TribeSocialContentTool.ts",
@@ -3386,10 +3822,21 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-07T12:08:19.466Z",
-      "size_bytes": 3698,
-      "hash": "110159d5",
-      "complexity": "medium"
+      "last_modified": "2025-06-24T09:44:57.762Z",
+      "size_bytes": 16547,
+      "hash": "5d079914",
+      "complexity": "high"
+    },
+    {
+      "path": "packages/agent-core/tsconfig.json",
+      "name": "tsconfig.json",
+      "directory": "packages/agent-core",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-06-22T15:46:03.559Z",
+      "size_bytes": 328,
+      "hash": "120170f3"
     },
     {
       "path": "packages/agent-core/types/ComponentSchema.ts",
@@ -3422,6 +3869,24 @@
       "size_bytes": 1183,
       "hash": "02cc0e76",
       "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/types/ProgressSchema.ts",
+      "name": "ProgressSchema.ts",
+      "directory": "packages/agent-core/types",
+      "extension": ".ts",
+      "purpose": "Progress Schema Types - Schema Integration for Universal Progress Tool",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "dependencies": [
+        "../tools/UserProgressTool"
+      ],
+      "last_modified": "2025-06-22T20:45:36.268Z",
+      "size_bytes": 9159,
+      "hash": "97a6b1e4",
+      "complexity": "high"
     },
     {
       "path": "packages/env/index.ts",

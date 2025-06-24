@@ -88,8 +88,12 @@ else
         exit 1
     fi
 
-    echo "Running: npx @langchain/langgraph-cli dev --port 8000"
-    npx @langchain/langgraph-cli dev --port 8000 &
+    echo "Running: npx @langchain/langgraph-cli dev --host 127.0.0.1 --port 8000"
+    # Pass environment variables from .env.local to the LangGraph server
+    if [ -f "../.env.local" ]; then
+        export $(grep -v '^#' ../.env.local | xargs)
+    fi
+    npx @langchain/langgraph-cli dev --host 127.0.0.1 --port 8000 &
     LANGGRAPH_PID=$!
     echo "LangGraph server started with PID: $LANGGRAPH_PID"
 
