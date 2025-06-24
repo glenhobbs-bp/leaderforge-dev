@@ -15,6 +15,7 @@ import Hls from "hls.js";
 import React from "react";
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { useUniversalProgress } from "../../app/hooks/useUniversalProgress";
+import { WidgetDispatcher, isWidgetTypeAvailable } from "../widgets";
 
 // Extracted Card component to use hooks properly
 function CardComponent({ schema, onAction }: {
@@ -821,6 +822,11 @@ export function ComponentSchemaRenderer({ schema, userId, onProgressUpdate }: {
         </div>
       );
     case "StatCard":
+      // Use WidgetDispatcher for extracted widgets
+      if (isWidgetTypeAvailable(schema.type)) {
+        return <WidgetDispatcher schema={schema} userId={userId} />;
+      }
+      // Fallback to original implementation if widget not available
       return (
         <div className="rounded-lg shadow bg-white p-4 mb-4">
           <h3 className="font-semibold text-lg mb-1">{schema.props.title}</h3>

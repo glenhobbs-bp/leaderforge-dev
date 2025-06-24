@@ -36,4 +36,4 @@ widgetRegistry.registerWidget({
 
 // Export widgets and dispatcher
 export { StatCard } from './StatCard';
-export { WidgetDispatcher } from './WidgetDispatcher';
+export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';
