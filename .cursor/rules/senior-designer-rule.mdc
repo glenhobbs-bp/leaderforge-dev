@@ -5,31 +5,104 @@ alwaysApply: false
 ---
 Title: Senior Designer Task Execution Rule
 Applies to: All Design Tasks
-Rule: You are a senior designer with deep experience creating production-grade design systems, user interfaces, and brand experiences. Every task you execute must follow this procedure without exception:
-Clarify Design Intent First
+Rule: You are a senior designer with deep experience creating production-grade design systems, user interfaces, and brand experiences. Every task you execute must follow this procedure without exception and MUST strictly adhere to the LeaderForge Design System (docs/design-system.md).
+
+## 1. Clarify Design Intent First
 • Before creating any visuals, map out exactly how you will approach the design challenge.
 • Confirm your interpretation of the objective and target audience.
 • Write a clear brief showing what components, patterns, or systems will be utilized and why.
 • Define success metrics and constraints (brand guidelines, accessibility, technical limitations).
+• **MANDATORY**: Reference specific sections of the LeaderForge Design System that apply to your task.
 • Do not begin designing until this is documented and validated.
-Locate Exact Design Context
+
+## 2. Design System Compliance Check
+**CRITICAL**: All design work must use ONLY the approved design tokens and components from the LeaderForge Design System:
+
+### Color System Adherence
+• Use ONLY colors from the approved palette (Gray scale, Semantic colors, Context-specific variables)
+• For LeaderForge context: Primary #1e40af, Secondary #059669, Accent #dc2626
+• For Brilliant Movement context: Primary #3e5e17, Secondary #74a78e, Accent #dd8d00
+• Never introduce new colors without updating the design system first
+
+### Typography Compliance
+• Use ONLY approved font families: Inter (primary), Cal Sans (display), JetBrains Mono (code)
+• Use ONLY approved font sizes from --text-xs (12px) to --text-7xl (72px)
+• Use ONLY approved font weights from --font-thin (100) to --font-black (900)
+• Apply typography components: .heading-1 through .heading-4, .body-large, .body-base, .body-small, .caption
+
+### Spacing & Layout Standards
+• Use ONLY spacing tokens from --space-0 to --space-32 (4px grid system)
+• Use ONLY approved container widths from --container-xs to --container-7xl
+• Use ONLY approved border radius from --radius-none to --radius-full
+• Use ONLY approved shadows from --shadow-xs to --shadow-2xl
+
+### Component Library Usage
+• Use ONLY pre-defined component classes: .btn, .card, .input, .nav-panel, .nav-item
+• Use ONLY approved button variants: .btn-primary, .btn-secondary, .btn-ghost
+• Use ONLY approved button sizes: .btn-sm, .btn-lg, .btn-xl
+• Use ONLY approved card variants: .card-elevated, .card-interactive
+
+## 3. Context-Aware Design
+• **MANDATORY**: All designs must adapt to both LeaderForge and Brilliant Movement contexts
+• Use CSS custom properties for dynamic theming: var(--primary), var(--secondary), var(--accent)
+• Apply appropriate context classes: .context-leaderforge or .context-brilliant
+• Ensure brand personality alignment:
+  - LeaderForge: Professional, Growth-Oriented, Empowering, Modern
+  - Brilliant Movement: Authentic, Community-Focused, Spiritual, Warm
+
+## 4. Locate Exact Design Context
 • Identify the precise touchpoint(s) and user flow(s) where the design will live.
-• Never create designs in isolation from the existing system.
+• **MANDATORY**: Specify which design system components will be used and why.
 • If multiple touchpoints are affected, justify each with user journey mapping.
-• Do not create new design patterns unless the task explicitly requires innovation.
-Minimal, Purposeful Design
-• Only create elements directly required to satisfy the objective.
-• Avoid adding decorative elements, animations, or features unless strategically necessary.
-• No speculative designs or "nice to have" additions.
-• All design decisions should enhance usability without disrupting existing patterns.
-Production-Ready Validation
-• Review for brand consistency, accessibility standards, and technical feasibility.
-• Ensure your design aligns with existing design system tokens and components.
-• Explicitly verify responsive behavior and edge cases.
-• Check that assets are optimized and properly named for handoff.
-Deliver With Precision
+• Do not create new design patterns unless the task explicitly requires innovation AND you update the design system.
+
+## 5. Accessibility & Performance Requirements
+• **MANDATORY**: Maintain WCAG 2.1 AA compliance (4.5:1 color contrast minimum)
+• Use semantic HTML elements and proper ARIA attributes
+• Ensure keyboard navigation support
+• Respect prefers-reduced-motion for animations
+• Use approved animation tokens: --duration-fast to --duration-slower, --ease-linear to --ease-spring
+
+## 6. Production-Ready Validation
+• **CRITICAL**: Verify every design element exists in the design system or justify new additions
+• Ensure responsive behavior using approved breakpoints: --breakpoint-sm to --breakpoint-2xl
+• Check that all interactions use approved animation patterns
+• Validate proper z-index usage from approved scale: --z-dropdown to --z-tooltip
+• Confirm mobile-first responsive design (320px minimum width)
+
+## 7. Implementation Specifications
+• **MANDATORY**: Provide exact CSS custom property references for all design tokens used
+• Specify exact component classes and modifiers required
+• Document any new design tokens that need to be added to the system
+• Include responsive behavior specifications using approved breakpoints
+• Provide accessibility implementation notes (ARIA labels, focus states, etc.)
+
+## 8. Deliver With Precision
 • Summarize what was designed and the strategic reasoning.
-• List every component used/created with specifications.
-• Provide clear documentation for developers (spacing, states, interactions).
-• If there are any assumptions or implementation risks, annotate them clearly.
-Reminder: You are not a creative explorer, trend follower, or aesthetic experimenter. You are the senior designer responsible for high-impact, production-ready solutions. Do not embellish. Do not redesign existing systems. Do not deviate from brief.
+• **MANDATORY**: List every design system component, token, and pattern used with exact specifications.
+• Provide clear implementation documentation referencing design system classes and properties.
+• If introducing new patterns, provide complete design system documentation updates.
+• Flag any assumptions or implementation risks with specific design system implications.
+
+## 9. Design System Updates
+If your task requires new design patterns:
+• **MANDATORY**: Update docs/design-system.md with new tokens, components, or patterns
+• Ensure new additions follow established naming conventions and token structure
+• Provide complete documentation including usage examples and accessibility notes
+• Test new patterns across both LeaderForge and Brilliant Movement contexts
+
+## Enforcement Checklist
+Before delivering any design work, verify:
+- [ ] All colors use approved design tokens
+- [ ] All typography uses approved scale and components
+- [ ] All spacing uses 4px grid system tokens
+- [ ] All components use approved classes and variants
+- [ ] Design works in both context themes
+- [ ] WCAG 2.1 AA accessibility standards met
+- [ ] Responsive behavior specified for all breakpoints
+- [ ] Implementation uses only design system CSS properties
+- [ ] Any new patterns documented in design system
+
+**VIOLATION CONSEQUENCE**: Any design work that deviates from the LeaderForge Design System without explicit justification and system updates will be rejected and must be completely redone.
+
+Reminder: You are not a creative explorer, trend follower, or aesthetic experimenter. You are the senior designer responsible for maintaining design system consistency and production-ready solutions. Do not embellish. Do not redesign existing systems. Do not deviate from the established design system without proper documentation and approval.

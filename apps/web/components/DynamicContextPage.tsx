@@ -1,7 +1,7 @@
 "use client";
 // File: apps/web/components/DynamicContextPage.tsx
 // Purpose: Agent-native 3-panel layout. Pure renderer - displays only what agents return.
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
 import { ComponentSchemaRenderer } from "./ai/ComponentSchemaRenderer";
@@ -158,6 +158,107 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
       }
     }
   }, []);
+
+  // 🤖 AGENT-NATIVE: Handle ComponentSchema from agent - MUST be at top level before any returns
+  // Memoize content to prevent object recreation causing video re-mounting
+  const content = useMemo(() => {
+    return agentSchema?.content as ComponentSchema | { type: string; title?: string; description?: string; action?: string; message?: string } | undefined;
+  }, [agentSchema?.content]);
+
+  // Check if it's a ComponentSchema (Grid, Card, etc.) or simple content - also memoized
+  const isComponentSchema = useMemo(() => {
+    return content && typeof content === 'object' && 'type' in content &&
+      (content.type === 'Grid' || content.type === 'Card' || 'props' in content);
+  }, [content]);
+
+  const isWelcomeContent = useMemo(() => {
+    return content && typeof content === 'object' && 'type' in content && (content.type === 'welcome' || content.type === 'error');
+  }, [content]);
+
+  // Create loading content component for content panel - MUST be defined before useMemo
+  const createLoadingContent = () => (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+        </div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
+          <p className="text-sm font-medium text-gray-800 mb-2">Loading Content</p>
+          <p className="text-xs text-gray-600 text-center">
+            Just a moment while we fetch your content...
+          </p>
+          <div className="mt-4 flex space-x-1">
+            <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Memoize content component to prevent video re-mounting - MUST be at top level before any returns
+  const contentComponent = useMemo(() => {
+    if (contentLoading) {
+      return createLoadingContent();
+    }
+
+    if (isComponentSchema) {
+      console.log('[DynamicContextPage] Rendering ComponentSchemaRenderer with userId:', {
+        session: !!session,
+        userId: session?.user?.id,
+        authLoading,
+        sessionUser: session?.user
+      });
+      return (
+        <div className="p-6">
+          <ComponentSchemaRenderer
+            schema={content as ComponentSchema}
+            userId={session?.user?.id}
+            onProgressUpdate={() => {
+              // Refresh content when video progress is updated
+              if (selectedNavOptionId) {
+                console.log('[DynamicContextPage] Refreshing content after progress update');
+                loadContentForNavOption(selectedNavOptionId, false);
+              }
+            }}
+          />
+        </div>
+      );
+    }
+
+    if (isWelcomeContent) {
+      return (
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center max-w-md">
+            <div className="mb-4 text-4xl" style={{ color: 'var(--primary, #667eea)' }}>✨</div>
+            <h2 className="text-2xl font-semibold mb-4">
+              {'title' in content ? content.title : 'Welcome'}
+            </h2>
+            <p className="text-gray-600 mb-6">
+              {'description' in content ? content.description : 'Loading content...'}
+            </p>
+            <div className="px-4 py-2 rounded-lg inline-block" style={{ backgroundColor: 'var(--bg-neutral, #e8f4f8)', color: 'var(--primary, #667eea)' }}>
+              {'action' in content ? content.action : 'Please wait'}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <div className="text-gray-500 mb-4">📄</div>
+          <p className="text-gray-600">
+            {typeof content === 'string' ? content :
+             (content && typeof content === 'object' && 'message' in content ? content.message : 'Content loaded successfully')}
+          </p>
+        </div>
+      </div>
+    );
+  }, [contentLoading, isComponentSchema, isWelcomeContent, content]);
 
   // 🤖 AGENT-NATIVE: Single API call to get complete UI schema
   useEffect(() => {
@@ -454,29 +555,6 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
     );
   }
 
-  // Create loading content component for content panel
-  const createLoadingContent = () => (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
-        <div className="flex flex-col items-center mb-6">
-          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
-        </div>
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
-          <p className="text-sm font-medium text-gray-800 mb-2">Loading Content</p>
-          <p className="text-xs text-gray-600 text-center">
-            Just a moment while we fetch your content...
-          </p>
-          <div className="mt-4 flex space-x-1">
-            <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   // Handle different response types OR show loading content with navigation
   console.log('[DynamicContextPage] Checking agentSchema type:', agentSchema?.type, 'has content:', !!agentSchema?.content, 'contentLoading:', contentLoading);
 
@@ -484,49 +562,6 @@ export default function DynamicContextPage(props: DynamicContextPageProps) {
   if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error') && agentSchema.content)) {
     console.log('[DynamicContextPage] Handling content_schema response or loading state');
     console.log('[DynamicContextPage] agentSchema.content:', agentSchema?.content);
-
-    // 🤖 AGENT-NATIVE: Handle ComponentSchema from agent
-    const content = agentSchema?.content as ComponentSchema | { type: string; title?: string; description?: string; action?: string; message?: string } | undefined;
-
-    // Check if it's a ComponentSchema (Grid, Card, etc.) or simple content
-    const isComponentSchema = content && typeof content === 'object' && 'type' in content &&
-      (content.type === 'Grid' || content.type === 'Card' || 'props' in content);
-
-    const isWelcomeContent = content && typeof content === 'object' && 'type' in content && (content.type === 'welcome' || content.type === 'error');
-
-    // Show loading content if contentLoading is true, otherwise show actual content
-    const contentComponent = contentLoading ? createLoadingContent() : (
-      isComponentSchema ? (
-        <div className="p-6">
-          <ComponentSchemaRenderer schema={content as ComponentSchema} />
-        </div>
-      ) : isWelcomeContent ? (
-        <div className="flex items-center justify-center min-h-96">
-          <div className="text-center max-w-md">
-            <div className="mb-4 text-4xl" style={{ color: 'var(--primary, #667eea)' }}>✨</div>
-            <h2 className="text-2xl font-semibold mb-4">
-              {'title' in content ? content.title : 'Welcome'}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {'description' in content ? content.description : 'Loading content...'}
-            </p>
-            <div className="px-4 py-2 rounded-lg inline-block" style={{ backgroundColor: 'var(--bg-neutral, #e8f4f8)', color: 'var(--primary, #667eea)' }}>
-              {'action' in content ? content.action : 'Please wait'}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="p-6">
-          <div className="text-center">
-            <div className="text-gray-500 mb-4">📄</div>
-            <p className="text-gray-600">
-              {typeof content === 'string' ? content :
-               (content && typeof content === 'object' && 'message' in content ? content.message : 'Content loaded successfully')}
-            </p>
-          </div>
-        </div>
-      )
-    );
 
     // Navigation is now handled by NavPanel's database-driven approach
 

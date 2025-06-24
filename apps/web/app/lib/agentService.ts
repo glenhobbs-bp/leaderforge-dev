@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { UserProgressTool, SupabaseUserProgressRepository } from '../../../../packages/agent-core/tools/UserProgressTool';
 
 /**
  * AgentService - Central service for invoking agents based on type
@@ -95,6 +96,79 @@ export class AgentService {
   }
 
   /**
+   * Enrich agent response content with user progress data
+   */
+  private async enrichWithProgressData(content: any, userId: string, contextKey: string): Promise<any> {
+    if (!content || typeof content !== 'object') {
+      return content;
+    }
+
+    try {
+      const progressRepository = new SupabaseUserProgressRepository(this.supabase);
+      const progressTool = new UserProgressTool(progressRepository);
+
+      // Helper function to enrich a single card with progress
+      const enrichCard = async (card: any) => {
+        if (card.type === 'Card' && card.props?.title && card.props?.videoUrl) {
+          try {
+            const progressData = await progressTool.getProgress(userId, card.props.title, contextKey);
+            return {
+              ...card,
+              props: {
+                ...card.props,
+                progress: progressData?.progress_percentage || 0,
+                videoWatched: (progressData?.progress_percentage || 0) >= 90
+              }
+            };
+          } catch (error) {
+            console.warn(`[AgentService] Failed to fetch progress for ${card.props.title}:`, error);
+            return card; // Return original card on error
+          }
+        }
+        return card;
+      };
+
+      // Recursively enrich content structure
+      const enrichContent = async (obj: any): Promise<any> => {
+        if (Array.isArray(obj)) {
+          return Promise.all(obj.map(enrichContent));
+        }
+
+        if (obj && typeof obj === 'object') {
+          if (obj.type === 'Card') {
+            return enrichCard(obj);
+          }
+
+          // Handle Grid components with items
+          if (obj.type === 'Grid' && obj.props?.items) {
+            return {
+              ...obj,
+              props: {
+                ...obj.props,
+                items: await Promise.all(obj.props.items.map(enrichContent))
+              }
+            };
+          }
+
+          // Recursively process other object properties
+          const enrichedObj: any = {};
+          for (const [key, value] of Object.entries(obj)) {
+            enrichedObj[key] = await enrichContent(value);
+          }
+          return enrichedObj;
+        }
+
+        return obj;
+      };
+
+      return await enrichContent(content);
+    } catch (error) {
+      console.error('[AgentService] Error enriching with progress data:', error);
+      return content; // Return original content on error
+    }
+  }
+
+  /**
    * Invoke LangGraph agent via HTTP API
    */
   private async invokeLangGraphAgent(
@@ -128,12 +202,11 @@ export class AgentService {
               role: 'user',
               content: request.message
             }],
-            context: {
-              userId: request.userId,
-              contextKey: request.contextKey,
-              navOptionId: request.navOptionId,
-              agentConfig: agent.config
-            }
+            // Flatten context to root level for easier access in agent
+            userId: request.userId,
+            contextKey: request.contextKey,
+            navOptionId: request.navOptionId,
+            agentConfig: agent.config
           }
         })
       });
@@ -179,9 +252,11 @@ export class AgentService {
           // Extract the schema from the final state
           const finalResult = state.values?.schema || state.values?.messages?.[state.values.messages?.length - 1] || state.values;
 
+          const enrichedContent = await this.enrichWithProgressData(finalResult, request.userId, request.contextKey);
+
           return {
             type: 'content_schema',
-            content: finalResult,
+            content: enrichedContent,
             metadata: {
               threadId: thread.thread_id,
               runId: runId,
