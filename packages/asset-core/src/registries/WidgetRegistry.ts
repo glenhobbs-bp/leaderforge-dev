@@ -106,4 +106,18 @@ export class WidgetRegistry extends AssetRegistry<WidgetMetadata> {
   getAllDefinitions(): WidgetDefinition[] {
     return Array.from(this.widgetDefinitions.values());
   }
+
+  /**
+   * Get widget definition (alias for getWidgetDefinition for consistency)
+   */
+  getWidget(widgetId: string): WidgetDefinition | undefined {
+    return this.getWidgetDefinition(widgetId);
+  }
+
+  /**
+   * Check if widget exists in registry
+   */
+  hasWidget(widgetId: string): boolean {
+    return this.widgetDefinitions.has(widgetId);
+  }
 }

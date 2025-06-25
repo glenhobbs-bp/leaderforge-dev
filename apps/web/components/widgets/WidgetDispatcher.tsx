@@ -1,113 +1,101 @@
 /**
  * File: apps/web/components/widgets/WidgetDispatcher.tsx
- * Purpose: Widget dispatcher for rendering widgets from registry
+ * Purpose: Simple universal widget dispatcher
  * Owner: Widget Team
- * Tags: #dispatcher #widgets #renderer
+ * Tags: #widgets #dispatcher #universal-rendering
  */
 
 "use client";
 
 import React from 'react';
-import { BaseWidgetProps } from '@leaderforge/asset-core';
-import { widgetRegistry } from './index';
 
-export interface WidgetDispatcherProps extends Omit<BaseWidgetProps, 'schema'> {
-  schema: {
-    type: string;
-    props: Record<string, unknown>;
-  };
-  // For layout widgets that need recursive rendering
+// Import widget components directly
+import { LeaderForgeCard } from './LeaderForgeCard';
+import { VideoPlayerModal } from './VideoPlayerModal';
+import StatCard from './StatCard';
+import Leaderboard from './Leaderboard';
+import VideoList from './VideoList';
+import Panel from './Panel';
+import Grid from './Grid';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+interface WidgetSchema {
+  type: string;
+  props: Record<string, any>;
+}
+
+interface WidgetDispatcherProps {
+  schema: WidgetSchema;
   onProgressUpdate?: () => void;
-  UniversalSchemaRenderer?: React.ComponentType<{
-    schema: { type: string; props: Record<string, unknown> };
-    userId?: string;
-    onProgressUpdate?: () => void;
-  }>;
+  [key: string]: any;
 }
 
 /**
- * Dispatches widget rendering based on schema type
+ * Simple Widget Dispatcher - maps schema types to components
  */
-export function WidgetDispatcher({ schema, UniversalSchemaRenderer, onProgressUpdate, ...props }: WidgetDispatcherProps) {
-  // Map schema type to widget ID (handle specific mappings for extracted widgets)
-  const getWidgetId = (schemaType: string): string => {
-    const mappings: Record<string, string> = {
-      'Card': 'leaderforge-card', // Map Card to LeaderForgeCard for platform-specific implementation
-      'StatCard': 'statcard',
-      'Leaderboard': 'leaderboard',
-      'VideoList': 'videolist',
-      'Panel': 'panel',
-      'Grid': 'grid',
-      'VideoPlayer': 'videoplayer-modal', // Map VideoPlayer to VideoPlayerModal widget
-    };
+export function WidgetDispatcher({ schema }: WidgetDispatcherProps) {
+  console.log(`[WidgetDispatcher] Rendering widget: ${schema.type}`);
 
-    return mappings[schemaType] || schemaType.toLowerCase();
-  };
+  try {
+    // Direct mapping of schema types to components
+    switch (schema.type) {
+      case 'Card':
+        return <LeaderForgeCard schema={schema as any} />;
 
-  const widgetId = getWidgetId(schema.type);
-  const WidgetComponent = widgetRegistry.getWidgetComponent(widgetId);
+      case 'VideoPlayer':
+        return <VideoPlayerModal schema={schema as any} />;
 
-  if (!WidgetComponent) {
-    console.warn(`[WidgetDispatcher] No widget found for type: ${schema.type} (ID: ${widgetId})`);
+      case 'StatCard':
+        return <StatCard {...(schema.props as any)} />;
+
+      case 'Leaderboard':
+        return <Leaderboard {...(schema.props as any)} />;
+
+      case 'VideoList':
+        return <VideoList {...(schema.props as any)} />;
+
+      case 'Panel':
+        return <Panel {...(schema.props as any)} />;
+
+      case 'Grid':
+        return <Grid {...(schema.props as any)} />;
+
+      default:
+        console.warn(`[WidgetDispatcher] Unknown widget type: ${schema.type}`);
+        return (
+          <div className="card border-orange-500 bg-orange-50 p-4">
+            <p className="text-orange-800">
+              Unknown widget type: {schema.type}
+            </p>
+          </div>
+        );
+    }
+
+  } catch (error) {
+    console.error('[WidgetDispatcher] Error rendering widget:', error);
+
     return (
-      <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
-        <p className="text-red-600 text-sm">
-          Widget not found: {schema.type}
+      <div className="card border-red-500 bg-red-50 p-4">
+        <p className="text-red-800">
+          Error rendering {schema.type}
         </p>
+        {process.env.NODE_ENV === 'development' && (
+          <pre className="text-xs text-red-600 mt-2">
+            {error instanceof Error ? error.message : String(error)}
+          </pre>
+        )}
       </div>
     );
   }
-
-  // For LeaderForgeCard (Card type), pass the schema object as it expects it
-  // For other widgets, pass individual props
-  let widgetProps;
-  if (schema.type === 'Card') {
-    // LeaderForgeCard expects the schema object
-    widgetProps = {
-      schema,
-      UniversalSchemaRenderer,
-      onProgressUpdate,
-      ...props
-    };
-  } else {
-    // Other widgets expect individual props
-    widgetProps = {
-      ...schema.props,
-      UniversalSchemaRenderer,
-      onProgressUpdate,
-      ...props
-    };
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return React.createElement(WidgetComponent as React.ComponentType<any>, widgetProps);
-}
-
-/**
- * Get available widget types from registry
- */
-export function getAvailableWidgetTypes(): string[] {
-  return widgetRegistry.getAll().map(widget => widget.name);
 }
 
 /**
  * Check if a widget type is available
  */
-export function isWidgetTypeAvailable(schemaType: string): boolean {
-  const getWidgetId = (schemaType: string): string => {
-    const mappings: Record<string, string> = {
-      'Card': 'leaderforge-card',
-      'StatCard': 'statcard',
-      'Leaderboard': 'leaderboard',
-      'VideoList': 'videolist',
-      'Panel': 'panel',
-      'Grid': 'grid',
-      'VideoPlayer': 'videoplayer-modal',
-    };
-
-    return mappings[schemaType] || schemaType.toLowerCase();
-  };
-
-  const widgetId = getWidgetId(schemaType);
-  return !!widgetRegistry.getWidgetComponent(widgetId);
+export function isWidgetTypeAvailable(type: string): boolean {
+  const availableTypes = ['Card', 'VideoPlayer', 'StatCard', 'Leaderboard', 'VideoList', 'Panel', 'Grid'];
+  return availableTypes.includes(type);
 }
+
+export default WidgetDispatcher;
