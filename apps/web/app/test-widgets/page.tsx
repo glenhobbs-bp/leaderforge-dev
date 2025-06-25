@@ -13,13 +13,15 @@ import { WidgetDispatcher } from '../../components/widgets';
 export default function TestWidgetsPage() {
   const [theme, setTheme] = useState<'leaderforge' | 'brilliant'>('leaderforge');
 
-  // Sample widget schemas for testing
+  // Sample widget schemas for testing - Fixed to match widget prop interfaces
   const statCardSchema = {
     type: 'StatCard',
     props: {
       title: 'Total Users',
       value: '1,234',
-      description: 'Active users this month'
+      change: '+12.5%',
+      trend: 'up' as const,
+      icon: '👥'
     }
   };
 
@@ -27,12 +29,12 @@ export default function TestWidgetsPage() {
     type: 'Leaderboard',
     props: {
       title: 'Top Performers',
-      items: [
-        { name: 'Alice Johnson', score: '95%' },
-        { name: 'Bob Smith', score: '92%' },
-        { name: 'Carol Wilson', score: '89%' },
-        { name: 'David Brown', score: '87%' },
-        { name: 'Eve Davis', score: '85%' }
+      entries: [
+        { rank: 1, name: 'Alice Johnson', score: 95, trend: 'up' as const },
+        { rank: 2, name: 'Bob Smith', score: 92, trend: 'up' as const },
+        { rank: 3, name: 'Carol Wilson', score: 89, trend: 'same' as const },
+        { rank: 4, name: 'David Brown', score: 87, trend: 'down' as const },
+        { rank: 5, name: 'Eve Davis', score: 85, trend: 'up' as const }
       ]
     }
   };
@@ -43,28 +45,31 @@ export default function TestWidgetsPage() {
       title: 'Featured Videos',
       videos: [
         {
-          props: {
-            title: 'Introduction to React',
-            image: '/thumb1.png',
-            description: 'Learn the fundamentals of React development',
-            duration: '12:34'
-          }
+          id: 'video1',
+          title: 'Introduction to React',
+          thumbnail: '/thumb1.png',
+          description: 'Learn the fundamentals of React development',
+          duration: '12:34',
+          isWatched: false,
+          url: 'https://example.com/video1.mp4'
         },
         {
-          props: {
-            title: 'Advanced TypeScript',
-            image: '/thumb2.png',
-            description: 'Master advanced TypeScript patterns',
-            duration: '18:45'
-          }
+          id: 'video2',
+          title: 'Advanced TypeScript',
+          thumbnail: '/thumb2.png',
+          description: 'Master advanced TypeScript patterns',
+          duration: '18:45',
+          isWatched: true,
+          url: 'https://example.com/video2.mp4'
         },
         {
-          props: {
-            title: 'Component Architecture',
-            image: '/thumb3.png',
-            description: 'Build scalable component systems',
-            duration: '22:17'
-          }
+          id: 'video3',
+          title: 'Component Architecture',
+          thumbnail: '/thumb3.png',
+          description: 'Build scalable component systems',
+          duration: '22:17',
+          isWatched: false,
+          url: 'https://example.com/video3.mp4'
         }
       ]
     }
@@ -87,80 +92,6 @@ export default function TestWidgetsPage() {
       actions: [
         { label: 'Watch Video', action: 'openVideoModal' },
         { label: 'Download Worksheet', action: 'downloadWorksheet' }
-      ]
-    }
-  };
-
-  const panelSchema = {
-    type: 'Panel',
-    props: {
-      title: 'Dashboard Metrics',
-      layout: 'horizontal',
-      children: [
-        {
-          type: 'StatCard',
-          props: {
-            title: 'Revenue',
-            value: '$45,678',
-            description: 'Monthly recurring revenue'
-          }
-        },
-        {
-          type: 'StatCard',
-          props: {
-            title: 'Completion Rate',
-            value: '87.5%',
-            description: 'Course completion this quarter'
-          }
-        }
-      ]
-    }
-  };
-
-  const gridSchema = {
-    type: 'Grid',
-    props: {
-      title: 'Course Library',
-      columns: 3,
-      gap: 'lg',
-      children: [
-        leaderForgeCardSchema,
-        {
-          type: 'Card',
-          props: {
-            title: 'Team Building Strategies',
-            description: 'Learn proven techniques for building high-performing teams.',
-            image: '/thumb2.png',
-            progress: 100,
-            videoWatched: true,
-            worksheetSubmitted: true,
-            pills: [
-              { label: 'Team Building', color: '#8b5cf6' },
-              { label: 'Intermediate', color: '#f59e0b' }
-            ],
-            actions: [
-              { label: 'Rewatch', action: 'openVideoModal' },
-              { label: 'View Certificate', action: 'viewCertificate' }
-            ]
-          }
-        },
-        {
-          type: 'Card',
-          props: {
-            title: 'Communication Excellence',
-            description: 'Develop advanced communication skills for leadership success.',
-            image: '/thumb3.png',
-            progress: 0,
-            videoWatched: false,
-            worksheetSubmitted: false,
-            pills: [
-              { label: 'Communication', color: '#ef4444' }
-            ],
-            actions: [
-              { label: 'Start Course', action: 'openVideoModal' }
-            ]
-          }
-        }
       ]
     }
   };
@@ -214,14 +145,19 @@ export default function TestWidgetsPage() {
                 props: {
                   title: 'Revenue',
                   value: '$45,678',
-                  description: 'Monthly recurring revenue'
+                  change: '+8.2%',
+                  trend: 'up' as const,
+                  icon: '💰'
                 }
               }} />
               <WidgetDispatcher schema={{
                 type: 'StatCard',
                 props: {
                   title: 'Completion Rate',
-                  value: '87.5%'
+                  value: '87.5%',
+                  change: '-1.2%',
+                  trend: 'down' as const,
+                  icon: '📊'
                 }
               }} />
             </div>
@@ -236,10 +172,12 @@ export default function TestWidgetsPage() {
                 type: 'Leaderboard',
                 props: {
                   title: 'Sales Team',
-                  items: [
-                    { name: 'Sarah Miller', score: '$125,000' },
-                    { name: 'Mike Chen', score: '$98,500' },
-                    { name: 'Lisa Garcia', score: '$87,200' }
+                  entries: [
+                    { rank: 1, name: 'Sarah Miller', score: 125000, trend: 'up' as const },
+                    { rank: 2, name: 'Mike Chen', score: 98500, trend: 'same' as const },
+                    { rank: 3, name: 'Lisa Garcia', score: 87200, trend: 'up' as const },
+                    { rank: 4, name: 'Tom Wilson', score: 76800, trend: 'down' as const },
+                    { rank: 5, name: 'Amy Davis', score: 65300, trend: 'up' as const }
                   ]
                 }
               }} />
@@ -305,18 +243,6 @@ export default function TestWidgetsPage() {
                 onAction={handleCardAction}
               />
             </div>
-          </section>
-
-          {/* Panel Widget Section */}
-          <section>
-            <h2 className="heading-3 mb-6">Panel Widget</h2>
-            <WidgetDispatcher schema={panelSchema} />
-          </section>
-
-          {/* Grid Widget Section */}
-          <section>
-            <h2 className="heading-3 mb-6">Grid Widget</h2>
-            <WidgetDispatcher schema={gridSchema} onAction={handleCardAction} />
           </section>
 
           {/* Design System Information */}

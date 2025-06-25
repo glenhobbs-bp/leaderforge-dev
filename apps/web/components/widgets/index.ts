@@ -6,11 +6,11 @@
  */
 
 import { WidgetRegistry, WidgetCapabilities, AssetCapabilities } from '@leaderforge/asset-core';
-import { StatCard } from './StatCard';
-import { Leaderboard } from './Leaderboard';
-import { VideoList } from './VideoList';
-import { Panel } from './Panel';
-import { Grid } from './Grid';
+import StatCard from './StatCard';
+import Leaderboard from './Leaderboard';
+import VideoList from './VideoList';
+import Panel from './Panel';
+import Grid from './Grid';
 import { LeaderForgeCard } from './LeaderForgeCard';
 import { VideoPlayerModal } from './VideoPlayerModal';
 
@@ -192,11 +192,11 @@ widgetRegistry.registerWidget({
 });
 
 // Export widgets and dispatcher
-export { StatCard } from './StatCard';
-export { Leaderboard } from './Leaderboard';
-export { VideoList } from './VideoList';
-export { Panel } from './Panel';
-export { Grid } from './Grid';
+export { default as StatCard } from './StatCard';
+export { default as Leaderboard } from './Leaderboard';
+export { default as VideoList } from './VideoList';
+export { default as Panel } from './Panel';
+export { default as Grid } from './Grid';
 export { LeaderForgeCard } from './LeaderForgeCard';
 export { VideoPlayerModal } from './VideoPlayerModal';
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';

@@ -22,18 +22,20 @@ interface VideoItem {
 
 interface VideoListProps {
   title?: string;
-  videos: VideoItem[];
+  videos?: VideoItem[];
   onVideoClick?: (video: VideoItem) => void;
   maxVideos?: number;
 }
 
 export default function VideoList({
   title = "Videos",
-  videos,
+  videos = [],
   onVideoClick,
   maxVideos = 6
 }: VideoListProps) {
-  const displayVideos = videos.slice(0, maxVideos);
+  // Handle undefined or null videos
+  const safeVideos = videos || [];
+  const displayVideos = safeVideos.slice(0, maxVideos);
 
   const handleVideoClick = (video: VideoItem) => {
     if (onVideoClick) {
@@ -108,7 +110,7 @@ export default function VideoList({
         ))}
       </div>
 
-      {videos.length === 0 && (
+      {safeVideos.length === 0 && (
         <div className="text-center py-12">
           <span className="text-4xl mb-3 block">🎬</span>
           <span className="text-glass-muted text-sm">No videos available</span>

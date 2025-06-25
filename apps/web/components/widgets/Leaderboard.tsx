@@ -19,12 +19,14 @@ interface LeaderboardEntry {
 
 interface LeaderboardProps {
   title?: string;
-  entries: LeaderboardEntry[];
+  entries?: LeaderboardEntry[];
   maxEntries?: number;
 }
 
-export default function Leaderboard({ title = "Leaderboard", entries, maxEntries = 5 }: LeaderboardProps) {
-  const displayEntries = entries.slice(0, maxEntries);
+export default function Leaderboard({ title = "Leaderboard", entries = [], maxEntries = 5 }: LeaderboardProps) {
+  // Handle undefined or null entries
+  const safeEntries = entries || [];
+  const displayEntries = safeEntries.slice(0, maxEntries);
 
   const getRankDisplay = (rank: number) => {
     if (rank <= 3) {
@@ -105,7 +107,7 @@ export default function Leaderboard({ title = "Leaderboard", entries, maxEntries
         ))}
       </div>
 
-      {entries.length === 0 && (
+      {safeEntries.length === 0 && (
         <div className="text-center py-8">
           <span className="text-glass-muted text-sm">No leaderboard data available</span>
         </div>

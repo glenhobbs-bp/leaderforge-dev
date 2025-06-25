@@ -58,12 +58,27 @@ export function WidgetDispatcher({ schema, UniversalSchemaRenderer, onProgressUp
     );
   }
 
-  const widgetProps = {
-    schema,
-    UniversalSchemaRenderer,
-    onProgressUpdate,
-    ...props
-  };
+  // For LeaderForgeCard (Card type), pass the schema object as it expects it
+  // For other widgets, pass individual props
+  let widgetProps;
+  if (schema.type === 'Card') {
+    // LeaderForgeCard expects the schema object
+    widgetProps = {
+      schema,
+      UniversalSchemaRenderer,
+      onProgressUpdate,
+      ...props
+    };
+  } else {
+    // Other widgets expect individual props
+    widgetProps = {
+      ...schema.props,
+      UniversalSchemaRenderer,
+      onProgressUpdate,
+      ...props
+    };
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return React.createElement(WidgetComponent as React.ComponentType<any>, widgetProps);
 }
