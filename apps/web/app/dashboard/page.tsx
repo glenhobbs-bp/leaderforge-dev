@@ -38,8 +38,8 @@ export default async function DashboardPage() {
   }
 
   // --- SSR: Fetch entitled context list ---
-  let initialContexts = [];
-  let initialContextConfig = null;
+  let initialTenants = [];
+  let initialTenantConfig = null;
   let initialNavOptions = null;
 
   try {
@@ -47,23 +47,23 @@ export default async function DashboardPage() {
     // Filter by user entitlement if required_entitlements is present
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, session.user.id);
     const entitlementIds = userEntitlements.map(e => e.entitlement_id);
-    initialContexts = allContexts.filter(ctx => {
+    initialTenants = allContexts.filter(ctx => {
       if (!ctx.required_entitlements || !Array.isArray(ctx.required_entitlements) || ctx.required_entitlements.length === 0) return true;
       return ctx.required_entitlements.every((ent: string) => entitlementIds.includes(ent));
     });
 
-    if (initialContexts.length === 0) {
+    if (initialTenants.length === 0) {
       console.error('[dashboard/page] No entitled contexts for user:', session.user.id);
       redirect('/login?error=no_contexts');
     }
 
     // --- SSR: Pre-fetch default context configuration and nav options ---
-    const defaultContextKey = initialContexts[0].context_key;
+    const defaultTenantKey = initialTenants[0].context_key;
 
     try {
       // Fetch context config server-side
       const { contextService } = await import('../lib/contextService');
-      initialContextConfig = await contextService.getContextConfig(supabase, defaultContextKey);
+      initialTenantConfig = await contextService.getContextConfig(supabase, defaultTenantKey);
     } catch (configErr) {
       console.error('[dashboard/page] Error pre-fetching context config:', configErr);
     }
@@ -71,14 +71,14 @@ export default async function DashboardPage() {
     try {
       // Fetch nav options server-side
       const { navService } = await import('../lib/navService');
-      initialNavOptions = await navService.getNavOptions(supabase, defaultContextKey, session.user.id);
+      initialNavOptions = await navService.getNavOptions(supabase, defaultTenantKey, session.user.id);
     } catch (navErr) {
       console.error('[dashboard/page] Error pre-fetching nav options:', navErr);
     }
 
   } catch (err) {
     console.error('[dashboard/page] Error fetching contexts:', err);
-    initialContexts = [];
+    initialTenants = [];
   }
 
   // TODO: Fetch last-used context for user (future)
@@ -88,10 +88,10 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       initialSession={session}
-      initialContexts={initialContexts}
-      initialContextConfig={initialContextConfig}
+      initialTenants={initialTenants}
+      initialTenantConfig={initialTenantConfig}
       initialNavOptions={initialNavOptions}
-      defaultContextKey={initialContexts[0]?.context_key}
+      defaultTenantKey={initialTenants[0]?.context_key}
     />
   );
 }

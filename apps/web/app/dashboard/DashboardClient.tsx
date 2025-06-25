@@ -5,6 +5,7 @@ import { Session } from '@supabase/supabase-js';
 
 // Type definitions
 interface Tenant {
+  id: string;
   tenant_key: string;
   display_name: string;
   theme: Record<string, string>;

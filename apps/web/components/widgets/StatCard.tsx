@@ -1,8 +1,8 @@
 /**
  * File: apps/web/components/widgets/StatCard.tsx
- * Purpose: Extracted StatCard widget from ComponentSchemaRenderer
+ * Purpose: Extracted StatCard widget from ComponentSchemaRenderer - Design System Compliant
  * Owner: Widget Team
- * Tags: #widget #statcard #stats #data-visualization
+ * Tags: #widget #statcard #stats #data-visualization #design-system
  */
 
 "use client";
@@ -29,10 +29,12 @@ export function StatCard({ schema }: StatCardProps) {
   const { title, value, description } = schema.props;
 
   return (
-    <div className="rounded-lg shadow bg-white p-4 mb-4">
-      <h3 className="font-semibold text-lg mb-1">{title}</h3>
-      <div className="text-2xl font-bold">{value}</div>
-      {description && <p className="text-gray-500 text-sm mt-1">{description}</p>}
+    <div className="card bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6">
+      <h3 className="heading-4 text-[var(--text-primary)] mb-2">{title}</h3>
+      <div className="text-3xl font-bold text-[var(--primary)] mb-1">{value}</div>
+      {description && (
+        <p className="body-small text-[var(--text-secondary)]">{description}</p>
+      )}
     </div>
   );
 }

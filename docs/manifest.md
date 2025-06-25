@@ -1,6 +1,6 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/24/2025, 6:30:00 PM*
+*Generated on 6/24/2025, 9:40:18 PM*
 
 ## Overview
 
@@ -416,7 +416,7 @@ Server-side dashboard page with SSR optimization and entitlement filtering
 
 **Owner**: Frontend team • **Complexity**: medium • **Size**: 3.7KB
 **Tags**: `Next.js page`, `SSR`, `entitlements`, `context management`, `performance`, `React`, `TypeScript`, `security`
-**Modified**: 6/21/2025
+**Modified**: 6/24/2025
 
 
 ### `apps/web/app/hooks/useContentForContext.ts`
@@ -954,7 +954,7 @@ Fetch user data from API
 
 File: apps/web/components/widgets/Grid.tsx
 
-**Complexity**: low • **Size**: 1.9KB
+**Complexity**: low • **Size**: 2.2KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/24/2025
 
@@ -972,7 +972,7 @@ File: apps/web/components/widgets/index.ts
 
 File: apps/web/components/widgets/Leaderboard.tsx
 
-**Complexity**: low • **Size**: 1.1KB
+**Complexity**: low • **Size**: 1.7KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/24/2025
 
@@ -981,7 +981,7 @@ File: apps/web/components/widgets/Leaderboard.tsx
 
 LeaderForgeCard.tsx
 
-**Complexity**: medium • **Size**: 6.5KB
+**Complexity**: medium • **Size**: 6.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
 **Modified**: 6/24/2025
 
@@ -990,7 +990,7 @@ LeaderForgeCard.tsx
 
 File: apps/web/components/widgets/Panel.tsx
 
-**Complexity**: low • **Size**: 1.7KB
+**Complexity**: low • **Size**: 1.6KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/24/2025
 
@@ -999,7 +999,7 @@ File: apps/web/components/widgets/Panel.tsx
 
 File: apps/web/components/widgets/StatCard.tsx
 
-**Complexity**: low • **Size**: 0.9KB
+**Complexity**: low • **Size**: 1.1KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/24/2025
 
@@ -1008,7 +1008,7 @@ File: apps/web/components/widgets/StatCard.tsx
 
 File: apps/web/components/widgets/VideoList.tsx
 
-**Complexity**: low • **Size**: 1.4KB
+**Complexity**: low • **Size**: 3.2KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/24/2025
 

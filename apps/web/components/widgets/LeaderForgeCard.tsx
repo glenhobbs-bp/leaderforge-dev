@@ -1,8 +1,8 @@
 /**
  * LeaderForgeCard.tsx
- * Purpose: Specialized card widget for LeaderForge platform with video modals, progress tracking, and worksheet status
+ * Purpose: Specialized card widget for LeaderForge platform with video modals, progress tracking, and worksheet status - Design System Compliant
  * Owner: Component System
- * Tags: #widget #leaderforge #video #progress #platform-specific
+ * Tags: #widget #leaderforge #video #progress #platform-specific #design-system
  */
 
 "use client";
@@ -56,14 +56,15 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
   };
 
   return (
-    <div className="bg-[var(--card-bg)] rounded-xl shadow border border-[var(--bg-neutral)] flex flex-col h-full min-h-[340px] transition-transform hover:shadow-lg hover:scale-[1.025] duration-150">
-      <div className="relative w-full aspect-video rounded-t-xl overflow-hidden px-0 lg:px-4">
+    <div className="card card-interactive bg-[var(--surface)] rounded-xl shadow-sm border border-[var(--border)] flex flex-col h-full min-h-[340px] transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:border-[var(--primary)]">
+      {/* Video/Image Section */}
+      <div className="relative w-full aspect-video rounded-t-xl overflow-hidden">
         {cardImage ? (
           <Image
             src={cardImage}
             alt={title}
             fill
-            className="object-cover rounded-t-xl"
+            className="object-cover"
             sizes="(max-width: 768px) 100vw, 400px"
             priority={false}
             onError={e => (e.currentTarget.src = '/icons/placeholder.png')}
@@ -71,86 +72,103 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
         ) : null}
         {videoUrl && (
           <button
-            className="absolute inset-0 flex items-center justify-center z-10 group"
+            className="absolute inset-0 flex items-center justify-center z-10 group bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200"
             onClick={() =>
               handleAction(
                 actions?.find(a => a.action === 'openVideoModal') ||
                 { action: 'openVideoModal', label: 'Watch', videoUrl, title }
               )
             }
-            style={{ background: 'rgba(0,0,0,0.2)' }}
             aria-label="Play video"
           >
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="24" r="24" fill="#fff" fillOpacity="0.7" />
-              <polygon points="20,16 34,24 20,32" fill="#222" />
-            </svg>
+            <div className="w-12 h-12 rounded-full bg-[var(--primary)] bg-opacity-90 flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-200">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-white ml-1">
+                <path d="M6 4l10 6-10 6V4z" fill="currentColor" />
+              </svg>
+            </div>
           </button>
         )}
       </div>
-      <div className="flex-1 flex flex-col p-4 gap-2">
-        <div className="flex flex-row items-center gap-2 mb-1">
-          <span className="font-semibold text-base line-clamp-1">{title}</span>
+
+      {/* Content Section */}
+      <div className="flex-1 flex flex-col p-6 gap-3">
+        {/* Title and Pills */}
+        <div className="flex flex-row items-start gap-3 mb-2">
+          <h3 className="heading-4 text-[var(--text-primary)] line-clamp-2 flex-1">{title}</h3>
           {pills && pills.length > 0 && (
-            <div className="flex flex-row gap-1 ml-auto">
+            <div className="flex flex-wrap gap-1">
               {pills.map((pill, i) => (
-                <span key={i} className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700" style={pill.color ? { background: pill.color } : {}}>
+                <span
+                  key={i}
+                  className="px-2 py-1 rounded-full text-xs font-medium bg-[var(--primary-light)] text-[var(--primary)] border border-[var(--primary)]"
+                  style={pill.color ? {
+                    backgroundColor: `${pill.color}20`,
+                    color: pill.color,
+                    borderColor: pill.color
+                  } : {}}
+                >
                   {pill.label}
                 </span>
               ))}
             </div>
           )}
         </div>
-        <div className="text-sm text-gray-600 line-clamp-2 mb-2">{description}</div>
+
+        {/* Description */}
+        <p className="body-base text-[var(--text-secondary)] line-clamp-3 mb-3">{description}</p>
+
         {/* Status indicators - LeaderForge specific: video watched and worksheet submission */}
-        <div className="flex flex-row items-center gap-4 mb-2">
-          <div className="flex items-center gap-1 text-xs">
-            <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="8" fill={actualVideoWatched ? '#22c55e' : '#d1d5db'} />
-              {actualVideoWatched ? (
-                <path d="M5 8.5l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              ) : (
-                <path d="M4 8l3 3 5-5" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        <div className="flex flex-row items-center gap-6 mb-4">
+          <div className="flex items-center gap-2">
+            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${actualVideoWatched ? 'bg-[var(--success-500)]' : 'bg-[var(--border)]'}`}>
+              {actualVideoWatched && (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-white">
+                  <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               )}
-            </svg>
-            <span className={actualVideoWatched ? 'text-green-600' : 'text-gray-400'}>
+            </div>
+            <span className={`caption ${actualVideoWatched ? 'text-[var(--success-600)]' : 'text-[var(--text-secondary)]'}`}>
               {actualProgress > 0 ? `${Math.round(actualProgress)}% watched` : 'Video Not Watched'}
             </span>
           </div>
-          <div className="flex items-center gap-1 text-xs">
-            <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="8" fill={worksheetSubmitted ? '#22c55e' : '#d1d5db'} />
-              {worksheetSubmitted ? (
-                <path d="M5 8.5l2 2 4-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              ) : (
-                <path d="M4 8l3 3 5-5" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+
+          <div className="flex items-center gap-2">
+            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${worksheetSubmitted ? 'bg-[var(--success-500)]' : 'bg-[var(--border)]'}`}>
+              {worksheetSubmitted && (
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-white">
+                  <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               )}
-            </svg>
-            <span className={worksheetSubmitted ? 'text-green-600' : 'text-gray-400'}>
+            </div>
+            <span className={`caption ${worksheetSubmitted ? 'text-[var(--success-600)]' : 'text-[var(--text-secondary)]'}`}>
               Worksheet {worksheetSubmitted ? 'Submitted' : 'Not Submitted'}
             </span>
           </div>
         </div>
+
         {/* Progress bar */}
         {typeof actualProgress === 'number' && (
-          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden mb-3">
+          <div className="w-full h-2 bg-[var(--border)] rounded-full overflow-hidden mb-4">
             <div
               className="h-full rounded-full transition-all duration-300"
-              style={{ width: `${actualProgress}%`, background: actualProgress === 100 ? 'var(--accent)' : 'var(--primary)' }}
+              style={{
+                width: `${actualProgress}%`,
+                backgroundColor: actualProgress === 100 ? 'var(--success-500)' : 'var(--primary)'
+              }}
             />
           </div>
         )}
+
         {/* Action buttons */}
-        <div className="flex flex-row gap-2 mt-auto">
+        <div className="flex flex-row gap-3 mt-auto">
           {actions && actions.map((action, i) => (
             <button
               key={i}
               onClick={() => handleAction(action)}
               className={
-                `px-3 py-1.5 rounded-full font-medium text-xs transition-all duration-200 shadow-sm ` +
-                (action.label.toLowerCase().includes('watch')
-                  ? 'bg-[var(--primary)] text-white hover:bg-[var(--secondary)] hover:shadow-md hover:scale-[1.02] active:scale-[0.98]'
-                  : 'bg-white text-[var(--primary)] border border-[var(--primary)]/30 hover:bg-[var(--primary)] hover:text-white hover:shadow-md hover:scale-[1.02] active:scale-[0.98]')
+                action.label.toLowerCase().includes('watch')
+                  ? 'btn btn-primary px-4 py-2 text-sm font-medium'
+                  : 'btn btn-secondary px-4 py-2 text-sm font-medium'
               }
             >
               {action.label}

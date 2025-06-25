@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generated_at": "2025-06-24T22:30:00.962Z",
+    "generated_at": "2025-06-25T01:40:18.908Z",
     "generator_version": "1.0.0",
     "total_files": 227,
-    "total_size_bytes": 1937721,
+    "total_size_bytes": 1941069,
     "file_types": {
       ".ts": 101,
       ".json": 16,
@@ -941,9 +941,9 @@
         "../../components/SupabaseProvider",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-24T22:28:27.045Z",
-      "size_bytes": 2953,
-      "hash": "5c9e8543",
+      "last_modified": "2025-06-25T01:34:53.365Z",
+      "size_bytes": 2967,
+      "hash": "e521a189",
       "complexity": "medium"
     },
     {
@@ -971,9 +971,9 @@
         "../lib/contextService",
         "../lib/entitlementService"
       ],
-      "last_modified": "2025-06-21T12:21:30.975Z",
-      "size_bytes": 3773,
-      "hash": "bbd6cd9c",
+      "last_modified": "2025-06-25T01:34:57.480Z",
+      "size_bytes": 3757,
+      "hash": "e12ed8d6",
       "complexity": "medium"
     },
     {
@@ -2320,11 +2320,12 @@
       ],
       "dependencies": [
         "react",
-        "@leaderforge/asset-core"
+        "@leaderforge/asset-core",
+        "./WidgetDispatcher"
       ],
-      "last_modified": "2025-06-24T22:11:22.733Z",
-      "size_bytes": 1907,
-      "hash": "7fa7e534",
+      "last_modified": "2025-06-25T01:36:32.205Z",
+      "size_bytes": 2288,
+      "hash": "04400e8e",
       "complexity": "low"
     },
     {
@@ -2370,9 +2371,9 @@
         "react",
         "@leaderforge/asset-core"
       ],
-      "last_modified": "2025-06-24T20:51:58.164Z",
-      "size_bytes": 1125,
-      "hash": "314300c6",
+      "last_modified": "2025-06-25T01:35:07.246Z",
+      "size_bytes": 1691,
+      "hash": "a3f139de",
       "complexity": "low"
     },
     {
@@ -2392,9 +2393,9 @@
         "next/image",
         "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-24T21:05:47.276Z",
-      "size_bytes": 6656,
-      "hash": "0511a62f",
+      "last_modified": "2025-06-25T01:36:01.225Z",
+      "size_bytes": 7111,
+      "hash": "d19375c2",
       "complexity": "medium"
     },
     {
@@ -2410,11 +2411,12 @@
       ],
       "dependencies": [
         "react",
-        "@leaderforge/asset-core"
+        "@leaderforge/asset-core",
+        "./WidgetDispatcher"
       ],
-      "last_modified": "2025-06-24T22:11:19.002Z",
-      "size_bytes": 1747,
-      "hash": "12c08556",
+      "last_modified": "2025-06-25T01:36:13.123Z",
+      "size_bytes": 1675,
+      "hash": "2e980107",
       "complexity": "low"
     },
     {
@@ -2432,9 +2434,9 @@
         "react",
         "@leaderforge/asset-core"
       ],
-      "last_modified": "2025-06-24T20:44:43.991Z",
-      "size_bytes": 956,
-      "hash": "f6697c79",
+      "last_modified": "2025-06-25T01:35:04.316Z",
+      "size_bytes": 1158,
+      "hash": "da6f8349",
       "complexity": "low"
     },
     {
@@ -2450,11 +2452,12 @@
       ],
       "dependencies": [
         "react",
+        "next/image",
         "@leaderforge/asset-core"
       ],
-      "last_modified": "2025-06-24T20:51:59.805Z",
-      "size_bytes": 1420,
-      "hash": "4d47953c",
+      "last_modified": "2025-06-25T01:35:59.284Z",
+      "size_bytes": 3241,
+      "hash": "21823693",
       "complexity": "low"
     },
     {
@@ -3762,9 +3765,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T21:47:07.567Z",
-      "size_bytes": 117413,
-      "hash": "4d081087"
+      "last_modified": "2025-06-24T22:30:00.973Z",
+      "size_bytes": 117411,
+      "hash": "f850d32a"
     },
     {
       "path": "docs/manifest.md",
@@ -3777,9 +3780,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T21:47:07.574Z",
-      "size_bytes": 44080,
-      "hash": "0cb6543d"
+      "last_modified": "2025-06-24T22:30:01.019Z",
+      "size_bytes": 44079,
+      "hash": "fc968d86"
     },
     {
       "path": "docs/product-design/design-system.md",

@@ -1,63 +1,65 @@
 /**
  * File: apps/web/components/widgets/Panel.tsx
- * Purpose: Extracted Panel widget from UniversalSchemaRenderer
+ * Purpose: Extracted Panel widget from ComponentSchemaRenderer - Design System Compliant
  * Owner: Widget Team
- * Tags: #panel #layout #widgets
+ * Tags: #widget #panel #layout #container #design-system
  */
 
 "use client";
 
 import React from 'react';
 import { BaseWidgetProps } from '@leaderforge/asset-core';
+import { WidgetDispatcher } from './WidgetDispatcher';
 
-interface PanelSchema {
-  type: 'Panel';
-  props: {
-    heading: string;
-    description?: string;
-    widgets?: Array<{ type: string; props: Record<string, unknown> }>;
+export interface PanelProps extends BaseWidgetProps {
+  schema: {
+    type: 'Panel';
+    props: {
+      title?: string;
+      children: Array<{
+        type: string;
+        props: Record<string, unknown>;
+      }>;
+      layout?: 'vertical' | 'horizontal';
+      padding?: 'none' | 'sm' | 'md' | 'lg';
+    };
   };
 }
 
-// UniversalSchemaRenderer type for recursive rendering
-type UniversalSchemaRenderer = React.ComponentType<{
-  schema: { type: string; props: Record<string, unknown> };
-  userId?: string;
-  onProgressUpdate?: () => void;
-}>;
+export function Panel({ schema }: PanelProps) {
+  if (schema.type !== 'Panel') {
+    return null;
+  }
 
-interface PanelProps extends BaseWidgetProps {
-  schema: PanelSchema;
-}
+  const { title, children, layout = 'vertical', padding = 'md' } = schema.props;
 
-// Panel-specific props that extend base widget props
-export interface PanelWidgetProps extends PanelProps {
-  // Panel needs access to UniversalSchemaRenderer for recursive rendering
-  UniversalSchemaRenderer?: UniversalSchemaRenderer;
-}
+  const paddingClasses = {
+    none: 'p-0',
+    sm: 'p-3',
+    md: 'p-6',
+    lg: 'p-8'
+  };
 
-export function Panel({ schema, userId, onProgressUpdate, UniversalSchemaRenderer }: PanelProps & {
-  userId?: string;
-  onProgressUpdate?: () => void;
-  UniversalSchemaRenderer?: UniversalSchemaRenderer;
-}) {
-  if (schema.type !== 'Panel') return null;
-
-  const { heading, description, widgets } = schema.props;
+  const layoutClasses = {
+    vertical: 'flex flex-col gap-4',
+    horizontal: 'flex flex-row gap-4 flex-wrap'
+  };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-2">{heading}</h2>
-      {description && <p className="text-gray-600 mb-4">{description}</p>}
-      {widgets && UniversalSchemaRenderer &&
-        widgets.map((widget, i) => (
-          <UniversalSchemaRenderer
+    <div className={`card bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-sm transition-all duration-200 ${paddingClasses[padding]}`}>
+      {title && (
+        <div className="mb-4 pb-4 border-b border-[var(--border)]">
+          <h3 className="heading-4 text-[var(--text-primary)]">{title}</h3>
+        </div>
+      )}
+      <div className={layoutClasses[layout]}>
+        {children && children.map((child, i) => (
+          <WidgetDispatcher
             key={i}
-            schema={widget}
-            userId={userId}
-            onProgressUpdate={onProgressUpdate}
+            schema={child}
           />
         ))}
+      </div>
     </div>
   );
 }

@@ -2,6 +2,244 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design System Base Variables */
+:root {
+  /* Gray Scale */
+  --gray-50: #fafafa;
+  --gray-100: #f4f4f5;
+  --gray-200: #e4e4e7;
+  --gray-300: #d4d4d8;
+  --gray-400: #a1a1aa;
+  --gray-500: #71717a;
+  --gray-600: #52525b;
+  --gray-700: #3f3f46;
+  --gray-800: #27272a;
+  --gray-900: #18181b;
+  --gray-950: #09090b;
+
+  /* Semantic Colors */
+  --success-50: #f0fdf4;
+  --success-500: #22c55e;
+  --success-600: #16a34a;
+  --success-700: #15803d;
+
+  --warning-50: #fffbeb;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+  --warning-700: #b45309;
+
+  --error-50: #fef2f2;
+  --error-500: #ef4444;
+  --error-600: #dc2626;
+  --error-700: #b91c1c;
+
+  --info-50: #eff6ff;
+  --info-500: #3b82f6;
+  --info-600: #2563eb;
+  --info-700: #1d4ed8;
+
+  /* Font Families */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  --font-display: 'Cal Sans', 'Inter', sans-serif;
+
+  /* Default theme fallbacks */
+  --primary: #1e40af;
+  --secondary: #059669;
+  --accent: #dc2626;
+  --surface: #ffffff;
+  --background: #ffffff;
+  --border: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --primary-light: #dbeafe;
+}
+
+/* Tenant-Specific Color Variables */
+.tenant-leaderforge {
+  --primary: #1e40af;
+  --primary-hover: #1d4ed8;
+  --primary-light: #dbeafe;
+  --secondary: #059669;
+  --accent: #dc2626;
+  --background: #ffffff;
+  --surface: #f8fafc;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --gradient: linear-gradient(135deg, #1e40af 0%, #059669 50%, #dc2626 100%);
+}
+
+.tenant-brilliant {
+  --primary: #3e5e17;
+  --primary-hover: #4d7c1f;
+  --primary-light: #f0f7e8;
+  --secondary: #74a78e;
+  --accent: #dd8d00;
+  --background: #f8f4f1;
+  --surface: #ffffff;
+  --text-primary: #222222;
+  --text-secondary: #666666;
+  --border: #e3ddc9;
+  --gradient: linear-gradient(135deg, #74a78e 0%, #dd8d00 50%, #3e5e17 100%);
+}
+
+/* Typography Components */
+.heading-1 {
+  font-family: var(--font-display);
+  font-size: 3rem; /* 48px */
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.heading-2 {
+  font-family: var(--font-display);
+  font-size: 2.25rem; /* 36px */
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+}
+
+.heading-3 {
+  font-family: var(--font-primary);
+  font-size: 1.5rem; /* 24px */
+  font-weight: 600;
+  line-height: 1.375;
+  color: var(--text-primary);
+}
+
+.heading-4 {
+  font-family: var(--font-primary);
+  font-size: 1.25rem; /* 20px */
+  font-weight: 500;
+  line-height: 1.375;
+  color: var(--text-primary);
+}
+
+.body-large {
+  font-family: var(--font-primary);
+  font-size: 1.125rem; /* 18px */
+  font-weight: 400;
+  line-height: 1.625;
+  color: var(--text-primary);
+}
+
+.body-base {
+  font-family: var(--font-primary);
+  font-size: 1rem; /* 16px */
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.body-small {
+  font-family: var(--font-primary);
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.caption {
+  font-family: var(--font-primary);
+  font-size: 0.75rem; /* 12px */
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Card Components */
+.card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem; /* 12px */
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  border-color: var(--primary);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transform: translateY(-2px);
+}
+
+/* Button Components */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover, var(--primary));
+  border-color: var(--primary-hover, var(--primary));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--text-primary);
+}
+
+.btn-ghost:hover {
+  background-color: var(--surface);
+  color: var(--primary);
+}
+
 body {
     @apply bg-red-100;
 }

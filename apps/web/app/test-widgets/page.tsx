@@ -1,16 +1,18 @@
 /**
  * File: apps/web/app/test-widgets/page.tsx
- * Purpose: Test page for extracted widgets with sample data
+ * Purpose: Test page for extracted widgets with sample data - Design System Showcase
  * Owner: Widget Team
- * Tags: #test #widgets #development
+ * Tags: #test #widgets #development #design-system
  */
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { WidgetDispatcher } from '../../components/widgets';
 
 export default function TestWidgetsPage() {
+  const [theme, setTheme] = useState<'leaderforge' | 'brilliant'>('leaderforge');
+
   // Sample widget schemas for testing
   const statCardSchema = {
     type: 'StatCard',
@@ -43,193 +45,313 @@ export default function TestWidgetsPage() {
         {
           props: {
             title: 'Introduction to React',
-            image: '/thumb1.png'
+            image: '/thumb1.png',
+            description: 'Learn the fundamentals of React development',
+            duration: '12:34'
           }
         },
         {
           props: {
             title: 'Advanced TypeScript',
-            image: '/thumb2.png'
+            image: '/thumb2.png',
+            description: 'Master advanced TypeScript patterns',
+            duration: '18:45'
           }
         },
         {
           props: {
             title: 'Component Architecture',
-            image: '/thumb3.png'
+            image: '/thumb3.png',
+            description: 'Build scalable component systems',
+            duration: '22:17'
           }
         }
       ]
     }
   };
 
-  const videoPlayerSchema = {
-    type: 'VideoPlayer',
+  const leaderForgeCardSchema = {
+    type: 'Card',
     props: {
-      videoUrl: 'https://example.com/sample-video.mp4',
-      title: 'Sample Training Video',
-      description: 'This is a demo video player modal widget',
-      progress: 25,
+      title: 'Leadership Fundamentals',
+      description: 'Master the core principles of effective leadership in this comprehensive course.',
+      image: '/thumb1.png',
+      videoUrl: 'https://example.com/video.mp4',
+      progress: 45,
       videoWatched: false,
       worksheetSubmitted: false,
       pills: [
-        { label: 'Training', color: '#3b82f6' },
-        { label: 'Demo', color: '#10b981' }
+        { label: 'Leadership', color: '#3b82f6' },
+        { label: 'Beginner', color: '#10b981' }
+      ],
+      actions: [
+        { label: 'Watch Video', action: 'openVideoModal' },
+        { label: 'Download Worksheet', action: 'downloadWorksheet' }
       ]
     }
   };
 
-  // Type the action parameter
+  const panelSchema = {
+    type: 'Panel',
+    props: {
+      title: 'Dashboard Metrics',
+      layout: 'horizontal',
+      children: [
+        {
+          type: 'StatCard',
+          props: {
+            title: 'Revenue',
+            value: '$45,678',
+            description: 'Monthly recurring revenue'
+          }
+        },
+        {
+          type: 'StatCard',
+          props: {
+            title: 'Completion Rate',
+            value: '87.5%',
+            description: 'Course completion this quarter'
+          }
+        }
+      ]
+    }
+  };
+
+  const gridSchema = {
+    type: 'Grid',
+    props: {
+      title: 'Course Library',
+      columns: 3,
+      gap: 'lg',
+      children: [
+        leaderForgeCardSchema,
+        {
+          type: 'Card',
+          props: {
+            title: 'Team Building Strategies',
+            description: 'Learn proven techniques for building high-performing teams.',
+            image: '/thumb2.png',
+            progress: 100,
+            videoWatched: true,
+            worksheetSubmitted: true,
+            pills: [
+              { label: 'Team Building', color: '#8b5cf6' },
+              { label: 'Intermediate', color: '#f59e0b' }
+            ],
+            actions: [
+              { label: 'Rewatch', action: 'openVideoModal' },
+              { label: 'View Certificate', action: 'viewCertificate' }
+            ]
+          }
+        },
+        {
+          type: 'Card',
+          props: {
+            title: 'Communication Excellence',
+            description: 'Develop advanced communication skills for leadership success.',
+            image: '/thumb3.png',
+            progress: 0,
+            videoWatched: false,
+            worksheetSubmitted: false,
+            pills: [
+              { label: 'Communication', color: '#ef4444' }
+            ],
+            actions: [
+              { label: 'Start Course', action: 'openVideoModal' }
+            ]
+          }
+        }
+      ]
+    }
+  };
+
   const handleCardAction = (action: { action: string; label: string; [key: string]: unknown }) => {
     console.log('Card action triggered:', action);
     alert(`Action: ${action.action} - ${action.label}`);
   };
 
   return (
-    <div className="container mx-auto p-8 max-w-6xl">
-      <h1 className="text-3xl font-bold mb-8">Widget Testing Dashboard</h1>
-
-      <div className="space-y-8">
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">StatCard Widget</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <WidgetDispatcher schema={statCardSchema} />
-            <WidgetDispatcher schema={{
-              type: 'StatCard',
-              props: {
-                title: 'Revenue',
-                value: '$45,678',
-                description: 'Monthly recurring revenue'
-              }
-            }} />
-            <WidgetDispatcher schema={{
-              type: 'StatCard',
-              props: {
-                title: 'Completion Rate',
-                value: '87.5%'
-              }
-            }} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Leaderboard Widget</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <WidgetDispatcher schema={leaderboardSchema} />
-            <WidgetDispatcher schema={{
-              type: 'Leaderboard',
-              props: {
-                title: 'Sales Team',
-                items: [
-                  { name: 'Sarah Miller', score: '$125,000' },
-                  { name: 'Mike Chen', score: '$98,500' },
-                  { name: 'Lisa Garcia', score: '$87,200' }
-                ]
-              }
-            }} />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">VideoList Widget</h2>
-          <WidgetDispatcher schema={videoListSchema} />
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">LeaderForge Card Widget</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <WidgetDispatcher
-              schema={{
-                type: 'Card',
-                props: {
-                  title: 'Leadership Fundamentals',
-                  description: 'Master the core principles of effective leadership in this comprehensive course.',
-                  image: '/thumb1.png',
-                  videoUrl: 'https://example.com/video.mp4',
-                  progress: 45,
-                  videoWatched: false,
-                  worksheetSubmitted: false,
-                  pills: [
-                    { label: 'Leadership', color: '#3b82f6' },
-                    { label: 'Beginner', color: '#10b981' }
-                  ],
-                  actions: [
-                    { label: 'Watch Video', action: 'openVideoModal' },
-                    { label: 'Download Worksheet', action: 'downloadWorksheet' }
-                  ]
-                }
-              }}
-              onAction={handleCardAction}
-            />
-            <WidgetDispatcher
-              schema={{
-                type: 'Card',
-                props: {
-                  title: 'Team Building Strategies',
-                  description: 'Learn proven techniques for building high-performing teams.',
-                  image: '/thumb2.png',
-                  videoUrl: 'https://example.com/video2.mp4',
-                  progress: 100,
-                  videoWatched: true,
-                  worksheetSubmitted: true,
-                  pills: [
-                    { label: 'Team Building', color: '#8b5cf6' },
-                    { label: 'Intermediate', color: '#f59e0b' }
-                  ],
-                  actions: [
-                    { label: 'Rewatch', action: 'openVideoModal' },
-                    { label: 'View Certificate', action: 'viewCertificate' }
-                  ]
-                }
-              }}
-              onAction={handleCardAction}
-            />
-            <WidgetDispatcher
-              schema={{
-                type: 'Card',
-                props: {
-                  title: 'Communication Excellence',
-                  description: 'Develop advanced communication skills for leadership success.',
-                  image: '/thumb3.png',
-                  videoUrl: 'https://example.com/video3.mp4',
-                  progress: 0,
-                  videoWatched: false,
-                  worksheetSubmitted: false,
-                  pills: [
-                    { label: 'Communication', color: '#ef4444' }
-                  ],
-                  actions: [
-                    { label: 'Start Course', action: 'openVideoModal' }
-                  ]
-                }
-              }}
-              onAction={handleCardAction}
-            />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Video Player Modal Widget</h2>
-          <div className="max-w-lg mx-auto">
-            <p className="text-sm text-gray-600 mb-4">
-              Basic VideoPlayerModal widget structure (video functionality will be added incrementally)
+    <div
+      className={`min-h-screen transition-all duration-300 tenant-${theme}`}
+      style={{
+        background: 'var(--background)',
+        color: 'var(--text-primary)'
+      }}
+    >
+      <div className="container mx-auto p-8 max-w-7xl">
+        {/* Header with Theme Switcher */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="heading-1 mb-2">Widget Testing Dashboard</h1>
+            <p className="body-large text-[var(--text-secondary)]">
+              Showcasing Design System compliant widgets with dynamic theming
             </p>
-            <WidgetDispatcher schema={videoPlayerSchema} />
           </div>
-        </section>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setTheme('leaderforge')}
+              className={`btn ${theme === 'leaderforge' ? 'btn-primary' : 'btn-secondary'}`}
+            >
+              LeaderForge Theme
+            </button>
+            <button
+              onClick={() => setTheme('brilliant')}
+              className={`btn ${theme === 'brilliant' ? 'btn-primary' : 'btn-secondary'}`}
+            >
+              Brilliant Movement Theme
+            </button>
+          </div>
+        </div>
 
-        <section className="border-t pt-8">
-          <h2 className="text-2xl font-semibold mb-4">Widget Registry Info</h2>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">
-              All widgets above are rendered via the <code className="bg-gray-200 px-1 rounded">WidgetDispatcher</code>
-              {' '}using the extracted widget registry system. This demonstrates that the ComponentSchemaRenderer
-              refactor is working correctly.
-            </p>
-            <div className="mt-2 text-xs text-gray-500">
-              <strong>Progress:</strong> 7 of 7 widget types now registered in the system
+        <div className="space-y-12">
+          {/* StatCard Widget Section */}
+          <section>
+            <h2 className="heading-3 mb-6">StatCard Widgets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <WidgetDispatcher schema={statCardSchema} />
+              <WidgetDispatcher schema={{
+                type: 'StatCard',
+                props: {
+                  title: 'Revenue',
+                  value: '$45,678',
+                  description: 'Monthly recurring revenue'
+                }
+              }} />
+              <WidgetDispatcher schema={{
+                type: 'StatCard',
+                props: {
+                  title: 'Completion Rate',
+                  value: '87.5%'
+                }
+              }} />
             </div>
-          </div>
-        </section>
+          </section>
+
+          {/* Leaderboard Widget Section */}
+          <section>
+            <h2 className="heading-3 mb-6">Leaderboard Widgets</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <WidgetDispatcher schema={leaderboardSchema} />
+              <WidgetDispatcher schema={{
+                type: 'Leaderboard',
+                props: {
+                  title: 'Sales Team',
+                  items: [
+                    { name: 'Sarah Miller', score: '$125,000' },
+                    { name: 'Mike Chen', score: '$98,500' },
+                    { name: 'Lisa Garcia', score: '$87,200' }
+                  ]
+                }
+              }} />
+            </div>
+          </section>
+
+          {/* VideoList Widget Section */}
+          <section>
+            <h2 className="heading-3 mb-6">VideoList Widget</h2>
+            <WidgetDispatcher schema={videoListSchema} />
+          </section>
+
+          {/* LeaderForge Card Widget Section */}
+          <section>
+            <h2 className="heading-3 mb-6">LeaderForge Card Widgets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <WidgetDispatcher
+                schema={leaderForgeCardSchema}
+                onAction={handleCardAction}
+              />
+              <WidgetDispatcher
+                schema={{
+                  type: 'Card',
+                  props: {
+                    title: 'Team Building Strategies',
+                    description: 'Learn proven techniques for building high-performing teams.',
+                    image: '/thumb2.png',
+                    videoUrl: 'https://example.com/video2.mp4',
+                    progress: 100,
+                    videoWatched: true,
+                    worksheetSubmitted: true,
+                    pills: [
+                      { label: 'Team Building', color: '#8b5cf6' },
+                      { label: 'Intermediate', color: '#f59e0b' }
+                    ],
+                    actions: [
+                      { label: 'Rewatch', action: 'openVideoModal' },
+                      { label: 'View Certificate', action: 'viewCertificate' }
+                    ]
+                  }
+                }}
+                onAction={handleCardAction}
+              />
+              <WidgetDispatcher
+                schema={{
+                  type: 'Card',
+                  props: {
+                    title: 'Communication Excellence',
+                    description: 'Develop advanced communication skills for leadership success.',
+                    image: '/thumb3.png',
+                    videoUrl: 'https://example.com/video3.mp4',
+                    progress: 0,
+                    videoWatched: false,
+                    worksheetSubmitted: false,
+                    pills: [
+                      { label: 'Communication', color: '#ef4444' }
+                    ],
+                    actions: [
+                      { label: 'Start Course', action: 'openVideoModal' }
+                    ]
+                  }
+                }}
+                onAction={handleCardAction}
+              />
+            </div>
+          </section>
+
+          {/* Panel Widget Section */}
+          <section>
+            <h2 className="heading-3 mb-6">Panel Widget</h2>
+            <WidgetDispatcher schema={panelSchema} />
+          </section>
+
+          {/* Grid Widget Section */}
+          <section>
+            <h2 className="heading-3 mb-6">Grid Widget</h2>
+            <WidgetDispatcher schema={gridSchema} onAction={handleCardAction} />
+          </section>
+
+          {/* Design System Information */}
+          <section className="mt-12 p-6 bg-[var(--surface)] border border-[var(--border)] rounded-xl">
+            <h2 className="heading-3 mb-4">Design System Features</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="heading-4 mb-3">Theme Variables</h3>
+                <ul className="space-y-2 body-small">
+                  <li>• Dynamic CSS variables per tenant</li>
+                  <li>• Consistent color tokens</li>
+                  <li>• Typography scale compliance</li>
+                  <li>• Component-based styling</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="heading-4 mb-3">Current Theme: {theme === 'leaderforge' ? 'LeaderForge' : 'Brilliant Movement'}</h3>
+                <div className="space-y-2 body-small">
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--primary)' }}></div>
+                    <span>Primary: var(--primary)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--secondary)' }}></div>
+                    <span>Secondary: var(--secondary)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--accent)' }}></div>
+                    <span>Accent: var(--accent)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );
