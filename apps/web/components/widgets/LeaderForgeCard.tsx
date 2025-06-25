@@ -56,125 +56,92 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
   };
 
   return (
-    <div className="card card-interactive bg-[var(--surface)] rounded-xl shadow-sm border border-[var(--border)] flex flex-col h-full min-h-[340px] transition-all duration-200 hover:shadow-lg hover:scale-[1.02] hover:border-[var(--primary)]">
-      {/* Video/Image Section */}
-      <div className="relative w-full aspect-video rounded-t-xl overflow-hidden">
-        {cardImage ? (
+    <div className="card-glass-subtle card-glass-interactive h-full">
+      {/* Header with Image */}
+      {cardImage && (
+        <div className="relative h-48 overflow-hidden rounded-t-lg">
           <Image
             src={cardImage}
             alt={title}
             fill
-            className="object-cover"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, 400px"
             priority={false}
             onError={e => (e.currentTarget.src = '/icons/placeholder.png')}
           />
-        ) : null}
-        {videoUrl && (
-          <button
-            className="absolute inset-0 flex items-center justify-center z-10 group bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200"
-            onClick={() =>
-              handleAction(
-                actions?.find(a => a.action === 'openVideoModal') ||
-                { action: 'openVideoModal', label: 'Watch', videoUrl, title }
-              )
-            }
-            aria-label="Play video"
-          >
-            <div className="w-12 h-12 rounded-full bg-[var(--primary)] bg-opacity-90 flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-200">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-white ml-1">
-                <path d="M6 4l10 6-10 6V4z" fill="currentColor" />
-              </svg>
-            </div>
-          </button>
-        )}
-      </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
 
-      {/* Content Section */}
-      <div className="flex-1 flex flex-col p-6 gap-3">
-        {/* Title and Pills */}
-        <div className="flex flex-row items-start gap-3 mb-2">
-          <h3 className="heading-4 text-[var(--text-primary)] line-clamp-2 flex-1">{title}</h3>
-          {pills && pills.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {pills.map((pill, i) => (
-                <span
-                  key={i}
-                  className="px-2 py-1 rounded-full text-xs font-medium bg-[var(--primary-light)] text-[var(--primary)] border border-[var(--primary)]"
-                  style={pill.color ? {
-                    backgroundColor: `${pill.color}20`,
-                    color: pill.color,
-                    borderColor: pill.color
-                  } : {}}
-                >
-                  {pill.label}
-                </span>
-              ))}
+          {/* Status Badge */}
+          <div className="absolute top-3 right-3">
+            <div
+              className="px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm border border-white/20"
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.9)',
+                color: actualVideoWatched ? 'var(--success-500)' : 'var(--text-secondary)'
+              }}
+            >
+              <span className="mr-1">{actualVideoWatched ? '✓' : '○'}</span>
+              {actualVideoWatched ? 'Watched' : 'Not Watched'}
+            </div>
+          </div>
+
+          {/* Duration Badge */}
+          {videoUrl && (
+            <div className="absolute top-3 left-3">
+              <div className="px-2 py-1 rounded-full bg-black/70 text-white text-xs font-medium">
+                {videoUrl.split('/').pop()?.split('.').slice(0, -1).join('.')}
+              </div>
             </div>
           )}
         </div>
+      )}
 
-        {/* Description */}
-        <p className="body-base text-[var(--text-secondary)] line-clamp-3 mb-3">{description}</p>
+      {/* Content */}
+      <div className="p-6 flex flex-col flex-1">
+        <h3 className="text-glass-primary font-semibold text-base leading-tight mb-3">
+          {title}
+        </h3>
 
-        {/* Status indicators - LeaderForge specific: video watched and worksheet submission */}
-        <div className="flex flex-row items-center gap-6 mb-4">
-          <div className="flex items-center gap-2">
-            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${actualVideoWatched ? 'bg-[var(--success-500)]' : 'bg-[var(--border)]'}`}>
-              {actualVideoWatched && (
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-white">
-                  <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
+        {description && (
+          <p className="text-glass-secondary text-sm leading-relaxed mb-4 flex-1">
+            {description}
+          </p>
+        )}
+
+        {/* Progress Bar */}
+        {actualProgress > 0 && (
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-glass-muted text-xs font-medium">Progress</span>
+              <span className="text-glass-muted text-xs font-medium">{Math.round(actualProgress)}%</span>
             </div>
-            <span className={`caption ${actualVideoWatched ? 'text-[var(--success-600)]' : 'text-[var(--text-secondary)]'}`}>
-              {actualProgress > 0 ? `${Math.round(actualProgress)}% watched` : 'Video Not Watched'}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className={`w-4 h-4 rounded-full flex items-center justify-center ${worksheetSubmitted ? 'bg-[var(--success-500)]' : 'bg-[var(--border)]'}`}>
-              {worksheetSubmitted && (
-                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" className="text-white">
-                  <path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
+            <div className="w-full bg-white/30 rounded-full h-2 overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500 ease-out"
+                style={{
+                  width: `${actualProgress}%`,
+                  background: actualProgress === 100 ? 'var(--success-500)' : 'var(--primary)'
+                }}
+              ></div>
             </div>
-            <span className={`caption ${worksheetSubmitted ? 'text-[var(--success-600)]' : 'text-[var(--text-secondary)]'}`}>
-              Worksheet {worksheetSubmitted ? 'Submitted' : 'Not Submitted'}
-            </span>
-          </div>
-        </div>
-
-        {/* Progress bar */}
-        {typeof actualProgress === 'number' && (
-          <div className="w-full h-2 bg-[var(--border)] rounded-full overflow-hidden mb-4">
-            <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{
-                width: `${actualProgress}%`,
-                backgroundColor: actualProgress === 100 ? 'var(--success-500)' : 'var(--primary)'
-              }}
-            />
           </div>
         )}
 
-        {/* Action buttons */}
-        <div className="flex flex-row gap-3 mt-auto">
-          {actions && actions.map((action, i) => (
-            <button
-              key={i}
-              onClick={() => handleAction(action)}
-              className={
-                action.label.toLowerCase().includes('watch')
-                  ? 'btn btn-primary px-4 py-2 text-sm font-medium'
-                  : 'btn btn-secondary px-4 py-2 text-sm font-medium'
-              }
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
+        {/* Action Button */}
+        <button
+          onClick={() => handleAction(
+            actions?.find(a => a.action === 'openVideoModal') ||
+            { action: 'openVideoModal', label: 'Watch', videoUrl, title }
+          )}
+          disabled={!videoUrl}
+          className={`w-full py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
+            !videoUrl
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white shadow-sm hover:shadow-md'
+          }`}
+        >
+          Watch
+        </button>
       </div>
     </div>
   );

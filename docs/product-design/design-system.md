@@ -383,6 +383,133 @@ interface DesignTokens {
 
 ## Widget Library
 
+### Premium Glassmorphism Components
+
+LeaderForge uses a sophisticated glassmorphism design language for premium UI components, featuring translucent backgrounds, backdrop blur effects, and layered shadows for depth and elegance.
+
+#### Glassmorphism Card Variants
+
+```css
+/* Subtle Glassmorphism - for most widgets */
+.card-glass-subtle {
+  background: linear-gradient(135deg, rgba(255,255,255,0.7) 60%, rgba(200,220,255,0.3) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 0.75rem; /* 12px */
+  box-shadow:
+    0 6px 20px rgba(60,60,60,0.15),
+    0 2px 8px rgba(60,60,60,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  transition: all 0.25s ease-in-out;
+}
+
+/* Standard Glassmorphism - for prominent components */
+.card-glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.85) 50%, rgba(241,245,249,0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 1rem; /* 16px */
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.12),
+    0 4px 16px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Premium Glassmorphism - for modals and overlays */
+.card-glass-premium {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 1.25rem; /* 20px */
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.1),
+    0 8px 32px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+```
+
+#### Glassmorphism Interactive States
+
+```css
+.card-glass-subtle:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow:
+    0 8px 28px rgba(60,60,60,0.2),
+    0 4px 12px rgba(60,60,60,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+  border-color: rgba(var(--primary-rgb), 0.25);
+}
+
+.card-glass-interactive:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.18),
+    0 6px 20px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.5);
+  border-color: rgba(var(--primary-rgb), 0.3);
+}
+```
+
+#### Glassmorphism Typography
+
+For use within glassmorphism components, special typography classes provide optimized contrast and readability:
+
+```css
+.text-glass-primary {
+  color: rgba(30, 41, 59, 0.9);
+  font-weight: 500;
+}
+
+.text-glass-secondary {
+  color: rgba(100, 116, 139, 0.8);
+  font-weight: 400;
+}
+
+.text-glass-muted {
+  color: rgba(100, 116, 139, 0.6);
+  font-weight: 400;
+  font-size: 0.8125rem; /* 13px */
+}
+
+.text-glass-tiny {
+  color: rgba(100, 116, 139, 0.7);
+  font-weight: 400;
+  font-size: 0.6875rem; /* 11px */
+  letter-spacing: 0.025em;
+}
+```
+
+#### Glassmorphism Usage Guidelines
+
+**When to Use Glassmorphism:**
+- **Navigation panels** - Primary navigation components (NavPanel)
+- **Widget containers** - Content widgets that need premium feel
+- **Modal overlays** - Dialogs, profile modals, settings panels
+- **Floating elements** - Tooltips, dropdowns, popovers
+- **Hero sections** - Landing areas requiring visual prominence
+
+**Component Selection Guide:**
+- **`.card-glass-subtle`** - Most widgets, content cards, secondary panels
+- **`.card-glass`** - Primary widgets, important content areas
+- **`.card-glass-premium`** - Modals, overlays, critical interactions
+
+**Typography Pairing:**
+- Use `.text-glass-*` classes within glassmorphism components
+- Avoid regular text classes as they may lack sufficient contrast
+- Font sizes should be 13px or larger for optimal readability
+
+**Required CSS Variables:**
+```css
+/* Must be defined in tenant themes */
+--primary-rgb: 30, 64, 175; /* For LeaderForge */
+--primary-rgb: 62, 94, 23;   /* For Brilliant Movement */
+```
+
 ### Button Widgets
 
 #### Base Button Styles

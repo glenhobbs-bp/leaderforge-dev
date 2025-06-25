@@ -1,87 +1,119 @@
 /**
  * File: apps/web/components/widgets/VideoList.tsx
- * Purpose: Extracted VideoList widget from ComponentSchemaRenderer - Design System Compliant
- * Owner: Widget Team
- * Tags: #widget #video #media #design-system
+ * Purpose: Displays video content grid with glassmorphism design and elegant hover effects
+ * Owner: Frontend team
+ * Tags: widget, video, content, glassmorphism
  */
 
 "use client";
 
 import React from 'react';
 import Image from 'next/image';
-import { BaseWidgetProps } from '@leaderforge/asset-core';
 
-export interface VideoListProps extends BaseWidgetProps {
-  schema: {
-    type: 'VideoList';
-    props: {
-      title: string;
-      videos: Array<{
-        props: {
-          title: string;
-          image: string;
-          description?: string;
-          duration?: string;
-        };
-      }>;
-    };
-  };
+interface VideoItem {
+  id: string;
+  title: string;
+  thumbnail?: string;
+  duration?: string;
+  description?: string;
+  isWatched?: boolean;
+  url?: string;
 }
 
-export function VideoList({ schema }: VideoListProps) {
-  if (schema.type !== 'VideoList') {
-    return null;
-  }
+interface VideoListProps {
+  title?: string;
+  videos: VideoItem[];
+  onVideoClick?: (video: VideoItem) => void;
+  maxVideos?: number;
+}
 
-  const { title, videos } = schema.props;
+export default function VideoList({
+  title = "Videos",
+  videos,
+  onVideoClick,
+  maxVideos = 6
+}: VideoListProps) {
+  const displayVideos = videos.slice(0, maxVideos);
+
+  const handleVideoClick = (video: VideoItem) => {
+    if (onVideoClick) {
+      onVideoClick(video);
+    } else if (video.url) {
+      window.open(video.url, '_blank');
+    }
+  };
 
   return (
-    <div className="card bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6">
-      <h3 className="heading-4 text-[var(--text-primary)] mb-6">{title}</h3>
+    <div className="card-glass-subtle p-6">
+      <h3 className="text-glass-primary text-lg font-semibold mb-5">
+        {title}
+      </h3>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {videos && videos.map((video, i) => (
+        {displayVideos.map((video) => (
           <div
-            key={i}
-            className="group relative cursor-pointer rounded-lg overflow-hidden bg-[var(--background)] border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-200 hover:shadow-md"
+            key={video.id}
+            className="group cursor-pointer rounded-lg overflow-hidden hover:bg-white/20 transition-all duration-300 hover:transform hover:scale-[1.02]"
+            onClick={() => handleVideoClick(video)}
           >
-            <div className="relative aspect-video">
-              {video.props.image && (
+            {/* Video Thumbnail */}
+            <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden mb-3">
+              {video.thumbnail ? (
                 <Image
-                  src={video.props.image}
-                  alt={video.props.title}
+                  src={video.thumbnail}
+                  alt={video.title}
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                  <span className="text-gray-500 text-2xl">🎥</span>
+                </div>
               )}
-              {/* Play button overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200">
-                <div className="w-12 h-12 rounded-full bg-[var(--primary)] bg-opacity-90 flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-200">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-white ml-1">
-                    <path d="M6 4l10 6-10 6V4z" fill="currentColor" />
-                  </svg>
+
+              {/* Play Button Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-all duration-300">
+                <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300 shadow-lg">
+                  <div className="w-0 h-0 border-l-[8px] border-l-gray-800 border-y-[6px] border-y-transparent ml-1"></div>
                 </div>
               </div>
-              {/* Duration badge */}
-              {video.props.duration && (
-                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black bg-opacity-75 text-white text-xs rounded">
-                  {video.props.duration}
+
+              {/* Duration Badge */}
+              {video.duration && (
+                <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                  {video.duration}
+                </div>
+              )}
+
+              {/* Watched Indicator */}
+              {video.isWatched && (
+                <div className="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">✓</span>
                 </div>
               )}
             </div>
-            <div className="p-3">
-              <h4 className="body-base font-medium text-[var(--text-primary)] line-clamp-2 mb-1">
-                {video.props.title}
+
+            {/* Video Info */}
+            <div className="px-2">
+              <h4 className="text-glass-primary font-medium text-sm leading-tight mb-1 line-clamp-2">
+                {video.title}
               </h4>
-              {video.props.description && (
-                <p className="body-small text-[var(--text-secondary)] line-clamp-2">
-                  {video.props.description}
+              {video.description && (
+                <p className="text-glass-muted text-xs leading-relaxed line-clamp-2">
+                  {video.description}
                 </p>
               )}
             </div>
           </div>
         ))}
       </div>
-    </div>
-  );
+
+      {videos.length === 0 && (
+        <div className="text-center py-12">
+          <span className="text-4xl mb-3 block">🎬</span>
+          <span className="text-glass-muted text-sm">No videos available</span>
+        </div>
+             )}
+     </div>
+   );
 }

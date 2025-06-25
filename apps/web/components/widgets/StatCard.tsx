@@ -1,39 +1,64 @@
 /**
  * File: apps/web/components/widgets/StatCard.tsx
- * Purpose: Extracted StatCard widget from ComponentSchemaRenderer - Design System Compliant
- * Owner: Widget Team
- * Tags: #widget #statcard #stats #data-visualization #design-system
+ * Purpose: Displays key performance metrics with glassmorphism design
+ * Owner: Frontend team
+ * Tags: widget, stats, metrics, glassmorphism
  */
 
 "use client";
 
 import React from 'react';
-import { BaseWidgetProps } from '@leaderforge/asset-core';
 
-export interface StatCardProps extends BaseWidgetProps {
-  schema: {
-    type: 'StatCard';
-    props: {
-      title: string;
-      value: string | number;
-      description?: string;
-    };
-  };
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  change?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  icon?: string;
 }
 
-export function StatCard({ schema }: StatCardProps) {
-  if (schema.type !== 'StatCard') {
-    return null;
-  }
+export default function StatCard({ title, value, change, trend = 'neutral', icon }: StatCardProps) {
+  const trendColor = {
+    up: 'var(--success-500)',
+    down: 'var(--error-500)',
+    neutral: 'var(--text-secondary)'
+  }[trend];
 
-  const { title, value, description } = schema.props;
+  const trendIcon = {
+    up: '↗',
+    down: '↘',
+    neutral: '→'
+  }[trend];
 
   return (
-    <div className="card bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6">
-      <h3 className="heading-4 text-[var(--text-primary)] mb-2">{title}</h3>
-      <div className="text-3xl font-bold text-[var(--primary)] mb-1">{value}</div>
-      {description && (
-        <p className="body-small text-[var(--text-secondary)]">{description}</p>
+    <div className="card-glass-subtle card-glass-interactive p-6">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-glass-muted uppercase tracking-wide font-medium">
+          {title}
+        </h3>
+        {icon && (
+          <span className="text-glass-secondary text-xl">
+            {icon}
+          </span>
+        )}
+      </div>
+
+      <div className="mb-2">
+        <span className="text-glass-primary text-3xl font-bold tracking-tight">
+          {value}
+        </span>
+      </div>
+
+      {change && (
+        <div className="flex items-center gap-1">
+          <span
+            className="text-glass-tiny font-medium"
+            style={{ color: trendColor }}
+          >
+            {trendIcon} {change}
+          </span>
+          <span className="text-glass-tiny">from last period</span>
+        </div>
       )}
     </div>
   );
