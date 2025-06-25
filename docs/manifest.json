@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "generated_at": "2025-06-25T01:40:18.908Z",
+    "generated_at": "2025-06-25T10:35:53.622Z",
     "generator_version": "1.0.0",
-    "total_files": 227,
-    "total_size_bytes": 1941069,
+    "total_files": 231,
+    "total_size_bytes": 1984714,
     "file_types": {
-      ".ts": 101,
+      ".ts": 103,
       ".json": 16,
       ".tsx": 33,
       ".js": 2,
-      ".md": 74,
+      ".md": 76,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 134,
+      "TypeScript": 136,
       "API": 34,
-      "AI agent": 93,
+      "AI agent": 99,
       "React": 33,
-      "React hooks": 22,
+      "React hooks": 23,
       "Next.js API": 33,
       "security": 58,
       "test": 10,
@@ -61,7 +61,7 @@
       "dashboard": 1,
       "batched queries": 1,
       "database-driven": 1,
-      "documentation": 76,
+      "documentation": 78,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -1877,7 +1877,8 @@
       "purpose": "File: apps/web/app/test-widgets/page.tsx",
       "tags": [
         "React",
-        "TypeScript"
+        "TypeScript",
+        "React hooks"
       ],
       "dependencies": [
         "react",
@@ -1886,9 +1887,9 @@
       "exports": [
         "TestWidgetsPage"
       ],
-      "last_modified": "2025-06-24T21:19:49.207Z",
-      "size_bytes": 7891,
-      "hash": "786ba30f",
+      "last_modified": "2025-06-25T10:24:21.480Z",
+      "size_bytes": 10173,
+      "hash": "33aea2ef",
       "complexity": "medium"
     },
     {
@@ -2316,17 +2317,18 @@
       "tags": [
         "React",
         "TypeScript",
-        "UI"
+        "UI",
+        "AI agent"
       ],
       "dependencies": [
         "react",
-        "@leaderforge/asset-core",
-        "./WidgetDispatcher"
+        "../ai/UniversalSchemaRenderer",
+        "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-25T01:36:32.205Z",
-      "size_bytes": 2288,
-      "hash": "04400e8e",
-      "complexity": "low"
+      "last_modified": "2025-06-25T10:25:24.665Z",
+      "size_bytes": 3317,
+      "hash": "8ffc8c3b",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/widgets/index.ts",
@@ -2351,9 +2353,9 @@
       "exports": [
         "widgetRegistry"
       ],
-      "last_modified": "2025-06-24T21:19:41.031Z",
-      "size_bytes": 5608,
-      "hash": "42b9e8e8",
+      "last_modified": "2025-06-25T09:27:44.974Z",
+      "size_bytes": 5643,
+      "hash": "75536815",
       "complexity": "medium"
     },
     {
@@ -2368,13 +2370,12 @@
         "UI"
       ],
       "dependencies": [
-        "react",
-        "@leaderforge/asset-core"
+        "react"
       ],
-      "last_modified": "2025-06-25T01:35:07.246Z",
-      "size_bytes": 1691,
-      "hash": "a3f139de",
-      "complexity": "low"
+      "last_modified": "2025-06-25T10:17:33.992Z",
+      "size_bytes": 4380,
+      "hash": "a99a7e18",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/widgets/LeaderForgeCard.tsx",
@@ -2393,9 +2394,9 @@
         "next/image",
         "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-25T01:36:01.225Z",
-      "size_bytes": 7111,
-      "hash": "d19375c2",
+      "last_modified": "2025-06-25T09:18:56.007Z",
+      "size_bytes": 4989,
+      "hash": "817b06d4",
       "complexity": "medium"
     },
     {
@@ -2407,17 +2408,18 @@
       "tags": [
         "React",
         "TypeScript",
-        "UI"
+        "UI",
+        "AI agent"
       ],
       "dependencies": [
         "react",
-        "@leaderforge/asset-core",
-        "./WidgetDispatcher"
+        "../ai/UniversalSchemaRenderer",
+        "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-25T01:36:13.123Z",
-      "size_bytes": 1675,
-      "hash": "2e980107",
-      "complexity": "low"
+      "last_modified": "2025-06-25T10:24:53.126Z",
+      "size_bytes": 3201,
+      "hash": "afd98e11",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/widgets/StatCard.tsx",
@@ -2431,13 +2433,12 @@
         "UI"
       ],
       "dependencies": [
-        "react",
-        "@leaderforge/asset-core"
+        "react"
       ],
-      "last_modified": "2025-06-25T01:35:04.316Z",
-      "size_bytes": 1158,
-      "hash": "da6f8349",
-      "complexity": "low"
+      "last_modified": "2025-06-25T10:16:46.404Z",
+      "size_bytes": 2520,
+      "hash": "1d45d3a4",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/widgets/VideoList.tsx",
@@ -2452,13 +2453,12 @@
       ],
       "dependencies": [
         "react",
-        "next/image",
-        "@leaderforge/asset-core"
+        "next/image"
       ],
-      "last_modified": "2025-06-25T01:35:59.284Z",
-      "size_bytes": 3241,
-      "hash": "21823693",
-      "complexity": "low"
+      "last_modified": "2025-06-25T10:18:25.711Z",
+      "size_bytes": 4993,
+      "hash": "67aff937",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/widgets/VideoPlayerModal.tsx",
@@ -2498,12 +2498,17 @@
       ],
       "dependencies": [
         "react",
-        "@leaderforge/asset-core",
-        "./index"
+        "./LeaderForgeCard",
+        "./VideoPlayerModal",
+        "./StatCard",
+        "./Leaderboard",
+        "./VideoList",
+        "./Panel",
+        "./Grid"
       ],
-      "last_modified": "2025-06-24T22:11:12.211Z",
-      "size_bytes": 3030,
-      "hash": "9dec1eb8",
+      "last_modified": "2025-06-25T10:25:32.607Z",
+      "size_bytes": 2785,
+      "hash": "4a0061a2",
       "complexity": "medium"
     },
     {
@@ -3573,6 +3578,20 @@
       "hash": "542419f9"
     },
     {
+      "path": "docs/architecture/adr/0008-pure-schema-driven-widgets.md",
+      "name": "0008-pure-schema-driven-widgets.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-25T10:16:28.542Z",
+      "size_bytes": 2877,
+      "hash": "1606bd4b"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -3651,9 +3670,23 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:40:10.050Z",
-      "size_bytes": 2668,
-      "hash": "af4b897c"
+      "last_modified": "2025-06-25T10:35:48.158Z",
+      "size_bytes": 2862,
+      "hash": "8bae38bd"
+    },
+    {
+      "path": "docs/engineering/how-to/schema-driven-widgets.md",
+      "name": "schema-driven-widgets.md",
+      "directory": "docs/engineering/how-to",
+      "extension": ".md",
+      "purpose": "File: apps/web/components/widgets/MyWidget.tsx",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-25T10:35:32.283Z",
+      "size_bytes": 13994,
+      "hash": "4dad9534"
     },
     {
       "path": "docs/engineering/implementation-plans/asset-system-refactor-plan.md",
@@ -3765,9 +3798,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T22:30:00.973Z",
-      "size_bytes": 117411,
-      "hash": "f850d32a"
+      "last_modified": "2025-06-25T01:40:18.915Z",
+      "size_bytes": 117494,
+      "hash": "15b5fc9e"
     },
     {
       "path": "docs/manifest.md",
@@ -3780,9 +3813,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T22:30:01.019Z",
+      "last_modified": "2025-06-25T01:40:18.922Z",
       "size_bytes": 44079,
-      "hash": "fc968d86"
+      "hash": "9ba36e13"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -3793,9 +3826,9 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T15:24:45.433Z",
-      "size_bytes": 21874,
-      "hash": "2b058f02"
+      "last_modified": "2025-06-25T09:18:29.169Z",
+      "size_bytes": 25788,
+      "hash": "d7740ded"
     },
     {
       "path": "docs/product-design/README.md",
@@ -3941,9 +3974,9 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-07T10:52:36.244Z",
-      "size_bytes": 116,
-      "hash": "80155d83",
+      "last_modified": "2025-06-25T10:01:24.918Z",
+      "size_bytes": 205,
+      "hash": "cdc9a327",
       "complexity": "low"
     },
     {
@@ -3958,6 +3991,24 @@
       "last_modified": "2025-06-22T15:48:20.132Z",
       "size_bytes": 262,
       "hash": "16e21e5f"
+    },
+    {
+      "path": "packages/agent-core/schema/SchemaProcessor.ts",
+      "name": "SchemaProcessor.ts",
+      "directory": "packages/agent-core/schema",
+      "extension": ".ts",
+      "purpose": "File: packages/agent-core/schema/SchemaProcessor.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "exports": [
+        "SchemaProcessor"
+      ],
+      "last_modified": "2025-06-25T10:01:22.253Z",
+      "size_bytes": 10719,
+      "hash": "606ad558",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/tools/__tests__/ProgressAwareAgent.test.ts",
@@ -4136,6 +4187,21 @@
       "complexity": "high"
     },
     {
+      "path": "packages/agent-core/types/UniversalWidgetSchema.ts",
+      "name": "UniversalWidgetSchema.ts",
+      "directory": "packages/agent-core/types",
+      "extension": ".ts",
+      "purpose": "File: packages/agent-core/types/UniversalWidgetSchema.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-25T10:01:17.674Z",
+      "size_bytes": 3119,
+      "hash": "83bda2c1",
+      "complexity": "medium"
+    },
+    {
       "path": "packages/asset-core/package.json",
       "name": "package.json",
       "directory": "packages/asset-core",
@@ -4195,9 +4261,9 @@
       "exports": [
         "WidgetRegistry"
       ],
-      "last_modified": "2025-06-24T20:44:50.059Z",
-      "size_bytes": 2798,
-      "hash": "1465046e",
+      "last_modified": "2025-06-25T10:01:26.827Z",
+      "size_bytes": 3146,
+      "hash": "6a38e2f2",
       "complexity": "medium"
     },
     {

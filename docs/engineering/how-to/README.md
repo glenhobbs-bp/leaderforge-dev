@@ -1,5 +1,7 @@
 # How-To Guides
 
+This directory contains practical, step-by-step guides for common development tasks in the LeaderForge platform.
+
 **File:** docs/engineering/how-to/README.md
 **Purpose:** Index of step-by-step development guides
 **Owner:** Engineering Team
@@ -8,9 +10,22 @@
 
 ## Available Guides
 
-### Agent Development
-- **[How to Add or Change Agents](../../how-to-add-or-change-agents.md)** - Complete guide for agent development
-- **[How to Add or Change LangGraph Agent Orchestration](../../how-to-add-or-change-langgraph-agent-orchestration.md)** - LangGraph integration patterns
+### Widget Development
+- **[Schema-Driven Widgets](./schema-driven-widgets.md)** - Complete guide for creating, registering, and using schema-driven widgets
+  - Creating new widgets with backwards compatibility
+  - Widget registration and discovery
+  - Agent integration patterns
+  - Schema design best practices
+  - Testing strategies
+  - Universal schema structure reference
+
+### Coming Soon
+- **Component System** - Building reusable UI components
+- **Agent Development** - Creating and deploying new agents
+- **API Integration** - Connecting external services
+- **Database Migrations** - Managing schema changes
+- **Performance Optimization** - Improving application performance
+- **Testing Strategies** - Comprehensive testing approaches
 
 ### UI Development
 - **[How to Add or Change Components](../../how-to-add-or-change-components.md)** - Widget and component development
@@ -23,38 +38,30 @@
 
 ## Guide Structure
 
-Each how-to guide follows this standard structure:
-1. **Overview** - What you'll accomplish
-2. **Prerequisites** - Required knowledge and setup
-3. **Step-by-Step Instructions** - Detailed implementation steps
+Each how-to guide follows this structure:
+1. **Overview** - What the guide covers
+2. **Prerequisites** - What you need to know first
+3. **Step-by-step instructions** - Detailed implementation steps
 4. **Examples** - Working code examples
 5. **Testing** - How to verify your implementation
 6. **Troubleshooting** - Common issues and solutions
-7. **Next Steps** - Related guides and advanced topics
+7. **Reference** - Additional resources and appendices
 
-## Contributing New Guides
+## Contributing
 
-### When to Create a How-To Guide
-- Task is performed by multiple team members
-- Process has more than 5 steps
-- Common questions or mistakes occur
-- New features require explanation
-- Integration patterns need documentation
+When adding new how-to guides:
+1. Use the established template structure
+2. Include practical, working examples
+3. Provide troubleshooting sections
+4. Add comprehensive testing instructions
+5. Update this README with the new guide
 
-### Guide Creation Process
-1. **Identify Need** - Document common questions or complex processes
-2. **Plan Content** - Outline steps and examples needed
-3. **Write Guide** - Follow standard structure with clear examples
-4. **Review** - Get team review for accuracy and clarity
-5. **Test** - Have someone else follow the guide to verify
-6. **Publish** - Add to this index and update manifest
+## Quick Reference
 
-### Quality Standards
-- **Clear Steps** - Each step should be unambiguous
-- **Working Examples** - All code examples must be tested
-- **Screenshots** - Include visual aids where helpful
-- **Error Handling** - Cover common error scenarios
-- **Maintenance** - Keep guides updated with system changes
+- **Widget Registration**: Add to `WidgetDispatcher.tsx` and export from `index.ts`
+- **Schema Structure**: All widgets must implement the universal schema pattern
+- **Testing**: Use the `/test-widgets` page for integration testing
+- **File Headers**: Include standardized headers with Purpose, Owner, and Tags
 
 ---
 
