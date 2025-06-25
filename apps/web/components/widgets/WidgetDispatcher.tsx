@@ -22,7 +22,7 @@ import Grid from './Grid';
 
 interface WidgetSchema {
   type: string;
-  props: Record<string, any>;
+  [key: string]: any; // Allow any additional properties for schema-driven widgets
 }
 
 interface WidgetDispatcherProps {
@@ -47,19 +47,19 @@ export function WidgetDispatcher({ schema }: WidgetDispatcherProps) {
         return <VideoPlayerModal schema={schema as any} />;
 
       case 'StatCard':
-        return <StatCard {...(schema.props as any)} />;
+        return <StatCard schema={schema as any} />;
 
       case 'Leaderboard':
-        return <Leaderboard {...(schema.props as any)} />;
+        return <Leaderboard schema={schema as any} />;
 
       case 'VideoList':
-        return <VideoList {...(schema.props as any)} />;
+        return <VideoList schema={schema as any} />;
 
       case 'Panel':
-        return <Panel {...(schema.props as any)} />;
+        return <Panel schema={schema as any} />;
 
       case 'Grid':
-        return <Grid {...(schema.props as any)} />;
+        return <Grid schema={schema as any} />;
 
       default:
         console.warn(`[WidgetDispatcher] Unknown widget type: ${schema.type}`);

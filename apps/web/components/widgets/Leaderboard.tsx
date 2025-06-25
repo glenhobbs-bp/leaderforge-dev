@@ -2,7 +2,7 @@
  * File: apps/web/components/widgets/Leaderboard.tsx
  * Purpose: Displays ranking list with glassmorphism design and elegant typography
  * Owner: Frontend team
- * Tags: widget, leaderboard, ranking, glassmorphism
+ * Tags: widget, leaderboard, ranking, glassmorphism, schema-driven
  */
 
 "use client";
@@ -17,13 +17,44 @@ interface LeaderboardEntry {
   trend?: 'up' | 'down' | 'same';
 }
 
+// Legacy props interface for backwards compatibility
 interface LeaderboardProps {
   title?: string;
   entries?: LeaderboardEntry[];
   maxEntries?: number;
 }
 
-export default function Leaderboard({ title = "Leaderboard", entries = [], maxEntries = 5 }: LeaderboardProps) {
+// Schema interface for new schema-driven approach
+interface LeaderboardSchema {
+  type: 'Leaderboard';
+  title?: string;
+  entries?: LeaderboardEntry[];
+  maxEntries?: number;
+  metadata?: {
+    version?: string;
+    source?: string;
+  };
+}
+
+// Union type for transition period
+type LeaderboardInput = LeaderboardProps | { schema: LeaderboardSchema };
+
+function isSchemaInput(input: LeaderboardInput): input is { schema: LeaderboardSchema } {
+  return 'schema' in input;
+}
+
+export default function Leaderboard(input: LeaderboardInput) {
+  // Extract props from either schema or direct props
+  const props: LeaderboardProps = isSchemaInput(input)
+    ? {
+        title: input.schema.title,
+        entries: input.schema.entries,
+        maxEntries: input.schema.maxEntries
+      }
+    : input;
+
+  const { title = "Leaderboard", entries = [], maxEntries = 5 } = props;
+
   // Handle undefined or null entries
   const safeEntries = entries || [];
   const displayEntries = safeEntries.slice(0, maxEntries);

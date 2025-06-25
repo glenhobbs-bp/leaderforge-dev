@@ -2,7 +2,7 @@
  * File: apps/web/components/widgets/Grid.tsx
  * Purpose: Responsive grid layout with glassmorphism design and configurable columns
  * Owner: Frontend team
- * Tags: widget, grid, layout, responsive, glassmorphism
+ * Tags: widget, grid, layout, responsive, glassmorphism, schema-driven
  */
 
 "use client";
@@ -11,6 +11,7 @@ import React from 'react';
 import { UniversalSchemaRenderer } from '../ai/UniversalSchemaRenderer';
 import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
 
+// Legacy props interface for backwards compatibility
 interface GridProps {
   title?: string;
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -21,15 +22,53 @@ interface GridProps {
   widgets?: ComponentSchema[];
 }
 
-export default function Grid({
-  title,
-  columns = 3,
-  gap = 'medium',
-  padding = 'medium',
-  background = 'glass',
-  children,
-  widgets = []
-}: GridProps) {
+// Schema interface for new schema-driven approach
+interface GridSchema {
+  type: 'Grid';
+  title?: string;
+  columns?: 1 | 2 | 3 | 4 | 5 | 6;
+  gap?: 'small' | 'medium' | 'large';
+  padding?: 'none' | 'small' | 'medium' | 'large';
+  background?: 'transparent' | 'glass' | 'solid';
+  children?: React.ReactNode;
+  widgets?: ComponentSchema[];
+  metadata?: {
+    version?: string;
+    source?: string;
+  };
+}
+
+// Union type for transition period
+type GridInput = GridProps | { schema: GridSchema };
+
+function isSchemaInput(input: GridInput): input is { schema: GridSchema } {
+  return 'schema' in input;
+}
+
+export default function Grid(input: GridInput) {
+  // Extract props from either schema or direct props
+  const props: GridProps = isSchemaInput(input)
+    ? {
+        title: input.schema.title,
+        columns: input.schema.columns,
+        gap: input.schema.gap,
+        padding: input.schema.padding,
+        background: input.schema.background,
+        children: input.schema.children,
+        widgets: input.schema.widgets
+      }
+    : input;
+
+  const {
+    title,
+    columns = 3,
+    gap = 'medium',
+    padding = 'medium',
+    background = 'glass',
+    children,
+    widgets = []
+  } = props;
+
   const gapClasses = {
     small: 'gap-3',
     medium: 'gap-4',

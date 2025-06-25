@@ -2,7 +2,7 @@
  * File: apps/web/components/widgets/VideoList.tsx
  * Purpose: Displays video content grid with glassmorphism design and elegant hover effects
  * Owner: Frontend team
- * Tags: widget, video, content, glassmorphism
+ * Tags: widget, video, content, glassmorphism, schema-driven
  */
 
 "use client";
@@ -20,6 +20,7 @@ interface VideoItem {
   url?: string;
 }
 
+// Legacy props interface for backwards compatibility
 interface VideoListProps {
   title?: string;
   videos?: VideoItem[];
@@ -27,12 +28,44 @@ interface VideoListProps {
   maxVideos?: number;
 }
 
-export default function VideoList({
-  title = "Videos",
-  videos = [],
-  onVideoClick,
-  maxVideos = 6
-}: VideoListProps) {
+// Schema interface for new schema-driven approach
+interface VideoListSchema {
+  type: 'VideoList';
+  title?: string;
+  videos?: VideoItem[];
+  onVideoClick?: (video: VideoItem) => void;
+  maxVideos?: number;
+  metadata?: {
+    version?: string;
+    source?: string;
+  };
+}
+
+// Union type for transition period
+type VideoListInput = VideoListProps | { schema: VideoListSchema };
+
+function isSchemaInput(input: VideoListInput): input is { schema: VideoListSchema } {
+  return 'schema' in input;
+}
+
+export default function VideoList(input: VideoListInput) {
+  // Extract props from either schema or direct props
+  const props: VideoListProps = isSchemaInput(input)
+    ? {
+        title: input.schema.title,
+        videos: input.schema.videos,
+        onVideoClick: input.schema.onVideoClick,
+        maxVideos: input.schema.maxVideos
+      }
+    : input;
+
+  const {
+    title = "Videos",
+    videos = [],
+    onVideoClick,
+    maxVideos = 6
+  } = props;
+
   // Handle undefined or null videos
   const safeVideos = videos || [];
   const displayVideos = safeVideos.slice(0, maxVideos);
@@ -115,7 +148,7 @@ export default function VideoList({
           <span className="text-4xl mb-3 block">🎬</span>
           <span className="text-glass-muted text-sm">No videos available</span>
         </div>
-             )}
-     </div>
-   );
+      )}
+    </div>
+  );
 }

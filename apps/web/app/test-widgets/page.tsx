@@ -13,66 +13,60 @@ import { WidgetDispatcher } from '../../components/widgets';
 export default function TestWidgetsPage() {
   const [theme, setTheme] = useState<'leaderforge' | 'brilliant'>('leaderforge');
 
-  // Sample widget schemas for testing - Fixed to match widget prop interfaces
+  // Sample widget schemas for testing - Fixed for schema-driven approach
   const statCardSchema = {
     type: 'StatCard',
-    props: {
-      title: 'Total Users',
-      value: '1,234',
-      change: '+12.5%',
-      trend: 'up' as const,
-      icon: '👥'
-    }
+    title: 'Total Users',
+    value: '1,234',
+    change: '+12.5%',
+    trend: 'up' as const,
+    icon: '👥'
   };
 
   const leaderboardSchema = {
     type: 'Leaderboard',
-    props: {
-      title: 'Top Performers',
-      entries: [
-        { rank: 1, name: 'Alice Johnson', score: 95, trend: 'up' as const },
-        { rank: 2, name: 'Bob Smith', score: 92, trend: 'up' as const },
-        { rank: 3, name: 'Carol Wilson', score: 89, trend: 'same' as const },
-        { rank: 4, name: 'David Brown', score: 87, trend: 'down' as const },
-        { rank: 5, name: 'Eve Davis', score: 85, trend: 'up' as const }
-      ]
-    }
+    title: 'Top Performers',
+    entries: [
+      { rank: 1, name: 'Alice Johnson', score: 95, trend: 'up' as const },
+      { rank: 2, name: 'Bob Smith', score: 92, trend: 'up' as const },
+      { rank: 3, name: 'Carol Wilson', score: 89, trend: 'same' as const },
+      { rank: 4, name: 'David Brown', score: 87, trend: 'down' as const },
+      { rank: 5, name: 'Eve Davis', score: 85, trend: 'up' as const }
+    ]
   };
 
   const videoListSchema = {
     type: 'VideoList',
-    props: {
-      title: 'Featured Videos',
-      videos: [
-        {
-          id: 'video1',
-          title: 'Introduction to React',
-          thumbnail: '/thumb1.png',
-          description: 'Learn the fundamentals of React development',
-          duration: '12:34',
-          isWatched: false,
-          url: 'https://example.com/video1.mp4'
-        },
-        {
-          id: 'video2',
-          title: 'Advanced TypeScript',
-          thumbnail: '/thumb2.png',
-          description: 'Master advanced TypeScript patterns',
-          duration: '18:45',
-          isWatched: true,
-          url: 'https://example.com/video2.mp4'
-        },
-        {
-          id: 'video3',
-          title: 'Component Architecture',
-          thumbnail: '/thumb3.png',
-          description: 'Build scalable component systems',
-          duration: '22:17',
-          isWatched: false,
-          url: 'https://example.com/video3.mp4'
-        }
-      ]
-    }
+    title: 'Featured Videos',
+    videos: [
+      {
+        id: 'video1',
+        title: 'Introduction to React',
+        thumbnail: '/thumb1.png',
+        description: 'Learn the fundamentals of React development',
+        duration: '12:34',
+        isWatched: false,
+        url: 'https://example.com/video1.mp4'
+      },
+      {
+        id: 'video2',
+        title: 'Advanced TypeScript',
+        thumbnail: '/thumb2.png',
+        description: 'Master advanced TypeScript patterns',
+        duration: '18:45',
+        isWatched: true,
+        url: 'https://example.com/video2.mp4'
+      },
+      {
+        id: 'video3',
+        title: 'Component Architecture',
+        thumbnail: '/thumb3.png',
+        description: 'Build scalable component systems',
+        duration: '22:17',
+        isWatched: false,
+        url: 'https://example.com/video3.mp4'
+      }
+    ]
   };
 
   const leaderForgeCardSchema = {
@@ -142,23 +136,19 @@ export default function TestWidgetsPage() {
               <WidgetDispatcher schema={statCardSchema} />
               <WidgetDispatcher schema={{
                 type: 'StatCard',
-                props: {
-                  title: 'Revenue',
-                  value: '$45,678',
-                  change: '+8.2%',
-                  trend: 'up' as const,
-                  icon: '💰'
-                }
+                title: 'Revenue',
+                value: '$45,678',
+                change: '+8.2%',
+                trend: 'up' as const,
+                icon: '💰'
               }} />
               <WidgetDispatcher schema={{
                 type: 'StatCard',
-                props: {
-                  title: 'Completion Rate',
-                  value: '87.5%',
-                  change: '-1.2%',
-                  trend: 'down' as const,
-                  icon: '📊'
-                }
+                title: 'Completion Rate',
+                value: '87.5%',
+                change: '-1.2%',
+                trend: 'down' as const,
+                icon: '📊'
               }} />
             </div>
           </section>
@@ -170,16 +160,14 @@ export default function TestWidgetsPage() {
               <WidgetDispatcher schema={leaderboardSchema} />
               <WidgetDispatcher schema={{
                 type: 'Leaderboard',
-                props: {
-                  title: 'Sales Team',
-                  entries: [
-                    { rank: 1, name: 'Sarah Miller', score: 125000, trend: 'up' as const },
-                    { rank: 2, name: 'Mike Chen', score: 98500, trend: 'same' as const },
-                    { rank: 3, name: 'Lisa Garcia', score: 87200, trend: 'up' as const },
-                    { rank: 4, name: 'Tom Wilson', score: 76800, trend: 'down' as const },
-                    { rank: 5, name: 'Amy Davis', score: 65300, trend: 'up' as const }
-                  ]
-                }
+                title: 'Sales Team',
+                entries: [
+                  { rank: 1, name: 'Sarah Miller', score: 125000, trend: 'up' as const },
+                  { rank: 2, name: 'Mike Chen', score: 98500, trend: 'same' as const },
+                  { rank: 3, name: 'Lisa Garcia', score: 87200, trend: 'up' as const },
+                  { rank: 4, name: 'Tom Wilson', score: 76800, trend: 'down' as const },
+                  { rank: 5, name: 'Amy Davis', score: 65300, trend: 'up' as const }
+                ]
               }} />
             </div>
           </section>

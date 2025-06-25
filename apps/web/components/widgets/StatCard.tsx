@@ -2,13 +2,14 @@
  * File: apps/web/components/widgets/StatCard.tsx
  * Purpose: Displays key performance metrics with glassmorphism design
  * Owner: Frontend team
- * Tags: widget, stats, metrics, glassmorphism
+ * Tags: widget, stats, metrics, glassmorphism, schema-driven
  */
 
 "use client";
 
 import React from 'react';
 
+// Legacy props interface for backwards compatibility
 interface StatCardProps {
   title: string;
   value: string | number;
@@ -17,7 +18,41 @@ interface StatCardProps {
   icon?: string;
 }
 
-export default function StatCard({ title, value, change, trend = 'neutral', icon }: StatCardProps) {
+// Schema interface for new schema-driven approach
+interface StatCardSchema {
+  type: 'StatCard';
+  title: string;
+  value: string | number;
+  change?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  icon?: string;
+  metadata?: {
+    version?: string;
+    source?: string;
+  };
+}
+
+// Union type for transition period
+type StatCardInput = StatCardProps | { schema: StatCardSchema };
+
+function isSchemaInput(input: StatCardInput): input is { schema: StatCardSchema } {
+  return 'schema' in input;
+}
+
+export default function StatCard(input: StatCardInput) {
+  // Extract props from either schema or direct props
+  const props: StatCardProps = isSchemaInput(input)
+    ? {
+        title: input.schema.title,
+        value: input.schema.value,
+        change: input.schema.change,
+        trend: input.schema.trend || 'neutral',
+        icon: input.schema.icon
+      }
+    : input;
+
+  const { title, value, change, trend = 'neutral', icon } = props;
+
   const trendColor = {
     up: 'var(--success-500)',
     down: 'var(--error-500)',
