@@ -8,7 +8,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../ui/dialog';
+
 import Hls from 'hls.js';
 import { useUniversalProgress } from '../../app/hooks/useUniversalProgress';
 import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
@@ -63,7 +63,7 @@ export function VideoPlayerModal({
   const [duration, setDuration] = useState(0);
   const [localProgress, setLocalProgress] = useState(progress || 0);
 
-  // Modal positioning and sizing state
+  // Modal positioning and sizing state - start centered
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   const [modalSize, setModalSize] = useState({ width: 800, height: 450 });
 
@@ -123,16 +123,19 @@ export function VideoPlayerModal({
 
   // Mouse event handlers for dragging
   const handleDragStart = useCallback((e: React.MouseEvent) => {
+    console.log('[VideoPlayerModal] Drag start triggered', { clientX: e.clientX, clientY: e.clientY, modalPosition });
     setIsDragging(true);
     setDragStart({ x: e.clientX - modalPosition.x, y: e.clientY - modalPosition.y });
   }, [modalPosition]);
 
   const handleDragMove = useCallback((e: MouseEvent) => {
     if (isDragging) {
-      setModalPosition({
+      const newPosition = {
         x: e.clientX - dragStart.x,
         y: e.clientY - dragStart.y
-      });
+      };
+      console.log('[VideoPlayerModal] Dragging to position', newPosition);
+      setModalPosition(newPosition);
     }
   }, [isDragging, dragStart]);
 
@@ -153,13 +156,14 @@ export function VideoPlayerModal({
   }, [modalSize]);
 
   const handleResizeMove = useCallback((e: MouseEvent) => {
-        if (isResizing) {
+    if (isResizing) {
       const deltaX = e.clientX - resizeStart.x;
 
       // Maintain 16:9 aspect ratio
       const newWidth = Math.max(400, resizeStart.width + deltaX);
       const newHeight = (newWidth * 9) / 16;
 
+      console.log('[VideoPlayerModal] Resizing to', { width: newWidth, height: newHeight });
       setModalSize({ width: newWidth, height: newHeight });
     }
   }, [isResizing, resizeStart]);
@@ -453,21 +457,51 @@ export function VideoPlayerModal({
     };
   }, [videoUrl, progress]);
 
-  return (
-    <div className="w-full max-w-2xl mx-auto p-4 border-2 border-blue-300 rounded-lg bg-blue-50">
-      <div className="mb-4 text-center">
-        <h3 className="text-lg font-semibold text-blue-800">🎥 VideoPlayerModal Widget</h3>
-        <p className="text-sm text-blue-600">This is a working video player widget</p>
-      </div>
+    return (
+    <div
+      className="fixed inset-0 z-50 pointer-events-none"
+      style={{ display: open ? 'block' : 'none' }}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 pointer-events-auto"
+        onClick={() => onOpenChange(false)}
+      />
 
-                            <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl w-auto h-auto p-0 !bg-transparent border-[0.5px] border-white/10 rounded-xl shadow-2xl overflow-hidden">
-            <DialogTitle className="sr-only">{title || 'Video Player'}</DialogTitle>
-            <DialogDescription className="sr-only">
-              {description || (title ? `Watch ${title}` : 'Video player')}
-            </DialogDescription>
+      {/* Modal Window */}
+      <div
+        className="border-[0.5px] border-white/10 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute"
+        style={{
+          width: `${modalSize.width}px`,
+          height: `${modalSize.height}px`,
+          left: `calc(50vw + ${modalPosition.x}px)`,
+          top: `calc(50vh + ${modalPosition.y}px)`,
+          transform: 'translate(-50%, -50%)',
+          zIndex: 1000
+        }}
+      >
+        <div className="aspect-video w-full relative group">
 
-            <div className="aspect-video w-full relative">
+              {/* Professional Netflix-style drag header - shows on hover OR when paused */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/80 to-transparent transition-opacity duration-200 z-20 cursor-move flex items-center px-3 ${
+                  (!isPlaying && !isLoading && !error && title) || isDragging
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100'
+                }`}
+                onMouseDown={handleDragStart}
+              >
+                <span className="text-white text-sm font-medium truncate">{title}</span>
+              </div>
+
+              {/* Professional YouTube-style resize handle - appears on hover */}
+              <div
+                className="absolute bottom-0 right-0 w-4 h-4 cursor-nw-resize opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
+                onMouseDown={handleResizeStart}
+              >
+                <div className="absolute bottom-1 right-1 w-2 h-2 border-r-2 border-b-2 border-white/60"></div>
+                <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-r border-b border-white/40"></div>
+              </div>
 
               {/* Video element */}
               <video
@@ -496,14 +530,7 @@ export function VideoPlayerModal({
                 crossOrigin="anonymous"
               />
 
-              {/* Title overlay - only shows when paused */}
-              {!isPlaying && !isLoading && !error && title && (
-                <div className="absolute top-4 left-4 z-10">
-                  <div className="bg-black/70 backdrop-blur-sm rounded-xl px-3 py-2">
-                    <h3 className="text-white text-sm font-medium">{title}</h3>
-                  </div>
-                </div>
-              )}
+
 
               {/* Loading overlay */}
               {isLoading && (
@@ -536,9 +563,8 @@ export function VideoPlayerModal({
                   </div>
                 </div>
               )}
-                        </div>
-        </DialogContent>
-        </Dialog>
+        </div>
+      </div>
     </div>
   );
 }
