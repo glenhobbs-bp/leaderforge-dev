@@ -470,7 +470,7 @@ export function VideoPlayerModal({
 
       {/* Modal Window */}
       <div
-        className="border-[0.5px] border-white/10 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute"
+        className="border border-white/20 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute"
         style={{
           width: `${modalSize.width}px`,
           height: `${modalSize.height}px`,
@@ -482,16 +482,18 @@ export function VideoPlayerModal({
       >
         <div className="aspect-video w-full relative group">
 
-              {/* Professional Netflix-style drag header - shows on hover OR when paused */}
+              {/* Professional drag header with semi-transparent black box - shows on hover OR when paused */}
               <div
-                className={`absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/80 to-transparent transition-opacity duration-200 z-20 cursor-move flex items-center px-3 ${
+                className={`absolute top-2 left-2 transition-opacity duration-200 z-20 cursor-move ${
                   (!isPlaying && !isLoading && !error && title) || isDragging
                     ? 'opacity-100'
                     : 'opacity-0 group-hover:opacity-100'
                 }`}
                 onMouseDown={handleDragStart}
               >
-                <span className="text-white text-sm font-medium truncate">{title}</span>
+                <div className="bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+                  <span className="text-white text-sm font-medium">{title}</span>
+                </div>
               </div>
 
               {/* Professional YouTube-style resize handle - appears on hover */}
