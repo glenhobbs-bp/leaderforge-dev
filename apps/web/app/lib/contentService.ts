@@ -5,6 +5,7 @@ import type { Content, Entitlement } from './types';
 /**
  * Service for content logic. All business rules and data access for content live here.
  * All methods are robustly logged for observability.
+ * Updated to use tenant_key after context-to-tenant migration.
  */
 export const contentService = {
   /**
@@ -21,7 +22,7 @@ export const contentService = {
       .schema('core')
       .from('content')
       .select('*')
-      .eq('context_key', contextKey);
+      .eq('tenant_key', contextKey);
     if (error) {
       console.error(`[contentService] Error fetching content:`, error);
       throw error;
@@ -56,7 +57,7 @@ export const contentService = {
       .schema('core')
       .from('content')
       .select('*')
-      .eq('context_key', contextKey);
+      .eq('tenant_key', contextKey);
     if (error) {
       console.error(`[contentService] Error fetching content:`, error);
       throw error;

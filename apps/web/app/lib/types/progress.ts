@@ -10,7 +10,7 @@ export interface UserProgress {
   id: string;
   user_id: string;
   content_id: string;
-  context_key: string;
+  tenant_key: string;
   progress_type: 'video' | 'quiz' | 'reading' | 'worksheet' | 'course' | 'custom';
   progress_percentage: number;
   completion_count: number;
@@ -32,7 +32,7 @@ export interface UserProgress {
 export interface ProgressEvent {
   userId: string;
   contentId: string;
-  contextKey: string;
+  tenantKey: string;
   progressType: 'video' | 'quiz' | 'reading' | 'worksheet' | 'course' | 'custom';
   value: number; // 0-100 percentage or custom metric
   metadata?: {
@@ -59,7 +59,7 @@ export interface ProgressEvent {
 // Progress summary for agent queries
 export interface ProgressSummary {
   userId: string;
-  contextKey: string;
+  tenantKey: string;
   totalItems: number;
   completedItems: number;
   inProgressItems: number;
@@ -72,7 +72,7 @@ export interface ProgressSummary {
 // Completion statistics for analytics
 export interface CompletionStats {
   userId: string;
-  contextKey: string;
+  tenantKey: string;
   completionsByType: Record<string, number>;
   averageSessionTime: number;
   streakDays: number;

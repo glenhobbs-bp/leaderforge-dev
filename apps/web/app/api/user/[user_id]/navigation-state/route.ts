@@ -11,18 +11,18 @@ export async function POST(
   { params }: { params: Promise<{ user_id: string }> }
 ) {
   try {
-    const { contextKey, navOptionId } = await request.json();
+    const { tenantKey, navOptionId } = await request.json();
     const resolvedParams = await params;
     const userId = resolvedParams.user_id;
 
-    if (!userId || !contextKey || !navOptionId) {
+    if (!userId || !tenantKey || !navOptionId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    await userService.updateNavigationState(userId, contextKey, navOptionId);
+    await userService.updateNavigationState(userId, tenantKey, navOptionId);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -23,7 +23,7 @@ export interface Agent {
 export interface AgentInvocationRequest {
   message: string;
   userId: string;
-  contextKey: string;
+  tenantKey: string;
   navOptionId?: string;
   metadata?: Record<string, any>;
 }
@@ -98,7 +98,7 @@ export class AgentService {
   /**
    * Enrich agent response content with user progress data
    */
-  private async enrichWithProgressData(content: any, userId: string, contextKey: string): Promise<any> {
+  private async enrichWithProgressData(content: any, userId: string, tenantKey: string): Promise<any> {
     if (!content || typeof content !== 'object') {
       return content;
     }
@@ -107,31 +107,58 @@ export class AgentService {
       const progressRepository = new SupabaseUserProgressRepository(this.supabase);
       const progressTool = new UserProgressTool(progressRepository);
 
-      // Helper function to enrich a single card with progress
-      const enrichCard = async (card: any) => {
-        if (card.type === 'Card' && card.props?.title && card.props?.videoUrl) {
-          try {
-            const progressData = await progressTool.getProgress(userId, card.props.title, contextKey);
-            return {
-              ...card,
-              props: {
-                ...card.props,
-                progress: progressData?.progress_percentage || 0,
-                videoWatched: (progressData?.progress_percentage || 0) >= 90
-              }
-            };
-          } catch (error) {
-            console.warn(`[AgentService] Failed to fetch progress for ${card.props.title}:`, error);
-            return card; // Return original card on error
+      // Collect all content IDs that need progress data
+      const contentIds: string[] = [];
+      const collectContentIds = (obj: any) => {
+        if (Array.isArray(obj)) {
+          obj.forEach(collectContentIds);
+        } else if (obj && typeof obj === 'object') {
+          if (obj.type === 'Card' && obj.props?.title && obj.props?.videoUrl) {
+            contentIds.push(obj.props.title);
+          } else if (obj.type === 'Grid' && obj.props?.items) {
+            obj.props.items.forEach(collectContentIds);
+          } else {
+            Object.values(obj).forEach(collectContentIds);
           }
+        }
+      };
+
+      // First pass: collect all content IDs
+      collectContentIds(content);
+
+      // Batch fetch progress data for all content IDs
+      let progressMap: Record<string, any> = {};
+      if (contentIds.length > 0) {
+        console.log(`[AgentService] Batch fetching progress for ${contentIds.length} content items:`, contentIds);
+        try {
+          progressMap = await progressTool.listProgressForContentIds(userId, contentIds, tenantKey);
+          console.log(`[AgentService] Successfully fetched progress for ${Object.keys(progressMap).length} items`);
+        } catch (error) {
+          console.warn(`[AgentService] Batch progress fetch failed:`, error);
+          // Continue with empty progress map - don't fail the entire enrichment
+        }
+      }
+
+      // Helper function to enrich a single card with progress
+      const enrichCard = (card: any) => {
+        if (card.type === 'Card' && card.props?.title && card.props?.videoUrl) {
+          const progressData = progressMap[card.props.title];
+          return {
+            ...card,
+            props: {
+              ...card.props,
+              progress: progressData?.progress_percentage || 0,
+              videoWatched: (progressData?.progress_percentage || 0) >= 90
+            }
+          };
         }
         return card;
       };
 
       // Recursively enrich content structure
-      const enrichContent = async (obj: any): Promise<any> => {
+      const enrichContent = (obj: any): any => {
         if (Array.isArray(obj)) {
-          return Promise.all(obj.map(enrichContent));
+          return obj.map(enrichContent);
         }
 
         if (obj && typeof obj === 'object') {
@@ -145,7 +172,7 @@ export class AgentService {
               ...obj,
               props: {
                 ...obj.props,
-                items: await Promise.all(obj.props.items.map(enrichContent))
+                items: obj.props.items.map(enrichContent)
               }
             };
           }
@@ -153,7 +180,7 @@ export class AgentService {
           // Recursively process other object properties
           const enrichedObj: any = {};
           for (const [key, value] of Object.entries(obj)) {
-            enrichedObj[key] = await enrichContent(value);
+            enrichedObj[key] = enrichContent(value);
           }
           return enrichedObj;
         }
@@ -161,7 +188,7 @@ export class AgentService {
         return obj;
       };
 
-      return await enrichContent(content);
+      return enrichContent(content);
     } catch (error) {
       console.error('[AgentService] Error enriching with progress data:', error);
       return content; // Return original content on error
@@ -204,7 +231,7 @@ export class AgentService {
             }],
             // Flatten context to root level for easier access in agent
             userId: request.userId,
-            contextKey: request.contextKey,
+            tenantKey: request.tenantKey,
             navOptionId: request.navOptionId,
             agentConfig: agent.config
           }
@@ -252,7 +279,7 @@ export class AgentService {
           // Extract the schema from the final state
           const finalResult = state.values?.schema || state.values?.messages?.[state.values.messages?.length - 1] || state.values;
 
-          const enrichedContent = await this.enrichWithProgressData(finalResult, request.userId, request.contextKey);
+          const enrichedContent = await this.enrichWithProgressData(finalResult, request.userId, request.tenantKey);
 
           return {
             type: 'content_schema',

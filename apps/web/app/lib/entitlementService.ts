@@ -124,16 +124,16 @@ export const entitlementService = {
   },
 
   /**
-   * Get all content accessible to a user in a given context.
+   * Get all content accessible to a user in a given tenant.
    */
-  async getAccessibleContent(supabase: SupabaseClient, userId: string, contextKey: string): Promise<any[]> {
+  async getAccessibleContent(supabase: SupabaseClient, userId: string, tenantKey: string): Promise<any[]> {
     try {
-      // Get all content for the context
+      // Get all content for the tenant
       const { data: allContent, error: contentError } = await supabase
         .schema('core')
         .from('content')
         .select('*')
-        .eq('context_key', contextKey);
+        .eq('tenant_key', tenantKey);
 
       if (contentError) {
         console.error('[entitlementService] Error fetching content:', contentError);

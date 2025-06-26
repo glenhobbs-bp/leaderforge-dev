@@ -10,19 +10,31 @@ import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/us
  * React Query hook for fetching user preferences.
  * Optimized with caching for better performance.
  * @param userId - The user ID to fetch preferences for.
+ * @param options - Optional query options to override defaults
  */
-export function useUserPreferences(userId: string) {
+export function useUserPreferences(userId: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['user-preferences', userId],
     queryFn: () => fetchUserPreferences(userId),
-    enabled: !!userId,
+    enabled: options?.enabled ?? !!userId,
     // Reduce stale time to prevent navigation state staleness
     staleTime: 30 * 1000, // 30 seconds (matches API cache)
     gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
-    retry: 1, // Reduce retries for faster fallback
+    retry: (failureCount, error) => {
+      // Don't retry on authentication errors (401, 403)
+      if (error instanceof Error && error.message.includes('Authentication')) {
+        return false;
+      }
+      // Only retry once for other errors
+      return failureCount < 1;
+    },
     refetchOnWindowFocus: true, // Refetch on window focus to get latest navigation state
     refetchOnReconnect: false, // Don't refetch on reconnect
     networkMode: 'offlineFirst', // Support offline-first
+    throwOnError: false, // Don't throw errors, handle them gracefully
+    meta: {
+      errorMessage: 'Failed to load user preferences'
+    }
   });
 }
 

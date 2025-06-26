@@ -31,10 +31,16 @@ interface AgentSchema {
 type DynamicTenantPageProps = {
   // Props for tenant management
   initialTenants?: Array<{
-    id: string;
     tenant_key: string;
     display_name: string;
-    description?: string;
+    theme?: unknown;
+    i18n?: unknown;
+    logo_url?: string;
+    nav_options?: unknown;
+    settings?: unknown;
+    created_at?: string;
+    updated_at?: string;
+    subtitle?: string;
   }>;
   initialTenantConfig?: unknown;
   initialNavOptions?: unknown;
@@ -50,12 +56,10 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   // React Query client for cache invalidation
   const queryClient = useQueryClient();
 
-  // Get user preferences for context restoration
-  const { data: userPrefs } = useUserPreferences(session?.user?.id || '');
-
   // Core state
   const hasMounted = useRef(false);
   const [hasRestoredContext, setHasRestoredContext] = useState(false);
+  const [shouldFetchUserPrefs, setShouldFetchUserPrefs] = useState(false);
   const [currentTenant, setCurrentTenant] = useState<string>(
     props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'brilliant'
   );
@@ -65,10 +69,42 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
 
-  // Navigation is now handled directly by NavPanel component
+  // Only fetch user preferences when explicitly needed
+  const { data: userPrefs, error: userPrefsError } = useUserPreferences(
+    session?.user?.id || '',
+    { enabled: shouldFetchUserPrefs && !!session?.user?.id }
+  );
 
-    // Context restoration effect - restore last visited context
+  // Trigger user preferences fetch on initial mount when session is available
   useEffect(() => {
+    if (session?.user?.id && !shouldFetchUserPrefs && !hasRestoredContext) {
+      console.log('[DynamicTenantPage] Triggering initial user preferences fetch for session:', session.user.id);
+      setShouldFetchUserPrefs(true);
+    }
+  }, [session?.user?.id, shouldFetchUserPrefs, hasRestoredContext]);
+
+  // Handle user preferences errors gracefully
+  useEffect(() => {
+    if (userPrefsError) {
+      console.warn('[DynamicTenantPage] User preferences failed to load:', userPrefsError);
+      // Don't block the app, just mark restoration as complete to proceed
+      if (!hasRestoredContext) {
+        setHasRestoredContext(true);
+      }
+    }
+  }, [userPrefsError, hasRestoredContext]);
+
+  // Context restoration effect - restore last visited context
+  useEffect(() => {
+    // If user preferences failed to load, proceed without restoration
+    if (userPrefsError) {
+      if (!hasRestoredContext) {
+        console.log('[DynamicTenantPage] Skipping tenant restoration due to user preferences error');
+        setHasRestoredContext(true);
+      }
+      return;
+    }
+
     if (!session?.user?.id || !userPrefs || hasRestoredContext) return;
 
     const preferences = userPrefs.preferences as UserPreferences;
@@ -88,16 +124,23 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       }
 
     setHasRestoredContext(true);
-  }, [session?.user?.id, userPrefs, hasRestoredContext, currentTenant]);
+  }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
 
   // Navigation option restoration effect - runs after context is restored
   useEffect(() => {
     console.log('[DynamicTenantPage] 🔄 Navigation restoration effect triggered:', {
       hasSession: !!session?.user?.id,
       hasUserPrefs: !!userPrefs,
+      hasUserPrefsError: !!userPrefsError,
       hasRestoredContext,
       currentTenant
     });
+
+    // If user preferences failed to load, skip navigation restoration
+    if (userPrefsError) {
+      console.log('[DynamicTenantPage] Skipping navigation restoration due to user preferences error');
+      return;
+    }
 
     if (!session?.user?.id || !userPrefs || !hasRestoredContext) return;
 
@@ -137,7 +180,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         tenantMatch: lastContext === currentTenant
       });
     }
-  }, [session?.user?.id, userPrefs, hasRestoredContext, currentTenant]);
+  }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
 
   // Debug session state
   useEffect(() => {
@@ -326,6 +369,9 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
     // Clear selected navigation when context changes
     setSelectedNavOptionId(null);
+
+    // Trigger user preferences refresh for new tenant
+    setShouldFetchUserPrefs(true);
 
     // Persist context change to user preferences
     if (session?.user?.id) {
@@ -573,7 +619,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           contextOptions={props.initialTenants?.map(ctx => ({
             id: ctx.tenant_key,
             title: ctx.display_name,
-            subtitle: ctx.description || 'AI-Powered Experience',
+            subtitle: ctx.subtitle || 'AI-Powered Experience',
             icon: 'star'
           })) || []}
           contextValue={currentTenant}

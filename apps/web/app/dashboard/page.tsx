@@ -6,8 +6,8 @@ import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import DashboardClient from './DashboardClient';
-import { contextService } from '../lib/contextService';
 import { entitlementService } from '../lib/entitlementService';
+import { tenantService } from '../lib/tenantService';
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
   let initialNavOptions = null;
 
   try {
-    let allContexts = await contextService.getAllContextConfigs(supabase);
+    let allContexts = await tenantService.getAllTenantConfigs(supabase);
     // Filter by user entitlement if required_entitlements is present
     const userEntitlements = await entitlementService.getUserEntitlements(supabase, session.user.id);
     const entitlementIds = userEntitlements.map(e => e.entitlement_id);
@@ -58,12 +58,11 @@ export default async function DashboardPage() {
     }
 
     // --- SSR: Pre-fetch default context configuration and nav options ---
-    const defaultTenantKey = initialTenants[0].context_key;
+    const defaultTenantKey = initialTenants[0].tenant_key;
 
     try {
       // Fetch context config server-side
-      const { contextService } = await import('../lib/contextService');
-      initialTenantConfig = await contextService.getContextConfig(supabase, defaultTenantKey);
+      initialTenantConfig = await tenantService.getTenantConfig(supabase, defaultTenantKey);
     } catch (configErr) {
       console.error('[dashboard/page] Error pre-fetching context config:', configErr);
     }
@@ -91,7 +90,7 @@ export default async function DashboardPage() {
       initialTenants={initialTenants}
       initialTenantConfig={initialTenantConfig}
       initialNavOptions={initialNavOptions}
-      defaultTenantKey={initialTenants[0]?.context_key}
+      defaultTenantKey={initialTenants[0]?.tenant_key}
     />
   );
 }

@@ -1,5 +1,5 @@
-// File: apps/web/app/api/nav/[context_key]/route.ts
-// Purpose: API route to return entitlement-filtered nav options for a given context. SSR/session safe, Next.js 15+ compatible.
+// File: apps/web/app/api/nav/[tenant_key]/route.ts
+// Purpose: API route to return entitlement-filtered nav options for a given tenant. SSR/session safe, Next.js 15+ compatible.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { navService } from '../../../lib/navService';
@@ -12,16 +12,16 @@ const navCache = new Map<string, { data: NavOption[]; timestamp: number; userId:
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 /**
- * GET /api/nav/[context_key]
- * Returns navigation options for a context, filtered by user entitlement.
+ * GET /api/nav/[tenant_key]
+ * Returns navigation options for a tenant, filtered by user entitlement.
  * Optimized with caching headers and performance monitoring.
  */
-export async function GET(req: NextRequest, context: { params: { context_key: string } }) {
+export async function GET(req: NextRequest, context: { params: { tenant_key: string } }) {
   const startTime = Date.now();
-  const { context_key } = await context.params;
+  const { tenant_key } = await context.params;
 
-  if (!context_key || typeof context_key !== 'string') {
-    return NextResponse.json({ error: 'Missing or invalid context_key' }, { status: 400 });
+  if (!tenant_key || typeof tenant_key !== 'string') {
+    return NextResponse.json({ error: 'Missing or invalid tenant_key' }, { status: 400 });
   }
 
   try {
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     }
 
     // Check cache first
-    const cacheKey = `${context_key}:${userId}`;
+    const cacheKey = `${tenant_key}:${userId}`;
     const cached = navCache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION && cached.userId === userId) {
       return NextResponse.json(cached.data, {
@@ -68,7 +68,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     }
 
     // Get nav options from database
-    const navOptions: NavOption[] = await navService.getNavOptions(supabase, context_key, userId);
+    const navOptions: NavOption[] = await navService.getNavOptions(supabase, tenant_key, userId);
 
     // Cache the result
     navCache.set(cacheKey, { data: navOptions, timestamp: Date.now(), userId });
@@ -76,20 +76,23 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    // Return with aggressive caching headers for performance
+    console.log(`[API] GET /api/nav/${tenant_key} completed in ${duration}ms for user ${userId} - ${navOptions.length} options returned`);
+
     return NextResponse.json(navOptions, {
       status: 200,
       headers: {
-        // Cache for 10 minutes in browser, 1 hour in CDN
         'Cache-Control': 'public, max-age=600, s-maxage=3600, stale-while-revalidate=86400',
         'X-Cache': 'MISS',
         'X-Response-Time': `${duration}ms`,
       }
     });
-  } catch (err) {
-    const error = err as Error;
-    console.error(`[API/nav] Error:`, error.message);
-    return NextResponse.json({ error: 'Failed to fetch nav options' }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    console.error(`[API] Error in GET /api/nav/${tenant_key} (${duration}ms):`, err);
+    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }
 

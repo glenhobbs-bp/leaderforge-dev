@@ -10,7 +10,7 @@ import { UserProgress, ProgressSummary, CompletionStats } from '../tools/UserPro
 
 export interface ProgressContext {
   userId: string;
-  contextKey: string;
+  tenantKey: string;
   currentProgress?: ProgressSummary;
   completionStats?: CompletionStats;
 }
@@ -44,19 +44,19 @@ export class ProgressAwareAgent {
     // Get current progress summary
     const progressSummary = await this.universalProgressTool.run(
       { action: 'getProgressSummary' },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as ProgressSummary;
 
     // Get completion stats for deeper analysis
     const completionStats = await this.universalProgressTool.run(
       { action: 'getCompletionStats' },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as CompletionStats;
 
     // Check for milestones
     const milestones = await this.universalProgressTool.run(
       { action: 'checkMilestones' },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     );
 
     // Decision logic based on progress patterns
@@ -69,12 +69,12 @@ export class ProgressAwareAgent {
   async getRecommendations(context: ProgressContext, availableContent: string[]): Promise<ProgressRecommendation[]> {
     const progressSummary = await this.universalProgressTool.run(
       { action: 'getProgressSummary' },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as ProgressSummary;
 
     const completionStats = await this.universalProgressTool.run(
       { action: 'getCompletionStats' },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as CompletionStats;
 
         // Get progress for available content
@@ -84,10 +84,10 @@ export class ProgressAwareAgent {
         queries: availableContent.map(contentId => ({
           userId: context.userId,
           contentId,
-          contextKey: context.contextKey
+          tenantKey: context.tenantKey
         }))
       },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as UserProgress[];
 
     return this.generateRecommendations(progressSummary, completionStats, contentProgress, availableContent);
@@ -105,10 +105,10 @@ export class ProgressAwareAgent {
         queries: prerequisites.map(prereqId => ({
           userId: context.userId,
           contentId: prereqId,
-          contextKey: context.contextKey
+          tenantKey: context.tenantKey
         }))
       },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as UserProgress[];
 
     // Check if all prerequisites are completed (100% progress)
@@ -123,7 +123,7 @@ export class ProgressAwareAgent {
   async generateProgressSchema(context: ProgressContext, baseSchema: Record<string, unknown>): Promise<Record<string, unknown>> {
     const progressSummary = await this.universalProgressTool.run(
       { action: 'getProgressSummary' },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as ProgressSummary;
 
     // Enhance schema with progress data
@@ -152,7 +152,7 @@ export class ProgressAwareAgent {
         progressEvent: {
           userId: context.userId,
           contentId,
-          contextKey: context.contextKey,
+          tenantKey: context.tenantKey,
           progressType,
           value,
           metadata: {
@@ -162,7 +162,7 @@ export class ProgressAwareAgent {
           }
         }
       },
-      { userId: context.userId, contextKey: context.contextKey }
+      { userId: context.userId, tenantKey: context.tenantKey }
     ) as UserProgress;
   }
 

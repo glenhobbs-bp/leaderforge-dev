@@ -6,7 +6,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 // Database row types
 export interface Content {
   id: string;
-  context_key: string;
+  tenant_key: string;
   title: string;
   description?: string;
   required_entitlements?: string[];
@@ -37,9 +37,9 @@ export interface Entitlement {
   [key: string]: unknown;
 }
 
-export interface ContextConfig {
+export interface TenantConfig {
   id?: string;
-  context_key: string;
+  tenant_key: string;
   theme?: string;
   name?: string;
   description?: string;
@@ -52,7 +52,7 @@ export interface ContextConfig {
 
 export interface NavOption {
   id: string;
-  context_key: string;
+  tenant_key: string;
   nav_key: string;
   label: string;
   icon?: string;
@@ -143,7 +143,7 @@ export interface PaginationOptions {
 }
 
 export interface FilterOptions {
-  context_key?: string;
+  tenant_key?: string;
   user_id?: string;
   is_active?: boolean;
 }

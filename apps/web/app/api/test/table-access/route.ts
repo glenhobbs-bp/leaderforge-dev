@@ -2,6 +2,27 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+interface TestResult {
+  timestamp: string;
+  tests: {
+    viewAccess: {
+      success: boolean;
+      error?: string;
+      dataCount: number;
+    };
+    insertTest?: {
+      success: boolean;
+      error?: string;
+      insertedId?: string;
+    };
+    fetchTest?: {
+      success: boolean;
+      error?: string;
+      data?: unknown;
+    };
+  };
+}
+
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -23,7 +44,7 @@ export async function GET() {
       .select('*')
       .limit(1);
 
-    const result: any = {
+    const result: TestResult = {
       timestamp: new Date().toISOString(),
       tests: {
         viewAccess: {
@@ -39,7 +60,7 @@ export async function GET() {
     const testRecord = {
       user_id: testUserId,
       content_id: 'test-content-123',
-      context_key: 'test-context',
+      tenant_key: 'test-context',
       progress_type: 'video' as const,
       progress_percentage: 25,
       completion_count: 0,

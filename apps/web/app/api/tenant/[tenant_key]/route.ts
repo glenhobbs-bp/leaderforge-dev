@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { contextService } from '../../../lib/contextService';
+import { tenantService } from '../../../lib/tenantService';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
-import { ContextConfig } from '../../../lib/types';
+import { TenantConfig } from '../../../lib/types';
 
 /**
- * GET /api/context/[context_key]
- * Returns context config, including entitlement requirements.
+ * GET /api/tenant/[tenant_key]
+ * Returns tenant config, including entitlement requirements.
  * Optimized with caching headers and performance monitoring.
  */
-export async function GET(req: NextRequest, context: { params: { context_key: string } }) {
+export async function GET(req: NextRequest, context: { params: { tenant_key: string } }) {
   const startTime = Date.now();
-  const { context_key } = await context.params;
+  const { tenant_key } = await context.params;
 
-  console.log(`[API] GET /api/context/${context_key} - optimized request`);
+  console.log(`[API] GET /api/tenant/${tenant_key} - optimized request`);
 
   const cookieStore = await nextCookies();
   const allCookies = cookieStore.getAll();
@@ -42,23 +42,23 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  if (!context_key || typeof context_key !== 'string') {
-    return NextResponse.json({ error: 'Missing or invalid context_key' }, { status: 400 });
+  if (!tenant_key || typeof tenant_key !== 'string') {
+    return NextResponse.json({ error: 'Missing or invalid tenant_key' }, { status: 400 });
   }
 
   try {
     await supabase.auth.getUser(); // Call for side effect if needed
-    const config: ContextConfig | null = await contextService.getContextConfig(supabase, context_key);
+    const config: TenantConfig | null = await tenantService.getTenantConfig(supabase, tenant_key);
 
     const endTime = Date.now();
     const duration = endTime - startTime;
 
     if (!config) {
-      console.log(`[API] Context config not found for: ${context_key} (${duration}ms)`);
-      return NextResponse.json({ error: 'Context config not found' }, { status: 404 });
+      console.log(`[API] Tenant config not found for: ${tenant_key} (${duration}ms)`);
+      return NextResponse.json({ error: 'Tenant config not found' }, { status: 404 });
     }
 
-    console.log(`[API] Context config for ${context_key} returned in ${duration}ms`);
+    console.log(`[API] Tenant config for ${tenant_key} returned in ${duration}ms`);
 
     // Return with aggressive caching headers for performance
     return NextResponse.json(config, {
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest, context: { params: { context_key: st
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    console.error(`[API] Error fetching context config for ${context_key} (${duration}ms):`, err);
+    console.error(`[API] Error fetching tenant config for ${tenant_key} (${duration}ms):`, err);
     return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });
   }
 }

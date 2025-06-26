@@ -83,19 +83,19 @@ const agentUniversalProgressTool = {
   description: 'Universal progress tracking for all content types',
   async run(input: any, context: any): Promise<any> {
     const { action } = input;
-    if (!context.userId || !context.contextKey) throw new Error('userId and contextKey required');
+    if (!context.userId || !context.tenantKey) throw new Error('userId and tenantKey required');
 
     switch (action) {
       case 'getProgressSummary': {
-        return await userProgressTool.getProgressSummary(context.userId, context.contextKey);
+        return await userProgressTool.getProgressSummary(context.userId, context.tenantKey);
       }
 
       case 'getCompletionStats': {
-        return await userProgressTool.getCompletionStats(context.userId, context.contextKey);
+        return await userProgressTool.getCompletionStats(context.userId, context.tenantKey);
       }
 
       case 'checkMilestones': {
-        return await userProgressTool.checkMilestones(context.userId, context.contextKey);
+        return await userProgressTool.checkMilestones(context.userId, context.tenantKey);
       }
 
       case 'batchGetProgress': {
@@ -118,7 +118,7 @@ const StateAnnotation = Annotation.Root({
     reducer: (x, y) => x.concat(y),
   }),
   userId: Annotation<string>(),
-  contextKey: Annotation<string>(),
+  tenantKey: Annotation<string>(),
   navOptionId: Annotation<string>(),
   agentConfig: Annotation<any>(),
   contentList: Annotation<any[]>(),
@@ -129,17 +129,17 @@ const StateAnnotation = Annotation.Root({
 
 // Node functions
 async function fetchContent(state: typeof StateAnnotation.State) {
-  console.log('[ContentAgent] Fetching content for context:', state.contextKey);
+  console.log('[ContentAgent] Fetching content for tenant:', state.tenantKey);
 
   try {
-    const content = await tribeContentTool.getContentForContext(state.contextKey || 'leaderforge');
+    const content = await tribeContentTool.getContentForContext(state.tenantKey || 'leaderforge');
     console.log('[ContentAgent] Retrieved content count:', content.length);
 
     return {
       contentList: content,
       messages: [
         ...state.messages,
-        new AIMessage(`Found ${content.length} content items for ${state.contextKey}`)
+        new AIMessage(`Found ${content.length} content items for ${state.tenantKey}`)
       ]
     };
   } catch (error) {
@@ -155,42 +155,25 @@ async function fetchContent(state: typeof StateAnnotation.State) {
 }
 
 async function fetchProgressData(state: typeof StateAnnotation.State) {
-  console.log('[ContentAgent] Fetching progress data for user:', state.userId);
+  console.log('[ContentAgent] Progress fetching delegated to web server - agent does not access database directly');
 
-  // Skip progress fetching if no userId (agent doesn't access database directly)
-  if (!state.userId) {
-    console.log('[ContentAgent] No userId provided - skipping progress fetch');
-    return {
-      progressMap: {},
-      messages: [
-        ...state.messages,
-        new AIMessage('Progress data will be handled by the web application')
-      ]
-    };
-  }
-
-  console.log('[ContentAgent] Progress fetching delegated to web server');
+  // ✅ ARCHITECTURE COMPLIANCE: Agents do not access databases directly
+  // Progress data will be enriched by the AgentService after the agent response
   return {
     progressMap: {},
     messages: [
       ...state.messages,
-      new AIMessage('Progress data handled by web application')
+      new AIMessage('Progress data will be handled by the web application')
     ]
   };
 }
 
 async function generateProgressSchema(state: typeof StateAnnotation.State) {
-  console.log('[ContentAgent] Generating progress-aware schema');
+  console.log('[ContentAgent] Generating base content schema (progress enrichment handled by web layer)');
 
   try {
-    // Use default agent parameters if not provided
-    const defaultParameters = {
-      completionThreshold: 0.9,
-      resumeBuffer: 10,
-      minimumWatchTime: 30
-    };
-
-    // Create base schema
+    // ✅ ARCHITECTURE COMPLIANCE: Agent generates base schema, web layer enriches with progress
+    // Create base schema without progress data
     const baseSchema = {
       type: 'Grid',
       props: {
@@ -205,30 +188,34 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             imageUrl: content.props?.image || content.props?.imageUrl || content.imageUrl,
             videoUrl: content.props?.videoUrl || content.videoUrl,
             duration: content.props?.duration || content.duration,
-            progress: 0
+            progress: 0 // Will be enriched by AgentService
           }
         })),
         title: 'Content Library',
         subtitle: 'Available content',
         availableContent: (state.contentList || []).map((content: any) => content.props?.id || content.id)
-      }
+      },
+      // Basic progress structure - will be enriched by web layer
+      progressData: null,
+      conditionalContent: {
+        showAdvanced: false,
+        showReview: false,
+        showCelebration: false,
+        enableNextModule: false
+      },
+      recommendations: []
     };
-
-    // Create progress context
-    const progressContext = {
-      userId: state.userId || 'anonymous',
-      contextKey: state.contextKey || 'default'
-    };
-
-    // Generate schema with progress awareness
-    const schema = await progressAwareAgent.generateProgressSchema(progressContext, baseSchema);
 
     return {
-      agentParameters: defaultParameters,
-      schema,
+      agentParameters: {
+        completionThreshold: 0.9,
+        resumeBuffer: 10,
+        minimumWatchTime: 30
+      },
+      schema: baseSchema,
       messages: [
         ...state.messages,
-        new AIMessage('Generated progress-aware content schema')
+        new AIMessage('Generated base content schema - progress enrichment handled by web layer')
       ]
     };
   } catch (error) {

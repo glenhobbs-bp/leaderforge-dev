@@ -112,7 +112,7 @@ export default function NavPanel({
     updateNavigationState
   } = useNavigationState({
     userId: userId || '',
-    contextKey: tenantKey
+    tenantKey: tenantKey
   });
 
   // Navigation state persistence restored with optimizations

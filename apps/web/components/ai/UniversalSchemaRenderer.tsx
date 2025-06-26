@@ -7,7 +7,7 @@
  */
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ComponentSchema, CardAction } from "../../../../packages/agent-core/types/ComponentSchema";
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { WidgetDispatcher, isWidgetTypeAvailable } from "../widgets";
@@ -38,6 +38,25 @@ export function UniversalSchemaRenderer({ schema, userId, onProgressUpdate }: {
 
   // Modal state for VideoPlayer (legacy support)
   const [videoModal, setVideoModal] = useState<VideoModalState | null>(null);
+
+  // Memoized schema for VideoPlayerModal to prevent unnecessary re-renders
+  const videoModalSchema = useMemo(() => {
+    if (!videoModal) return null;
+    return {
+      type: 'VideoPlayer' as const,
+      props: {
+        videoUrl: videoModal.videoUrl,
+        title: videoModal.title,
+        poster: videoModal.poster,
+        progress: videoModal.progress,
+        pills: videoModal.pills,
+        videoWatched: videoModal.videoWatched,
+        worksheetSubmitted: videoModal.worksheetSubmitted,
+        onCompleteAction: videoModal.onCompleteAction,
+        description: videoModal.description
+      }
+    };
+  }, [videoModal]);
 
   const handleAction = (action: CardAction) => {
     if (action.action === 'openVideoModal') {
@@ -71,7 +90,7 @@ export function UniversalSchemaRenderer({ schema, userId, onProgressUpdate }: {
         body: JSON.stringify({
           userId,
           contentId,
-          contextKey: 'leaderforge',
+          tenantKey: 'leaderforge',
           progress_percentage: typeof progress === 'number' ? progress : 100,
           completed_at: new Date().toISOString()
         })
@@ -84,8 +103,10 @@ export function UniversalSchemaRenderer({ schema, userId, onProgressUpdate }: {
       const result = await response.json();
       console.log('[UniversalSchemaRenderer] Progress updated successfully:', result);
 
-      // Trigger parent refresh
-      if (onProgressUpdate) {
+      // Only trigger parent refresh for completion actions (100% progress)
+      // This prevents unnecessary content reloads for partial progress updates
+      if (onProgressUpdate && progress >= 100) {
+        console.log('[UniversalSchemaRenderer] Triggering content refresh for completion');
         onProgressUpdate();
       }
     } catch (error) {
@@ -133,30 +154,16 @@ export function UniversalSchemaRenderer({ schema, userId, onProgressUpdate }: {
           UniversalSchemaRenderer={UniversalSchemaRenderer}
         />
         {/* Legacy video modal support - will be removed once all video handling is in widgets */}
-        {videoModal && (
+        {videoModal && videoModalSchema && (
           <VideoPlayerModal
-            schema={{
-              type: 'VideoPlayer',
-              props: {
-                videoUrl: videoModal.videoUrl,
-                title: videoModal.title,
-                poster: videoModal.poster,
-                progress: videoModal.progress,
-                pills: videoModal.pills,
-                videoWatched: videoModal.videoWatched,
-                worksheetSubmitted: videoModal.worksheetSubmitted,
-                onCompleteAction: videoModal.onCompleteAction,
-                description: videoModal.description
-              }
-            }}
+            schema={videoModalSchema}
             open={!!videoModal}
             onOpenChange={(open) => {
               if (!open) {
                 setVideoModal(null);
-                if (onProgressUpdate) {
-                  console.log('[UniversalSchemaRenderer] Video modal closed, triggering progress update');
-                  onProgressUpdate();
-                }
+                // Progress is automatically saved by VideoPlayerModal cleanup
+                // We don't trigger content reload here to prevent unnecessary re-renders
+                console.log('[UniversalSchemaRenderer] Video modal closed, progress persisted automatically');
               }
             }}
             userId={userId}

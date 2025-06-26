@@ -7,34 +7,61 @@ import { createSupabaseServerClient } from './supabaseServerClient';
 import { cookies } from 'next/headers';
 import type { User, VideoProgress } from './types';
 
-// Optimized session setup helper
+/**
+ * Get authenticated Supabase client with proper session handling
+ */
 async function getAuthenticatedSupabase() {
   const cookieStore = await cookies();
   const supabase = createSupabaseServerClient(cookieStore);
 
-  // Try to get session directly first
-  let session = (await supabase.auth.getSession()).data.session;
+  // Try to get the current session first
+  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-  // If no session, try manual hydration once
-  if (!session?.user?.id) {
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+  if (session && !sessionError) {
+    // Session is valid, return it
+    return { supabase, session };
+  }
 
-    if (accessToken && refreshToken) {
+  // If no valid session, try to set session from cookies manually
+  const allCookies = cookieStore.getAll();
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+
+  // Look for the correct Supabase SSR cookie names
+  const accessTokenCookie = allCookies.find(c =>
+    c.name === `sb-${projectRef}-auth-token` ||
+    c.name.includes('auth-token')
+  );
+  const refreshTokenCookie = allCookies.find(c =>
+    c.name === `sb-${projectRef}-auth-token-code-verifier` ||
+    c.name.includes('refresh-token') ||
+    c.name.includes('code-verifier')
+  );
+
+  if (accessTokenCookie?.value && refreshTokenCookie?.value) {
+    try {
+      // Try to set the session manually first
       await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
+        access_token: accessTokenCookie.value,
+        refresh_token: refreshTokenCookie.value,
       });
-      session = (await supabase.auth.getSession()).data.session;
+
+      const { data: { session: manualSession } } = await supabase.auth.getSession();
+      if (manualSession) {
+        return { supabase, session: manualSession };
+      }
+    } catch (error) {
+      console.warn('[userService] Manual session setup failed:', error);
     }
   }
 
-  if (!session?.user?.id) {
+  // If all else fails, check if we have any session at all
+  const { data: { session: finalSession } } = await supabase.auth.getSession();
+
+  if (!finalSession?.user?.id) {
     throw new Error('Authentication required');
   }
 
-  return { supabase, session };
+  return { supabase, session: finalSession };
 }
 
 /**
@@ -171,7 +198,7 @@ export const userService = {
     const allCookies = cookieStore.getAll();
     const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
     const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token-code-verifier`)?.value;
 
     if (accessToken && refreshToken) {
       await supabase.auth.setSession({

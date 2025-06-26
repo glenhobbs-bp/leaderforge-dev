@@ -11,7 +11,7 @@ export interface AgentTool {
 
 export interface ToolContext {
   userId: string;
-  contextKey?: string;
+  tenantKey?: string;
   entitlements?: string[];
 }
 
@@ -32,7 +32,7 @@ export const universalProgressTool: AgentTool = {
   description: 'Universal progress tracking for all content types. Actions: trackVideoProgress, trackQuizCompletion, trackReadingProgress, trackProgressEvent, getProgress, getProgressSummary, getCompletionStats, checkMilestones, batchGetProgress, batchTrackProgress.',
   async run(input, context) {
     const { action } = input;
-    if (!context.userId || !context.contextKey) throw new Error('userId and contextKey required');
+    if (!context.userId || !context.tenantKey) throw new Error('userId and tenantKey required');
 
     switch (action) {
       case 'trackVideoProgress': {
@@ -40,7 +40,7 @@ export const universalProgressTool: AgentTool = {
         if (!contentId || watchTime === undefined || position === undefined) {
           throw new Error('contentId, watchTime, and position required');
         }
-        return await userProgressToolInstance.trackVideoProgress(context.userId, contentId, context.contextKey, watchTime, position, duration);
+        return await userProgressToolInstance.trackVideoProgress(context.userId, contentId, context.tenantKey, watchTime, position, duration);
       }
 
       case 'trackQuizCompletion': {
@@ -48,7 +48,7 @@ export const universalProgressTool: AgentTool = {
         if (!contentId || score === undefined || !totalQuestions || !answeredQuestions) {
           throw new Error('contentId, score, totalQuestions, and answeredQuestions required');
         }
-        return await userProgressToolInstance.trackQuizCompletion(context.userId, contentId, context.contextKey, score, totalQuestions, answeredQuestions);
+        return await userProgressToolInstance.trackQuizCompletion(context.userId, contentId, context.tenantKey, score, totalQuestions, answeredQuestions);
       }
 
       case 'trackReadingProgress': {
@@ -56,38 +56,38 @@ export const universalProgressTool: AgentTool = {
         if (!contentId || scrollPosition === undefined) {
           throw new Error('contentId and scrollPosition required');
         }
-        return await userProgressToolInstance.trackReadingProgress(context.userId, contentId, context.contextKey, scrollPosition, highlights);
+        return await userProgressToolInstance.trackReadingProgress(context.userId, contentId, context.tenantKey, scrollPosition, highlights);
       }
 
       case 'trackProgressEvent': {
         const { progressEvent } = input;
         if (!progressEvent) throw new Error('progressEvent required');
-        const fullEvent = { ...progressEvent, userId: context.userId, contextKey: context.contextKey };
+        const fullEvent = { ...progressEvent, userId: context.userId, tenantKey: context.tenantKey };
         return await userProgressToolInstance.trackProgressEvent(fullEvent);
       }
 
       case 'getProgress': {
         const { contentId } = input;
         if (!contentId) throw new Error('contentId required');
-        return await userProgressToolInstance.getProgress(context.userId, contentId, context.contextKey);
+        return await userProgressToolInstance.getProgress(context.userId, contentId, context.tenantKey);
       }
 
       case 'listProgressForContentIds': {
         const { contentIds } = input;
         if (!Array.isArray(contentIds)) throw new Error('contentIds array required');
-        return await userProgressToolInstance.listProgressForContentIds(context.userId, contentIds, context.contextKey);
+        return await userProgressToolInstance.listProgressForContentIds(context.userId, contentIds, context.tenantKey);
       }
 
       case 'getProgressSummary': {
-        return await userProgressToolInstance.getProgressSummary(context.userId, context.contextKey);
+        return await userProgressToolInstance.getProgressSummary(context.userId, context.tenantKey);
       }
 
       case 'getCompletionStats': {
-        return await userProgressToolInstance.getCompletionStats(context.userId, context.contextKey);
+        return await userProgressToolInstance.getCompletionStats(context.userId, context.tenantKey);
       }
 
       case 'checkMilestones': {
-        return await userProgressToolInstance.checkMilestones(context.userId, context.contextKey);
+        return await userProgressToolInstance.checkMilestones(context.userId, context.tenantKey);
       }
 
       case 'batchGetProgress': {
@@ -99,7 +99,7 @@ export const universalProgressTool: AgentTool = {
       case 'batchTrackProgress': {
         const { events } = input;
         if (!Array.isArray(events)) throw new Error('events array required');
-        const fullEvents = events.map(event => ({ ...event, userId: context.userId, contextKey: context.contextKey }));
+        const fullEvents = events.map(event => ({ ...event, userId: context.userId, tenantKey: context.tenantKey }));
         return await userProgressToolInstance.batchTrackProgress(fullEvents);
       }
 
@@ -107,7 +107,7 @@ export const universalProgressTool: AgentTool = {
       case 'setProgress': {
         const { contentId, progress } = input;
         if (!contentId || !progress) throw new Error('contentId and progress required');
-        return await userProgressToolInstance.setProgress(context.userId, contentId, context.contextKey, progress);
+        return await userProgressToolInstance.setProgress(context.userId, contentId, context.tenantKey, progress);
       }
 
       default:
@@ -128,7 +128,7 @@ export async function getAvailableTools(
           const enabled = await isFeatureEnabled(
             tool.featureFlag,
             ctx.userId,
-            ctx.contextKey,
+            ctx.tenantKey,
           );
           if (!enabled) return null;
         }

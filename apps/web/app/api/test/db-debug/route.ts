@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       const testRecord = {
         user_id: userId,
         content_id: 'test-content-debug',
-        context_key: 'debug',
+        tenant_key: 'debug',
         progress_type: 'video',
         progress_percentage: 1,
         metadata: { debug: true }
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
       const { data: insertData, error: insertError } = await supabase
         .schema('core')
         .from('user_progress')
-        .upsert([testRecord], { onConflict: 'user_id,content_id,context_key' })
+        .upsert([testRecord], { onConflict: 'user_id,content_id,tenant_key' })
         .select()
         .single();
 

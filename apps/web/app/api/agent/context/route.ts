@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
-import type { ContextConfig } from '../../../lib/types';
+import type { TenantConfig } from '../../../lib/types';
 import { cookies as nextCookies } from 'next/headers';
 
 /**
@@ -156,10 +156,10 @@ async function invokeContextAgent({ userId, userMessage, requestedContext, supab
   }
 
   // 2. Load available contexts from configuration (not hardcoded)
-  let availableContexts: ContextConfig[] = [];
+  let availableContexts: TenantConfig[] = [];
   try {
-    const { contextService } = await import('../../../lib/contextService');
-    const allContexts = await contextService.getAllContextConfigs(supabase);
+    const { tenantService } = await import('../../../lib/tenantService');
+    const allContexts = await tenantService.getAllTenantConfigs(supabase);
     availableContexts = allContexts || [];
     console.log(`[Agent] Found ${availableContexts.length} available contexts`);
   } catch (error) {
@@ -213,7 +213,7 @@ async function generateDynamicContextSchema({
   supabase
 }: {
   entitlementIds: string[];
-  availableContexts: ContextConfig[];
+  availableContexts: TenantConfig[];
   userProfile: any;
   userMessage: string;
   requestedContext?: string;
@@ -236,14 +236,14 @@ async function generateDynamicContextSchema({
   });
 
   console.log(`[Agent] User can access ${accessibleContexts.length} contexts:`,
-    accessibleContexts.map(c => c.context_key));
+    accessibleContexts.map(c => c.tenant_key));
 
   // 🎯 AGENT DETERMINES PRIMARY CONTEXT
   let primaryContext = null;
 
   // 1. Use explicitly requested context if provided and accessible
   if (requestedContext) {
-    primaryContext = accessibleContexts.find(c => c.context_key === requestedContext);
+    primaryContext = accessibleContexts.find(c => c.tenant_key === requestedContext);
     if (primaryContext) {
       console.log(`[Agent] Using requested context: ${requestedContext}`);
     } else {
@@ -255,7 +255,7 @@ async function generateDynamicContextSchema({
   if (!primaryContext) {
     const lastContext = userProfile?.preferences?.last_context;
     if (lastContext) {
-      primaryContext = accessibleContexts.find(c => c.context_key === lastContext);
+      primaryContext = accessibleContexts.find(c => c.tenant_key === lastContext);
       if (primaryContext) {
         console.log(`[Agent] Using user's last context: ${lastContext}`);
       }
@@ -265,7 +265,7 @@ async function generateDynamicContextSchema({
   // 3. If no preference or not accessible, use first accessible context
   if (!primaryContext && accessibleContexts.length > 0) {
     primaryContext = accessibleContexts[0];
-    console.log(`[Agent] Using first accessible context: ${primaryContext.context_key}`);
+    console.log(`[Agent] Using first accessible context: ${primaryContext.tenant_key}`);
   }
 
   // 3. If no accessible contexts, provide limited access message
@@ -300,13 +300,13 @@ async function generateDynamicContextSchema({
   }
 
   // 🎨 AGENT GENERATES NAVIGATION: Based on accessible contexts and entitlements
-  const navigation = await generateNavigationSchema(primaryContext.context_key, entitlementIds, userId, supabase);
+  const navigation = await generateNavigationSchema(primaryContext.tenant_key, entitlementIds, userId, supabase);
 
   // 📋 AGENT GENERATES CONTENT: Based on user's context and intent
-  const content = await generateContentSchema(primaryContext.context_key, entitlementIds, userMessage);
+  const content = await generateContentSchema(primaryContext.tenant_key, entitlementIds, userMessage);
 
   return {
-    contextKey: primaryContext.context_key,
+    contextKey: primaryContext.tenant_key,
     contextName: primaryContext.context_name,
     theme: primaryContext.theme || {
       primary: '#667eea',

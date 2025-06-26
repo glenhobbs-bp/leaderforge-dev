@@ -6,16 +6,16 @@ import { Content } from '../../../lib/types';
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ context_key: string }> }
+  context: { params: Promise<{ tenant_key: string }> }
 ) {
-  const { context_key } = await context.params;
+  const { tenant_key } = await context.params;
   const cookieStore = await cookies();
   const supabase = createSupabaseServerClient(cookieStore);
-  console.log(`[API] GET /api/content/${context_key}`);
+  console.log(`[API] GET /api/content/${tenant_key}`);
 
-  if (!context_key || typeof context_key !== 'string') {
-    console.error('[API] Missing or invalid context_key');
-    return NextResponse.json({ error: 'Missing or invalid context_key' }, { status: 400 });
+  if (!tenant_key || typeof tenant_key !== 'string') {
+    console.error('[API] Missing or invalid tenant_key');
+    return NextResponse.json({ error: 'Missing or invalid tenant_key' }, { status: 400 });
   }
 
   // ✅ Get session from Supabase cookie
@@ -37,8 +37,8 @@ export async function GET(
   const user_id = session.user.id;
 
   try {
-    const content: Content[] = await contentService.getContentForContext(supabase, context_key, user_id);
-    console.log(`[API] Found ${content.length} items for user ${user_id} in context ${context_key}`);
+    const content: Content[] = await contentService.getContentForContext(supabase, tenant_key, user_id);
+    console.log(`[API] Found ${content.length} items for user ${user_id} in tenant ${tenant_key}`);
     return NextResponse.json(content, { status: 200 });
   } catch (error) {
     const err = error as Error;

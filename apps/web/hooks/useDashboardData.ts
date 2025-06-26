@@ -18,7 +18,7 @@ interface DashboardData {
   } | null;
   navOptions: NavOption[];
   contextConfig: {
-    context_key: string;
+    tenant_key: string;
     display_name: string;
     theme: Record<string, string>;
     i18n: Record<string, string>;

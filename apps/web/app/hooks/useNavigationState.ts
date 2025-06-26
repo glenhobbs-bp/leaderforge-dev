@@ -10,7 +10,7 @@ import type { UserPreferences } from '../lib/types';
 
 interface UseNavigationStateProps {
   userId: string;
-  contextKey: string;
+  tenantKey: string;
 }
 
 interface UseNavigationStateReturn {
@@ -22,14 +22,14 @@ interface UseNavigationStateReturn {
 /**
  * Hook for managing navigation state persistence
  */
-export function useNavigationState({ userId, contextKey }: UseNavigationStateProps): UseNavigationStateReturn {
+export function useNavigationState({ userId, tenantKey }: UseNavigationStateProps): UseNavigationStateReturn {
   const { data: userPrefs } = useUserPreferences(userId);
   const queryClient = useQueryClient();
 
   // Get last navigation state - FIX: Use correct field names that match userService
   const preferences = userPrefs?.preferences as UserPreferences;
   const navigationState = preferences?.navigationState; // Changed from 'navigation' to 'navigationState'
-  const lastNavOptionId = navigationState?.lastContext === contextKey // Changed from 'lastContextKey' to 'lastContext'
+  const lastNavOptionId = navigationState?.lastContext === tenantKey // Changed from 'lastContextKey' to 'lastContext'
     ? navigationState.lastNavOption || null // Changed from 'lastNavOptionId' to 'lastNavOption'
     : null;
 
@@ -44,7 +44,7 @@ export function useNavigationState({ userId, contextKey }: UseNavigationStatePro
       const response = await fetch(`/api/user/${userId}/navigation-state`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contextKey, navOptionId })
+        body: JSON.stringify({ tenantKey, navOptionId })
       });
 
       if (!response.ok) {

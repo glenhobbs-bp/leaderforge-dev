@@ -9,21 +9,21 @@ import type { NavOption, Entitlement } from './types';
  */
 export const navService = {
   /**
-   * Get nav options for a context, filtered by user entitlement.
+   * Get nav options for a tenant, filtered by user entitlement.
    * Uses cached entitlements for better performance.
    */
   async getNavOptions(
     supabase: SupabaseClient,
-    contextKey: string,
+    tenantKey: string,
     userId: string
   ): Promise<NavOption[]> {
     try {
-      // Get all nav options for the context
+      // Get all nav options for the tenant
       const { data: navOptions, error } = await supabase
         .schema('core')
         .from('nav_options')
         .select('*')
-        .eq('context_key', contextKey)
+        .eq('tenant_key', tenantKey)
         .order('section_order', { ascending: true })
         .order('order', { ascending: true });
 
@@ -64,19 +64,19 @@ export const navService = {
   },
 
   /**
-   * Get nav options for a context with pre-fetched entitlements.
+   * Get nav options for a tenant with pre-fetched entitlements.
    * More efficient when you already have entitlements.
    */
   async getNavOptionsWithEntitlements(
     supabase: SupabaseClient,
-    contextKey: string,
+    tenantKey: string,
     userEntitlements: Entitlement[]
   ): Promise<NavOption[]> {
     const { data, error } = await supabase
       .schema('core')
       .from('nav_options')
       .select('*')
-      .eq('context_key', contextKey)
+      .eq('tenant_key', tenantKey)
       .order('section', { ascending: true })
       .order('order', { ascending: true });
 
@@ -97,7 +97,7 @@ export const navService = {
    */
   async getNavOption(
     supabase: SupabaseClient,
-    contextKey: string,
+    tenantKey: string,
     navKey: string,
     userId: string
   ): Promise<NavOption | null> {
@@ -106,7 +106,7 @@ export const navService = {
         .schema('core')
         .from('nav_options')
         .select('*')
-        .eq('context_key', contextKey)
+        .eq('tenant_key', tenantKey)
         .eq('nav_key', navKey)
         .single();
 

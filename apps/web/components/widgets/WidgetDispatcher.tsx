@@ -27,39 +27,63 @@ interface WidgetSchema {
 
 interface WidgetDispatcherProps {
   schema: WidgetSchema;
+  userId?: string;
+  onAction?: (action: any) => void;
   onProgressUpdate?: () => void;
+  UniversalSchemaRenderer?: React.ComponentType<any>;
   [key: string]: any;
 }
 
 /**
  * Simple Widget Dispatcher - maps schema types to components
  */
-export function WidgetDispatcher({ schema }: WidgetDispatcherProps) {
-  console.log(`[WidgetDispatcher] Rendering widget: ${schema.type}`);
+export function WidgetDispatcher({
+  schema,
+  userId,
+  onAction,
+  onProgressUpdate,
+  UniversalSchemaRenderer,
+  ...otherProps
+}: WidgetDispatcherProps) {
+  console.log(`[WidgetDispatcher] Rendering widget: ${schema.type} with props:`, {
+    hasOnAction: !!onAction,
+    hasUserId: !!userId,
+    otherPropsKeys: Object.keys(otherProps)
+  });
 
   try {
+    // Common props to pass to all widgets
+    const commonProps = {
+      schema: schema as any,
+      userId,
+      onAction,
+      onProgressUpdate,
+      UniversalSchemaRenderer,
+      ...otherProps
+    };
+
     // Direct mapping of schema types to components
     switch (schema.type) {
       case 'Card':
-        return <LeaderForgeCard schema={schema as any} />;
+        return <LeaderForgeCard {...commonProps} />;
 
       case 'VideoPlayer':
-        return <VideoPlayerModal schema={schema as any} />;
+        return <VideoPlayerModal {...commonProps} />;
 
       case 'StatCard':
-        return <StatCard schema={schema as any} />;
+        return <StatCard {...commonProps} />;
 
       case 'Leaderboard':
-        return <Leaderboard schema={schema as any} />;
+        return <Leaderboard {...commonProps} />;
 
       case 'VideoList':
-        return <VideoList schema={schema as any} />;
+        return <VideoList {...commonProps} />;
 
       case 'Panel':
-        return <Panel schema={schema as any} />;
+        return <Panel {...commonProps} />;
 
       case 'Grid':
-        return <Grid schema={schema as any} />;
+        return <Grid {...commonProps} />;
 
       default:
         console.warn(`[WidgetDispatcher] Unknown widget type: ${schema.type}`);

@@ -18,6 +18,11 @@ interface CardAction {
   [key: string]: unknown; // Allow extra properties for renderer use
 }
 
+interface PillItem {
+  label: string;
+  color?: string;
+}
+
 interface LeaderForgeCardProps {
   schema: ComponentSchema;
   onAction?: (action: CardAction) => void;
@@ -40,7 +45,6 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
     videoWatched,
     worksheetSubmitted,
     progress,
-    actions,
     pills,
   } = schema.props;
 
@@ -52,6 +56,17 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
   const actualVideoWatched = actualProgress >= 90 || videoWatched;
 
   const handleAction = (action: CardAction) => {
+    console.log('[LeaderForgeCard] Action triggered:', action);
+    console.log('[LeaderForgeCard] Current schema props:', {
+      videoUrl,
+      title,
+      cardImage,
+      actualProgress,
+      pills,
+      actualVideoWatched,
+      worksheetSubmitted,
+      description
+    });
     onAction?.(action);
   };
 
@@ -108,6 +123,21 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
           </p>
         )}
 
+        {/* Pills/Tags */}
+        {pills && pills.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {(pills as PillItem[]).map((pill, index) => (
+              <span
+                key={index}
+                className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"
+                style={pill.color ? { backgroundColor: pill.color + '20', color: pill.color } : {}}
+              >
+                {pill.label}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Progress Bar */}
         {actualProgress > 0 && (
           <div className="mb-4">
@@ -127,20 +157,59 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
           </div>
         )}
 
+        {/* Worksheet Status */}
+        {worksheetSubmitted !== undefined && (
+          <div className="flex items-center gap-2 mb-4 text-xs">
+            <span className={`w-2 h-2 rounded-full ${worksheetSubmitted ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+            <span className="text-glass-muted">
+              Worksheet {worksheetSubmitted ? 'Submitted' : 'Not Submitted'}
+            </span>
+          </div>
+        )}
+
         {/* Action Button */}
         <button
-          onClick={() => handleAction(
-            actions?.find(a => a.action === 'openVideoModal') ||
-            { action: 'openVideoModal', label: 'Watch', videoUrl, title }
-          )}
+          onClick={() => handleAction({
+            action: 'openVideoModal',
+            label: 'Watch Video',
+            videoUrl: videoUrl || '',
+            title: title || '',
+            poster: cardImage || '',
+            progress: actualProgress || 0,
+            pills: pills || [],
+            videoWatched: actualVideoWatched || false,
+            worksheetSubmitted: worksheetSubmitted || false,
+            description: description || '',
+            onCompleteAction: { action: 'completeProgress', contentId: title, progress: 100 }
+          })}
           disabled={!videoUrl}
-          className={`w-full py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ${
-            !videoUrl
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white shadow-sm hover:shadow-md'
-          }`}
+          className={`
+            w-full py-3 px-4 rounded-lg font-medium text-sm
+            transition-all duration-200
+            flex items-center justify-center gap-2
+            ${!videoUrl
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+              : `
+                bg-gradient-to-r from-blue-500 to-blue-600
+                hover:from-blue-600 hover:to-blue-700
+                text-white shadow-sm hover:shadow-md
+                transform hover:scale-[1.02] active:scale-[0.98]
+                border border-blue-500/20
+              `
+            }
+          `}
         >
-          Watch
+          {!videoUrl ? (
+            <>
+              <span className="text-xs">⚠️</span>
+              No Video Available
+            </>
+          ) : (
+            <>
+              <span className="text-lg">▶️</span>
+              Watch Video
+            </>
+          )}
         </button>
       </div>
     </div>

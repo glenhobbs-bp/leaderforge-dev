@@ -25,6 +25,16 @@ interface GridProps {
 // Schema interface for new schema-driven approach
 interface GridSchema {
   type: 'Grid';
+  props?: {
+    title?: string;
+    subtitle?: string;
+    columns?: 1 | 2 | 3 | 4 | 5 | 6;
+    gap?: 'small' | 'medium' | 'large';
+    padding?: 'none' | 'small' | 'medium' | 'large';
+    background?: 'transparent' | 'glass' | 'solid';
+    items?: ComponentSchema[];
+    availableContent?: string[];
+  };
   title?: string;
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
   gap?: 'small' | 'medium' | 'large';
@@ -39,35 +49,74 @@ interface GridSchema {
 }
 
 // Union type for transition period
-type GridInput = GridProps | { schema: GridSchema };
+type GridInput = GridProps | { schema: GridSchema } | GridSchema;
 
 function isSchemaInput(input: GridInput): input is { schema: GridSchema } {
   return 'schema' in input;
 }
 
-export default function Grid(input: GridInput) {
+function isDirectSchema(input: GridInput): input is GridSchema {
+  return 'type' in input && input.type === 'Grid';
+}
+
+export default function Grid(input: GridInput & { userId?: string; onAction?: (action: any) => void; onProgressUpdate?: () => void }) {
   // Extract props from either schema or direct props
-  const props: GridProps = isSchemaInput(input)
-    ? {
-        title: input.schema.title,
-        columns: input.schema.columns,
-        gap: input.schema.gap,
-        padding: input.schema.padding,
-        background: input.schema.background,
-        children: input.schema.children,
-        widgets: input.schema.widgets
-      }
-    : input;
+  let props: GridProps;
+
+  if (isDirectSchema(input)) {
+    // Handle direct schema format from agent
+    props = {
+      title: input.props?.title || input.title,
+      columns: input.props?.columns || input.columns,
+      gap: input.props?.gap || input.gap,
+      padding: input.props?.padding || input.padding,
+      background: input.props?.background || input.background,
+      children: input.children,
+      widgets: input.props?.items || input.widgets || []
+    };
+  } else if (isSchemaInput(input)) {
+    // Handle wrapped schema format
+    props = {
+      title: input.schema.props?.title || input.schema.title,
+      columns: input.schema.props?.columns || input.schema.columns,
+      gap: input.schema.props?.gap || input.schema.gap,
+      padding: input.schema.props?.padding || input.schema.padding,
+      background: input.schema.props?.background || input.schema.background,
+      children: input.schema.children,
+      widgets: input.schema.props?.items || input.schema.widgets || []
+    };
+  } else {
+    // Handle legacy direct props format
+    props = input;
+  }
 
   const {
     title,
     columns = 3,
     gap = 'medium',
-    padding = 'medium',
-    background = 'glass',
+    padding = 'none',
+    background = 'transparent',
     children,
     widgets = []
   } = props;
+
+  console.log('[Grid] Rendering with:', {
+    title,
+    columns,
+    widgetCount: widgets.length,
+    widgetTypes: widgets.map(w => w.type),
+    hasUserId: !!input.userId,
+    hasOnAction: !!input.onAction
+  });
+
+  // Debug: Log first widget data for progress tracking
+  if (widgets.length > 0) {
+    const firstWidget = widgets[0];
+    console.log('[Grid] First widget debug:', {
+      type: firstWidget.type,
+      props: firstWidget.props
+    });
+  }
 
   const gapClasses = {
     small: 'gap-3',
@@ -102,11 +151,14 @@ export default function Grid(input: GridInput) {
       ${backgroundClasses[background]}
       ${paddingClasses[padding]}
       transition-all duration-200
+      w-full min-h-0
     `}>
       {title && (
-        <h2 className="text-glass-primary text-lg font-semibold mb-6">
-          {title}
-        </h2>
+        <div className="px-6 pt-6 pb-2">
+          <h2 className="text-glass-primary text-xl font-bold tracking-tight">
+            {title}
+          </h2>
+        </div>
       )}
 
       <div className={`
@@ -114,11 +166,17 @@ export default function Grid(input: GridInput) {
         ${columnClasses[columns]}
         ${gapClasses[gap]}
         auto-rows-fr
+        px-6 pb-6
+        w-full
       `}>
         {children}
         {widgets.map((widget, index) => (
-          <div key={`grid-item-${index}`} className="min-h-0">
-            <UniversalSchemaRenderer schema={widget} />
+          <div key={`grid-item-${index}`} className="min-h-0 flex w-full">
+            <UniversalSchemaRenderer
+              schema={widget}
+              userId={input.userId}
+              onProgressUpdate={input.onProgressUpdate}
+            />
           </div>
         ))}
       </div>

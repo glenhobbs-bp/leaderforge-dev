@@ -2,7 +2,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { entitlementService } from './entitlementService';
 import { navService } from './navService';
 import { contentService } from './contentService';
-import { contextService } from './contextService';
+import { tenantService } from './tenantService';
 import type { NavOption, Content, Entitlement, ContextConfig } from './types';
 
 /**
@@ -32,7 +32,7 @@ export const batchService = {
     // Step 2: Parallelize the remaining operations that don't depend on each other
     const [contextConfig, navOptions, content] = await Promise.all([
       // Context config doesn't need entitlements
-      contextService.getContextConfig(supabase, contextKey),
+      tenantService.getTenantConfig(supabase, contextKey),
 
       // Nav options with pre-fetched entitlements
       navService.getNavOptionsWithEntitlements(supabase, contextKey, userEntitlements),
@@ -128,5 +128,47 @@ export const batchService = {
 
     console.log(`[batchService] Multi-context bundle complete for ${contextKeys.length} contexts`);
     return bundle;
+  },
+
+  /**
+   * Get comprehensive data needed for context rendering, batch all operations together.
+   * Fetches context config, nav options, and content in optimized sequence.
+   */
+  async getBatchDataForContext(
+    supabase: SupabaseClient,
+    contextKey: string,
+    userId: string
+  ): Promise<{
+    contextConfig: ContextConfig | null;
+    navOptions: NavOption[];
+    contentList: Content[];
+  }> {
+    console.log(`[batchService] Fetching batch data for context: ${contextKey}, user: ${userId}`);
+
+    try {
+      // Execute the most critical operations in parallel
+      const [contextConfig, navOptions] = await Promise.all([
+        tenantService.getTenantConfig(supabase, contextKey),
+        navService.getNavOptions(supabase, contextKey, userId)
+      ]);
+
+      // Then fetch content (may depend on context config)
+      const contentList = await contentService.getContentForContext(supabase, contextKey, userId);
+
+      console.log(`[batchService] Batch operation completed - Config: ${!!contextConfig}, Nav: ${navOptions.length}, Content: ${contentList.length}`);
+
+      return {
+        contextConfig,
+        navOptions,
+        contentList
+      };
+    } catch (error) {
+      console.error('[batchService] Error in getBatchDataForContext:', error);
+      return {
+        contextConfig: null,
+        navOptions: [],
+        contentList: []
+      };
+    }
   }
 };

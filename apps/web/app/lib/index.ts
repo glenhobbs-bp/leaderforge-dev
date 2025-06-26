@@ -1,14 +1,18 @@
-export * from './contextService';
-export * from './navService';
+export * from './agentService';
+export * from './apiClient';
+export * from './authService';
+export * from './batchService';
 export * from './contentService';
+export * from './tenantService';
 export * from './entitlementService';
+export * from './navService';
 export * from './organizationService';
 export * from './provisioningService';
-export * from './userService';
+export * from './requestDeduplication';
 export * from './supabaseClient';
 export * from './supabaseServerClient';
 export * from './types';
+export * from './userProgressService';
+export * from './userProgressService.client';
+export * from './userService';
 export * from './utils';
-
-// New optimized batch service for performance
-export * from './batchService';

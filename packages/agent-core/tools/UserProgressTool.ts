@@ -8,7 +8,7 @@ export interface UserProgress {
   id: string;
   user_id: string;
   content_id: string;
-  context_key: string;
+  tenant_key: string;
   progress_type: 'video' | 'quiz' | 'reading' | 'worksheet' | 'course' | 'custom';
   progress_percentage: number;
   completion_count: number;
@@ -30,7 +30,7 @@ export interface UserProgress {
 export interface ProgressEvent {
   userId: string;
   contentId: string;
-  contextKey: string;
+  tenantKey: string;
   progressType: 'video' | 'quiz' | 'reading' | 'worksheet' | 'course' | 'custom';
   value: number; // 0-100 percentage or custom metric
   metadata?: {
@@ -57,7 +57,7 @@ export interface ProgressEvent {
 // Progress summary for agent queries
 export interface ProgressSummary {
   userId: string;
-  contextKey: string;
+  tenantKey: string;
   totalItems: number;
   completedItems: number;
   inProgressItems: number;
@@ -70,7 +70,7 @@ export interface ProgressSummary {
 // Completion statistics for analytics
 export interface CompletionStats {
   userId: string;
-  contextKey: string;
+  tenantKey: string;
   completionsByType: Record<string, number>;
   averageSessionTime: number;
   streakDays: number;
@@ -91,18 +91,18 @@ export interface Milestone {
  */
 export interface UserProgressRepository {
   // Core progress operations (backward compatible)
-  getProgress(userId: string, contentId: string, contextKey: string): Promise<UserProgress | null>;
-  listProgressForContentIds(userId: string, contentIds: string[], contextKey: string): Promise<UserProgress[]>;
-  setProgress(userId: string, contentId: string, contextKey: string, progress: Partial<UserProgress>): Promise<UserProgress>;
+  getProgress(userId: string, contentId: string, tenantKey: string): Promise<UserProgress | null>;
+  listProgressForContentIds(userId: string, contentIds: string[], tenantKey: string): Promise<UserProgress[]>;
+  setProgress(userId: string, contentId: string, tenantKey: string, progress: Partial<UserProgress>): Promise<UserProgress>;
 
   // Enhanced universal operations
   trackProgressEvent(event: ProgressEvent): Promise<UserProgress>;
-  getProgressSummary(userId: string, contextKey: string): Promise<ProgressSummary>;
-  getCompletionStats(userId: string, contextKey: string): Promise<CompletionStats>;
-  checkMilestones(userId: string, contextKey: string): Promise<Milestone[]>;
+  getProgressSummary(userId: string, tenantKey: string): Promise<ProgressSummary>;
+  getCompletionStats(userId: string, tenantKey: string): Promise<CompletionStats>;
+  checkMilestones(userId: string, tenantKey: string): Promise<Milestone[]>;
 
   // Batch operations for performance
-  batchGetProgress(queries: Array<{ userId: string; contentId: string; contextKey: string }>): Promise<UserProgress[]>;
+  batchGetProgress(queries: Array<{ userId: string; contentId: string; tenantKey: string }>): Promise<UserProgress[]>;
   batchTrackProgress(events: ProgressEvent[]): Promise<UserProgress[]>;
 }
 
@@ -117,14 +117,14 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
   /**
    * Fetch progress for a single user/content/context.
    */
-  async getProgress(userId: string, contentId: string, contextKey: string): Promise<UserProgress | null> {
+  async getProgress(userId: string, contentId: string, tenantKey: string): Promise<UserProgress | null> {
     const { data, error } = await this.supabase
       .schema('core')
       .from('user_progress')
       .select('*')
       .eq('user_id', userId)
       .eq('content_id', contentId)
-      .eq('context_key', contextKey)
+      .eq('tenant_key', tenantKey)
       .single();
 
     if (error && error.code !== 'PGRST116') throw error;
@@ -136,24 +136,58 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
   /**
    * Fetch progress for a batch of content IDs for a user/context.
    */
-  async listProgressForContentIds(userId: string, contentIds: string[], contextKey: string): Promise<UserProgress[]> {
+  async listProgressForContentIds(userId: string, contentIds: string[], tenantKey: string): Promise<UserProgress[]> {
     if (!contentIds.length) return [];
-    const { data, error } = await this.supabase
-      .schema('core')
-      .from('user_progress')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('context_key', contextKey)
-      .in('content_id', contentIds);
-    if (error) throw error;
 
-    return (data || []).map(item => this.transformProgress(item));
+    try {
+      // Try batch query first
+      const { data, error } = await this.supabase
+        .schema('core')
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('tenant_key', tenantKey)
+        .in('content_id', contentIds);
+
+      if (error) {
+        console.warn('[UserProgressTool] Batch query failed, falling back to individual queries:', error);
+        // Fallback to individual queries
+        return this.listProgressForContentIdsIndividual(userId, contentIds, tenantKey);
+      }
+
+      return (data || []).map(item => this.transformProgress(item));
+    } catch (error) {
+      console.warn('[UserProgressTool] Batch query exception, falling back to individual queries:', error);
+      // Fallback to individual queries
+      return this.listProgressForContentIdsIndividual(userId, contentIds, tenantKey);
+    }
+  }
+
+  /**
+   * Fallback method: Fetch progress using individual queries (for RLS compatibility)
+   */
+  private async listProgressForContentIdsIndividual(userId: string, contentIds: string[], tenantKey: string): Promise<UserProgress[]> {
+    // Execute individual queries in parallel
+    const promises = contentIds.map(async (contentId) => {
+      try {
+        const progress = await this.getProgress(userId, contentId, tenantKey);
+        return progress;
+      } catch (error) {
+        console.warn(`[UserProgressTool] Failed to fetch progress for ${contentId}:`, error);
+        return null;
+      }
+    });
+
+    const progressResults = await Promise.all(promises);
+
+    // Filter out nulls and return valid progress records
+    return progressResults.filter((result): result is UserProgress => result !== null);
   }
 
   /**
    * Upsert (set) progress for a user/content/context.
    */
-  async setProgress(userId: string, contentId: string, contextKey: string, progress: Partial<UserProgress>): Promise<UserProgress> {
+  async setProgress(userId: string, contentId: string, tenantKey: string, progress: Partial<UserProgress>): Promise<UserProgress> {
     // Prepare metadata from backward compatibility fields
     const metadata = { ...progress.metadata };
     if (progress.watch_time_seconds !== undefined) {
@@ -170,15 +204,19 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
         {
           user_id: userId,
           content_id: contentId,
-          context_key: contextKey,
-          progress_type: progress.progress_type || 'video',
+          tenant_key: tenantKey,
+          progress_percentage: progress.progress_percentage || 0,
           metadata,
-          ...progress
-        }
-      ], { onConflict: 'user_id,content_id,context_key' })
+        },
+      ], {
+        onConflict: 'user_id,content_id,tenant_key',
+        ignoreDuplicates: false,
+      })
       .select()
       .single();
+
     if (error) throw error;
+
     return this.transformProgress(data);
   }
 
@@ -186,7 +224,7 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
    * Track a progress event and update progress accordingly.
    */
   async trackProgressEvent(event: ProgressEvent): Promise<UserProgress> {
-    const existingProgress = await this.getProgress(event.userId, event.contentId, event.contextKey);
+    const existingProgress = await this.getProgress(event.userId, event.contentId, event.tenantKey);
 
     // Update progress based on event
     const updatedProgress: Partial<UserProgress> = {
@@ -202,72 +240,53 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
       updatedProgress.completion_count = (existingProgress?.completion_count || 0) + 1;
     }
 
-    return this.setProgress(event.userId, event.contentId, event.contextKey, updatedProgress);
+    return this.setProgress(event.userId, event.contentId, event.tenantKey, updatedProgress);
   }
 
   /**
    * Get progress summary for a user in a context.
    */
-  async getProgressSummary(userId: string, contextKey: string): Promise<ProgressSummary> {
+  async getProgressSummary(userId: string, tenantKey: string): Promise<ProgressSummary> {
     const { data, error } = await this.supabase
       .schema('core')
       .from('user_progress')
       .select('*')
       .eq('user_id', userId)
-      .eq('context_key', contextKey);
+      .eq('tenant_key', tenantKey);
 
     if (error) throw error;
 
-    const items = (data || []) as Array<Record<string, unknown>>;
-    const completed = items.filter((item: Record<string, unknown>) => item.completed_at).length;
-    const inProgress = items.filter((item: Record<string, unknown>) => !item.completed_at && (item.progress_percentage as number) > 0).length;
-
-    // Group by progress type
-    const progressByType: Record<string, { completed: number; total: number; percentage: number }> = {};
-    const typeGroups = items.reduce((acc: Record<string, Array<Record<string, unknown>>>, item: Record<string, unknown>) => {
-      const type = (item.progress_type as string) || 'video';
-      if (!acc[type]) acc[type] = [];
-      acc[type].push(item);
-      return acc;
-    }, {} as Record<string, Array<Record<string, unknown>>>);
-
-        Object.entries(typeGroups).forEach(([type, typeItems]) => {
-      const typeCompleted = typeItems.filter((item: Record<string, unknown>) => item.completed_at).length;
-      progressByType[type] = {
-        completed: typeCompleted,
-        total: typeItems.length,
-        percentage: typeItems.length > 0 ? Math.round((typeCompleted / typeItems.length) * 100) : 0
-      };
-    });
+    const progressRecords = (data || []).map(item => this.transformProgress(item));
 
     return {
       userId,
-      contextKey,
-      totalItems: items.length,
-      completedItems: completed,
-      inProgressItems: inProgress,
-      completionPercentage: items.length > 0 ? Math.round((completed / items.length) * 100) : 0,
-      totalSessionTime: items.reduce((sum: number, item: Record<string, unknown>) => {
-        const metadata = item.metadata as Record<string, unknown> || {};
-        return sum + ((metadata.watchTimeSeconds as number) || 0);
-      }, 0),
-      lastActivity: items.reduce((latest: string, item: Record<string, unknown>) =>
-        (item.last_viewed_at as string) > latest ? (item.last_viewed_at as string) : latest, ''),
-      progressByType
+      tenantKey,
+      totalItems: progressRecords.length,
+      completedItems: progressRecords.filter(item => !!item.completed_at).length,
+      inProgressItems: progressRecords.filter(item => item.progress_percentage > 0 && !item.completed_at).length,
+      completionPercentage: progressRecords.length > 0
+        ? (progressRecords.filter(item => !!item.completed_at).length / progressRecords.length) * 100
+        : 0,
+      totalSessionTime: progressRecords.reduce((sum, item) => sum + (item.total_sessions || 0), 0),
+      lastActivity: progressRecords.reduce((latest, item) => {
+        const itemDate = item.last_viewed_at || item.started_at;
+        return itemDate > latest ? itemDate : latest;
+      }, ''),
+      progressByType: {} // Simplified for now - would need proper grouping
     };
   }
 
   /**
    * Get completion statistics for analytics.
    */
-  async getCompletionStats(userId: string, contextKey: string): Promise<CompletionStats> {
+  async getCompletionStats(userId: string, tenantKey: string): Promise<CompletionStats> {
     // This would typically involve more complex analytics queries
     // For now, return basic stats from progress summary
-    const summary = await this.getProgressSummary(userId, contextKey);
+    const summary = await this.getProgressSummary(userId, tenantKey);
 
     return {
       userId,
-      contextKey,
+      tenantKey,
       completionsByType: Object.fromEntries(
         Object.entries(summary.progressByType).map(([type, stats]) => [type, stats.completed])
       ),
@@ -280,22 +299,23 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
   /**
    * Check for milestone achievements.
    */
-  async checkMilestones(_userId: string, _contextKey: string): Promise<Milestone[]> {
+  async checkMilestones(userId: string, tenantKey: string): Promise<Milestone[]> {
     // This would implement milestone detection logic
     // For now, return empty array - to be implemented based on business rules
+    console.log('Checking milestones for user:', userId, 'tenant:', tenantKey);
     return [];
   }
 
   /**
    * Batch get progress for multiple queries.
    */
-  async batchGetProgress(queries: Array<{ userId: string; contentId: string; contextKey: string }>): Promise<UserProgress[]> {
+  async batchGetProgress(queries: Array<{ userId: string; contentId: string; tenantKey: string }>): Promise<UserProgress[]> {
     if (!queries.length) return [];
 
     // Build complex query for batch retrieval
     // For simplicity, execute individual queries in parallel
     const results = await Promise.all(
-      queries.map(query => this.getProgress(query.userId, query.contentId, query.contextKey))
+      queries.map(query => this.getProgress(query.userId, query.contentId, query.tenantKey))
     );
 
     return results.filter((result): result is UserProgress => result !== null);
@@ -328,7 +348,7 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
       id: record.id as string,
       user_id: record.user_id as string,
       content_id: record.content_id as string,
-      context_key: record.context_key as string,
+      tenant_key: record.tenant_key as string,
       progress_type: (record.progress_type as UserProgress['progress_type']) || 'video',
       progress_percentage: (record.progress_percentage as number) || 0,
       completion_count: (record.completion_count as number) || 0,
@@ -358,15 +378,15 @@ export class UserProgressTool {
   /**
    * Get progress for a single content item. (Backward compatible)
    */
-  async getProgress(userId: string, contentId: string, contextKey: string): Promise<UserProgress | null> {
-    return this.repo.getProgress(userId, contentId, contextKey);
+  async getProgress(userId: string, contentId: string, tenantKey: string): Promise<UserProgress | null> {
+    return this.repo.getProgress(userId, contentId, tenantKey);
   }
 
   /**
    * Get progress for a batch of content IDs. Returns a map keyed by content_id. (Backward compatible)
    */
-  async listProgressForContentIds(userId: string, contentIds: string[], contextKey: string): Promise<Record<string, UserProgress>> {
-    const results = await this.repo.listProgressForContentIds(userId, contentIds, contextKey);
+  async listProgressForContentIds(userId: string, contentIds: string[], tenantKey: string): Promise<Record<string, UserProgress>> {
+    const results = await this.repo.listProgressForContentIds(userId, contentIds, tenantKey);
     const map: Record<string, UserProgress> = {};
     for (const progress of results) {
       map[progress.content_id] = progress;
@@ -377,42 +397,58 @@ export class UserProgressTool {
   /**
    * Set (upsert) progress for a user/content/context. (Backward compatible)
    */
-  async setProgress(userId: string, contentId: string, contextKey: string, progress: Partial<UserProgress>): Promise<UserProgress> {
-    return this.repo.setProgress(userId, contentId, contextKey, progress);
+  async setProgress(userId: string, contentId: string, tenantKey: string, progress: Partial<UserProgress>): Promise<UserProgress> {
+    return this.repo.setProgress(userId, contentId, tenantKey, progress);
   }
 
   /**
    * Track a progress event - universal method for all content types.
    */
   async trackProgressEvent(event: ProgressEvent): Promise<UserProgress> {
-    return this.repo.trackProgressEvent(event);
+    const existingProgress = await this.getProgress(event.userId, event.contentId, event.tenantKey);
+
+    // Update progress based on event
+    const updatedProgress: Partial<UserProgress> = {
+      progress_type: event.progressType,
+      progress_percentage: event.value,
+      metadata: { ...existingProgress?.metadata, ...event.metadata },
+      total_sessions: (existingProgress?.total_sessions || 0) + 1
+    };
+
+    // Mark as completed if 100%
+    if (event.value >= 100) {
+      updatedProgress.completed_at = event.timestamp || new Date().toISOString();
+      updatedProgress.completion_count = (existingProgress?.completion_count || 0) + 1;
+    }
+
+    return this.setProgress(event.userId, event.contentId, event.tenantKey, updatedProgress);
   }
 
   /**
    * Get comprehensive progress summary for agent decision making.
    */
-  async getProgressSummary(userId: string, contextKey: string): Promise<ProgressSummary> {
-    return this.repo.getProgressSummary(userId, contextKey);
+  async getProgressSummary(userId: string, tenantKey: string): Promise<ProgressSummary> {
+    return this.repo.getProgressSummary(userId, tenantKey);
   }
 
   /**
    * Get completion statistics for analytics and insights.
    */
-  async getCompletionStats(userId: string, contextKey: string): Promise<CompletionStats> {
-    return this.repo.getCompletionStats(userId, contextKey);
+  async getCompletionStats(userId: string, tenantKey: string): Promise<CompletionStats> {
+    return this.repo.getCompletionStats(userId, tenantKey);
   }
 
   /**
    * Check for milestone achievements based on progress.
    */
-  async checkMilestones(userId: string, contextKey: string): Promise<Milestone[]> {
-    return this.repo.checkMilestones(userId, contextKey);
+  async checkMilestones(userId: string, tenantKey: string): Promise<Milestone[]> {
+    return this.repo.checkMilestones(userId, tenantKey);
   }
 
   /**
    * Batch operations for performance optimization.
    */
-  async batchGetProgress(queries: Array<{ userId: string; contentId: string; contextKey: string }>): Promise<UserProgress[]> {
+  async batchGetProgress(queries: Array<{ userId: string; contentId: string; tenantKey: string }>): Promise<UserProgress[]> {
     return this.repo.batchGetProgress(queries);
   }
 
@@ -426,11 +462,11 @@ export class UserProgressTool {
   /**
    * Quick helper for video progress (backward compatibility).
    */
-  async trackVideoProgress(userId: string, contentId: string, contextKey: string, watchTime: number, position: number, duration?: number): Promise<UserProgress> {
+  async trackVideoProgress(userId: string, contentId: string, tenantKey: string, watchTime: number, position: number, duration?: number): Promise<UserProgress> {
     return this.trackProgressEvent({
       userId,
       contentId,
-      contextKey,
+      tenantKey,
       progressType: 'video',
       value: duration ? Math.round((watchTime / duration) * 100) : 0,
       metadata: {
@@ -444,11 +480,11 @@ export class UserProgressTool {
   /**
    * Quick helper for quiz completion.
    */
-  async trackQuizCompletion(userId: string, contentId: string, contextKey: string, score: number, totalQuestions: number, answeredQuestions: number): Promise<UserProgress> {
+  async trackQuizCompletion(userId: string, contentId: string, tenantKey: string, score: number, totalQuestions: number, answeredQuestions: number): Promise<UserProgress> {
     return this.trackProgressEvent({
       userId,
       contentId,
-      contextKey,
+      tenantKey,
       progressType: 'quiz',
       value: Math.round((answeredQuestions / totalQuestions) * 100),
       metadata: {
@@ -462,11 +498,11 @@ export class UserProgressTool {
   /**
    * Quick helper for reading progress.
    */
-  async trackReadingProgress(userId: string, contentId: string, contextKey: string, scrollPosition: number, highlights?: number): Promise<UserProgress> {
+  async trackReadingProgress(userId: string, contentId: string, tenantKey: string, scrollPosition: number, highlights?: number): Promise<UserProgress> {
     return this.trackProgressEvent({
       userId,
       contentId,
-      contextKey,
+      tenantKey,
       progressType: 'reading',
       value: Math.round(scrollPosition * 100),
       metadata: {

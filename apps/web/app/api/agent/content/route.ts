@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies as nextCookies } from 'next/headers';
+import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
-import { createClient } from '@supabase/supabase-js';
 import { AgentService } from '../../../lib/agentService';
-
-// In-memory cache for agent responses (simple optimization)
-const responseCache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes cache
 
 /**
  * POST /api/agent/content
@@ -14,176 +9,79 @@ const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes cache
  * Follows the architectural principle: APIs only invoke agents and return their schema.
  */
 export async function POST(req: NextRequest) {
-  const startTime = Date.now();
+  const cookieStore = await cookies();
+  const supabase = createSupabaseServerClient(cookieStore);
 
   try {
     const body = await req.json();
-    const { userId, contextKey, navOptionId, intent } = body;
+    const { userId, tenantKey, navOptionId, intent } = body;
 
-    console.log('[API/agent/content] Request:', { userId, contextKey, navOptionId, intent });
+    console.log('[API/agent/content] Request:', { userId, tenantKey, navOptionId, intent });
 
-    // Create cache key for this request
-    const cacheKey = `${contextKey}:${navOptionId}:${userId}`;
-
-    // Check cache first
-    const cached = responseCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp < CACHE_DURATION)) {
-      console.log(`[API/agent/content] Cache hit for ${cacheKey}, returning cached response`);
-      return NextResponse.json(cached.data, {
-        headers: {
-          'X-Cache': 'HIT',
-          'X-Response-Time': `${Date.now() - startTime}ms`
-        }
-      });
+    if (!userId || !tenantKey || !navOptionId) {
+      console.error('[API/agent/content] Missing required fields:', { userId, tenantKey, navOptionId });
+      return NextResponse.json(
+        { error: 'Missing required fields: userId, tenantKey, navOptionId' },
+        { status: 400 }
+      );
     }
 
-    // Get user session for authentication (using same method as avatar API)
-    const cookieStore = await nextCookies();
-    const allCookies = cookieStore.getAll();
-    console.log('[API/agent/content] Cookies available:', allCookies.map(c => ({ name: c.name, value: c.value?.substring(0, 10) + '...' })));
-
-    // Extract tokens like the avatar API does
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-    console.log('[API/agent/content] Extracted tokens:', { accessToken: accessToken ? 'present' : 'missing', refreshToken: refreshToken ? 'present' : 'missing' });
-
-    const supabase = createSupabaseServerClient(cookieStore);
-
-    // Manually restore session if tokens are present
-    if (accessToken && refreshToken) {
-      const setSessionRes = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-      console.log('[API/agent/content] setSession result:', setSessionRes.error ? { error: setSessionRes.error } : 'success');
-    } else {
-      console.warn('[API/agent/content] Missing access or refresh token in cookies');
-    }
-
-    // Get current session
+    // ✅ Get session with fallback restoration
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    console.log('[API/agent/content] Auth result:', { user: session?.user?.id, error: sessionError });
 
-    if (sessionError || !session?.user) {
-      console.error('[API/agent/content] Auth error:', sessionError);
-      return NextResponse.json({
-        type: 'AuthError',
-        message: 'Authentication required',
-        details: {
-          error: sessionError?.message || 'No session',
-          cookieCount: allCookies.length
-        }
-      }, { status: 401 });
+    // If no session, try manual hydration once
+    if (!session?.user?.id) {
+      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+      const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
+      const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+
+      if (accessToken && refreshToken) {
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+      }
     }
 
-    const user = session.user;
+    // Final session check
+    const { data: { session: finalSession } } = await supabase.auth.getSession();
+    if (!finalSession?.user?.id) {
+      console.error('[API/agent/content] Session error after restoration:', sessionError);
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-    const effectiveUserId = userId || user.id;
+    // ✅ Verify user matches session
+    if (finalSession.user.id !== userId) {
+      console.error('[API/agent/content] User ID mismatch');
+      return NextResponse.json({ error: 'User ID mismatch' }, { status: 403 });
+    }
 
-    // Use service role for database lookups to avoid RLS issues
-    const serviceSupabase = createClient(
+    console.log('[API/agent/content] Calling LangGraph agent...');
+    const agentService = new AgentService(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      process.env.LANGGRAPH_URL || 'http://localhost:8000'
     );
 
-    // 1. Look up the navigation option to get the agent_id
-    console.log('[API/agent/content] Looking up navOptionId:', navOptionId, 'in context:', contextKey);
+    // For now, use a default agent ID until we implement nav-option-to-agent mapping
+    const defaultAgentId = 'd9f0bd53-ec61-4dfc-95fe-8f3355d293b9'; // leaderforgeContentLibrary
 
-    const { data: navOption, error: queryError } = await serviceSupabase
-      .schema('core')
-      .from('nav_options')
-      .select('*')
-      .eq('context_key', contextKey)
-      .eq('id', navOptionId)
-      .single();
+    const agentResponse = await agentService.invokeAgent(defaultAgentId, {
+      message: intent?.message || `Show me content for navigation option ${navOptionId}`,
+      userId,
+      tenantKey: tenantKey,
+      navOptionId,
+      metadata: { navOptionId }
+    });
 
-    if (queryError || !navOption) {
-      console.error('[API/agent/content] Navigation lookup error:', queryError);
-      return NextResponse.json({
-        type: 'NavOptionNotFound',
-        message: 'Navigation option not found',
-        details: { contextKey, navOptionId }
-      }, { status: 404 });
-    }
-
-    console.log('[API/agent/content] Found nav option:', navOption);
-
-    // 2. Check if nav option has an agent_id
-    if (!navOption.agent_id) {
-      console.log('[API/agent/content] No agent assigned to nav option, returning fallback');
-      return NextResponse.json({
-        type: 'no_agent',
-        message: 'No agent assigned to this navigation option',
-        fallback: {
-          type: 'message',
-          content: `No agent configured for ${navOption.label}. Please contact support.`
-        }
-      });
-    }
-
-    // 3. Look up the agent from the database
-    const { data: agent, error: agentError } = await serviceSupabase
-      .schema('core')
-      .from('agents')
-      .select('*')
-      .eq('id', navOption.agent_id)
-      .single();
-
-    if (agentError || !agent) {
-      console.error('[API/agent/content] Agent lookup error:', agentError);
-      return NextResponse.json({
-        type: 'AgentNotFound',
-        message: 'Agent not found',
-        details: { agentId: navOption.agent_id }
-      }, { status: 404 });
-    }
-
-    console.log('[API/agent/content] Found agent:', { id: agent.id, name: agent.name, type: agent.type });
-
-    // 4. Invoke the agent based on its type using AgentService
-    try {
-      const agentService = new AgentService(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        process.env.LANGGRAPH_URL || 'http://localhost:8000'
-      );
-
-      const agentResponse = await agentService.invokeAgent(agent.id, {
-        message: intent?.message || `Show me content for ${navOption.label}`,
-        userId: effectiveUserId,
-        contextKey,
-        navOptionId,
-        metadata: { navOption, agent }
-      });
-
-      console.log('[API/agent/content] Agent response:', agentResponse);
-
-      // Cache the response
-      responseCache.set(cacheKey, { data: agentResponse, timestamp: Date.now() });
-
-      return NextResponse.json(agentResponse, {
-        headers: {
-          'X-Cache': 'MISS',
-          'X-Response-Time': `${Date.now() - startTime}ms`
-        }
-      });
-
-    } catch (agentError) {
-      console.error('[API/agent/content] Agent invocation error:', agentError);
-      return NextResponse.json({
-        type: 'AgentError',
-        message: 'Agent invocation failed',
-        error: agentError.message
-      }, { status: 500 });
-    }
-
+    console.log('[API/agent/content] Agent response:', agentResponse);
+    return NextResponse.json(agentResponse);
   } catch (error) {
-    console.error('[API/agent/content] Unexpected error:', error);
-    return NextResponse.json({
-      type: 'ServerError',
-      message: 'Internal server error'
-    }, { status: 500 });
+    console.error('[API/agent/content] Error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
