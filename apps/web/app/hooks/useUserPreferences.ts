@@ -28,7 +28,7 @@ export function useUserPreferences(userId: string, options?: { enabled?: boolean
       // Only retry once for other errors
       return failureCount < 1;
     },
-    refetchOnWindowFocus: true, // Refetch on window focus to get latest navigation state
+    refetchOnWindowFocus: false, // Don't refetch on focus to prevent annoying page reloads when switching tabs
     refetchOnReconnect: false, // Don't refetch on reconnect
     networkMode: 'offlineFirst', // Support offline-first
     throwOnError: false, // Don't throw errors, handle them gracefully

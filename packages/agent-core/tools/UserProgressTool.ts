@@ -113,7 +113,10 @@ export interface UserProgressRepository {
  * Supabase-backed implementation of UserProgressRepository.
  */
 export class SupabaseUserProgressRepository implements UserProgressRepository {
-  constructor(private supabase: any) {}
+  constructor(private supabase: {
+    schema: (name: string) => any;
+    auth: { uid: () => string | undefined };
+  }) {}
   /**
    * Fetch progress for a single user/content/context.
    */
@@ -226,21 +229,86 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
   async trackProgressEvent(event: ProgressEvent): Promise<UserProgress> {
     const existingProgress = await this.getProgress(event.userId, event.contentId, event.tenantKey);
 
+    // Determine if this is a new session
+    const isNewSession = this.isNewSession(existingProgress, event);
+
+    // Determine if this is a completion transition (incomplete -> complete)
+    const isCompletionTransition = this.isCompletionTransition(existingProgress, event);
+
     // Update progress based on event
     const updatedProgress: Partial<UserProgress> = {
       progress_type: event.progressType,
       progress_percentage: event.value,
       metadata: { ...existingProgress?.metadata, ...event.metadata },
-      total_sessions: (existingProgress?.total_sessions || 0) + 1
+      last_viewed_at: event.timestamp || new Date().toISOString()
     };
 
-    // Mark as completed if 100%
+    // Only increment total_sessions for new sessions
+    if (isNewSession) {
+      updatedProgress.total_sessions = (existingProgress?.total_sessions || 0) + 1;
+    }
+
+    // Mark as completed and increment completion_count only on transition to complete
     if (event.value >= 100) {
       updatedProgress.completed_at = event.timestamp || new Date().toISOString();
-      updatedProgress.completion_count = (existingProgress?.completion_count || 0) + 1;
+
+      // Only increment completion_count if transitioning from incomplete to complete
+      if (isCompletionTransition) {
+        updatedProgress.completion_count = (existingProgress?.completion_count || 0) + 1;
+      }
     }
 
     return this.setProgress(event.userId, event.contentId, event.tenantKey, updatedProgress);
+  }
+
+  /**
+   * Determine if this event represents a new session.
+   * A new session is when:
+   * - No existing progress (first time)
+   * - Last viewed was more than 30 minutes ago
+   * - Progress went from 0 to > 0 (restarting content)
+   */
+  private isNewSession(existingProgress: UserProgress | null, event: ProgressEvent): boolean {
+    // First time watching
+    if (!existingProgress) {
+      return true;
+    }
+
+    // Check if enough time has passed since last view (30 minutes = session timeout)
+    const lastViewedAt = new Date(existingProgress.last_viewed_at);
+    const now = new Date(event.timestamp || new Date().toISOString());
+    const timeDifferenceMinutes = (now.getTime() - lastViewedAt.getTime()) / (1000 * 60);
+
+    if (timeDifferenceMinutes > 30) {
+      return true;
+    }
+
+    // Check if restarting content (progress was 0 and now > 0)
+    if (existingProgress.progress_percentage === 0 && event.value > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Determine if this event represents a completion transition.
+   * Only count as completion if going from incomplete to complete state.
+   */
+  private isCompletionTransition(existingProgress: UserProgress | null, event: ProgressEvent): boolean {
+    // If no existing progress and reaching 100%, this is a completion
+    if (!existingProgress && event.value >= 100) {
+      return true;
+    }
+
+    // If existing progress was incomplete and now reaching 100%, this is a completion
+    if (existingProgress &&
+        existingProgress.progress_percentage < 100 &&
+        event.value >= 100) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -407,18 +475,33 @@ export class UserProgressTool {
   async trackProgressEvent(event: ProgressEvent): Promise<UserProgress> {
     const existingProgress = await this.getProgress(event.userId, event.contentId, event.tenantKey);
 
+    // Determine if this is a new session
+    const isNewSession = this.isNewSession(existingProgress, event);
+
+    // Determine if this is a completion transition (incomplete -> complete)
+    const isCompletionTransition = this.isCompletionTransition(existingProgress, event);
+
     // Update progress based on event
     const updatedProgress: Partial<UserProgress> = {
       progress_type: event.progressType,
       progress_percentage: event.value,
       metadata: { ...existingProgress?.metadata, ...event.metadata },
-      total_sessions: (existingProgress?.total_sessions || 0) + 1
+      last_viewed_at: event.timestamp || new Date().toISOString()
     };
 
-    // Mark as completed if 100%
+    // Only increment total_sessions for new sessions
+    if (isNewSession) {
+      updatedProgress.total_sessions = (existingProgress?.total_sessions || 0) + 1;
+    }
+
+    // Mark as completed and increment completion_count only on transition to complete
     if (event.value >= 100) {
       updatedProgress.completed_at = event.timestamp || new Date().toISOString();
-      updatedProgress.completion_count = (existingProgress?.completion_count || 0) + 1;
+
+      // Only increment completion_count if transitioning from incomplete to complete
+      if (isCompletionTransition) {
+        updatedProgress.completion_count = (existingProgress?.completion_count || 0) + 1;
+      }
     }
 
     return this.setProgress(event.userId, event.contentId, event.tenantKey, updatedProgress);
@@ -510,5 +593,55 @@ export class UserProgressTool {
         highlightCount: highlights || 0
       }
     });
+  }
+
+  /**
+   * Determine if this event represents a new session.
+   * A new session is when:
+   * - No existing progress (first time)
+   * - Last viewed was more than 30 minutes ago
+   * - Progress went from 0 to > 0 (restarting content)
+   */
+  private isNewSession(existingProgress: UserProgress | null, event: ProgressEvent): boolean {
+    // First time watching
+    if (!existingProgress) {
+      return true;
+    }
+
+    // Check if enough time has passed since last view (30 minutes = session timeout)
+    const lastViewedAt = new Date(existingProgress.last_viewed_at);
+    const now = new Date(event.timestamp || new Date().toISOString());
+    const timeDifferenceMinutes = (now.getTime() - lastViewedAt.getTime()) / (1000 * 60);
+
+    if (timeDifferenceMinutes > 30) {
+      return true;
+    }
+
+    // Check if restarting content (progress was 0 and now > 0)
+    if (existingProgress.progress_percentage === 0 && event.value > 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Determine if this event represents a completion transition.
+   * Only count as completion if going from incomplete to complete state.
+   */
+  private isCompletionTransition(existingProgress: UserProgress | null, event: ProgressEvent): boolean {
+    // If no existing progress and reaching 100%, this is a completion
+    if (!existingProgress && event.value >= 100) {
+      return true;
+    }
+
+    // If existing progress was incomplete and now reaching 100%, this is a completion
+    if (existingProgress &&
+        existingProgress.progress_percentage < 100 &&
+        event.value >= 100) {
+      return true;
+    }
+
+    return false;
   }
 }

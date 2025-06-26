@@ -64,6 +64,7 @@ async function getAuthenticatedSupabase() {
   return { supabase, session: finalSession };
 }
 
+
 /**
  * Service for user profile and preferences logic. All business rules and data access for users live here.
  * Optimized for performance with minimal logging.

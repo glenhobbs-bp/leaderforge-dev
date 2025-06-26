@@ -122,7 +122,7 @@ export function VideoPlayerModal({
   const handlePause = () => {
     console.log('[VideoPlayerModal] Video pause event - setting isPlaying to false');
     setIsPlaying(false);
-    // Progress will be auto-saved by the 10-second interval
+          // Progress will be auto-saved by the 5-second interval
   };
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
@@ -231,7 +231,7 @@ export function VideoPlayerModal({
     }
   }, [open, title, userId, saveProgressToAPI]);
 
-  // Auto-save progress every 10 seconds while playing
+  // Auto-save progress every 5 seconds while playing (industry standard)
   useEffect(() => {
     console.log('[VideoPlayerModal] Auto-save effect triggered:', {
       isPlaying,
@@ -246,7 +246,7 @@ export function VideoPlayerModal({
       return;
     }
 
-    console.log('[VideoPlayerModal] Starting auto-save interval (10 seconds)');
+    console.log('[VideoPlayerModal] Starting auto-save interval (5 seconds)');
     const interval = window.setInterval(() => {
       console.log('[VideoPlayerModal] Auto-save interval triggered');
       if (videoRef.current && title && userId && saveProgressRef.current) {
@@ -262,7 +262,7 @@ export function VideoPlayerModal({
       } else {
         console.log('[VideoPlayerModal] Auto-save skipped - missing video/title/user/saveFunction');
       }
-    }, 10000); // Save every 10 seconds
+    }, 5000); // Save every 5 seconds (industry standard)
 
     return () => {
       console.log('[VideoPlayerModal] Clearing auto-save interval');
