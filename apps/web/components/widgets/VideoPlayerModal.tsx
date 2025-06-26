@@ -466,15 +466,15 @@ export function VideoPlayerModal({
       <div
         className={`absolute inset-0 pointer-events-auto transition-all duration-300 ${
           isPlaying && !isLoading && !error
-            ? 'bg-black/70 backdrop-blur-sm'
-            : 'bg-black/50'
+            ? 'bg-black/80 backdrop-blur-md'
+            : 'bg-black/60'
         }`}
         onClick={() => onOpenChange(false)}
       />
 
       {/* Modal Window */}
       <div
-        className="border border-white/20 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute"
+        className="border-8 border-white/30 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute"
         style={{
           width: `${modalSize.width}px`,
           height: `${modalSize.height}px`,
@@ -505,7 +505,7 @@ export function VideoPlayerModal({
                 }`}
                 onMouseDown={handleDragStart}
               >
-                <div className="bg-black/70 backdrop-blur-sm rounded-lg px-3 py-2">
+                <div className="bg-black/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
                   <span className="text-white text-sm font-medium">{title}</span>
                 </div>
               </div>
