@@ -327,7 +327,7 @@ export function VideoPlayerModal({
       return;
     }
 
-    console.log('[VideoPlayerModal] Starting auto-save interval (5 seconds)');
+    console.log('[VideoPlayerModal] Starting auto-save interval (15 seconds)');
     const interval = window.setInterval(() => {
       console.log('[VideoPlayerModal] Auto-save interval triggered');
       if (videoRef.current && title && userId && saveProgressRef.current) {
@@ -466,7 +466,7 @@ export function VideoPlayerModal({
       <div
         className={`absolute inset-0 pointer-events-auto transition-all duration-300 ${
           isPlaying && !isLoading && !error
-            ? 'bg-black/80 backdrop-blur-md'
+            ? 'bg-black/80 backdrop-blur-sm'
             : 'bg-black/60'
         }`}
         onClick={() => onOpenChange(false)}
@@ -474,7 +474,7 @@ export function VideoPlayerModal({
 
       {/* Modal Window */}
       <div
-        className="border-8 border-white/30 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute"
+        className="border-8 border-white/30 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute cursor-move group"
         style={{
           width: `${modalSize.width}px`,
           height: `${modalSize.height}px`,
@@ -483,7 +483,17 @@ export function VideoPlayerModal({
           transform: 'translate(-50%, -50%)',
           zIndex: 1000
         }}
+        onMouseDown={handleDragStart}
       >
+        {/* Professional YouTube-style resize handle - appears on modal hover */}
+        <div
+          className="absolute bottom-0 right-0 w-6 h-6 cursor-nw-resize opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30"
+          onMouseDown={handleResizeStart}
+        >
+          <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-white/60"></div>
+          <div className="absolute bottom-0.5 right-0.5 w-2 h-2 border-r border-b border-white/40"></div>
+        </div>
+
         <div className="aspect-video w-full relative group">
 
               {/* Close button - always visible in top-right corner */}
@@ -505,19 +515,12 @@ export function VideoPlayerModal({
                 }`}
                 onMouseDown={handleDragStart}
               >
-                <div className="bg-black/80 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+                <div className="bg-black/30 backdrop-blur-sm rounded-xl px-2 py-1">
                   <span className="text-white text-sm font-medium">{title}</span>
                 </div>
               </div>
 
-              {/* Professional YouTube-style resize handle - appears on hover */}
-              <div
-                className="absolute bottom-0 right-0 w-4 h-4 cursor-nw-resize opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20"
-                onMouseDown={handleResizeStart}
-              >
-                <div className="absolute bottom-1 right-1 w-2 h-2 border-r-2 border-b-2 border-white/60"></div>
-                <div className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 border-r border-b border-white/40"></div>
-              </div>
+
 
               {/* Video element */}
               <video

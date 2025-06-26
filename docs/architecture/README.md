@@ -101,6 +101,9 @@ Documentation for all external service integrations:
 
 ## Compliance & Reviews
 
+### 🔍 **Architecture Governance**
+- **[Architecture Compliance Checklist](./architecture-compliance-checklist.md)** - Comprehensive checklist for periodic architectural review and compliance verification
+
 ### Documentation Requirements
 - **All major decisions** must have ADRs
 - **External integrations** must be documented
@@ -108,7 +111,8 @@ Documentation for all external service integrations:
 - **Performance changes** require benchmarking
 
 ### Review Schedule
-- **Monthly**: Review pending ADRs and decisions
+- **Weekly**: Development compliance review using checklist
+- **Monthly**: Review pending ADRs and architectural health
 - **Quarterly**: Assess architecture health and tech debt
 - **Semi-Annual**: Review architectural principles and patterns
 - **Annual**: Comprehensive architecture assessment
@@ -118,6 +122,7 @@ Documentation for all external service integrations:
 - **Code Review**: Implementation checked against architecture
 - **Security Review**: Security implications assessed
 - **Performance Review**: Performance impact measured
+- **Compliance Review**: Weekly checklist verification
 
 ## Getting Started
 

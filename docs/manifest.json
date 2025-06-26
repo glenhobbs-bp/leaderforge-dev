@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-06-25T10:35:53.622Z",
+    "generated_at": "2025-06-26T16:07:45.037Z",
     "generator_version": "1.0.0",
-    "total_files": 231,
-    "total_size_bytes": 1984714,
+    "total_files": 233,
+    "total_size_bytes": 2032816,
     "file_types": {
-      ".ts": 103,
+      ".ts": 104,
       ".json": 16,
       ".tsx": 33,
       ".js": 2,
-      ".md": 76,
+      ".md": 77,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 136,
+      "TypeScript": 137,
       "API": 34,
-      "AI agent": 99,
+      "AI agent": 101,
       "React": 33,
       "React hooks": 23,
       "Next.js API": 33,
-      "security": 58,
+      "security": 59,
       "test": 10,
       "API endpoint": 2,
       "navigation state": 2,
@@ -38,7 +38,7 @@
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 28,
+      "utility": 29,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
@@ -61,7 +61,7 @@
       "dashboard": 1,
       "batched queries": 1,
       "database-driven": 1,
-      "documentation": 78,
+      "documentation": 79,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -223,13 +223,12 @@
         "next/server",
         "next/headers",
         "../../../lib/supabaseServerClient",
-        "@supabase/supabase-js",
         "../../../lib/agentService"
       ],
-      "last_modified": "2025-06-22T08:49:26.074Z",
-      "size_bytes": 7069,
-      "hash": "7dfdec6a",
-      "complexity": "medium"
+      "last_modified": "2025-06-25T20:09:30.858Z",
+      "size_bytes": 3385,
+      "hash": "831c6b6a",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/api/agent/context/route.ts",
@@ -250,9 +249,9 @@
         "../../../lib/types",
         "next/headers"
       ],
-      "last_modified": "2025-06-21T11:51:56.577Z",
-      "size_bytes": 21583,
-      "hash": "88134310",
+      "last_modified": "2025-06-25T17:58:24.852Z",
+      "size_bytes": 21569,
+      "hash": "902fea88",
       "complexity": "high"
     },
     {
@@ -297,9 +296,9 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/content/[context_key]/route.ts",
+      "path": "apps/web/app/api/content/[tenant_key]/route.ts",
       "name": "route.ts",
-      "directory": "apps/web/app/api/content/[context_key]",
+      "directory": "apps/web/app/api/content/[tenant_key]",
       "extension": ".ts",
       "purpose": "✅ Get session from Supabase cookie",
       "tags": [
@@ -314,79 +313,9 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-21T00:59:26.382Z",
-      "size_bytes": 1778,
-      "hash": "63fe04a7",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/api/context/[context_key]/bundle/route.ts",
-      "name": "route.ts",
-      "directory": "apps/web/app/api/context/[context_key]/bundle",
-      "extension": ".ts",
-      "purpose": "GET /api/context/[context_key]/bundle",
-      "tags": [
-        "TypeScript",
-        "API",
-        "Next.js API",
-        "security"
-      ],
-      "dependencies": [
-        "next/server",
-        "../../../../lib/batchService",
-        "../../../../lib/supabaseServerClient",
-        "next/headers"
-      ],
-      "last_modified": "2025-06-18T18:38:24.097Z",
-      "size_bytes": 2721,
-      "hash": "b7c68dca",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/api/context/[context_key]/route.ts",
-      "name": "route.ts",
-      "directory": "apps/web/app/api/context/[context_key]",
-      "extension": ".ts",
-      "purpose": "GET /api/context/[context_key]",
-      "tags": [
-        "TypeScript",
-        "API",
-        "Next.js API",
-        "security"
-      ],
-      "dependencies": [
-        "next/server",
-        "../../../lib/contextService",
-        "../../../lib/supabaseServerClient",
-        "next/headers",
-        "../../../lib/types"
-      ],
-      "last_modified": "2025-06-18T18:47:08.334Z",
-      "size_bytes": 3223,
-      "hash": "7a6512f2",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/api/context/list/route.ts",
-      "name": "route.ts",
-      "directory": "apps/web/app/api/context/list",
-      "extension": ".ts",
-      "purpose": "API route to return all available contexts (core.context_configs) for the authenticated user, filtered by entitlement. Used to drive the context selector in the UI. SSR/session safe, Next.js 15+ compatible.",
-      "tags": [
-        "TypeScript",
-        "API",
-        "Next.js API",
-        "security"
-      ],
-      "dependencies": [
-        "next/server",
-        "../../../lib/supabaseServerClient",
-        "next/headers",
-        "../../../lib/types"
-      ],
-      "last_modified": "2025-06-18T17:53:40.795Z",
-      "size_bytes": 2296,
-      "hash": "1b5c3412",
+      "last_modified": "2025-06-25T11:40:21.392Z",
+      "size_bytes": 1768,
+      "hash": "0b8fd27f",
       "complexity": "low"
     },
     {
@@ -515,11 +444,11 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/nav/[context_key]/route.ts",
+      "path": "apps/web/app/api/nav/[tenant_key]/route.ts",
       "name": "route.ts",
-      "directory": "apps/web/app/api/nav/[context_key]",
+      "directory": "apps/web/app/api/nav/[tenant_key]",
       "extension": ".ts",
-      "purpose": "API route to return entitlement-filtered nav options for a given context. SSR/session safe, Next.js 15+ compatible.",
+      "purpose": "API route to return entitlement-filtered nav options for a given tenant. SSR/session safe, Next.js 15+ compatible.",
       "tags": [
         "TypeScript",
         "API",
@@ -533,9 +462,9 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-22T05:53:35.406Z",
-      "size_bytes": 3638,
-      "hash": "e87d7d4b",
+      "last_modified": "2025-06-25T11:40:19.533Z",
+      "size_bytes": 3765,
+      "hash": "8f93d1d6",
       "complexity": "medium"
     },
     {
@@ -582,6 +511,76 @@
       "last_modified": "2025-06-18T18:07:44.210Z",
       "size_bytes": 3685,
       "hash": "00c75143",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/tenant/[tenant_key]/bundle/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/tenant/[tenant_key]/bundle",
+      "extension": ".ts",
+      "purpose": "GET /api/context/[context_key]/bundle",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../../lib/batchService",
+        "../../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-18T18:38:24.097Z",
+      "size_bytes": 2721,
+      "hash": "b7c68dca",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/tenant/[tenant_key]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/tenant/[tenant_key]",
+      "extension": ".ts",
+      "purpose": "GET /api/tenant/[tenant_key]",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/tenantService",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-25T13:43:25.286Z",
+      "size_bytes": 3199,
+      "hash": "20a6115b",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/tenant/list/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/tenant/list",
+      "extension": ".ts",
+      "purpose": "API route to return all available contexts (core.context_configs) for the authenticated user, filtered by entitlement. Used to drive the context selector in the UI. SSR/session safe, Next.js 15+ compatible.",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers",
+        "../../../lib/types"
+      ],
+      "last_modified": "2025-06-18T17:53:40.795Z",
+      "size_bytes": 2296,
+      "hash": "1b5c3412",
       "complexity": "low"
     },
     {
@@ -646,9 +645,9 @@
         "next/headers",
         "../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-23T21:00:00.373Z",
-      "size_bytes": 3376,
-      "hash": "63cd5046",
+      "last_modified": "2025-06-25T20:09:22.738Z",
+      "size_bytes": 3374,
+      "hash": "9b108bb9",
       "complexity": "medium"
     },
     {
@@ -691,9 +690,9 @@
         "@supabase/ssr",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T20:14:16.035Z",
-      "size_bytes": 2630,
-      "hash": "5fb385f7",
+      "last_modified": "2025-06-25T20:09:24.292Z",
+      "size_bytes": 2987,
+      "hash": "9156884a",
       "complexity": "medium"
     },
     {
@@ -801,9 +800,9 @@
         "next/server",
         "../../../../lib/userService"
       ],
-      "last_modified": "2025-06-21T16:37:14.450Z",
-      "size_bytes": 1094,
-      "hash": "7241c0c9",
+      "last_modified": "2025-06-25T12:05:52.495Z",
+      "size_bytes": 1091,
+      "hash": "da373abc",
       "complexity": "low"
     },
     {
@@ -968,12 +967,12 @@
         "next/navigation",
         "next/headers",
         "./DashboardClient",
-        "../lib/contextService",
-        "../lib/entitlementService"
+        "../lib/entitlementService",
+        "../lib/tenantService"
       ],
-      "last_modified": "2025-06-25T01:34:57.480Z",
-      "size_bytes": 3757,
-      "hash": "e12ed8d6",
+      "last_modified": "2025-06-25T13:43:22.375Z",
+      "size_bytes": 3677,
+      "hash": "6ec3fef3",
       "complexity": "medium"
     },
     {
@@ -1069,9 +1068,9 @@
         "./useUserPreferences",
         "../lib/types"
       ],
-      "last_modified": "2025-06-22T09:09:28.544Z",
-      "size_bytes": 2810,
-      "hash": "d93120d0",
+      "last_modified": "2025-06-25T12:05:54.548Z",
+      "size_bytes": 2806,
+      "hash": "fcb559cc",
       "complexity": "low"
     },
     {
@@ -1189,9 +1188,9 @@
       "exports": [
         "useUserPreferences"
       ],
-      "last_modified": "2025-06-22T11:41:56.165Z",
-      "size_bytes": 2038,
-      "hash": "97ecb3c5",
+      "last_modified": "2025-06-26T12:33:08.236Z",
+      "size_bytes": 2553,
+      "hash": "7f950c50",
       "complexity": "low"
     },
     {
@@ -1258,9 +1257,9 @@
         "@supabase/supabase-js",
         "../../../../packages/agent-core/tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-24T10:04:28.642Z",
-      "size_bytes": 10603,
-      "hash": "177ec516",
+      "last_modified": "2025-06-25T20:09:27.102Z",
+      "size_bytes": 11659,
+      "hash": "fe3b1c95",
       "complexity": "high"
     },
     {
@@ -1453,15 +1452,15 @@
         "./entitlementService",
         "./navService",
         "./contentService",
-        "./contextService",
+        "./tenantService",
         "./types"
       ],
       "exports": [
         "batchService"
       ],
-      "last_modified": "2025-06-18T18:38:02.173Z",
-      "size_bytes": 4703,
-      "hash": "5947817a",
+      "last_modified": "2025-06-25T13:43:27.036Z",
+      "size_bytes": 6079,
+      "hash": "d7e9a7ab",
       "complexity": "medium"
     },
     {
@@ -1483,9 +1482,9 @@
       "exports": [
         "contentService"
       ],
-      "last_modified": "2025-06-18T18:37:39.921Z",
-      "size_bytes": 4484,
-      "hash": "7f25a072",
+      "last_modified": "2025-06-25T12:06:07.454Z",
+      "size_bytes": 4546,
+      "hash": "66f1c950",
       "complexity": "medium"
     },
     {
@@ -1493,7 +1492,7 @@
       "name": "contextService.ts",
       "directory": "apps/web/app/lib",
       "extension": ".ts",
-      "purpose": "Service for context configuration logic. Optimized for performance with minimal logging.",
+      "purpose": "Service for tenant configuration logic. Optimized for performance with minimal logging.",
       "tags": [
         "TypeScript",
         "utility"
@@ -1504,11 +1503,11 @@
         "./types"
       ],
       "exports": [
-        "contextService"
+        "tenantService"
       ],
-      "last_modified": "2025-06-21T11:39:54.933Z",
-      "size_bytes": 2294,
-      "hash": "2efa8bb4",
+      "last_modified": "2025-06-25T13:43:14.801Z",
+      "size_bytes": 2323,
+      "hash": "08216892",
       "complexity": "low"
     },
     {
@@ -1529,9 +1528,9 @@
       "exports": [
         "entitlementService"
       ],
-      "last_modified": "2025-06-22T01:48:18.978Z",
-      "size_bytes": 5334,
-      "hash": "15cdc28a",
+      "last_modified": "2025-06-25T12:05:47.751Z",
+      "size_bytes": 5329,
+      "hash": "dd4df464",
       "complexity": "medium"
     },
     {
@@ -1539,15 +1538,16 @@
       "name": "index.ts",
       "directory": "apps/web/app/lib",
       "extension": ".ts",
-      "purpose": "New optimized batch service for performance",
+      "purpose": "—",
       "tags": [
         "TypeScript",
         "utility",
+        "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-18T18:37:42.634Z",
-      "size_bytes": 448,
-      "hash": "1bf21ce6",
+      "last_modified": "2025-06-25T13:43:17.250Z",
+      "size_bytes": 616,
+      "hash": "af4f8e02",
       "complexity": "low"
     },
     {
@@ -1569,9 +1569,9 @@
       "exports": [
         "navService"
       ],
-      "last_modified": "2025-06-21T11:40:46.127Z",
-      "size_bytes": 5249,
-      "hash": "21cebd7c",
+      "last_modified": "2025-06-25T12:05:45.434Z",
+      "size_bytes": 5237,
+      "hash": "04b9f33f",
       "complexity": "medium"
     },
     {
@@ -1677,6 +1677,27 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/lib/tenantService.ts",
+      "name": "tenantService.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Service for tenant configuration logic. Optimized for performance with minimal logging.",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "./types"
+      ],
+      "exports": [
+        "tenantService"
+      ],
+      "last_modified": "2025-06-25T13:58:43.927Z",
+      "size_bytes": 2318,
+      "hash": "7c1b09fb",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/lib/types.ts",
       "name": "types.ts",
       "directory": "apps/web/app/lib",
@@ -1691,9 +1712,9 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-22T09:09:31.979Z",
-      "size_bytes": 4304,
-      "hash": "41f6b564",
+      "last_modified": "2025-06-25T13:43:20.914Z",
+      "size_bytes": 4299,
+      "hash": "593c85fb",
       "complexity": "medium"
     },
     {
@@ -1707,9 +1728,9 @@
         "utility",
         "AI agent"
       ],
-      "last_modified": "2025-06-23T02:13:10.304Z",
-      "size_bytes": 2323,
-      "hash": "d0fd83c7",
+      "last_modified": "2025-06-25T17:58:26.706Z",
+      "size_bytes": 2319,
+      "hash": "79ccdd63",
       "complexity": "low"
     },
     {
@@ -1768,9 +1789,9 @@
         "next/headers",
         "./types"
       ],
-      "last_modified": "2025-06-22T05:53:32.928Z",
-      "size_bytes": 8588,
-      "hash": "2a464406",
+      "last_modified": "2025-06-26T14:34:00.941Z",
+      "size_bytes": 7673,
+      "hash": "8248b1b6",
       "complexity": "medium"
     },
     {
@@ -1887,7 +1908,7 @@
       "exports": [
         "TestWidgetsPage"
       ],
-      "last_modified": "2025-06-25T10:24:21.480Z",
+      "last_modified": "2025-06-25T10:37:06.942Z",
       "size_bytes": 10173,
       "hash": "33aea2ef",
       "complexity": "medium"
@@ -1969,9 +1990,9 @@
         "../widgets",
         "../widgets/VideoPlayerModal"
       ],
-      "last_modified": "2025-06-24T22:11:16.047Z",
-      "size_bytes": 6493,
-      "hash": "ce05097e",
+      "last_modified": "2025-06-26T11:07:41.090Z",
+      "size_bytes": 6941,
+      "hash": "91f60cb0",
       "complexity": "medium"
     },
     {
@@ -2000,9 +2021,9 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-24T22:29:27.134Z",
-      "size_bytes": 25495,
-      "hash": "5acd9b0c",
+      "last_modified": "2025-06-25T21:48:49.622Z",
+      "size_bytes": 27225,
+      "hash": "d73fa5c7",
       "complexity": "high"
     },
     {
@@ -2187,9 +2208,9 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-24T22:29:34.047Z",
-      "size_bytes": 19332,
-      "hash": "dcf0f5b7",
+      "last_modified": "2025-06-25T12:05:56.238Z",
+      "size_bytes": 19331,
+      "hash": "253146e4",
       "complexity": "high"
     },
     {
@@ -2325,9 +2346,9 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-25T10:25:24.665Z",
-      "size_bytes": 3317,
-      "hash": "8ffc8c3b",
+      "last_modified": "2025-06-26T13:31:53.789Z",
+      "size_bytes": 5348,
+      "hash": "6ff0b3c1",
       "complexity": "medium"
     },
     {
@@ -2372,7 +2393,7 @@
       "dependencies": [
         "react"
       ],
-      "last_modified": "2025-06-25T10:17:33.992Z",
+      "last_modified": "2025-06-25T10:37:06.941Z",
       "size_bytes": 4380,
       "hash": "a99a7e18",
       "complexity": "medium"
@@ -2392,11 +2413,12 @@
       "dependencies": [
         "react",
         "next/image",
+        "lucide-react",
         "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-25T09:18:56.007Z",
-      "size_bytes": 4989,
-      "hash": "817b06d4",
+      "last_modified": "2025-06-26T15:49:38.412Z",
+      "size_bytes": 10770,
+      "hash": "7d826488",
       "complexity": "medium"
     },
     {
@@ -2416,7 +2438,7 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-25T10:24:53.126Z",
+      "last_modified": "2025-06-25T10:37:06.941Z",
       "size_bytes": 3201,
       "hash": "afd98e11",
       "complexity": "medium"
@@ -2435,7 +2457,7 @@
       "dependencies": [
         "react"
       ],
-      "last_modified": "2025-06-25T10:16:46.404Z",
+      "last_modified": "2025-06-25T10:37:06.941Z",
       "size_bytes": 2520,
       "hash": "1d45d3a4",
       "complexity": "medium"
@@ -2455,7 +2477,7 @@
         "react",
         "next/image"
       ],
-      "last_modified": "2025-06-25T10:18:25.711Z",
+      "last_modified": "2025-06-25T10:37:06.941Z",
       "size_bytes": 4993,
       "hash": "67aff937",
       "complexity": "medium"
@@ -2480,9 +2502,9 @@
         "../../app/hooks/useUniversalProgress",
         "../../../../packages/agent-core/types/ComponentSchema"
       ],
-      "last_modified": "2025-06-24T21:32:39.119Z",
-      "size_bytes": 12082,
-      "hash": "f53a12ee",
+      "last_modified": "2025-06-26T16:07:34.651Z",
+      "size_bytes": 17476,
+      "hash": "1c3a6a98",
       "complexity": "high"
     },
     {
@@ -2506,9 +2528,9 @@
         "./Panel",
         "./Grid"
       ],
-      "last_modified": "2025-06-25T10:25:32.607Z",
-      "size_bytes": 2785,
-      "hash": "4a0061a2",
+      "last_modified": "2025-06-25T21:48:49.649Z",
+      "size_bytes": 3268,
+      "hash": "83c4f3b1",
       "complexity": "medium"
     },
     {
@@ -2602,9 +2624,9 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-22T06:20:24.635Z",
-      "size_bytes": 1721,
-      "hash": "926105ec",
+      "last_modified": "2025-06-25T17:58:28.861Z",
+      "size_bytes": 1720,
+      "hash": "1def0240",
       "complexity": "low"
     },
     {
@@ -3619,6 +3641,21 @@
       "hash": "0b72a540"
     },
     {
+      "path": "docs/architecture/architecture-compliance-checklist.md",
+      "name": "architecture-compliance-checklist.md",
+      "directory": "docs/architecture",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-26T14:33:57.810Z",
+      "size_bytes": 9425,
+      "hash": "c7f125bb"
+    },
+    {
       "path": "docs/architecture/directory-structure.md",
       "name": "directory-structure.md",
       "directory": "docs/architecture",
@@ -3656,9 +3693,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:27:01.955Z",
-      "size_bytes": 6822,
-      "hash": "731030f2"
+      "last_modified": "2025-06-26T15:40:39.921Z",
+      "size_bytes": 7156,
+      "hash": "972cd2ec"
     },
     {
       "path": "docs/engineering/how-to/README.md",
@@ -3713,9 +3750,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:25:04.372Z",
-      "size_bytes": 3133,
-      "hash": "34397f6c"
+      "last_modified": "2025-06-25T10:40:37.445Z",
+      "size_bytes": 10728,
+      "hash": "7520263c"
     },
     {
       "path": "docs/engineering/README.md",
@@ -3798,9 +3835,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-25T01:40:18.915Z",
-      "size_bytes": 117494,
-      "hash": "15b5fc9e"
+      "last_modified": "2025-06-26T15:59:08.034Z",
+      "size_bytes": 120417,
+      "hash": "50ffd5a0"
     },
     {
       "path": "docs/manifest.md",
@@ -3813,9 +3850,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-25T01:40:18.922Z",
-      "size_bytes": 44079,
-      "hash": "9ba36e13"
+      "last_modified": "2025-06-26T15:59:08.059Z",
+      "size_bytes": 45248,
+      "hash": "c0a268cc"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -3826,9 +3863,9 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-25T09:18:29.169Z",
-      "size_bytes": 25788,
-      "hash": "d7740ded"
+      "last_modified": "2025-06-26T16:07:06.064Z",
+      "size_bytes": 29556,
+      "hash": "2a51764e"
     },
     {
       "path": "docs/product-design/README.md",
@@ -3939,9 +3976,9 @@
         "../tools/ToolRegistry",
         "../tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-22T20:45:33.741Z",
-      "size_bytes": 10461,
-      "hash": "bd3d998c",
+      "last_modified": "2025-06-25T20:09:13.725Z",
+      "size_bytes": 10436,
+      "hash": "42dc9b8c",
       "complexity": "high"
     },
     {
@@ -4087,9 +4124,9 @@
       "exports": [
         "echoTool"
       ],
-      "last_modified": "2025-06-22T16:13:33.406Z",
-      "size_bytes": 5715,
-      "hash": "3e6bf8c0",
+      "last_modified": "2025-06-25T20:09:37.663Z",
+      "size_bytes": 5698,
+      "hash": "75dc2ae9",
       "complexity": "medium"
     },
     {
@@ -4120,9 +4157,9 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T09:44:57.762Z",
-      "size_bytes": 16547,
-      "hash": "5d079914",
+      "last_modified": "2025-06-26T12:28:20.287Z",
+      "size_bytes": 22366,
+      "hash": "2a6d5df3",
       "complexity": "high"
     },
     {

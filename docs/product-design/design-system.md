@@ -453,6 +453,32 @@ LeaderForge uses a sophisticated glassmorphism design language for premium UI co
     inset 0 1px 0 rgba(255,255,255,0.5);
   border-color: rgba(var(--primary-rgb), 0.3);
 }
+
+/* Premium Elevated Cards - for hero content */
+.card-glass-elevated {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 1.25rem; /* 20px */
+  box-shadow:
+    0 16px 48px rgba(0,0,0,0.15),
+    0 8px 24px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.6),
+    inset 0 0 0 1px rgba(255,255,255,0.1);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-glass-elevated:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.2),
+    0 12px 30px rgba(0,0,0,0.15),
+    inset 0 1px 0 rgba(255,255,255,0.7),
+    inset 0 0 0 1px rgba(255,255,255,0.2);
+  border-color: rgba(var(--primary-rgb), 0.4);
+}
 ```
 
 #### Glassmorphism Typography
@@ -584,10 +610,67 @@ For use within glassmorphism components, special typography classes provide opti
   }
 }
 
+/* Premium Glassmorphism Button Variants */
+.btn-gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-full);
+  color: var(--white);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.1),
+    0 2px 8px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow:
+      0 8px 24px rgba(0,0,0,0.15),
+      0 4px 12px rgba(0,0,0,0.1),
+      inset 0 1px 0 rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.3);
+  }
+}
+
+.btn-glass {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.08),
+    0 2px 8px rgba(0,0,0,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.95);
+    box-shadow:
+      0 8px 24px rgba(0,0,0,0.12),
+      0 4px 12px rgba(0,0,0,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.5);
+    border-color: rgba(var(--primary-rgb), 0.3);
+  }
+}
+
 /* Button Sizes */
+.btn-xs {
+  padding: var(--space-1) var(--space-2-5);
+  font-size: var(--text-xs);
+  font-weight: var(--font-normal);
+  gap: var(--space-1);
+}
+
 .btn-sm {
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-xs);
+  font-weight: var(--font-normal);
+  gap: var(--space-1);
 }
 
 .btn-lg {
@@ -598,6 +681,18 @@ For use within glassmorphism components, special typography classes provide opti
 .btn-xl {
   padding: var(--space-5) var(--space-10);
   font-size: var(--text-lg);
+}
+
+/* Icon Buttons */
+.btn-icon {
+  padding: var(--space-2);
+  aspect-ratio: 1;
+  justify-content: center;
+}
+
+.btn-icon-sm {
+  padding: var(--space-1-5);
+  aspect-ratio: 1;
 }
 ```
 
@@ -701,6 +796,66 @@ For use within glassmorphism components, special typography classes provide opti
 .input-error {
   font-size: var(--text-xs);
   color: var(--error-500);
+}
+```
+
+### Progress & Status Widgets
+
+```css
+/* Progress Bars */
+.progress-bar {
+  width: 100%;
+  height: 0.5rem; /* 8px */
+  background-color: rgba(200, 200, 200, 0.6);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: all 0.5s ease-out;
+
+  /* Gradient variants */
+  &.progress-complete {
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+  }
+
+  &.progress-active {
+    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  }
+
+  &.progress-minimal {
+    background-color: #d1d5db;
+    min-width: 4%;
+  }
+}
+
+/* Status Indicators */
+.status-icon {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &.status-complete {
+    background-color: #22c55e;
+    color: white;
+  }
+
+  &.status-incomplete {
+    background-color: #9ca3af;
+    color: white;
+  }
+}
+
+.status-text {
+  font-size: var(--text-xs);
+  font-weight: var(--font-normal);
+  color: var(--text-glass-muted);
 }
 ```
 

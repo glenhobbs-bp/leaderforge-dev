@@ -59,7 +59,7 @@ function isDirectSchema(input: GridInput): input is GridSchema {
   return 'type' in input && input.type === 'Grid';
 }
 
-export default function Grid(input: GridInput & { userId?: string; onAction?: (action: any) => void; onProgressUpdate?: () => void }) {
+export default function Grid(input: GridInput & { userId?: string; onAction?: (action: unknown) => void; onProgressUpdate?: () => void }) {
   // Extract props from either schema or direct props
   let props: GridProps;
 
@@ -119,9 +119,9 @@ export default function Grid(input: GridInput & { userId?: string; onAction?: (a
   }
 
   const gapClasses = {
-    small: 'gap-3',
-    medium: 'gap-4',
-    large: 'gap-6'
+    small: 'gap-4',
+    medium: 'gap-6',
+    large: 'gap-8'
   };
 
   const paddingClasses = {
@@ -133,8 +133,8 @@ export default function Grid(input: GridInput & { userId?: string; onAction?: (a
 
   const backgroundClasses = {
     transparent: '',
-    glass: 'card-glass-subtle',
-    solid: 'card bg-[var(--surface)] border border-[var(--border)] rounded-xl'
+    glass: 'card-glass-premium backdrop-blur-xl',
+    solid: 'card bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg'
   };
 
   const columnClasses = {
@@ -150,12 +150,12 @@ export default function Grid(input: GridInput & { userId?: string; onAction?: (a
     <div className={`
       ${backgroundClasses[background]}
       ${paddingClasses[padding]}
-      transition-all duration-200
+      transition-all duration-300 ease-out
       w-full min-h-0
     `}>
       {title && (
-        <div className="px-6 pt-6 pb-2">
-          <h2 className="text-glass-primary text-xl font-bold tracking-tight">
+        <div className="px-8 pt-8 pb-4">
+          <h2 className="text-glass-primary text-2xl font-bold tracking-tight leading-tight">
             {title}
           </h2>
         </div>
@@ -166,7 +166,7 @@ export default function Grid(input: GridInput & { userId?: string; onAction?: (a
         ${columnClasses[columns]}
         ${gapClasses[gap]}
         auto-rows-fr
-        px-6 pb-6
+        px-8 pb-8
         w-full
       `}>
         {children}
