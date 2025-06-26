@@ -39,9 +39,6 @@ export function VideoPlayerModal({
     title,
     poster,
     progress,
-    pills,
-    videoWatched,
-    worksheetSubmitted,
     onCompleteAction,
     description,
   } = schema.props;
@@ -65,6 +62,16 @@ export function VideoPlayerModal({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [localProgress, setLocalProgress] = useState(progress || 0);
+
+  // Modal positioning and sizing state
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
+  const [modalSize, setModalSize] = useState({ width: 800, height: 450 });
+
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   // Update local progress when schema progress changes
   useEffect(() => {
@@ -113,6 +120,76 @@ export function VideoPlayerModal({
 
   // Update the ref whenever the function changes
   saveProgressRef.current = saveProgressToAPI;
+
+  // Mouse event handlers for dragging
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - modalPosition.x, y: e.clientY - modalPosition.y });
+  }, [modalPosition]);
+
+  const handleDragMove = useCallback((e: MouseEvent) => {
+    if (isDragging) {
+      setModalPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  }, [isDragging, dragStart]);
+
+  const handleDragEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Mouse event handlers for resizing
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsResizing(true);
+    setResizeStart({
+      x: e.clientX,
+      y: e.clientY,
+      width: modalSize.width,
+      height: modalSize.height
+    });
+  }, [modalSize]);
+
+  const handleResizeMove = useCallback((e: MouseEvent) => {
+        if (isResizing) {
+      const deltaX = e.clientX - resizeStart.x;
+
+      // Maintain 16:9 aspect ratio
+      const newWidth = Math.max(400, resizeStart.width + deltaX);
+      const newHeight = (newWidth * 9) / 16;
+
+      setModalSize({ width: newWidth, height: newHeight });
+    }
+  }, [isResizing, resizeStart]);
+
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Add mouse event listeners
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleDragMove);
+      document.addEventListener('mouseup', handleDragEnd);
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleDragMove);
+      document.removeEventListener('mouseup', handleDragEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResizeMove);
+      document.addEventListener('mouseup', handleResizeEnd);
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
 
   // Video event handlers
   const handlePlay = () => {
@@ -383,19 +460,19 @@ export function VideoPlayerModal({
         <p className="text-sm text-blue-600">This is a working video player widget</p>
       </div>
 
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-3xl w-full p-0 rounded-xl overflow-hidden">
-          <div className="border border-[var(--bg-neutral)]/30 rounded-xl overflow-hidden" style={{ boxShadow: '0 8px 40px 0 rgba(0,0,0,0.15)' }}>
+                            <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl w-auto h-auto p-0 !bg-transparent border-[0.5px] border-white/10 rounded-xl shadow-2xl overflow-hidden">
             <DialogTitle className="sr-only">{title || 'Video Player'}</DialogTitle>
             <DialogDescription className="sr-only">
               {description || (title ? `Watch ${title}` : 'Video player')}
             </DialogDescription>
 
-            <div className="aspect-video w-full bg-black rounded-t-xl overflow-hidden relative">
+            <div className="aspect-video w-full relative">
+
               {/* Video element */}
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain rounded-xl"
                 poster={poster}
                 controls
                 onPlay={handlePlay}
@@ -418,6 +495,15 @@ export function VideoPlayerModal({
                 playsInline
                 crossOrigin="anonymous"
               />
+
+              {/* Title overlay - only shows when paused */}
+              {!isPlaying && !isLoading && !error && title && (
+                <div className="absolute top-4 left-4 z-10">
+                  <div className="bg-black/70 backdrop-blur-sm rounded-xl px-3 py-2">
+                    <h3 className="text-white text-sm font-medium">{title}</h3>
+                  </div>
+                </div>
+              )}
 
               {/* Loading overlay */}
               {isLoading && (
@@ -450,67 +536,9 @@ export function VideoPlayerModal({
                   </div>
                 </div>
               )}
-            </div>
-
-            <div className="p-6 bg-[var(--card-bg)] flex flex-col gap-3 rounded-b-xl">
-              {title && <DialogTitle>{title}</DialogTitle>}
-              {description && <DialogDescription>{description}</DialogDescription>}
-
-              {/* Progress and status indicators */}
-              <div className="flex flex-col gap-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Progress: {Math.round(localProgress)}%</span>
-                  <span className={videoWatched ? 'text-green-600' : 'text-gray-500'}>
-                    {videoWatched ? '✅ Watched' : '⏸️ Not Watched'}
-                  </span>
-                </div>
-
-                {/* Real-time progress bar */}
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.max(0, Math.min(100, localProgress))}%` }}
-                  />
-                </div>
-
-                {worksheetSubmitted !== undefined && (
-                  <div className="flex justify-between">
-                    <span>Worksheet Status:</span>
-                    <span className={worksheetSubmitted ? 'text-green-600' : 'text-gray-500'}>
-                      {worksheetSubmitted ? '✅ Submitted' : '📝 Not Submitted'}
-                    </span>
-                  </div>
-                )}
-
-                {pills && pills.length > 0 && (
-                  <div className="flex gap-2 mt-2">
-                    {pills.map((pill, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-1 rounded-full text-xs"
-                        style={{
-                          backgroundColor: pill.color || '#gray',
-                          color: 'white'
-                        }}
-                      >
-                        {pill.label}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+                        </div>
         </DialogContent>
-      </Dialog>
-
-      {/* Debug info outside modal for testing */}
-      <div className="mt-4 p-3 bg-white rounded border text-xs text-gray-600">
-        <div><strong>Widget State:</strong> Loading: {isLoading ? 'Yes' : 'No'} | Progress: {Math.round(localProgress)}%</div>
-        <div><strong>URL:</strong> {videoUrl}</div>
-        {error && <div className="text-red-600"><strong>Error:</strong> {error}</div>}
-        <div><strong>Playing:</strong> {isPlaying ? 'Yes' : 'No'} | <strong>Time:</strong> {Math.round(currentTime)}s / {Math.round(duration)}s</div>
-      </div>
+        </Dialog>
     </div>
   );
 }
