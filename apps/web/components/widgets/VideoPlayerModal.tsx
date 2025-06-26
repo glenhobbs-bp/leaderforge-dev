@@ -464,7 +464,11 @@ export function VideoPlayerModal({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 pointer-events-auto"
+        className={`absolute inset-0 pointer-events-auto transition-all duration-300 ${
+          isPlaying && !isLoading && !error
+            ? 'bg-black/70 backdrop-blur-sm'
+            : 'bg-black/50'
+        }`}
         onClick={() => onOpenChange(false)}
       />
 
@@ -481,6 +485,16 @@ export function VideoPlayerModal({
         }}
       >
         <div className="aspect-video w-full relative group">
+
+              {/* Close button - always visible in top-right corner */}
+              <button
+                onClick={() => onOpenChange(false)}
+                className="absolute top-2 right-2 z-30 w-8 h-8 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-colors duration-200"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 6L18 18M6 18L18 6" />
+                </svg>
+              </button>
 
               {/* Professional drag header with semi-transparent black box - shows on hover OR when paused */}
               <div
