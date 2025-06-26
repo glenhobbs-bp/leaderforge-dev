@@ -74,6 +74,15 @@ const config: Config = {
     "from-white",
     "to-gray-50",
     "text-gray-400",
+    // Modal styling classes
+    "backdrop-blur-sm",
+    "backdrop-blur",
+    "border-white/20",
+    "bg-black/70",
+    "bg-black/50",
+    "rounded-lg",
+    "rounded-xl",
+    "rounded-full",
   ],
 };
 
