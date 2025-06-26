@@ -474,14 +474,16 @@ export function VideoPlayerModal({
 
       {/* Modal Window */}
       <div
-        className="border-8 border-white/30 rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute cursor-move group"
+        className="rounded-xl shadow-2xl overflow-hidden bg-black select-none pointer-events-auto absolute cursor-move group"
         style={{
           width: `${modalSize.width}px`,
           height: `${modalSize.height}px`,
           left: `calc(50vw + ${modalPosition.x}px)`,
           top: `calc(50vh + ${modalPosition.y}px)`,
           transform: 'translate(-50%, -50%)',
-          zIndex: 1000
+          zIndex: 1000,
+          border: '5px solid rgba(255, 255, 255, 0.7)',
+          boxSizing: 'border-box'
         }}
         onMouseDown={handleDragStart}
       >

@@ -80,6 +80,7 @@ const config: Config = {
     "backdrop-blur-md",
     "border-white/20",
     "border-white/30",
+    "border-white/50",
     "border-8",
     "bg-black/70",
     "bg-black/80",
