@@ -5,7 +5,7 @@
  * Tags: #widgets #registry #exports
  */
 
-import { WidgetRegistry, WidgetCapabilities, AssetCapabilities } from '@leaderforge/asset-core';
+import { WidgetRegistry, WidgetCapabilities, AssetCapabilities } from './types';
 import StatCard from './StatCard';
 import Leaderboard from './Leaderboard';
 import VideoList from './VideoList';
