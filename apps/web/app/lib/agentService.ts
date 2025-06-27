@@ -113,10 +113,11 @@ export class AgentService {
         if (Array.isArray(obj)) {
           obj.forEach(collectContentIds);
         } else if (obj && typeof obj === 'object') {
-          if (obj.type === 'Card' && obj.props?.title && obj.props?.videoUrl) {
-            contentIds.push(obj.props.title);
-          } else if (obj.type === 'Grid' && obj.props?.items) {
-            obj.props.items.forEach(collectContentIds);
+          // Updated for Universal Widget Schema format
+          if (obj.type === 'Card' && obj.config?.title && obj.data?.videoUrl) {
+            contentIds.push(obj.config.title);
+          } else if (obj.type === 'Grid' && obj.data?.items) {
+            obj.data.items.forEach(collectContentIds);
           } else {
             Object.values(obj).forEach(collectContentIds);
           }
@@ -141,14 +142,22 @@ export class AgentService {
 
       // Helper function to enrich a single card with progress
       const enrichCard = (card: any) => {
-        if (card.type === 'Card' && card.props?.title && card.props?.videoUrl) {
-          const progressData = progressMap[card.props.title];
+        // Updated for Universal Widget Schema format
+        if (card.type === 'Card' && card.config?.title && card.data?.videoUrl) {
+          const progressData = progressMap[card.config.title];
           return {
             ...card,
-            props: {
-              ...card.props,
+            data: {
+              ...card.data,
+              // Replace random/placeholder progress with real data
               progress: progressData?.progress_percentage || 0,
-              videoWatched: (progressData?.progress_percentage || 0) >= 90
+              value: progressData?.progress_percentage || 0,
+              stats: {
+                ...card.data.stats,
+                watched: (progressData?.progress_percentage || 0) >= 90,
+                completed: (progressData?.progress_percentage || 0) >= 100,
+                lastWatched: progressData?.last_viewed_at || null
+              }
             }
           };
         }
@@ -166,13 +175,13 @@ export class AgentService {
             return enrichCard(obj);
           }
 
-          // Handle Grid components with items
-          if (obj.type === 'Grid' && obj.props?.items) {
+          // Handle Grid components with items (Universal Widget Schema format)
+          if (obj.type === 'Grid' && obj.data?.items) {
             return {
               ...obj,
-              props: {
-                ...obj.props,
-                items: obj.props.items.map(enrichContent)
+              data: {
+                ...obj.data,
+                items: obj.data.items.map(enrichContent)
               }
             };
           }

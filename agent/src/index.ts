@@ -187,13 +187,13 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
         duration: content.props?.duration || content.duration,
         featuredImage: content.props?.featuredImage,
         coverImage: content.props?.coverImage,
-        // Progress data (will be enriched by web layer)
-        progress: Math.floor(Math.random() * 101), // Temporary random progress for demo
-        value: Math.floor(Math.random() * 101), // For progress percentage
+        // Progress data (placeholder - will be enriched by web layer)
+        progress: 0, // Will be replaced with real data by AgentService
+        value: 0, // Will be replaced with real data by AgentService
         stats: {
-          watched: Math.random() > 0.5, // Random for demo
-          completed: Math.random() > 0.7, // Random for demo
-          lastWatched: Math.random() > 0.5 ? new Date().toISOString() : null
+          watched: false, // Will be replaced with real data by AgentService
+          completed: false, // Will be replaced with real data by AgentService
+          lastWatched: null // Will be replaced with real data by AgentService
         }
       },
       config: {
