@@ -13,7 +13,7 @@
 ## Pre-Deployment Checklist
 
 ### ✅ **Production Build Validation**
-- [x] Production build successful (`npm run build`)
+- [x] Production build successful (`pnpm run build`)
 - [x] All 28 pages building correctly
 - [x] All 35 API routes functional
 - [x] Bundle optimization complete (102kB first load JS)
@@ -44,13 +44,27 @@
 4. Select repository and continue
 
 ### 2. **Project Configuration**
+
+**Recommended Approach (Turborepo from root):**
+```bash
+# Build Configuration
+Framework Preset: Next.js
+Root Directory: ./
+Build Command: cd apps/web && pnpm run build
+Output Directory: apps/web/.next
+Install Command: pnpm install
+
+# Node.js Version: 18.x (recommended)
+```
+
+**Alternative Approach (if above fails):**
 ```bash
 # Build Configuration
 Framework Preset: Next.js
 Root Directory: apps/web
-Build Command: npm run build
+Build Command: pnpm run turbo:build
 Output Directory: .next
-Install Command: npm install
+Install Command: pnpm install
 
 # Node.js Version: 18.x (recommended)
 ```
