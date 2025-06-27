@@ -60,7 +60,7 @@ const server = createServer(async (req, res) => {
         // Run the graph
         const result = await graph.invoke({
           userId: input.context?.userId || 'test-user',
-          tenantKey: input.context?.tenantKey || input.context?.contextKey || 'leaderforge',
+          tenantKey: input.context?.tenantKey || 'leaderforge',
           navOptionId: input.context?.navOptionId || 'test-nav',
           contentList: [],
           progressMap: {},
