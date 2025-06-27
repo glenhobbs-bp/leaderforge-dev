@@ -26,32 +26,84 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Get session with fallback restoration
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // ✅ Robust Session Restoration with Token Refresh Handling
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
 
-    // If no session, try manual hydration once
-    if (!session?.user?.id) {
-      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-      const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
-      const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+    let session = null;
+    let sessionError = null;
 
-      if (accessToken && refreshToken) {
-        await supabase.auth.setSession({
+    // Try to restore session if tokens are present
+    if (accessToken && refreshToken) {
+      console.log('[API/agent/content] Attempting session restoration...');
+
+      try {
+        const setSessionRes = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
+
+        if (setSessionRes.error) {
+          console.log('[API/agent/content] setSession failed:', setSessionRes.error.message);
+
+          // If JWT is invalid, try refresh
+          if (setSessionRes.error.message.includes('JWT') || setSessionRes.error.message.includes('expired')) {
+            console.log('[API/agent/content] Attempting token refresh...');
+
+            const refreshRes = await supabase.auth.refreshSession();
+            if (refreshRes.error) {
+              console.log('[API/agent/content] Token refresh failed:', refreshRes.error.message);
+              sessionError = refreshRes.error;
+            } else {
+              console.log('[API/agent/content] Token refresh successful');
+              session = refreshRes.data.session;
+            }
+          } else {
+            sessionError = setSessionRes.error;
+          }
+        } else {
+          console.log('[API/agent/content] Session restored successfully');
+          session = setSessionRes.data.session;
+        }
+      } catch (error) {
+        console.log('[API/agent/content] Session restoration threw error:', error.message);
+        sessionError = error;
+      }
+    } else {
+      console.warn('[API/agent/content] Missing access or refresh token in cookies');
+    }
+
+    // Final session check - try one more time to get current session
+    if (!session) {
+      const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
+      session = currentSession;
+      if (currentError && !sessionError) {
+        sessionError = currentError;
       }
     }
 
-    // Final session check
-    const { data: { session: finalSession } } = await supabase.auth.getSession();
-    if (!finalSession?.user?.id) {
-      console.error('[API/agent/content] Session error after restoration:', sessionError);
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.log('[API/agent/content] Final auth result:', {
+      user: session?.user?.id,
+      hasSession: !!session,
+      error: sessionError?.message
+    });
+
+    if (sessionError || !session?.user) {
+      console.error('[API/agent/content] Authentication failed:', sessionError?.message || 'No session');
+      return NextResponse.json({
+        error: 'Authentication required',
+        details: {
+          error: sessionError?.message || 'No session',
+          cookieCount: allCookies.length,
+          hasTokens: !!(accessToken && refreshToken)
+        }
+      }, { status: 401 });
     }
 
     // ✅ Verify user matches session
-    if (finalSession.user.id !== userId) {
+    if (session.user.id !== userId) {
       console.error('[API/agent/content] User ID mismatch');
       return NextResponse.json({ error: 'User ID mismatch' }, { status: 403 });
     }
