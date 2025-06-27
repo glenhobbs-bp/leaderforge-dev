@@ -22,9 +22,10 @@ import { WidgetDispatcher, isWidgetTypeAvailable } from "../widgets";
  * - Pure pass-through to registry-based rendering system
  * - ONLY accepts UniversalWidgetSchema format (no legacy support)
  */
-export function UniversalSchemaRenderer({ schema, userId, onAction, onProgressUpdate }: {
+export function UniversalSchemaRenderer({ schema, userId, tenantKey, onAction, onProgressUpdate }: {
   schema: UniversalWidgetSchema;
   userId?: string;
+  tenantKey?: string;
   onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
   onProgressUpdate?: () => void;
 }) {
@@ -79,6 +80,7 @@ export function UniversalSchemaRenderer({ schema, userId, onAction, onProgressUp
       <WidgetDispatcher
         schema={schema}
         userId={userId}
+        tenantKey={tenantKey}
         onAction={onAction}
         onProgressUpdate={onProgressUpdate}
       />

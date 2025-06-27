@@ -18,6 +18,7 @@ interface VideoPlayerModalProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   userId?: string;
+  tenantKey?: string;
   onProgressUpdate?: () => void;
 }
 
@@ -26,6 +27,7 @@ export function VideoPlayerModal({
   open = true,
   onOpenChange = () => {},
   userId,
+  tenantKey,
   onProgressUpdate
 }: VideoPlayerModalProps) {
   // Type guard to ensure we have a VideoPlayer schema
@@ -106,6 +108,7 @@ export function VideoPlayerModal({
   // Universal Progress API integration
   const { trackVideoProgress } = useUniversalProgress({
     userId: userId || '',
+    contextKey: tenantKey || '', // Use tenantKey for progress tracking
     onProgressUpdate: (progress) => {
       console.log('[VideoPlayerModal] Progress saved to database:', progress);
       // Progress is being tracked and saved to database, but we don't trigger

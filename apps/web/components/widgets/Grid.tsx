@@ -20,6 +20,7 @@ interface GridProps {
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
   availableContent?: unknown[];
   userId?: string;
+  tenantKey?: string;
   onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
   onProgressUpdate?: () => void;
 }
@@ -31,6 +32,7 @@ export default function Grid({
   columns = 3,
   availableContent = [],
   userId,
+  tenantKey,
   onAction,
   onProgressUpdate,
   ...otherProps
@@ -92,6 +94,7 @@ export default function Grid({
             <UniversalSchemaRenderer
               schema={item}
               userId={userId}
+              tenantKey={tenantKey}
               onAction={onAction}
               onProgressUpdate={onProgressUpdate}
             />

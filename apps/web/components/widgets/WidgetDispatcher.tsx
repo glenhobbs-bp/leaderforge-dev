@@ -22,6 +22,7 @@ import Grid from './Grid';
 interface WidgetDispatcherProps {
   schema: UniversalWidgetSchema;
   userId?: string;
+  tenantKey?: string;
   onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
   onProgressUpdate?: () => void;
 }
@@ -43,7 +44,7 @@ export function isWidgetTypeAvailable(type: string): boolean {
  * Routes Universal Widget Schema to appropriate components.
  * All components now accept UniversalWidgetSchema directly.
  */
-export function WidgetDispatcher({ schema, userId, onAction, onProgressUpdate }: WidgetDispatcherProps) {
+export function WidgetDispatcher({ schema, userId, tenantKey, onAction, onProgressUpdate }: WidgetDispatcherProps) {
   console.log('[WidgetDispatcher] Dispatching schema:', {
     type: schema.type,
     id: schema.id,
@@ -69,6 +70,7 @@ export function WidgetDispatcher({ schema, userId, onAction, onProgressUpdate }:
         <VideoPlayerModal
           schema={schema}
           userId={userId}
+          tenantKey={tenantKey}
           onProgressUpdate={onProgressUpdate}
         />
       );

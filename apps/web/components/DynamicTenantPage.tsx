@@ -294,6 +294,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           <UniversalSchemaRenderer
             schema={content as UniversalWidgetSchema}
             userId={session?.user?.id}
+            tenantKey={currentTenant}
             onAction={handleAction}
             onProgressUpdate={() => {
               // Refresh content when video progress is updated
@@ -745,6 +746,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
               }
             }}
             userId={session?.user?.id}
+            tenantKey={currentTenant}
             onProgressUpdate={() => {
               // Refresh content when video progress is updated
               if (selectedNavOptionId) {

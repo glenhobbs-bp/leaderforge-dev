@@ -15,11 +15,12 @@ import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/Uni
 interface PanelProps {
   schema: UniversalWidgetSchema;
   userId?: string;
+  tenantKey?: string;
   onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
   onProgressUpdate?: () => void;
 }
 
-export default function Panel({ schema, userId, onAction, onProgressUpdate }: PanelProps) {
+export default function Panel({ schema, userId, tenantKey, onAction, onProgressUpdate }: PanelProps) {
   // Extract data from Universal Widget Schema (ADR-0009)
   const title = schema.config.title;
   const layout = (schema.config as any).layout || 'vertical';
@@ -76,6 +77,7 @@ export default function Panel({ schema, userId, onAction, onProgressUpdate }: Pa
             key={`panel-widget-${index}`}
             schema={widget}
             userId={userId}
+            tenantKey={tenantKey}
             onAction={onAction}
             onProgressUpdate={onProgressUpdate}
           />
