@@ -4,7 +4,6 @@
   "installCommand": "npm install --legacy-peer-deps",
   "buildCommand": "cd apps/web && npm run build",
   "outputDirectory": "apps/web/.next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/web/",
   "functions": {
     "apps/web/app/api/**/*.ts": {
       "runtime": "nodejs18.x"
