@@ -2,10 +2,12 @@ services:
   - type: web
     name: leaderforge-langgraph
     runtime: node
-    plan: starter
-    buildCommand: cd agent && npm install
+    plan: free
+    buildCommand: cd agent && npm install && npm run build
     startCommand: cd agent && npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
     healthCheckPath: /health
