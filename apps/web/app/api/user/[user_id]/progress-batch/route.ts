@@ -7,8 +7,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { restoreSession } from '../../../../lib/supabaseServerClient';
 
 interface BatchProgressRequest {
   contentIds: string[];
@@ -24,6 +24,15 @@ interface BatchProgressResponse {
     updated_at: string;
   }>;
   error?: string;
+}
+
+interface ProgressItem {
+  content_id: string;
+  progress_percentage: number | null;
+  last_watch_time: number | null;
+  total_watch_time: number | null;
+  completed: boolean | null;
+  updated_at: string;
 }
 
 export async function POST(
@@ -47,11 +56,10 @@ export async function POST(
       );
     }
 
-    const supabase = createRouteHandlerClient({ cookies });
+    const cookieStore = await cookies();
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    // Authenticate user
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    if (sessionError || !session?.user) {
       return NextResponse.json(
         { progress: {}, error: 'Unauthorized' },
         { status: 401 }
@@ -59,7 +67,7 @@ export async function POST(
     }
 
     // Validate user_id matches authenticated user
-    if (user.id !== params.user_id) {
+    if (session.user.id !== params.user_id) {
       return NextResponse.json(
         { progress: {}, error: 'User ID mismatch' },
         { status: 403 }
@@ -77,7 +85,7 @@ export async function POST(
         completed,
         updated_at
       `)
-      .eq('user_id', user.id)
+      .eq('user_id', session.user.id)
       .eq('context_key', contextKey)
       .in('content_id', contentIds);
 
@@ -90,8 +98,14 @@ export async function POST(
     }
 
     // Transform array to object map for fast lookup
-    const progressMap: Record<string, any> = {};
-    progressData?.forEach(item => {
+    const progressMap: Record<string, {
+      progress_percentage: number;
+      last_watch_time: number;
+      total_watch_time: number;
+      completed: boolean;
+      updated_at: string | null;
+    }> = {};
+    progressData?.forEach((item: ProgressItem) => {
       progressMap[item.content_id] = {
         progress_percentage: item.progress_percentage || 0,
         last_watch_time: item.last_watch_time || 0,
