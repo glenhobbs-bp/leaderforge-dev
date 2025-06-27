@@ -262,6 +262,58 @@ pnpm type-check
 3. Check [database schema](database/) for test data planning
 4. Review [deployment process](#deployment-process) for release testing
 
+## Quick Navigation
+
+### Implementation Guides
+- **[How-To Guides](how-to/)** - Step-by-step implementation guides
+- **[Schema-Driven Widgets](how-to/schema-driven-widgets.md)** - Widget development patterns
+
+### Planning & Enhancement
+- **[Future Enhancements](future-enhancements.md)** - Planned improvements and feature backlog
+- **[Implementation Plans](implementation-plans/)** - Detailed technical implementation plans
+
+### Development Process
+- **Development environment setup and workflow guides**
+- **Code review standards and best practices**
+- **Testing strategies and quality assurance**
+
+## Key Resources
+
+### Architecture Alignment
+All engineering work must comply with our [Architecture Compliance Checklist](../architecture/architecture-compliance-checklist.md) and follow established [ADRs](../architecture/adr/).
+
+### Universal Standards
+Refer to the [Universal Glossary](../governance/universal-glossary.md) for consistent terminology across all technical documentation and code.
+
+## Contributing
+
+When adding new engineering documentation:
+
+1. **Follow file naming conventions**: Use kebab-case for filenames
+2. **Include proper headers**: Add purpose, owner, and tags as specified in governance standards
+3. **Cross-reference related docs**: Link to relevant architecture decisions and implementation plans
+4. **Update this README**: Add new documents to the appropriate section above
+
+## Document Standards
+
+### File Headers
+All engineering documents should include:
+```markdown
+<!--
+Purpose: [Brief description of document purpose]
+Owner: Engineering Team
+Tags: implementation, how-to, [other relevant tags]
+-->
+```
+
+### Quality Requirements
+- **Accuracy**: All code examples must be tested and current
+- **Completeness**: Include all necessary steps and dependencies
+- **Clarity**: Write for engineers at different experience levels
+- **Maintenance**: Update documents when referenced code changes
+
 ---
 
-**Remember**: Quality engineering enables great user experiences. Follow our principles, write comprehensive tests, and maintain excellent documentation.
+**Owner**: Engineering Team
+**Last Updated**: 2024-12-27
+**Next Review**: 2025-01-27
