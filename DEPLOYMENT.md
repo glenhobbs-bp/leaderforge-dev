@@ -46,7 +46,19 @@
 
 ### 2. **Project Configuration**
 
-**Recommended Approach (Simplest):**
+**✅ RECOMMENDED: Use Vercel Dashboard Settings**
+```bash
+# Build Configuration (in Vercel Dashboard)
+Framework Preset: Next.js
+Root Directory: apps/web
+Build Command: npm run build
+Output Directory: .next
+Install Command: npm install --legacy-peer-deps
+Node.js Version: 18.x
+```
+
+**Alternative: Manual Commands (if needed)**
+If the dashboard approach doesn't work, you can override with these commands:
 ```bash
 # Build Configuration
 Framework Preset: Next.js
@@ -54,27 +66,12 @@ Root Directory: apps/web
 Build Command: npm run build
 Output Directory: .next
 Install Command: npm install --legacy-peer-deps
-
-# Node.js Version: 18.x (recommended)
 ```
 
-**Alternative Approach (Using vercel.json):**
-If you prefer to use a `vercel.json` configuration file:
-1. The project includes a `vercel.json` file with optimized settings
-2. Set Root Directory to: `./` (project root)
-3. Vercel will automatically use the configuration from the file
-
-**Manual Configuration (troubleshooting):**
-```bash
-# Build Configuration
-Framework Preset: Next.js
-Root Directory: ./
-Build Command: npm run build --prefix apps/web
-Output Directory: apps/web/.next
-Install Command: npm install --legacy-peer-deps
-
-# Node.js Version: 18.x (recommended)
-```
+**⚠️ IMPORTANT:**
+- Always set **Root Directory** to `apps/web` in Vercel dashboard
+- This avoids monorepo path issues and uses the web app's package.json directly
+- The vercel.json file is provided as backup but dashboard settings take precedence
 
 ### 3. **Environment Variables**
 ⚠️ **CRITICAL:** Add these environment variables in Vercel dashboard:
