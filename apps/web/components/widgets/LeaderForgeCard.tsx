@@ -2,7 +2,7 @@
  * LeaderForgeCard.tsx
  * Purpose: Specialized card widget for LeaderForge platform with video modals, progress tracking, and worksheet status - Design System Compliant
  * Owner: Component System
- * Tags: #widget #leaderforge #video #progress #platform-specific #design-system
+ * Tags: #widget #leaderforge #video #progress #platform-specific #design-system #adr-0009
  */
 
 "use client";
@@ -10,63 +10,87 @@
 import React from 'react';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
-import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
-
-// CardAction interface from agent-core types
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
+// CardAction interface for action handling
 interface CardAction {
   label: string;
   action: string;
   [key: string]: unknown; // Allow extra properties for renderer use
 }
 
-
-
 interface LeaderForgeCardProps {
-  schema: ComponentSchema;
+  schema: UniversalWidgetSchema;
+  userId?: string;
   onAction?: (action: CardAction) => void;
+  onProgressUpdate?: () => void;
 }
 
-export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
+export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: LeaderForgeCardProps) {
+
   // Type guard to ensure we have a Card schema
   if (schema.type !== 'Card') {
+    console.warn('[LeaderForgeCard] Invalid schema type:', schema.type);
     return null;
   }
 
+  // Extract data from Universal Widget Schema structure
+  const data = schema.data as any;
+  const config = schema.config as any;
+
+  // Map Universal Schema to component props
   const {
-    image,
+    imageUrl,
     featuredImage,
     coverImage,
-    imageUrl,
     videoUrl,
-    title,
     description,
+    duration,
+    progress = 0,
+    stats = {},
+  } = data;
+
+  const {
+    title,
+    subtitle,
+    actions = [],
+  } = config;
+
+  // Determine the best image to use
+  const cardImage = imageUrl || featuredImage || coverImage || "/icons/placeholder.png";
+
+  // Progress and completion logic
+  const actualProgress = progress || 0;
+  const videoWatched = stats.watched || actualProgress >= 90;
+  const worksheetSubmitted = stats.completed || false;
+  const isFullyCompleted = videoWatched && worksheetSubmitted;
+
+  console.log('[LeaderForgeCard] Rendering with Universal Schema:', {
+    id: schema.id,
+    title,
+    videoUrl,
+    actualProgress,
     videoWatched,
     worksheetSubmitted,
-    progress,
-    pills,
-  } = schema.props;
-
-  const cardImage = image || featuredImage || coverImage || imageUrl || "/icons/placeholder.png";
-
-  // Use passed progress data (should come from server-side agent response)
-  // TODO: Agent responses should include progress data fetched server-side
-  const actualProgress = progress || 0;
-  const actualVideoWatched = actualProgress >= 90 || videoWatched;
-  const isFullyCompleted = actualVideoWatched && worksheetSubmitted;
+    userId
+  });
 
   const handleAction = (action: CardAction) => {
     console.log('[LeaderForgeCard] Action triggered:', action);
-    console.log('[LeaderForgeCard] Current schema props:', {
-      videoUrl,
-      title,
-      cardImage,
-      actualProgress,
-      pills,
-      actualVideoWatched,
-      worksheetSubmitted,
-      description
-    });
-    onAction?.(action);
+
+    // Only call onAction if it's provided, otherwise just log for now
+    if (onAction) {
+      onAction(action);
+    } else {
+      console.log('[LeaderForgeCard] No onAction handler provided - action will be ignored:', action);
+    }
+
+    // Only trigger progress update for actions that actually change progress
+    // openVideoModal should NOT refresh content - it should open a modal
+    // Only completeProgress should refresh content to update UI
+    if (action.action === 'completeProgress') {
+      console.log('[LeaderForgeCard] Triggering progress update for completion');
+      onProgressUpdate?.();
+    }
   };
 
   return (
@@ -82,16 +106,21 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
             title: title || '',
             poster: cardImage || '',
             progress: actualProgress || 0,
-            pills: pills || [],
-            videoWatched: actualVideoWatched || false,
+            videoWatched: videoWatched || false,
             worksheetSubmitted: worksheetSubmitted || false,
             description: description || '',
-            onCompleteAction: { action: 'completeProgress', contentId: title, progress: 100 }
+            duration: duration,
+            userId,
+            onCompleteAction: {
+              action: 'completeProgress',
+              contentId: schema.id,
+              progress: 100
+            }
           })}
         >
           <Image
             src={cardImage}
-            alt={title}
+            alt={title || 'Content'}
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             sizes="(max-width: 768px) 100vw, 400px"
@@ -100,7 +129,7 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
 
-          {/* Play Overlay - Semi-transparent like pre-refactor */}
+          {/* Play Overlay */}
           {videoUrl && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-10 h-10 bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/30 group-hover:bg-white/60 group-hover:scale-110 transition-all duration-300">
@@ -129,12 +158,24 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
             {title}
           </h3>
 
+          {subtitle && (
+            <p className="text-glass-muted text-xs mb-2">
+              {subtitle}
+            </p>
+          )}
+
           {description && (
             <div className="flex-1">
               <p className="text-glass-secondary text-xs leading-relaxed line-clamp-3">
                 {description}
               </p>
             </div>
+          )}
+
+          {duration && (
+            <p className="text-glass-muted text-xs mt-2">
+              Duration: {duration}
+            </p>
           )}
         </div>
 
@@ -166,7 +207,7 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
           <div className="space-y-1">
             {/* Video Status */}
             <div className="flex items-center gap-1.5">
-              {actualVideoWatched ? (
+              {videoWatched ? (
                 <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -176,7 +217,7 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
                 </svg>
               )}
               <span className="text-glass-muted text-xs font-normal">
-                Video {actualVideoWatched ? 'Watched' : 'Not Watched'}
+                Video {videoWatched ? 'Watched' : 'Not Watched'}
               </span>
             </div>
 
@@ -197,48 +238,44 @@ export function LeaderForgeCard({ schema, onAction }: LeaderForgeCardProps) {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-1">
-            {/* Watch Video Button - Left */}
-            {videoUrl && (
-              <button
-                onClick={() => handleAction({
-                  action: 'openVideoModal',
-                  label: 'Watch Video',
-                  videoUrl: videoUrl || '',
-                  title: title || '',
-                  poster: cardImage || '',
-                  progress: actualProgress || 0,
-                  pills: pills || [],
-                  videoWatched: actualVideoWatched || false,
-                  worksheetSubmitted: worksheetSubmitted || false,
-                  description: description || '',
-                  onCompleteAction: { action: 'completeProgress', contentId: title, progress: 100 }
-                })}
-                className="px-2.5 py-1 bg-blue-500/90 backdrop-blur-sm hover:bg-blue-600 text-white text-xs font-normal rounded-full shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-1 border border-blue-400/30"
-              >
-                <Play className="w-2.5 h-2.5" fill="currentColor" />
-                Watch
-              </button>
-            )}
+          {/* Action Buttons from config.actions */}
+          {actions.length > 0 && (
+            <div className="flex justify-between items-center pt-2">
+              {/* Watch button - left aligned */}
+              {actions.filter((action: any) => action.action === 'openVideoModal').map((action: any, index: number) => (
+                <button
+                  key={`watch-${index}`}
+                  onClick={() => handleAction({
+                    action: action.action,
+                    label: action.label,
+                    ...action.parameters
+                  })}
+                  className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md hover:scale-105"
+                >
+                  <Play className="w-3 h-3" fill="currentColor" />
+                  {action.label}
+                </button>
+              ))}
 
-            {/* Worksheet Button - Right */}
-            <button
-              onClick={() => handleAction({
-                action: 'openWorksheet',
-                label: 'Open Worksheet',
-                worksheetUrl: '#', // TODO: Add worksheet URL to schema
-                title: title || '',
-                worksheetSubmitted: worksheetSubmitted || false
-              })}
-              className="px-2.5 py-1 bg-green-500/90 backdrop-blur-sm hover:bg-green-600 text-white text-xs font-normal rounded-full shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-1 border border-green-400/30"
-            >
-              <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-              </svg>
-              Worksheet
-            </button>
-          </div>
+              {/* Worksheet button - right aligned */}
+              {actions.filter((action: any) => action.action === 'openWorksheet').map((action: any, index: number) => (
+                <button
+                  key={`worksheet-${index}`}
+                  onClick={() => handleAction({
+                    action: action.action,
+                    label: action.label,
+                    ...action.parameters
+                  })}
+                  className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white shadow-sm hover:shadow-md hover:scale-105"
+                >
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

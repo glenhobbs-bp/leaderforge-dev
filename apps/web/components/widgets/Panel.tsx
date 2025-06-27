@@ -1,73 +1,32 @@
 /**
  * File: apps/web/components/widgets/Panel.tsx
- * Purpose: Flexible layout container with glassmorphism design and configurable spacing
+ * Purpose: Flexible layout container with glassmorphism design (Universal Widget Schema)
  * Owner: Frontend team
- * Tags: widget, layout, container, glassmorphism, schema-driven
+ * Tags: widget, layout, container, glassmorphism, universal-schema, adr-0009
  */
 
 "use client";
 
 import React from 'react';
 import { UniversalSchemaRenderer } from '../ai/UniversalSchemaRenderer';
-import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
-// Legacy props interface for backwards compatibility
+// Panel component props (transformed from Universal Widget Schema)
 interface PanelProps {
-  title?: string;
-  layout?: 'vertical' | 'horizontal';
-  spacing?: 'compact' | 'normal' | 'spacious';
-  padding?: 'none' | 'small' | 'medium' | 'large';
-  background?: 'transparent' | 'glass' | 'solid';
-  children?: React.ReactNode;
-  widgets?: ComponentSchema[];
+  schema: UniversalWidgetSchema;
+  userId?: string;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
+  onProgressUpdate?: () => void;
 }
 
-// Schema interface for new schema-driven approach
-interface PanelSchema {
-  type: 'Panel';
-  title?: string;
-  layout?: 'vertical' | 'horizontal';
-  spacing?: 'compact' | 'normal' | 'spacious';
-  padding?: 'none' | 'small' | 'medium' | 'large';
-  background?: 'transparent' | 'glass' | 'solid';
-  children?: React.ReactNode;
-  widgets?: ComponentSchema[];
-  metadata?: {
-    version?: string;
-    source?: string;
-  };
-}
-
-// Union type for transition period
-type PanelInput = PanelProps | { schema: PanelSchema };
-
-function isSchemaInput(input: PanelInput): input is { schema: PanelSchema } {
-  return 'schema' in input;
-}
-
-export default function Panel(input: PanelInput) {
-  // Extract props from either schema or direct props
-  const props: PanelProps = isSchemaInput(input)
-    ? {
-        title: input.schema.title,
-        layout: input.schema.layout,
-        spacing: input.schema.spacing,
-        padding: input.schema.padding,
-        background: input.schema.background,
-        children: input.schema.children,
-        widgets: input.schema.widgets
-      }
-    : input;
-
-  const {
-    title,
-    layout = 'vertical',
-    spacing = 'normal',
-    padding = 'medium',
-    background = 'glass',
-    children,
-    widgets = []
-  } = props;
+export default function Panel({ schema, userId, onAction, onProgressUpdate }: PanelProps) {
+  // Extract data from Universal Widget Schema (ADR-0009)
+  const title = schema.config.title;
+  const layout = (schema.config as any).layout || 'vertical';
+  const spacing = (schema.config as any).spacing || 'normal';
+  const padding = (schema.config as any).padding || 'medium';
+  const background = (schema.config as any).background || 'glass';
+  const widgets = (schema.data as any).widgets || [];
 
   const spacingClasses = {
     compact: 'gap-2',
@@ -112,11 +71,13 @@ export default function Panel(input: PanelInput) {
         ${spacingClasses[spacing]}
         flex-1
       `}>
-        {children}
         {widgets.map((widget, index) => (
           <UniversalSchemaRenderer
             key={`panel-widget-${index}`}
             schema={widget}
+            userId={userId}
+            onAction={onAction}
+            onProgressUpdate={onProgressUpdate}
           />
         ))}
       </div>

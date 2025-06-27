@@ -1,120 +1,33 @@
 /**
  * File: apps/web/components/ai/UniversalSchemaRenderer.tsx
  * Purpose: Universal component renderer for agent-generated UI schemas
- * Architecture: Agent-native, registry-based, no hardcoded component logic
+ * Architecture: Pure registry-driven, no hardcoded logic, no schema transformation
  * Owner: Component System
- * Tags: #universal-renderer #agent-native #registry-driven
+ * Tags: #universal-renderer #agent-native #registry-driven #adr-0009
  */
 "use client";
 
-import React, { useState, useMemo } from 'react';
-import { ComponentSchema, CardAction } from "../../../../packages/agent-core/types/ComponentSchema";
+import React from 'react';
+import { UniversalWidgetSchema } from "../../../../packages/agent-core/types/UniversalWidgetSchema";
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import { WidgetDispatcher, isWidgetTypeAvailable } from "../widgets";
-import { VideoPlayerModal } from '../widgets/VideoPlayerModal';
 
-interface VideoModalState {
-  videoUrl: string;
-  title: string;
-  poster: string;
-  progress: number;
-  pills: { label: string; color?: string; }[];
-  videoWatched: boolean;
-  worksheetSubmitted: boolean;
-  onCompleteAction: CardAction;
-  description: string;
-}
-
-export function UniversalSchemaRenderer({ schema, userId, onProgressUpdate }: {
-  schema: ComponentSchema;
+/**
+ * Pure Universal Schema Renderer (ADR-0009)
+ *
+ * PRINCIPLES:
+ * - Zero transformation logic (handled by WidgetDispatcher/Registry)
+ * - Zero widget-specific code (uses registry for all widgets)
+ * - Zero schema format assumptions (WidgetDispatcher handles all formats)
+ * - Pure pass-through to registry-based rendering system
+ * - ONLY accepts UniversalWidgetSchema format (no legacy support)
+ */
+export function UniversalSchemaRenderer({ schema, userId, onAction, onProgressUpdate }: {
+  schema: UniversalWidgetSchema;
   userId?: string;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
   onProgressUpdate?: () => void;
 }) {
-  // Debug: log the received schema
-  console.log("[UniversalSchemaRenderer] schema:", schema);
-
-  // Error handling state
-  const [error, setError] = useState<string | null>(null);
-
-  // Modal state for VideoPlayer (legacy support)
-  const [videoModal, setVideoModal] = useState<VideoModalState | null>(null);
-
-  // Memoized schema for VideoPlayerModal to prevent unnecessary re-renders
-  const videoModalSchema = useMemo(() => {
-    if (!videoModal) return null;
-    return {
-      type: 'VideoPlayer' as const,
-      props: {
-        videoUrl: videoModal.videoUrl,
-        title: videoModal.title,
-        poster: videoModal.poster,
-        progress: videoModal.progress,
-        pills: videoModal.pills,
-        videoWatched: videoModal.videoWatched,
-        worksheetSubmitted: videoModal.worksheetSubmitted,
-        onCompleteAction: videoModal.onCompleteAction,
-        description: videoModal.description
-      }
-    };
-  }, [videoModal]);
-
-  const handleAction = (action: CardAction) => {
-    if (action.action === 'openVideoModal') {
-      setVideoModal({
-        videoUrl: action.videoUrl as string,
-        title: action.title as string,
-        poster: action.poster as string,
-        progress: action.progress as number,
-        pills: action.pills as { label: string; color?: string; }[],
-        videoWatched: action.videoWatched as boolean,
-        worksheetSubmitted: action.worksheetSubmitted as boolean,
-        onCompleteAction: action.onCompleteAction as CardAction,
-        description: action.description as string,
-      });
-    } else if (action.action === 'completeProgress') {
-      if (action.contentId) {
-        handleProgressUpdate(action.contentId, action.progress as number);
-      }
-    } else {
-      console.log('[UniversalSchemaRenderer] Unknown action:', action);
-    }
-  };
-
-  // Safely handle progress update
-  async function handleProgressUpdate(contentId: string, progress: number) {
-    console.log(`[UniversalSchemaRenderer] Progress update request: ${contentId} = ${progress}%`);
-    try {
-      const response = await fetch('/api/universal-progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          contentId,
-          tenantKey: 'leaderforge',
-          progress_percentage: typeof progress === 'number' ? progress : 100,
-          completed_at: new Date().toISOString()
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Progress update failed: ${response.status}`);
-      }
-
-      const result = await response.json();
-      console.log('[UniversalSchemaRenderer] Progress updated successfully:', result);
-
-      // Only trigger parent refresh for completion actions (100% progress)
-      // This prevents unnecessary content reloads for partial progress updates
-      if (onProgressUpdate && progress >= 100) {
-        console.log('[UniversalSchemaRenderer] Triggering content refresh for completion');
-        onProgressUpdate();
-      }
-    } catch (error) {
-      console.error('[UniversalSchemaRenderer] Progress update failed:', error);
-      setError('Failed to update progress. Please try again.');
-    }
-  }
-
   // User-friendly error UI
   function ErrorMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
     return (
@@ -134,47 +47,45 @@ export function UniversalSchemaRenderer({ schema, userId, onProgressUpdate }: {
     );
   }
 
-  // If error at top level, show error UI
-  if (error) {
-    return <ErrorMessage message={error} onRetry={() => window.location.reload()} />;
-  }
-  if (!schema || typeof schema !== 'object' || !schema.type) {
-    return <ErrorMessage message="Unable to load content. Please try again later." onRetry={() => window.location.reload()} />;
+  // Validate Universal Widget Schema format (ADR-0009)
+  if (!schema || typeof schema !== 'object') {
+    return <ErrorMessage message="Invalid schema format. Expected UniversalWidgetSchema." onRetry={() => window.location.reload()} />;
   }
 
-  // **UNIVERSAL RENDERING**: Use WidgetDispatcher for ALL registered widgets
+  if (!schema.type) {
+    return <ErrorMessage message="Schema missing required 'type' field." onRetry={() => window.location.reload()} />;
+  }
+
+  if (!schema.id || !schema.data || !schema.config || !schema.version) {
+    console.warn('[UniversalSchemaRenderer] Schema not in Universal Widget Schema format:', {
+      hasId: !!schema.id,
+      hasData: !!schema.data,
+      hasConfig: !!schema.config,
+      hasVersion: !!schema.version,
+      type: schema.type
+    });
+    return <ErrorMessage message={`Invalid schema format. UniversalWidgetSchema requires: id, data, config, version. Missing: ${[
+      !schema.id && 'id',
+      !schema.data && 'data',
+      !schema.config && 'config',
+      !schema.version && 'version'
+    ].filter(Boolean).join(', ')}`} />;
+  }
+
+  // **UNIVERSAL RENDERING**: Pure registry-based delegation
+  // WidgetDispatcher handles ALL schema formats and transformations
   if (isWidgetTypeAvailable(schema.type)) {
     return (
-      <>
-        <WidgetDispatcher
-          schema={schema}
-          userId={userId}
-          onAction={handleAction}
-          onProgressUpdate={onProgressUpdate}
-          UniversalSchemaRenderer={UniversalSchemaRenderer}
-        />
-        {/* Legacy video modal support - will be removed once all video handling is in widgets */}
-        {videoModal && videoModalSchema && (
-          <VideoPlayerModal
-            schema={videoModalSchema}
-            open={!!videoModal}
-            onOpenChange={(open) => {
-              if (!open) {
-                setVideoModal(null);
-                // Progress is automatically saved by VideoPlayerModal cleanup
-                // We don't trigger content reload here to prevent unnecessary re-renders
-                console.log('[UniversalSchemaRenderer] Video modal closed, progress persisted automatically');
-              }
-            }}
-            userId={userId}
-            onProgressUpdate={onProgressUpdate}
-          />
-        )}
-      </>
+      <WidgetDispatcher
+        schema={schema}
+        userId={userId}
+        onAction={onAction}
+        onProgressUpdate={onProgressUpdate}
+      />
     );
   }
 
-  // **FALLBACK**: Only for unregistered widget types (should be rare in production)
-  console.warn(`[UniversalSchemaRenderer] Widget type '${schema.type}' not found in registry, using fallback`);
+  // **FALLBACK**: Only for unregistered widget types
+  console.warn(`[UniversalSchemaRenderer] Widget type '${schema.type}' not found in registry`);
   return <ErrorMessage message={`Widget type '${schema.type}' is not available. Please register this widget in the widget registry.`} />;
 }

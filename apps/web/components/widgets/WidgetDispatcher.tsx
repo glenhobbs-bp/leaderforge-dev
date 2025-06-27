@@ -1,13 +1,14 @@
 /**
  * File: apps/web/components/widgets/WidgetDispatcher.tsx
- * Purpose: Simple universal widget dispatcher
+ * Purpose: Universal widget dispatcher for Universal Widget Schema (ADR-0009)
  * Owner: Widget Team
- * Tags: #widgets #dispatcher #universal-rendering
+ * Tags: #widgets #dispatcher #universal-rendering #adr-0009
  */
 
 "use client";
 
 import React from 'react';
+import { UniversalWidgetSchema } from "../../../../packages/agent-core/types/UniversalWidgetSchema";
 
 // Import widget components directly
 import { LeaderForgeCard } from './LeaderForgeCard';
@@ -18,108 +19,131 @@ import VideoList from './VideoList';
 import Panel from './Panel';
 import Grid from './Grid';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-interface WidgetSchema {
-  type: string;
-  [key: string]: any; // Allow any additional properties for schema-driven widgets
-}
-
 interface WidgetDispatcherProps {
-  schema: WidgetSchema;
+  schema: UniversalWidgetSchema;
   userId?: string;
-  onAction?: (action: any) => void;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
   onProgressUpdate?: () => void;
-  UniversalSchemaRenderer?: React.ComponentType<any>;
-  [key: string]: any;
 }
 
 /**
- * Simple Widget Dispatcher - maps schema types to components
- */
-export function WidgetDispatcher({
-  schema,
-  userId,
-  onAction,
-  onProgressUpdate,
-  UniversalSchemaRenderer,
-  ...otherProps
-}: WidgetDispatcherProps) {
-  console.log(`[WidgetDispatcher] Rendering widget: ${schema.type} with props:`, {
-    hasOnAction: !!onAction,
-    hasUserId: !!userId,
-    otherPropsKeys: Object.keys(otherProps)
-  });
-
-  try {
-    // Common props to pass to all widgets
-    const commonProps = {
-      schema: schema as any,
-      userId,
-      onAction,
-      onProgressUpdate,
-      UniversalSchemaRenderer,
-      ...otherProps
-    };
-
-    // Direct mapping of schema types to components
-    switch (schema.type) {
-      case 'Card':
-        return <LeaderForgeCard {...commonProps} />;
-
-      case 'VideoPlayer':
-        return <VideoPlayerModal {...commonProps} />;
-
-      case 'StatCard':
-        return <StatCard {...commonProps} />;
-
-      case 'Leaderboard':
-        return <Leaderboard {...commonProps} />;
-
-      case 'VideoList':
-        return <VideoList {...commonProps} />;
-
-      case 'Panel':
-        return <Panel {...commonProps} />;
-
-      case 'Grid':
-        return <Grid {...commonProps} />;
-
-      default:
-        console.warn(`[WidgetDispatcher] Unknown widget type: ${schema.type}`);
-        return (
-          <div className="card border-orange-500 bg-orange-50 p-4">
-            <p className="text-orange-800">
-              Unknown widget type: {schema.type}
-            </p>
-          </div>
-        );
-    }
-
-  } catch (error) {
-    console.error('[WidgetDispatcher] Error rendering widget:', error);
-
-    return (
-      <div className="card border-red-500 bg-red-50 p-4">
-        <p className="text-red-800">
-          Error rendering {schema.type}
-        </p>
-        {process.env.NODE_ENV === 'development' && (
-          <pre className="text-xs text-red-600 mt-2">
-            {error instanceof Error ? error.message : String(error)}
-          </pre>
-        )}
-      </div>
-    );
-  }
-}
-
-/**
- * Check if a widget type is available
+ * Available widget types in the system
  */
 export function isWidgetTypeAvailable(type: string): boolean {
-  const availableTypes = ['Card', 'VideoPlayer', 'StatCard', 'Leaderboard', 'VideoList', 'Panel', 'Grid'];
+  const availableTypes = [
+    'Card', 'VideoPlayer', 'StatCard', 'Leaderboard',
+    'VideoList', 'Panel', 'Grid'
+  ];
   return availableTypes.includes(type);
 }
 
-export default WidgetDispatcher;
+/**
+ * Universal Widget Dispatcher (ADR-0009)
+ *
+ * Routes Universal Widget Schema to appropriate components.
+ * All components now accept UniversalWidgetSchema directly.
+ */
+export function WidgetDispatcher({ schema, userId, onAction, onProgressUpdate }: WidgetDispatcherProps) {
+  console.log('[WidgetDispatcher] Dispatching schema:', {
+    type: schema.type,
+    id: schema.id,
+    hasData: !!schema.data,
+    hasConfig: !!schema.config,
+    userId
+  });
+
+  // Direct schema routing - no transformation needed
+  switch (schema.type) {
+    case 'Card':
+      return (
+        <LeaderForgeCard
+          schema={schema}
+          userId={userId}
+          onAction={onAction}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    case 'VideoPlayer':
+      return (
+        <VideoPlayerModal
+          schema={schema}
+          userId={userId}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    case 'StatCard':
+      return (
+        <StatCard
+          schema={schema}
+          userId={userId}
+          onAction={onAction}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    case 'Leaderboard':
+      return (
+        <Leaderboard
+          schema={schema}
+          userId={userId}
+          onAction={onAction}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    case 'VideoList':
+      return (
+        <VideoList
+          schema={schema}
+          userId={userId}
+          onAction={onAction}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    case 'Panel':
+      return (
+        <Panel
+          schema={schema}
+          userId={userId}
+          onAction={onAction}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    case 'Grid':
+      const columns = schema.config.layout?.columns || 3;
+      return (
+        <Grid
+          type="Grid"
+          title={schema.config.title}
+          subtitle={schema.config.subtitle}
+          items={(schema.data as any).items || []}
+          columns={[1, 2, 3, 4, 5, 6].includes(columns) ? columns as 1 | 2 | 3 | 4 | 5 | 6 : 3}
+          availableContent={(schema.data as any).availableContent || []}
+          userId={userId}
+          onAction={onAction}
+          onProgressUpdate={onProgressUpdate}
+        />
+      );
+
+    default:
+      console.warn('[WidgetDispatcher] Unknown widget type:', schema.type);
+      return (
+        <div className="p-4 border border-red-200 rounded-lg bg-red-50">
+          <h3 className="text-red-800 font-medium">Unknown Widget Type</h3>
+          <p className="text-red-600 text-sm mt-1">
+            Widget type "{schema.type}" is not supported.
+          </p>
+          <details className="mt-2">
+            <summary className="text-red-600 text-sm cursor-pointer">Debug Info</summary>
+            <pre className="text-xs mt-1 text-red-700 bg-red-100 p-2 rounded overflow-auto">
+              {JSON.stringify(schema, null, 2)}
+            </pre>
+          </details>
+        </div>
+      );
+  }
+}

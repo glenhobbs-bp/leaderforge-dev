@@ -1,57 +1,30 @@
 /**
  * File: apps/web/components/widgets/StatCard.tsx
- * Purpose: Displays key performance metrics with glassmorphism design
+ * Purpose: Displays key performance metrics with glassmorphism design (Universal Widget Schema)
  * Owner: Frontend team
- * Tags: widget, stats, metrics, glassmorphism, schema-driven
+ * Tags: widget, stats, metrics, glassmorphism, universal-schema, adr-0009
  */
 
 "use client";
 
 import React from 'react';
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
-// Legacy props interface for backwards compatibility
+// StatCard component props (transformed from Universal Widget Schema)
 interface StatCardProps {
-  title: string;
-  value: string | number;
-  change?: string;
-  trend?: 'up' | 'down' | 'neutral';
-  icon?: string;
+  schema: UniversalWidgetSchema;
+  userId?: string;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
+  onProgressUpdate?: () => void;
 }
 
-// Schema interface for new schema-driven approach
-interface StatCardSchema {
-  type: 'StatCard';
-  title: string;
-  value: string | number;
-  change?: string;
-  trend?: 'up' | 'down' | 'neutral';
-  icon?: string;
-  metadata?: {
-    version?: string;
-    source?: string;
-  };
-}
-
-// Union type for transition period
-type StatCardInput = StatCardProps | { schema: StatCardSchema };
-
-function isSchemaInput(input: StatCardInput): input is { schema: StatCardSchema } {
-  return 'schema' in input;
-}
-
-export default function StatCard(input: StatCardInput) {
-  // Extract props from either schema or direct props
-  const props: StatCardProps = isSchemaInput(input)
-    ? {
-        title: input.schema.title,
-        value: input.schema.value,
-        change: input.schema.change,
-        trend: input.schema.trend || 'neutral',
-        icon: input.schema.icon
-      }
-    : input;
-
-  const { title, value, change, trend = 'neutral', icon } = props;
+export default function StatCard({ schema }: StatCardProps) {
+  // Extract data from Universal Widget Schema (ADR-0009)
+  const title = schema.config.title || 'Statistic';
+  const value = (schema.data as any).value || '0';
+  const change = (schema.data as any).change;
+  const trend = ((schema.data as any).trend as 'up' | 'down' | 'neutral') || 'neutral';
+  const icon = (schema.data as any).icon;
 
   const trendColor = {
     up: 'var(--success-500)',

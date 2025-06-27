@@ -36,6 +36,8 @@ Architecture Decision Records (ADRs) document significant architecture and techn
 | [ADR-0005](0005-hybrid-communication-pattern.md) | Hybrid Communication Pattern | Accepted | 2024-01-15 | Medium |
 | [ADR-0006](0006-bullmq-message-queue.md) | BullMQ for Message Queue Implementation | Accepted | 2024-01-15 | Low |
 | [ADR-0007](0007-api-route-organization.md) | API Route Organization Pattern | Accepted | 2024-01-15 | Low |
+| [ADR-0008](0008-pure-schema-driven-widgets.md) | Pure Schema-Driven Widgets | Accepted | 2024-01-15 | Medium |
+| [ADR-0009](0009-schema-props-boundary-separation.md) | Schema-Props Boundary Separation | Accepted | 2025-06-26 | High |
 
 ## Superseded ADRs
 

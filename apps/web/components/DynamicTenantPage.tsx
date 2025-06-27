@@ -1,11 +1,13 @@
 "use client";
 // File: apps/web/components/DynamicTenantPage.tsx
 // Purpose: Agent-native 3-panel layout. Pure renderer - displays only what agents return.
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
 import { UniversalSchemaRenderer } from "./ai/UniversalSchemaRenderer";
 import { ComponentSchema } from "../../../packages/agent-core/types/ComponentSchema";
+import { UniversalWidgetSchema } from "../../../packages/agent-core/types/UniversalWidgetSchema";
+import { VideoPlayerModal } from "./widgets/VideoPlayerModal";
 import { useSupabase } from './SupabaseProvider';
 import React from "react";
 import { useUserPreferences } from '../app/hooks/useUserPreferences';
@@ -60,6 +62,10 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   const hasMounted = useRef(false);
   const [hasRestoredContext, setHasRestoredContext] = useState(false);
   const [shouldFetchUserPrefs, setShouldFetchUserPrefs] = useState(false);
+
+  // Video modal state
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [videoModalData, setVideoModalData] = useState<{ action: string; label: string; [key: string]: unknown } | null>(null);
   const [currentTenant, setCurrentTenant] = useState<string>(
     props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'brilliant'
   );
@@ -241,6 +247,35 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     </div>
   );
 
+
+
+  // Action handler for Universal Widget Schema interactions
+  const handleAction = useCallback(async (action: { action: string; label: string; [key: string]: unknown }) => {
+    console.log('[DynamicTenantPage] Action triggered:', action);
+
+    switch (action.action) {
+      case 'openVideoModal':
+        console.log('[DynamicTenantPage] Opening video modal:', action);
+        setVideoModalData(action);
+        setIsVideoModalOpen(true);
+        break;
+
+      case 'openWorksheet':
+        console.log('[DynamicTenantPage] Opening worksheet:', action);
+        // TODO: Implement worksheet handling
+        break;
+
+      case 'completeProgress':
+        console.log('[DynamicTenantPage] Completing progress:', action);
+        // TODO: Implement progress completion
+        break;
+
+      default:
+        console.warn('[DynamicTenantPage] Unknown action:', action);
+        break;
+    }
+  }, []);
+
   // Memoize content component to prevent video re-mounting - MUST be at top level before any returns
   const contentComponent = useMemo(() => {
     if (contentLoading) {
@@ -257,8 +292,9 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       return (
         <div className="p-6">
           <UniversalSchemaRenderer
-            schema={content as ComponentSchema}
+            schema={content as UniversalWidgetSchema}
             userId={session?.user?.id}
+            onAction={handleAction}
             onProgressUpdate={() => {
               // Refresh content when video progress is updated
               if (selectedNavOptionId) {
@@ -671,6 +707,43 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             }
           }}
         />
+
+        {/* Video Modal */}
+        {isVideoModalOpen && videoModalData && (
+          <VideoPlayerModal
+            schema={{
+              type: 'VideoPlayer',
+              id: `video-modal-${Date.now()}`,
+              data: {
+                videoUrl: videoModalData.videoUrl,
+                poster: videoModalData.poster,
+                description: videoModalData.description,
+                progress: videoModalData.progress || 0
+              } as any,
+              config: {
+                title: videoModalData.title,
+                autoplay: true,
+                actions: videoModalData.onCompleteAction ? [videoModalData.onCompleteAction] : []
+              } as any,
+              version: '1.0'
+            } as UniversalWidgetSchema}
+            open={isVideoModalOpen}
+            onOpenChange={(open) => {
+              setIsVideoModalOpen(open);
+              if (!open) {
+                setVideoModalData(null);
+              }
+            }}
+            userId={session?.user?.id}
+            onProgressUpdate={() => {
+              // Refresh content when video progress is updated
+              if (selectedNavOptionId) {
+                console.log('[DynamicTenantPage] Refreshing content after video progress update');
+                loadContentForNavOption(selectedNavOptionId, false);
+              }
+            }}
+          />
+        )}
       </div>
     );
   }

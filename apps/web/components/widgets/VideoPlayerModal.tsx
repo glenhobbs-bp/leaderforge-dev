@@ -2,7 +2,7 @@
  * VideoPlayerModal.tsx
  * Purpose: Advanced video player modal widget with HLS support, progress tracking, and platform compatibility
  * Owner: Component System
- * Tags: #widget #video #modal #hls #progress #platform-agnostic
+ * Tags: #widget #video #modal #hls #progress #platform-agnostic #adr-0009
  */
 
 "use client";
@@ -11,10 +11,10 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import Hls from 'hls.js';
 import { useUniversalProgress } from '../../app/hooks/useUniversalProgress';
-import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
 interface VideoPlayerModalProps {
-  schema: ComponentSchema;
+  schema: UniversalWidgetSchema;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   userId?: string;
@@ -33,25 +33,41 @@ export function VideoPlayerModal({
     return null;
   }
 
-  // Extract props from schema
+  // Extract data from Universal Widget Schema structure
+  const data = schema.data as any;
+  const config = schema.config as any;
+
+  // Map Universal Schema to component props
   const {
     videoUrl,
-    title,
     poster,
-    progress,
-    onCompleteAction,
     description,
-  } = schema.props;
+    progress = 0,
+    duration: contentDuration,
+  } = data;
+
+  const {
+    title,
+    autoplay = false,
+    actions = [],
+  } = config;
+
+  // Find completion action for progress tracking
+  const onCompleteAction = actions.find((action: any) =>
+    action.action === 'completeProgress' || action.action === 'onCompleteAction'
+  );
 
   // Remove this console.log that's causing spam on every render
   // Only log when component first mounts
   useEffect(() => {
-    console.log('[VideoPlayerModal] Component mounted with props:', {
+    console.log('[VideoPlayerModal] Component mounted with Universal Schema:', {
+      id: schema.id,
       videoUrl,
       title,
       poster,
       progress,
-      hasProps: !!schema.props
+      hasData: !!schema.data,
+      hasConfig: !!schema.config
     });
   }, []); // Empty dependency array - only runs on mount
 

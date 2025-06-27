@@ -169,41 +169,90 @@ async function fetchProgressData(state: typeof StateAnnotation.State) {
 }
 
 async function generateProgressSchema(state: typeof StateAnnotation.State) {
-  console.log('[ContentAgent] Generating base content schema (progress enrichment handled by web layer)');
+  console.log('[ContentAgent] Generating Universal Widget Schema (ADR-0009 compliant)');
 
   try {
-    // ✅ ARCHITECTURE COMPLIANCE: Agent generates base schema, web layer enriches with progress
-    // Create base schema without progress data
-    const baseSchema = {
-      type: 'Grid',
-      props: {
-        columns: 3,
-        items: (state.contentList || []).map((content: any) => ({
-          type: 'Card',
-          props: {
-            id: content.props?.id || content.id,
-            title: content.props?.title || content.title,
-            subtitle: content.props?.subtitle || content.subtitle,
-            description: content.props?.description || content.description,
-            imageUrl: content.props?.image || content.props?.imageUrl || content.imageUrl,
-            videoUrl: content.props?.videoUrl || content.videoUrl,
-            duration: content.props?.duration || content.duration,
-            progress: 0 // Will be enriched by AgentService
+    // ✅ ARCHITECTURE COMPLIANCE: Agent generates Universal Widget Schema per ADR-0009
+    // Web layer will enrich with real-time progress data
+
+    // Transform content items to Card format
+    const cardItems = (state.contentList || []).map((content: any) => ({
+      type: 'Card',
+      id: `card-${content.props?.id || content.id}-${Date.now()}`,
+      data: {
+        // Content data
+        imageUrl: content.props?.image || content.props?.imageUrl || content.imageUrl,
+        videoUrl: content.props?.videoUrl || content.videoUrl,
+        description: content.props?.description || content.description,
+        duration: content.props?.duration || content.duration,
+        featuredImage: content.props?.featuredImage,
+        coverImage: content.props?.coverImage,
+        // Progress data (will be enriched by web layer)
+        progress: Math.floor(Math.random() * 101), // Temporary random progress for demo
+        value: Math.floor(Math.random() * 101), // For progress percentage
+        stats: {
+          watched: Math.random() > 0.5, // Random for demo
+          completed: Math.random() > 0.7, // Random for demo
+          lastWatched: Math.random() > 0.5 ? new Date().toISOString() : null
+        }
+      },
+      config: {
+        // Display configuration
+        title: content.props?.title || content.title,
+        subtitle: content.props?.subtitle || content.subtitle || 'Learning Content',
+        actions: [
+          {
+            action: 'openVideoModal',
+            label: 'Watch Video',
+            primary: true,
+            parameters: {
+              videoUrl: content.props?.videoUrl || content.videoUrl,
+              title: content.props?.title || content.title,
+              poster: content.props?.image || content.props?.imageUrl || content.imageUrl
+            }
+          },
+          {
+            action: 'openWorksheet',
+            label: 'Worksheet',
+            primary: false,
+            parameters: {
+              worksheetUrl: '#worksheet', // Placeholder
+              contentId: content.props?.id || content.id
+            }
           }
-        })),
-        title: 'Content Library',
-        subtitle: 'Available content',
+        ]
+      },
+      version: '1.0'
+    }));
+
+    // Generate Universal Widget Schema (ADR-0009)
+    const universalSchema = {
+      type: 'Grid',
+      id: `grid-content-library-${Date.now()}`,
+      data: {
+        // Grid data content
+        items: cardItems,
         availableContent: (state.contentList || []).map((content: any) => content.props?.id || content.id)
       },
-      // Basic progress structure - will be enriched by web layer
-      progressData: null,
-      conditionalContent: {
-        showAdvanced: false,
-        showReview: false,
-        showCelebration: false,
-        enableNextModule: false
+      config: {
+        // Grid display configuration
+        title: 'Content Library',
+        subtitle: 'Available content',
+        layout: {
+          columns: 3,
+          gap: 'medium',
+          direction: 'horizontal'
+        },
+        displayMode: 'grid',
+        interactions: [
+          {
+            trigger: 'cardClick',
+            action: 'openVideo',
+            parameters: {}
+          }
+        ]
       },
-      recommendations: []
+      version: '1.0'
     };
 
     return {
@@ -212,36 +261,45 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
         resumeBuffer: 10,
         minimumWatchTime: 30
       },
-      schema: baseSchema,
+      schema: universalSchema,
       messages: [
         ...state.messages,
-        new AIMessage('Generated base content schema - progress enrichment handled by web layer')
+        new AIMessage('Generated Universal Widget Schema (ADR-0009) - progress enrichment handled by web layer')
       ]
     };
   } catch (error) {
     console.log('[ContentAgent] Error generating schema:', error);
 
-    // Fallback: create basic grid schema
+    // Fallback: create basic Universal Widget Schema
     const fallbackSchema = {
       type: 'Grid',
-      props: {
-        columns: 3,
+      id: `grid-fallback-${Date.now()}`,
+      data: {
         items: (state.contentList || []).map((content: any) => ({
           type: 'Card',
-          props: {
-            id: content.props?.id || content.id,
-            title: content.props?.title || content.title,
-            subtitle: content.props?.subtitle || content.subtitle,
-            description: content.props?.description || content.description,
+          id: `card-fallback-${content.props?.id || content.id}`,
+          data: {
             imageUrl: content.props?.image || content.props?.imageUrl || content.imageUrl,
             videoUrl: content.props?.videoUrl || content.videoUrl,
-            duration: content.props?.duration || content.duration,
+            description: content.props?.description || content.description,
             progress: 0
-          }
+          },
+          config: {
+            title: content.props?.title || content.title,
+            subtitle: content.props?.subtitle || content.subtitle
+          },
+          version: '1.0'
         })),
+        availableContent: []
+      },
+      config: {
         title: 'Content Library',
-        subtitle: 'Available content'
-      }
+        subtitle: 'Available content',
+        layout: {
+          columns: 3
+        }
+      },
+      version: '1.0'
     };
 
     return {
@@ -253,7 +311,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
       schema: fallbackSchema,
       messages: [
         ...state.messages,
-        new AIMessage('Generated fallback content schema')
+        new AIMessage('Generated fallback Universal Widget Schema')
       ]
     };
   }

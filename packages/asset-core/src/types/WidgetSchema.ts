@@ -2,7 +2,7 @@
  * File: packages/asset-core/src/types/WidgetSchema.ts
  * Purpose: Widget-specific types for UI component assets
  * Owner: Asset Core Team
- * Tags: #types #widgets #ui
+ * Tags: #types #widgets #ui #adr-0009
  */
 
 import { z } from 'zod';
@@ -74,6 +74,23 @@ export const WidgetActionSchema = z.object({
 export type WidgetAction = z.infer<typeof WidgetActionSchema>;
 
 /**
+ * Universal Widget Schema import for transformation functions
+ */
+interface UniversalWidgetSchema {
+  type: string;
+  id: string;
+  data: Record<string, unknown>;
+  config: Record<string, unknown>;
+  version: string;
+  // Other properties as needed
+}
+
+/**
+ * Schema-to-Props transformation function type (ADR-0009)
+ */
+export type SchemaToPropsTransformer = (schema: UniversalWidgetSchema) => Record<string, unknown>;
+
+/**
  * Widget definition for registry
  */
 export const WidgetDefinitionSchema = z.object({
@@ -85,6 +102,9 @@ export const WidgetDefinitionSchema = z.object({
 
   /** Component import path for lazy loading */
   componentPath: z.string().optional(),
+
+  /** Schema-to-props transformation function (ADR-0009) */
+  schemaToProps: z.function().optional(),
 
   /** Default action handlers */
   actionHandlers: z.record(z.function()).optional(),

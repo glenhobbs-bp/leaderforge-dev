@@ -116,6 +116,23 @@
 - [ ] Universal schema compliance across components
 - [ ] No direct component imports (use registry)
 
+### **Universal Registry-Driven System (Critical)**
+- [ ] UniversalSchemaRenderer requires ZERO modification when adding new widgets
+- [ ] New widgets can be registered and immediately discoverable/usable
+- [ ] All widget-specific logic contained within the widget registry
+- [ ] No hardcoded widget types in universal rendering components
+- [ ] Schema transformation handled entirely by registry/dispatcher layer
+
+### **Schema-Props Boundary Compliance (ADR-0009)**
+- [ ] Widget schemas contain only agent-controllable properties
+- [ ] Component props contain only implementation details
+- [ ] No schema properties duplicated in component props
+- [ ] Schema-to-props transformation functions implemented
+- [ ] Components receive transformed props, not raw schemas
+- [ ] Agent-controllable properties NOT hardcoded in components
+- [ ] Framework-specific concerns NOT exposed in schemas
+- [ ] Universal schema structure followed consistently
+
 ### **Design System Adherence**
 - [ ] Color palette consistently applied
 - [ ] Typography hierarchy maintained
@@ -197,6 +214,31 @@
 
 ---
 
+## 🔧 **Registry-Driven Development Workflow**
+
+### **Adding New Widgets (Must Follow)**
+1. **Widget Implementation** - Create widget component with proper TypeScript interfaces
+2. **Registry Registration** - Add widget to WidgetRegistry with transformation functions
+3. **Schema Definition** - Define Universal Widget Schema structure for the widget
+4. **Testing** - Verify widget works through agent-generated schemas
+5. **Documentation** - Update widget registry documentation
+
+### **Forbidden Practices**
+- ❌ **Never modify UniversalSchemaRenderer** for new widget types
+- ❌ **Never add widget-specific imports** to universal components
+- ❌ **Never hardcode widget logic** outside the registry
+- ❌ **Never bypass schema transformation** layer
+- ❌ **Never create widget-specific rendering paths** in universal components
+
+### **Registry-First Principles**
+- ✅ **All widget discovery** happens through registry APIs
+- ✅ **All schema transformation** happens in registry layer
+- ✅ **All widget routing** happens through dispatcher pattern
+- ✅ **All new functionality** accessible immediately after registration
+- ✅ **All rendering logic** contained within individual widget components
+
+---
+
 ## 📋 **Review Process**
 
 ### **Weekly Development Review**
@@ -223,6 +265,12 @@
 - ❌ Direct database access bypassing service layer
 - ❌ Hardcoded configurations or entitlement bypasses
 - ❌ Cross-module coupling
+- ❌ Schema-props boundary violations (ADR-0009)
+- ❌ Components accessing raw schemas instead of transformed props
+- ❌ Agent-controllable properties hardcoded in component logic
+- ❌ UniversalSchemaRenderer modified to support new widget types
+- ❌ Widget-specific transformation logic outside the registry
+- ❌ Hardcoded widget type handling in universal components
 
 ### **Performance Issues**
 - ❌ API response times > 2 seconds
@@ -264,6 +312,8 @@
 - <2 second API response times
 - Zero hardcoded business logic in routes
 - 100% entitlement enforcement coverage
+- 100% registry-driven widget system (no universal renderer modifications)
+- Zero widget-specific code outside the registry layer
 
 ### **Development Metrics**
 - Weekly compliance score trend

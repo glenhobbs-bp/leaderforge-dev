@@ -1,13 +1,14 @@
 /**
  * File: apps/web/components/widgets/Leaderboard.tsx
- * Purpose: Displays ranking list with glassmorphism design and elegant typography
+ * Purpose: Displays ranking list with glassmorphism design (Universal Widget Schema)
  * Owner: Frontend team
- * Tags: widget, leaderboard, ranking, glassmorphism, schema-driven
+ * Tags: widget, leaderboard, ranking, glassmorphism, universal-schema, adr-0009
  */
 
 "use client";
 
 import React from 'react';
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
 interface LeaderboardEntry {
   rank: number;
@@ -17,43 +18,19 @@ interface LeaderboardEntry {
   trend?: 'up' | 'down' | 'same';
 }
 
-// Legacy props interface for backwards compatibility
+// Leaderboard component props (transformed from Universal Widget Schema)
 interface LeaderboardProps {
-  title?: string;
-  entries?: LeaderboardEntry[];
-  maxEntries?: number;
+  schema: UniversalWidgetSchema;
+  userId?: string;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
+  onProgressUpdate?: () => void;
 }
 
-// Schema interface for new schema-driven approach
-interface LeaderboardSchema {
-  type: 'Leaderboard';
-  title?: string;
-  entries?: LeaderboardEntry[];
-  maxEntries?: number;
-  metadata?: {
-    version?: string;
-    source?: string;
-  };
-}
-
-// Union type for transition period
-type LeaderboardInput = LeaderboardProps | { schema: LeaderboardSchema };
-
-function isSchemaInput(input: LeaderboardInput): input is { schema: LeaderboardSchema } {
-  return 'schema' in input;
-}
-
-export default function Leaderboard(input: LeaderboardInput) {
-  // Extract props from either schema or direct props
-  const props: LeaderboardProps = isSchemaInput(input)
-    ? {
-        title: input.schema.title,
-        entries: input.schema.entries,
-        maxEntries: input.schema.maxEntries
-      }
-    : input;
-
-  const { title = "Leaderboard", entries = [], maxEntries = 5 } = props;
+export default function Leaderboard({ schema }: LeaderboardProps) {
+  // Extract data from Universal Widget Schema (ADR-0009)
+  const title = schema.config.title || "Leaderboard";
+  const entries = (schema.data as any).entries || [];
+  const maxEntries = (schema.config as any).maxEntries || 5;
 
   // Handle undefined or null entries
   const safeEntries = entries || [];

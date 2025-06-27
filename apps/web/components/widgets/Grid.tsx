@@ -9,133 +9,46 @@
 
 import React from 'react';
 import { UniversalSchemaRenderer } from '../ai/UniversalSchemaRenderer';
-import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
-// Legacy props interface for backwards compatibility
+// Grid component props (transformed from Universal Widget Schema)
 interface GridProps {
-  title?: string;
-  columns?: 1 | 2 | 3 | 4 | 5 | 6;
-  gap?: 'small' | 'medium' | 'large';
-  padding?: 'none' | 'small' | 'medium' | 'large';
-  background?: 'transparent' | 'glass' | 'solid';
-  children?: React.ReactNode;
-  widgets?: ComponentSchema[];
-}
-
-// Schema interface for new schema-driven approach
-interface GridSchema {
   type: 'Grid';
-  props?: {
-    title?: string;
-    subtitle?: string;
-    columns?: 1 | 2 | 3 | 4 | 5 | 6;
-    gap?: 'small' | 'medium' | 'large';
-    padding?: 'none' | 'small' | 'medium' | 'large';
-    background?: 'transparent' | 'glass' | 'solid';
-    items?: ComponentSchema[];
-    availableContent?: string[];
-  };
   title?: string;
+  subtitle?: string;
+  items?: UniversalWidgetSchema[];
   columns?: 1 | 2 | 3 | 4 | 5 | 6;
-  gap?: 'small' | 'medium' | 'large';
-  padding?: 'none' | 'small' | 'medium' | 'large';
-  background?: 'transparent' | 'glass' | 'solid';
-  children?: React.ReactNode;
-  widgets?: ComponentSchema[];
-  metadata?: {
-    version?: string;
-    source?: string;
-  };
+  availableContent?: unknown[];
+  userId?: string;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
+  onProgressUpdate?: () => void;
 }
 
-// Union type for transition period
-type GridInput = GridProps | { schema: GridSchema } | GridSchema;
-
-function isSchemaInput(input: GridInput): input is { schema: GridSchema } {
-  return 'schema' in input;
-}
-
-function isDirectSchema(input: GridInput): input is GridSchema {
-  return 'type' in input && input.type === 'Grid';
-}
-
-export default function Grid(input: GridInput & { userId?: string; onAction?: (action: unknown) => void; onProgressUpdate?: () => void }) {
-  // Extract props from either schema or direct props
-  let props: GridProps;
-
-  if (isDirectSchema(input)) {
-    // Handle direct schema format from agent
-    props = {
-      title: input.props?.title || input.title,
-      columns: input.props?.columns || input.columns,
-      gap: input.props?.gap || input.gap,
-      padding: input.props?.padding || input.padding,
-      background: input.props?.background || input.background,
-      children: input.children,
-      widgets: input.props?.items || input.widgets || []
-    };
-  } else if (isSchemaInput(input)) {
-    // Handle wrapped schema format
-    props = {
-      title: input.schema.props?.title || input.schema.title,
-      columns: input.schema.props?.columns || input.schema.columns,
-      gap: input.schema.props?.gap || input.schema.gap,
-      padding: input.schema.props?.padding || input.schema.padding,
-      background: input.schema.props?.background || input.schema.background,
-      children: input.schema.children,
-      widgets: input.schema.props?.items || input.schema.widgets || []
-    };
-  } else {
-    // Handle legacy direct props format
-    props = input;
-  }
-
-  const {
-    title,
-    columns = 3,
-    gap = 'medium',
-    padding = 'none',
-    background = 'transparent',
-    children,
-    widgets = []
-  } = props;
-
+export default function Grid({
+  title,
+  subtitle,
+  items = [],
+  columns = 3,
+  availableContent = [],
+  userId,
+  onAction,
+  onProgressUpdate,
+  ...otherProps
+}: GridProps) {
   console.log('[Grid] Rendering with:', {
     title,
+    subtitle,
     columns,
-    widgetCount: widgets.length,
-    widgetTypes: widgets.map(w => w.type),
-    hasUserId: !!input.userId,
-    hasOnAction: !!input.onAction
+    itemCount: items.length,
+    itemTypes: items.map(item => item.type),
+    availableContentCount: availableContent.length,
+    hasUserId: !!userId,
+    otherPropsKeys: Object.keys(otherProps)
   });
 
-  // Debug: Log first widget data for progress tracking
-  if (widgets.length > 0) {
-    const firstWidget = widgets[0];
-    console.log('[Grid] First widget debug:', {
-      type: firstWidget.type,
-      props: firstWidget.props
-    });
-  }
-
-  const gapClasses = {
-    small: 'gap-4',
-    medium: 'gap-6',
-    large: 'gap-8'
-  };
-
-  const paddingClasses = {
-    none: 'p-0',
-    small: 'p-3',
-    medium: 'p-6',
-    large: 'p-8'
-  };
-
-  const backgroundClasses = {
-    transparent: '',
-    glass: 'card-glass-premium backdrop-blur-xl',
-    solid: 'card bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg'
-  };
+  const gapClasses = 'gap-6';
+  const paddingClasses = 'p-0';
+  const backgroundClasses = '';
 
   const columnClasses = {
     1: 'grid-cols-1',
@@ -148,8 +61,8 @@ export default function Grid(input: GridInput & { userId?: string; onAction?: (a
 
   return (
     <div className={`
-      ${backgroundClasses[background]}
-      ${paddingClasses[padding]}
+      ${backgroundClasses}
+      ${paddingClasses}
       transition-all duration-300 ease-out
       w-full min-h-0
     `}>
@@ -158,28 +71,47 @@ export default function Grid(input: GridInput & { userId?: string; onAction?: (a
           <h2 className="text-glass-primary text-2xl font-bold tracking-tight leading-tight">
             {title}
           </h2>
+          {subtitle && (
+            <p className="text-glass-muted text-sm mt-2">
+              {subtitle}
+            </p>
+          )}
         </div>
       )}
 
       <div className={`
         grid
         ${columnClasses[columns]}
-        ${gapClasses[gap]}
+        ${gapClasses}
         auto-rows-fr
         px-8 pb-8
         w-full
       `}>
-        {children}
-        {widgets.map((widget, index) => (
-          <div key={`grid-item-${index}`} className="min-h-0 flex w-full">
+        {items.map((item, index) => (
+          <div key={item.id || `grid-item-${index}`} className="min-h-0 flex w-full">
             <UniversalSchemaRenderer
-              schema={widget}
-              userId={input.userId}
-              onProgressUpdate={input.onProgressUpdate}
+              schema={item}
+              userId={userId}
+              onAction={onAction}
+              onProgressUpdate={onProgressUpdate}
             />
           </div>
         ))}
       </div>
+
+      {/* Debug info for empty state */}
+      {items.length === 0 && (
+        <div className="px-8 pb-8">
+          <div className="text-center py-8 text-glass-muted">
+            <p>No items to display</p>
+            {availableContent.length > 0 && (
+              <p className="text-xs mt-2">
+                {availableContent.length} items in availableContent but not rendered
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

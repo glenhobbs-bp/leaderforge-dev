@@ -1,14 +1,15 @@
 /**
  * File: apps/web/components/widgets/VideoList.tsx
- * Purpose: Displays video content grid with glassmorphism design and elegant hover effects
+ * Purpose: Displays video content grid with glassmorphism design (Universal Widget Schema)
  * Owner: Frontend team
- * Tags: widget, video, content, glassmorphism, schema-driven
+ * Tags: widget, video, content, glassmorphism, universal-schema, adr-0009
  */
 
 "use client";
 
 import React from 'react';
 import Image from 'next/image';
+import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
 interface VideoItem {
   id: string;
@@ -20,59 +21,35 @@ interface VideoItem {
   url?: string;
 }
 
-// Legacy props interface for backwards compatibility
+// VideoList component props (transformed from Universal Widget Schema)
 interface VideoListProps {
-  title?: string;
-  videos?: VideoItem[];
-  onVideoClick?: (video: VideoItem) => void;
-  maxVideos?: number;
+  schema: UniversalWidgetSchema;
+  userId?: string;
+  onAction?: (action: { action: string; label: string; [key: string]: unknown }) => void;
+  onProgressUpdate?: () => void;
 }
 
-// Schema interface for new schema-driven approach
-interface VideoListSchema {
-  type: 'VideoList';
-  title?: string;
-  videos?: VideoItem[];
-  onVideoClick?: (video: VideoItem) => void;
-  maxVideos?: number;
-  metadata?: {
-    version?: string;
-    source?: string;
-  };
-}
-
-// Union type for transition period
-type VideoListInput = VideoListProps | { schema: VideoListSchema };
-
-function isSchemaInput(input: VideoListInput): input is { schema: VideoListSchema } {
-  return 'schema' in input;
-}
-
-export default function VideoList(input: VideoListInput) {
-  // Extract props from either schema or direct props
-  const props: VideoListProps = isSchemaInput(input)
-    ? {
-        title: input.schema.title,
-        videos: input.schema.videos,
-        onVideoClick: input.schema.onVideoClick,
-        maxVideos: input.schema.maxVideos
-      }
-    : input;
-
-  const {
-    title = "Videos",
-    videos = [],
-    onVideoClick,
-    maxVideos = 6
-  } = props;
+export default function VideoList({ schema, onAction }: VideoListProps) {
+  // Extract data from Universal Widget Schema (ADR-0009)
+  const title = schema.config.title || "Videos";
+  const videos = (schema.data as any).videos || [];
+  const maxVideos = (schema.config as any).maxVideos || 6;
 
   // Handle undefined or null videos
   const safeVideos = videos || [];
   const displayVideos = safeVideos.slice(0, maxVideos);
 
   const handleVideoClick = (video: VideoItem) => {
-    if (onVideoClick) {
-      onVideoClick(video);
+    if (onAction && video.url) {
+      onAction({
+        action: 'openVideoModal',
+        label: 'Watch Video',
+        videoUrl: video.url,
+        title: video.title,
+        poster: video.thumbnail || '',
+        description: video.description || '',
+        duration: video.duration
+      });
     } else if (video.url) {
       window.open(video.url, '_blank');
     }

@@ -2,7 +2,11 @@
 
 ## Overview
 
-This guide covers everything you need to know about creating, registering, and using schema-driven widgets in our agent-native platform. All widgets follow the Pure Schema-Driven approach documented in [ADR-0008](../../architecture/adr/0008-pure-schema-driven-widgets.md).
+This guide covers everything you need to know about creating, registering, and using schema-driven widgets in our agent-native platform. All widgets follow the Pure Schema-Driven approach documented in [ADR-0008](../../architecture/adr/0008-pure-schema-driven-widgets.md) and the Universal Registry-Driven System principles from [ADR-0009](../../architecture/adr/0009-schema-props-boundary-separation.md).
+
+## ⚠️ **CRITICAL PRINCIPLE**
+
+**UniversalSchemaRenderer must NEVER be modified when adding new widgets.** New widgets must be registry-discoverable and work immediately after registration without any changes to universal components.
 
 ## Table of Contents
 
@@ -127,64 +131,94 @@ All widget files must include standardized headers:
 
 ## Widget Registration
 
-### Step 1: Add to WidgetDispatcher
+### Step 1: Add to WidgetRegistry
 
-Register your widget in the `WidgetDispatcher`:
+**CRITICAL: Registry-First Registration**
+
+Register your widget in the `WidgetRegistry` with transformation functions:
+
+```typescript
+// packages/asset-core/src/registries/WidgetRegistry.ts
+import { MyWidgetProps } from './MyWidget';
+
+// Add transformation function
+export function transformMyWidgetSchema(schema: UniversalWidgetSchema): MyWidgetProps {
+  return {
+    title: schema.config?.title || schema.data?.title || 'Untitled',
+    data: schema.data?.items || schema.data?.data || [],
+    theme: schema.config?.theme || 'light',
+    onClick: schema.config?.interactions?.find(i => i.type === 'click')?.handler
+  };
+}
+
+// Add to registry
+export const WIDGET_TRANSFORMERS: WidgetTransformers = {
+  // ... existing transformers ...
+  MyWidget: transformMyWidgetSchema
+};
+
+// Add to available types
+export function isWidgetTypeAvailable(type: string): boolean {
+  return Object.keys(WIDGET_TRANSFORMERS).includes(type);
+}
+```
+
+### Step 2: Update WidgetDispatcher (Only Once)
+
+**IMPORTANT: This step should be done by the platform team. Individual widget developers should NOT modify WidgetDispatcher.**
 
 ```typescript
 // apps/web/components/widgets/WidgetDispatcher.tsx
 
-// Add import
+// Add import (done by platform team)
 import MyWidget from './MyWidget';
 
-// Add case in switch statement
-switch (schema.type) {
-  // ... existing cases ...
-
-  case 'MyWidget':
-    return <MyWidget schema={schema as any} />;
-
-  // ... rest of cases ...
-}
-
-// Update available types
-export function isWidgetTypeAvailable(type: string): boolean {
-  const availableTypes = [
-    'Card', 'VideoPlayer', 'StatCard', 'Leaderboard',
-    'VideoList', 'Panel', 'Grid', 'MyWidget' // Add your widget
-  ];
-  return availableTypes.includes(type);
-}
+// Add case in switch statement (done by platform team)
+case 'MyWidget':
+  const myWidgetProps = transformSchemaToProps(schema, 'MyWidget');
+  return <MyWidget {...myWidgetProps} />;
 ```
 
-### Step 2: Export from Widget Index
+### Step 3: Export from Widget Index
 
 Add to the widget index file:
 
 ```typescript
 // apps/web/components/widgets/index.ts
 export { default as MyWidget } from './MyWidget';
-export { WidgetDispatcher } from './WidgetDispatcher';
+export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';
 // ... other exports
 ```
 
-### Step 3: Update Widget Registry (Optional)
+### Step 4: Add Metadata to Registry (Optional)
 
-For advanced discovery, add to the widget registry:
+For enhanced discovery and documentation:
 
 ```typescript
 // packages/asset-core/src/registries/WidgetRegistry.ts
-export const WIDGET_REGISTRY = {
+export const WIDGET_METADATA = {
   // ... existing widgets ...
   MyWidget: {
-    component: 'MyWidget',
-    schema: 'MyWidgetSchema',
+    name: 'MyWidget',
     category: 'data-display', // or 'layout', 'input', etc.
     description: 'Displays custom data with interactive features',
-    tags: ['data', 'interactive', 'custom']
+    tags: ['data', 'interactive', 'custom'],
+    version: '1.0.0',
+    author: 'Your Team',
+    universalSchemaCompliant: true // ADR-0009
   }
 };
 ```
+
+## ⚠️ **CRITICAL: Universal System Compliance**
+
+### **Registry-First Development Rules**
+
+1. **NEVER modify UniversalSchemaRenderer** - It must remain universal
+2. **NEVER modify WidgetDispatcher directly** - Use registry registration only
+3. **ALWAYS implement transformation functions** - Schema-to-props conversion
+4. **ALWAYS test via agent generation** - End-to-end schema flow
+5. **ALWAYS follow ADR-0009** - Schema-props boundary separation
 
 ---
 
@@ -381,34 +415,53 @@ expect(agentResponse.widgets[0].title).toBeDefined();
 ### Common Issues
 
 **1. Widget not rendering**
-- Check WidgetDispatcher registration
-- Verify schema type matches case statement
-- Ensure schema structure is correct
+- Check WidgetRegistry transformation function registration
+- Verify schema type is in WIDGET_TRANSFORMERS
+- Ensure schema structure matches Universal Widget Schema
+- Verify isWidgetTypeAvailable returns true for your widget
 
 **2. Props not being passed correctly**
-- Verify schema extraction logic in isSchemaInput check
+- Check transformation function in WidgetRegistry
+- Verify schema-to-props mapping logic
+- Ensure ADR-0009 boundary separation (schema vs props)
 - Check for typos in property names
-- Ensure proper type conversion
 
 **3. Fallbacks not working**
-- Check metadata.fallbacks structure
-- Verify fallback logic implementation
-- Ensure graceful degradation patterns
+- Check Universal Widget Schema metadata.fallbacks structure
+- Verify fallback logic in transformation function
+- Ensure graceful degradation patterns in widget component
 
 **4. Type errors**
-- Update widget interfaces
-- Check schema type definitions
-- Verify union type implementation
+- Update widget props interfaces (not schema interfaces)
+- Check transformation function return types
+- Verify schema follows UniversalWidgetSchema structure
+- Ensure clean separation between schema and props types
+
+**5. Widget not discoverable**
+- Verify widget is in WIDGET_TRANSFORMERS registry
+- Check isWidgetTypeAvailable function includes your widget
+- Ensure transformation function is properly exported
+- Verify widget follows registry-first registration pattern
 
 ### Debug Checklist
 
+**Registry-First Checklist:**
 - [ ] Widget exported from index
-- [ ] WidgetDispatcher case added
+- [ ] Transformation function implemented in WidgetRegistry
 - [ ] Schema interface properly defined
-- [ ] isSchemaInput function implemented
+- [ ] Props interface clearly separated from schema
 - [ ] Fallback handling in place
-- [ ] Test page entry added
+- [ ] Test page entry added (via registry)
 - [ ] Unit tests passing
+- [ ] Agent can generate valid schemas
+- [ ] UniversalSchemaRenderer unchanged
+- [ ] WidgetDispatcher requires no widget-specific changes
+
+**Universal System Validation:**
+- [ ] New widget works via agent-generated schemas
+- [ ] No hardcoded widget logic outside registry
+- [ ] Schema-props boundary maintained (ADR-0009)
+- [ ] Zero modifications to universal components
 
 ---
 
