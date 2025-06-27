@@ -5,14 +5,22 @@ import QueryClientProvider from "./QueryClientProvider";
 import SupabaseProvider from '../components/SupabaseProvider';
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from './lib/supabaseServerClient';
+import { Metadata } from 'next';
+import { ReactNode } from 'react';
 
-// TODO: See enhancements-and-todos.md — move metadata export to a server component or separate file for App Router compliance.
-// export const metadata = {
-//   title: "LeaderForge",
-//   description: "Building something epic!",
-// };
+export const metadata: Metadata = {
+  title: "LeaderForge",
+  description: "Building something epic!",
+  icons: {
+    icon: '/favicon.ico',
+  },
+};
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children
+}: {
+  children: ReactNode
+}) {
   // Get initial session server-side for SSR
   const cookieStore = await cookies();
   const supabase = createSupabaseServerClient(cookieStore);
