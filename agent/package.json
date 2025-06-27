@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc --project tsconfig.build.json --skipLibCheck --noEmitOnError false",
-    "start": "node -r ts-node/register src/server.ts",
-    "dev": "nodemon --exec \"npm start\"",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec \"npm run start:dev\"",
+    "start:dev": "node -r ts-node/register src/server.ts",
     "test": "jest"
   },
   "keywords": [
