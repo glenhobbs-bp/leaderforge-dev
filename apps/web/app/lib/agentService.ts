@@ -155,7 +155,9 @@ export class AgentService {
               stats: {
                 ...card.data.stats,
                 watched: (progressData?.progress_percentage || 0) >= 90,
-                completed: (progressData?.progress_percentage || 0) >= 100,
+                // Fix: Worksheet completion should not be tied to video progress
+                // Worksheets are not implemented yet, so always false
+                completed: false, // TODO: Implement actual worksheet tracking
                 lastWatched: progressData?.last_viewed_at || null
               }
             }
