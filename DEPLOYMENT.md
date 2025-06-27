@@ -46,26 +46,32 @@
 
 ### 2. **Project Configuration**
 
-**Recommended Approach (Turborepo from root):**
-```bash
-# Build Configuration
-Framework Preset: Next.js
-Root Directory: ./
-Build Command: cd apps/web && pnpm run build
-Output Directory: apps/web/.next
-Install Command: pnpm install
-
-# Node.js Version: 18.x (recommended)
-```
-
-**Alternative Approach (if above fails):**
+**Recommended Approach (Simplified for Vercel):**
 ```bash
 # Build Configuration
 Framework Preset: Next.js
 Root Directory: apps/web
-Build Command: pnpm run turbo:build
+Build Command: npm run build
 Output Directory: .next
-Install Command: pnpm install
+Install Command: npm install --legacy-peer-deps
+
+# Node.js Version: 18.x (recommended)
+```
+
+**Alternative Approach (Using vercel.json):**
+If you prefer to use a `vercel.json` configuration file:
+1. The project includes a `vercel.json` file with optimized settings
+2. Set Root Directory to: `./` (project root)
+3. Vercel will automatically use the configuration from the file
+
+**Manual Configuration (if needed):**
+```bash
+# Build Configuration
+Framework Preset: Next.js
+Root Directory: ./
+Build Command: cd apps/web && npm run build
+Output Directory: apps/web/.next
+Install Command: npm install --legacy-peer-deps
 
 # Node.js Version: 18.x (recommended)
 ```

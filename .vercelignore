@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+.pnpm-debug.log*
+node_modules/.pnpm/
+.turbo/
+agent/
+*.log
+.env.local
+.DS_Store
+coverage/
+.nyc_output/
