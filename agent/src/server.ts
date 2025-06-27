@@ -6,7 +6,7 @@
 import { createServer } from 'http';
 import graph from './index.js';
 
-const PORT = 8000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
 
 // Store the last successful result for state retrieval
 let lastSuccessfulResult: unknown = null;
