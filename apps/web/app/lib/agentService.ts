@@ -37,10 +37,12 @@ export interface AgentInvocationResponse {
 export class AgentService {
   private supabase: any; // Using any to avoid schema typing issues
   private langGraphUrl: string;
+  private authHeaders?: Record<string, string>;
 
-  constructor(supabaseUrl: string, supabaseKey: string, langGraphUrl: string = 'http://localhost:8000') {
+  constructor(supabaseUrl: string, supabaseKey: string, langGraphUrl: string = 'http://localhost:8000', authHeaders?: Record<string, string>) {
     this.supabase = createClient(supabaseUrl, supabaseKey);
     this.langGraphUrl = langGraphUrl;
+    this.authHeaders = authHeaders;
   }
 
   /**
@@ -96,45 +98,52 @@ export class AgentService {
   }
 
   /**
-   * Enrich agent response content with user progress data
+   * Enrich content with progress data from database
    */
   private async enrichWithProgressData(content: any, userId: string, tenantKey: string): Promise<any> {
-    if (!content || typeof content !== 'object') {
-      return content;
-    }
-
     try {
-      // Note: Direct progress tool access replaced with optimized batch API
-
-      // Collect all content IDs that need progress data
+      // First, extract all content IDs from the schema
       const contentIds: string[] = [];
+
       const collectContentIds = (obj: any) => {
         if (Array.isArray(obj)) {
           obj.forEach(collectContentIds);
         } else if (obj && typeof obj === 'object') {
-          // Updated for Universal Widget Schema format
-          if (obj.type === 'Card' && obj.config?.title && obj.data?.videoUrl) {
+          if (obj.type === 'Card' && obj.config?.title) {
             contentIds.push(obj.config.title);
-          } else if (obj.type === 'Grid' && obj.data?.items) {
-            obj.data.items.forEach(collectContentIds);
-          } else {
-            Object.values(obj).forEach(collectContentIds);
           }
+          Object.values(obj).forEach(collectContentIds);
         }
       };
 
-      // First pass: collect all content IDs
       collectContentIds(content);
 
-      // Batch fetch progress data for all content IDs using optimized API
+      // Batch fetch progress data if we have content IDs
       let progressMap: Record<string, any> = {};
       if (contentIds.length > 0) {
         console.log(`[AgentService] Batch fetching progress for ${contentIds.length} content items:`, contentIds);
         try {
           // Use new optimized batch progress API (reduces 19 queries to 1)
-          const response = await fetch(`/api/user/${userId}/progress-batch`, {
+          // Fix: Use absolute URL for server-side fetch calls
+          const baseUrl = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : process.env.NODE_ENV === 'production'
+              ? 'https://leaderforge.vercel.app'
+              : 'http://localhost:3000';
+
+          // Prepare headers including authentication
+          const headers: Record<string, string> = {
+            'Content-Type': 'application/json'
+          };
+
+          // Forward authentication headers if available
+          if (this.authHeaders) {
+            Object.assign(headers, this.authHeaders);
+          }
+
+          const response = await fetch(`${baseUrl}/api/user/${userId}/progress-batch`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify({
               contentIds,
               contextKey: tenantKey,

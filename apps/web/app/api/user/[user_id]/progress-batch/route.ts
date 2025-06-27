@@ -12,35 +12,22 @@ import { restoreSession } from '../../../../lib/supabaseServerClient';
 
 interface BatchProgressRequest {
   contentIds: string[];
-  contextKey: string;
+  contextKey?: string; // Optional since we're not using it yet
 }
 
 interface BatchProgressResponse {
-  progress: Record<string, {
-    progress_percentage: number;
-    last_watch_time: number;
-    total_watch_time: number;
-    completed: boolean;
-    updated_at: string;
-  }>;
+  progress: Record<string, unknown>;
   error?: string;
-}
-
-interface ProgressItem {
-  content_id: string;
-  progress_percentage: number | null;
-  last_watch_time: number | null;
-  total_watch_time: number | null;
-  completed: boolean | null;
-  updated_at: string;
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { user_id: string } }
+  { params }: { params: Promise<{ user_id: string }> }
 ): Promise<NextResponse<BatchProgressResponse>> {
   try {
-    const { contentIds, contextKey }: BatchProgressRequest = await request.json();
+    const resolvedParams = await params;
+    const { user_id } = resolvedParams;
+    const { contentIds }: BatchProgressRequest = await request.json();
 
     if (!contentIds || !Array.isArray(contentIds) || contentIds.length === 0) {
       return NextResponse.json(
@@ -59,83 +46,59 @@ export async function POST(
     const cookieStore = await cookies();
     const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    if (sessionError || !session?.user) {
+    if (sessionError || !session) {
+      console.log('[BatchProgress] Session error:', sessionError);
       return NextResponse.json(
-        { progress: {}, error: 'Unauthorized' },
+        { progress: {}, error: 'Authentication failed' },
         { status: 401 }
       );
     }
 
     // Validate user_id matches authenticated user
-    if (session.user.id !== params.user_id) {
+    if (session.user.id !== user_id) {
       return NextResponse.json(
         { progress: {}, error: 'User ID mismatch' },
         { status: 403 }
       );
     }
 
-    // Single optimized query with IN clause
+    // Batch query for user progress - using correct column names
     const { data: progressData, error: queryError } = await supabase
-      .from('user_video_progress')
-      .select(`
-        content_id,
-        progress_percentage,
-        last_watch_time,
-        total_watch_time,
-        completed,
-        updated_at
-      `)
-      .eq('user_id', session.user.id)
-      .eq('context_key', contextKey)
+      .schema('core')
+      .from('user_progress')
+      .select('content_id, progress_percentage, metadata, last_viewed_at, completed_at, started_at')
+      .eq('user_id', user_id)
       .in('content_id', contentIds);
 
     if (queryError) {
-      console.error('[BatchProgress] Database query error:', queryError);
+      console.log('[BatchProgress] Database query error:', queryError);
       return NextResponse.json(
         { progress: {}, error: 'Database query failed' },
         { status: 500 }
       );
     }
 
-    // Transform array to object map for fast lookup
-    const progressMap: Record<string, {
-      progress_percentage: number;
-      last_watch_time: number;
-      total_watch_time: number;
-      completed: boolean;
-      updated_at: string | null;
-    }> = {};
-    progressData?.forEach((item: ProgressItem) => {
+    // Transform to expected format
+    const progressMap: Record<string, unknown> = {};
+    progressData?.forEach((item) => {
       progressMap[item.content_id] = {
-        progress_percentage: item.progress_percentage || 0,
-        last_watch_time: item.last_watch_time || 0,
-        total_watch_time: item.total_watch_time || 0,
-        completed: item.completed || false,
-        updated_at: item.updated_at
+        progress_percentage: item.progress_percentage,
+        metadata: item.metadata,
+        last_viewed_at: item.last_viewed_at,
+        completed_at: item.completed_at,
+        started_at: item.started_at,
+        lastUpdated: item.last_viewed_at
       };
     });
 
-    // Fill in missing content with zero progress
-    contentIds.forEach(contentId => {
-      if (!progressMap[contentId]) {
-        progressMap[contentId] = {
-          progress_percentage: 0,
-          last_watch_time: 0,
-          total_watch_time: 0,
-          completed: false,
-          updated_at: null
-        };
-      }
-    });
-
-    console.log(`[BatchProgress] Fetched progress for ${contentIds.length} items, ${progressData?.length || 0} found in DB`);
+    console.log(`[BatchProgress] Fetched progress for ${progressData?.length || 0} items out of ${contentIds.length} requested`);
 
     return NextResponse.json({
       progress: progressMap
     });
 
   } catch (error) {
-    console.error('[BatchProgress] API error:', error);
+    console.error('[BatchProgress] Unexpected error:', error);
     return NextResponse.json(
       { progress: {}, error: 'Internal server error' },
       { status: 500 }

@@ -143,10 +143,20 @@ export async function POST(req: NextRequest) {
 
     // ✅ INVOKE THE CORRECT AGENT
     console.log('[API/agent/content] Calling LangGraph agent...');
+
+    // Prepare authentication headers to forward for server-side API calls
+    const authHeaders: Record<string, string> = {};
+    if (accessToken) {
+      authHeaders['Cookie'] = cookieStore.getAll()
+        .map(cookie => `${cookie.name}=${cookie.value}`)
+        .join('; ');
+    }
+
     const agentService = new AgentService(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      process.env.LANGGRAPH_URL || 'http://localhost:8000'
+      process.env.LANGGRAPH_URL || 'http://localhost:8000',
+      authHeaders
     );
 
     const agentResponse = await agentService.invokeAgent(navOption.agent_id, {

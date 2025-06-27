@@ -14,18 +14,18 @@ console.log('[Agent] Initializing content agent with API-only access');
 
 // API-based repository that makes HTTP calls to the web server instead of direct database access
 class ApiUserProgressRepository implements UserProgressRepository {
-  async getProgress(_userId: string, _contentId: string, _contextKey: string): Promise<UserProgress | null> {
+  async getProgress(_userId: string, _contentId: string, _tenantKey: string): Promise<UserProgress | null> {
     // For now, return null - the agent doesn't need direct progress access
     // Progress is handled by the web server via API calls
     return null;
   }
 
-  async listProgressForContentIds(_userId: string, _contentIds: string[], _contextKey: string): Promise<UserProgress[]> {
+  async listProgressForContentIds(_userId: string, _contentIds: string[], _tenantKey: string): Promise<UserProgress[]> {
     // Return empty array - progress fetching handled by web server
     return [];
   }
 
-  async setProgress(_userId: string, _contentId: string, _contextKey: string, _progress: Partial<UserProgress>): Promise<UserProgress> {
+  async setProgress(_userId: string, _contentId: string, _tenantKey: string, _progress: Partial<UserProgress>): Promise<UserProgress> {
     throw new Error('Agent should not update progress directly - use API endpoints');
   }
 
@@ -33,11 +33,11 @@ class ApiUserProgressRepository implements UserProgressRepository {
     throw new Error('Agent should not track events directly - use API endpoints');
   }
 
-  async getProgressSummary(_userId: string, _contextKey: string): Promise<ProgressSummary> {
+  async getProgressSummary(_userId: string, _tenantKey: string): Promise<ProgressSummary> {
     // Return empty summary - handled by web server
     return {
       userId: _userId,
-      contextKey: _contextKey,
+      tenantKey: _tenantKey,
       totalItems: 0,
       completedItems: 0,
       inProgressItems: 0,
@@ -48,10 +48,10 @@ class ApiUserProgressRepository implements UserProgressRepository {
     };
   }
 
-  async getCompletionStats(_userId: string, _contextKey: string): Promise<CompletionStats> {
+  async getCompletionStats(_userId: string, _tenantKey: string): Promise<CompletionStats> {
     return {
       userId: _userId,
-      contextKey: _contextKey,
+      tenantKey: _tenantKey,
       completionsByType: {},
       averageSessionTime: 0,
       streakDays: 0,
@@ -59,11 +59,11 @@ class ApiUserProgressRepository implements UserProgressRepository {
     };
   }
 
-  async checkMilestones(_userId: string, _contextKey: string): Promise<Milestone[]> {
+  async checkMilestones(_userId: string, _tenantKey: string): Promise<Milestone[]> {
     return [];
   }
 
-  async batchGetProgress(_queries: Array<{ userId: string; contentId: string; contextKey: string }>): Promise<UserProgress[]> {
+  async batchGetProgress(_queries: Array<{ userId: string; contentId: string; tenantKey: string }>): Promise<UserProgress[]> {
     return [];
   }
 

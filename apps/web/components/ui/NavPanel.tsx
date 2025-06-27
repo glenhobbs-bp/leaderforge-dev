@@ -71,7 +71,7 @@ interface NavPanelProps {
     subtitle?: string;
     icon?: string;
   }[];
-  contextValue?: string;
+  selectedTenantKey?: string; // Current selected tenant - should match tenantKey
   onContextChange?: (id: string) => void;
   onNavSelect?: (navOptionId: string) => void;
   isCollapsed?: boolean;
@@ -83,7 +83,7 @@ interface NavPanelProps {
 export default function NavPanel({
   tenantKey,
   contextOptions = [],
-  contextValue,
+  selectedTenantKey,
   onContextChange,
   onNavSelect,
   isCollapsed = false,
@@ -149,12 +149,12 @@ export default function NavPanel({
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] contextValue changed:', contextValue);
+      console.log('[NavPanel] selectedTenantKey changed:', selectedTenantKey);
     }
-    // Reset user interaction flag when context changes to allow restoration
+    // Reset user interaction flag when tenant changes to allow restoration
     setHasUserInteracted(false);
-    setSelectedNav(null); // Clear selection for new context
-  }, [contextValue]);
+    setSelectedNav(null); // Clear selection for new tenant
+  }, [selectedTenantKey]);
 
   // Initialize selected nav from persisted state only on first load and if user hasn't interacted
   useEffect(() => {
@@ -340,7 +340,7 @@ export default function NavPanel({
         <div className={`${isCollapsed ? 'px-0 pb-2 pt-2' : 'w-full pb-2 pt-2'}`}>
           <ContextSelector
             contexts={contextOptions}
-            value={contextValue || ""}
+            value={selectedTenantKey || ""}
             onChange={onContextChange || (() => {})}
             collapsed={isCollapsed}
           />

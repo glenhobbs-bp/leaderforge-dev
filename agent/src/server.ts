@@ -9,7 +9,7 @@ import graph from './index';
 const PORT = 8000;
 
 // Store the last successful result for state retrieval
-let lastSuccessfulResult: any = null;
+let lastSuccessfulResult: unknown = null;
 
 const server = createServer(async (req, res) => {
   // Set CORS headers
@@ -60,10 +60,12 @@ const server = createServer(async (req, res) => {
         // Run the graph
         const result = await graph.invoke({
           userId: input.context?.userId || 'test-user',
-          contextKey: input.context?.contextKey || 'leaderforge',
+          tenantKey: input.context?.tenantKey || input.context?.contextKey || 'leaderforge',
           navOptionId: input.context?.navOptionId || 'test-nav',
-          intent: input.messages?.[0]?.content || 'Show content',
           contentList: [],
+          progressMap: {},
+          agentConfig: {},
+          agentParameters: {},
           schema: null,
           messages: input.messages || []
         });
@@ -101,9 +103,9 @@ const server = createServer(async (req, res) => {
 
     // Get thread state - return the stored result from the run
   if (req.url?.includes('/state') && req.method === 'GET') {
-    // Extract threadId from URL
-    const urlParts = req.url.split('/');
-    const threadId = urlParts[2];
+    // Extract threadId from URL (for potential future use)
+    // const urlParts = req.url.split('/');
+    // const threadId = urlParts[2];
 
     // In a real implementation, we'd store results per thread
     // For now, return the last successful result if available

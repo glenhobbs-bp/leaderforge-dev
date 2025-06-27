@@ -669,7 +669,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             subtitle: ctx.subtitle || 'AI-Powered Experience',
             icon: 'star'
           })) || []}
-          contextValue={currentTenant}
+          selectedTenantKey={currentTenant}
           onContextChange={handleTenantChange}
           onNavSelect={handleNavSelect}
           isCollapsed={isCollapsed}

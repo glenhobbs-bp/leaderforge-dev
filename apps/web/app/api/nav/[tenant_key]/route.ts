@@ -28,20 +28,32 @@ export async function GET(req: NextRequest, context: { params: { tenant_key: str
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
+    // Debug: Log authentication attempt
+    console.log(`[API/nav/${tenant_key}] Starting authentication check...`);
+
     // Simplified auth: try to get session directly first
     const { data: { session } } = await supabase.auth.getSession();
+    console.log(`[API/nav/${tenant_key}] Initial session check:`, session ? 'Found' : 'None');
 
     // If no session, try manual hydration once
     if (!session?.user?.id) {
+      console.log(`[API/nav/${tenant_key}] No initial session, attempting manual hydration...`);
       const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
       const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
       const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+
+      console.log(`[API/nav/${tenant_key}] Cookie tokens found:`, {
+        hasAccessToken: !!accessToken,
+        hasRefreshToken: !!refreshToken,
+        projectRef
+      });
 
       if (accessToken && refreshToken) {
         await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
+        console.log(`[API/nav/${tenant_key}] Session restoration attempted`);
       }
     }
 
@@ -49,7 +61,14 @@ export async function GET(req: NextRequest, context: { params: { tenant_key: str
     const { data: { session: finalSession } } = await supabase.auth.getSession();
     const userId = finalSession?.user?.id;
 
+    console.log(`[API/nav/${tenant_key}] Final auth result:`, {
+      hasSession: !!finalSession,
+      userId: userId || 'None',
+      tenant: tenant_key
+    });
+
     if (!userId) {
+      console.log(`[API/nav/${tenant_key}] Authentication failed - returning 401`);
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
