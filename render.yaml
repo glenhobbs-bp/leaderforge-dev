@@ -3,8 +3,9 @@ services:
     name: leaderforge-langgraph
     runtime: node
     plan: free
-    buildCommand: cd agent && npm install && npm run build
-    startCommand: cd agent && npm start
+    rootDir: agent
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
