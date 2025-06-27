@@ -1,25 +1,23 @@
 // File: apps/web/hooks/useNavOptions.ts
-// Purpose: Custom hook to fetch entitlement-filtered nav options for a given context from the API, using SWR. Used to drive schema-driven NavPanel.
+// Purpose: React hook for fetching navigation options from the database
+// Owner: Frontend team
+// Tags: React hooks, navigation, SWR, database
 
 import useSWR from 'swr';
 
-async function fetchWithCredentials(url: string) {
-  console.log('[useNavOptions] Fetching nav options from:', url);
-  const res = await fetch(url, { credentials: 'include' });
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    console.error('[useNavOptions] Fetch error:', errorData);
-    throw new Error(errorData?.error || 'Failed to fetch nav options');
-  }
-  const data = await res.json();
-  console.log(`[useNavOptions] Fetch success: loaded ${Array.isArray(data) ? data.length : 0} nav options.`);
-  return data;
-}
+// Fetch function with credentials
+const fetchWithCredentials = (url: string) =>
+  fetch(url, { credentials: 'include' }).then((res) => {
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return res.json();
+  });
 
-export function useNavOptions(contextKey: string, initialData?: unknown) {
-  const shouldFetch = !!contextKey;
+export function useNavOptions(tenantKey: string, initialData?: unknown) {
+  const shouldFetch = !!tenantKey;
   const { data, error, isLoading } = useSWR(
-    shouldFetch ? `/api/nav/${contextKey}` : null,
+    shouldFetch ? `/api/nav/${tenantKey}` : null,
     fetchWithCredentials,
     {
       fallbackData: initialData,

@@ -1,11 +1,11 @@
 // File: apps/web/app/api/user/[user_id]/video-progress/route.ts
-// Purpose: API endpoint for updating user video progress
+// Purpose: SSR-compliant API endpoint for updating user video progress
 // Owner: Backend team
-// Tags: API endpoint, video progress, user preferences
+// Tags: API endpoint, video progress, SSR auth
 
 import { NextRequest, NextResponse } from 'next/server';
-import { userService } from '../../../../lib/userService';
-import type { VideoProgress } from '../../../../lib/types';
+import { cookies } from 'next/headers';
+import { restoreSession } from '../../../../lib/supabaseServerClient';
 
 export async function POST(
   request: NextRequest,
@@ -23,7 +23,35 @@ export async function POST(
       );
     }
 
-    await userService.updateVideoProgress(userId, contentId, progress as Partial<VideoProgress>);
+        // SSR-first authentication with robust session restoration
+    const cookieStore = await cookies();
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
+
+    if (sessionError || !session || session.user.id !== userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Update video progress with authenticated context (respects RLS)
+    const { error: updateError } = await supabase
+      .schema('core')
+      .from('user_progress')
+      .upsert({
+        user_id: userId,
+        content_id: contentId,
+        progress_data: progress,
+        updated_at: new Date().toISOString()
+      });
+
+    if (updateError) {
+      console.error('[API] Error updating video progress:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to update video progress' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

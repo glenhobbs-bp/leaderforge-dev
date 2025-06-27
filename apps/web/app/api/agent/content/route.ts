@@ -108,6 +108,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User ID mismatch' }, { status: 403 });
     }
 
+    // ✅ LOOK UP AGENT FROM NAVIGATION OPTION
+    console.log('[API/agent/content] Looking up agent for navigation option...');
+
+    // Query nav_options to get the agent_id
+    const { data: navOption, error: navError } = await supabase
+      .schema('core')
+      .from('nav_options')
+      .select('agent_id, label, nav_key')
+      .eq('id', navOptionId)
+      .eq('tenant_key', tenantKey)
+      .single();
+
+    if (navError || !navOption) {
+      console.error('[API/agent/content] Navigation option not found:', { navOptionId, tenantKey, error: navError });
+      return NextResponse.json(
+        { error: `Navigation option not found: ${navOptionId}` },
+        { status: 404 }
+      );
+    }
+
+    if (!navOption.agent_id) {
+      console.warn('[API/agent/content] No agent assigned to navigation option:', navOption.label);
+      return NextResponse.json({
+        type: 'no_agent',
+        message: `The ${navOption.label} feature is being prepared for you.`
+      });
+    }
+
+    console.log('[API/agent/content] Found navigation option:', {
+      label: navOption.label,
+      agentId: navOption.agent_id
+    });
+
+    // ✅ INVOKE THE CORRECT AGENT
     console.log('[API/agent/content] Calling LangGraph agent...');
     const agentService = new AgentService(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -115,15 +149,12 @@ export async function POST(req: NextRequest) {
       process.env.LANGGRAPH_URL || 'http://localhost:8000'
     );
 
-    // For now, use a default agent ID until we implement nav-option-to-agent mapping
-    const defaultAgentId = 'd9f0bd53-ec61-4dfc-95fe-8f3355d293b9'; // leaderforgeContentLibrary
-
-    const agentResponse = await agentService.invokeAgent(defaultAgentId, {
-      message: intent?.message || `Show me content for navigation option ${navOptionId}`,
+    const agentResponse = await agentService.invokeAgent(navOption.agent_id, {
+      message: intent?.message || `Show me content for ${navOption.label}`,
       userId,
       tenantKey: tenantKey,
       navOptionId,
-      metadata: { navOptionId }
+      metadata: { navOptionId, navLabel: navOption.label }
     });
 
     console.log('[API/agent/content] Agent response:', agentResponse);

@@ -1,15 +1,16 @@
 // File: apps/web/app/api/user/[user_id]/preferences/route.ts
-// Purpose: User preferences API with performance optimizations and caching
+// Purpose: SSR-compliant user preferences API with proper authentication
 // Owner: Backend team
-// Tags: API, user management, preferences, caching, performance
+// Tags: API, user management, preferences, SSR auth
 
 import { NextRequest, NextResponse } from 'next/server';
-import { userService } from '../../../../lib/userService';
+import { cookies } from 'next/headers';
+import { restoreSession } from '../../../../lib/supabaseServerClient';
+import type { User } from '../../../../lib/types';
 
 /**
  * GET /api/user/[user_id]/preferences
- * Fetches user profile and preferences data.
- * Optimized with caching headers for better performance.
+ * Fetches user profile and preferences data with SSR authentication.
  */
 export async function GET(
   request: NextRequest,
@@ -18,7 +19,33 @@ export async function GET(
   try {
     const { user_id } = await params;
 
-    const user = await userService.getUser(user_id);
+        // SSR-first authentication with robust session restoration
+    const cookieStore = await cookies();
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
+
+    if (sessionError || !session || session.user.id !== user_id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Get user data with authenticated context (respects RLS)
+    const { data: user, error: userError } = await supabase
+      .schema('core')
+      .from('users')
+      .select('*')
+      .eq('id', user_id)
+      .single();
+
+    if (userError) {
+      console.error('[API] Error fetching user preferences:', userError);
+      return NextResponse.json(
+        { error: 'Failed to fetch user data' },
+        { status: 500 }
+      );
+    }
+
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
@@ -53,7 +80,7 @@ export async function GET(
 
 /**
  * PUT /api/user/[user_id]/preferences
- * Updates user profile and/or preferences data.
+ * Updates user profile and/or preferences data with SSR authentication.
  */
 export async function PUT(
   request: NextRequest,
@@ -63,25 +90,61 @@ export async function PUT(
     const { user_id } = await params;
     const body = await request.json();
 
+        // SSR-first authentication with robust session restoration
+    const cookieStore = await cookies();
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
+
+    if (sessionError || !session || session.user.id !== user_id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     // Separate profile fields from preferences
     const { first_name, last_name, full_name, avatar_url, ...preferences } = body;
 
-    const profileFields: Record<string, string> = {};
+    const profileFields: Partial<User> = {};
     if (first_name !== undefined) profileFields.first_name = first_name;
     if (last_name !== undefined) profileFields.last_name = last_name;
     if (full_name !== undefined) profileFields.full_name = full_name;
     if (avatar_url !== undefined) profileFields.avatar_url = avatar_url;
 
-    // Update both profile and preferences if both are provided
-    let updatedUser;
-    if (Object.keys(profileFields).length > 0 && Object.keys(preferences).length > 0) {
-      updatedUser = await userService.updateUserProfileAndPreferences(user_id, profileFields, preferences);
-    } else if (Object.keys(profileFields).length > 0) {
-      updatedUser = await userService.updateUserProfile(user_id, profileFields);
-    } else if (Object.keys(preferences).length > 0) {
-      updatedUser = await userService.updateUserPreferences(user_id, preferences);
-    } else {
+    // Prepare update data
+    const updateData: Partial<User> = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Add profile fields if any
+    if (Object.keys(profileFields).length > 0) {
+      Object.assign(updateData, profileFields);
+    }
+
+    // Add preferences if any
+    if (Object.keys(preferences).length > 0) {
+      updateData.preferences = preferences;
+    }
+
+    // Validate that we have something to update
+    if (Object.keys(updateData).length === 1) { // Only updated_at
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
+    }
+
+    // Update with authenticated user context (respects RLS)
+    const { data: updatedUser, error: updateError } = await supabase
+      .schema('core')
+      .from('users')
+      .update(updateData)
+      .eq('id', user_id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('[API] Error updating user preferences:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to update user data' },
+        { status: 500 }
+      );
     }
 
     if (!updatedUser) {

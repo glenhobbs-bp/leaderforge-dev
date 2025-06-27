@@ -124,9 +124,10 @@ export default function NavPanel({
     const handleAvatarUpdate = (event: CustomEvent) => {
       if (event.detail.userId === userId) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('[NavPanel] Avatar update event received for user:', userId);
+          console.log('[NavPanel] Avatar update event received for user:', userId, '- refreshing avatar');
         }
-        // The useAvatar hook will handle the refetch through React Query
+        // Invalidate avatar queries to trigger refresh
+        // Note: This happens when UserProfileModal closes, not during upload
         window.dispatchEvent(new CustomEvent('refetchAvatar', { detail: { userId } }));
       }
     };
@@ -162,7 +163,7 @@ export default function NavPanel({
         lastNavOptionId,
         selectedNav,
         hasUserInteracted,
-        contextKey: tenantKey,
+        tenantKey: tenantKey,
         shouldRestore: lastNavOptionId && !selectedNav && !hasUserInteracted
       });
     }
@@ -185,11 +186,18 @@ export default function NavPanel({
     }
   }, [selectedNavOptionId, selectedNav]);
 
+  // Debug modal state changes
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[NavPanel] Profile modal state changed:', isProfileModalOpen);
+    }
+  }, [isProfileModalOpen]);
+
   const handleNavClick = (navOptionId: string) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('[NavPanel] handleNavClick:', {
         navOptionId,
-        contextKey: tenantKey,
+        tenantKey: tenantKey,
         userId,
         previousSelection: selectedNav
       });
@@ -205,7 +213,7 @@ export default function NavPanel({
     if (userId && tenantKey) {
       updateNavigationState(navOptionId);
       if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Persisting navigation state:', { contextKey: tenantKey, navOptionId });
+        console.log('[NavPanel] Persisting navigation state:', { tenantKey: tenantKey, navOptionId });
       }
     }
 
@@ -294,7 +302,7 @@ export default function NavPanel({
   // Debug: Log navigation items and current selection
   if (process.env.NODE_ENV === 'development') {
     console.log('[NavPanel] Rendering navigation items:', {
-      contextKey: tenantKey,
+      tenantKey: tenantKey,
       selectedNav,
       lastNavOptionId,
       allItems: mainSections.flatMap(s => s.items.map(i => ({ id: i.id, label: i.label }))),
@@ -479,7 +487,10 @@ export default function NavPanel({
         {/* User Profile Modal */}
         <UserProfileModal
           isOpen={isProfileModalOpen}
-          onClose={() => setIsProfileModalOpen(false)}
+          onClose={() => {
+            console.log('[NavPanel] Profile modal close requested');
+            setIsProfileModalOpen(false);
+          }}
           userId={userId || ""}
         />
       </aside>

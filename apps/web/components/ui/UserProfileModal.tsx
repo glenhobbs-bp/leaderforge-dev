@@ -29,7 +29,9 @@ interface UserProfileModalProps {
 
 // Fetch user data from API
 async function fetchUserData(userId: string): Promise<{ user: UserData; preferences: UserPreferences }> {
-  const response = await fetch(`/api/user/${userId}/preferences`);
+  const response = await fetch(`/api/user/${userId}/preferences`, {
+    credentials: 'include'
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch user data');
   }
@@ -43,6 +45,7 @@ async function updateUserData(userId: string, data: Partial<UserData & UserPrefe
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(data),
   });
   if (!response.ok) {
@@ -53,7 +56,12 @@ async function updateUserData(userId: string, data: Partial<UserData & UserPrefe
 
 // Fetch avatar signed URL
 async function fetchAvatarUrl(userId: string): Promise<string> {
-  const response = await fetch(`/api/user/avatar?userId=${userId}`);
+  // Add cache-busting timestamp to ensure fresh avatar after upload
+  const cacheBuster = Date.now();
+  const response = await fetch(`/api/user/avatar?userId=${userId}&t=${cacheBuster}`, {
+    credentials: 'include',
+    cache: 'no-cache' // Ensure no browser caching
+  });
   if (!response.ok) {
     return "/icons/default-avatar.svg";
   }
@@ -70,6 +78,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
     notifications: true,
     language: 'en'
   });
+  const [avatarPendingRefresh, setAvatarPendingRefresh] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -102,37 +111,60 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
   // Avatar upload mutation
   const avatarUploadMutation = useMutation({
     mutationFn: async (file: File) => {
+      console.log('[UserProfileModal] Starting avatar upload for user:', userId);
       const formData = new FormData();
       formData.append('avatar', file);
       formData.append('userId', userId);
 
       const response = await fetch('/api/user/avatar', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
 
+      console.log('[UserProfileModal] Avatar upload response status:', response.status);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error('[UserProfileModal] Avatar upload failed:', error);
         throw new Error(error.error || 'Failed to upload avatar');
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log('[UserProfileModal] Avatar upload successful:', result);
+      return result;
     },
-            onSuccess: () => {
-      // Force NavPanel avatar refresh with event system
-      forceAvatarRefresh(userId);
+    onSuccess: (data) => {
+      console.log('[UserProfileModal] Avatar upload mutation onSuccess:', data);
 
-      // Invalidate all avatar-related queries to refresh NavPanel and modal
-      queryClient.invalidateQueries({ queryKey: ['avatar', userId] });
-      queryClient.invalidateQueries({ queryKey: ['user', userId] });
-      // Also invalidate any other avatar queries that might exist in NavPanel
-      queryClient.invalidateQueries({ queryKey: ['avatar'] });
-      queryClient.invalidateQueries({ predicate: (query) =>
-        query.queryKey.includes('avatar') || query.queryKey.includes(userId)
+      // Mark that NavPanel needs refresh when modal closes (not immediately)
+      setAvatarPendingRefresh(true);
+
+      // Force refetch avatar queries to show new avatar in modal immediately
+      queryClient.refetchQueries({ queryKey: ['avatar', userId] });
+      queryClient.refetchQueries({ queryKey: ['avatar'] });
+
+      // Update the user query cache to reflect the new avatar filename
+      queryClient.setQueryData(['user', userId], (oldData: { user: UserData; preferences: UserPreferences } | undefined) => {
+        if (oldData && data.fileName) {
+          return {
+            ...oldData,
+            user: {
+              ...oldData.user,
+              avatar_url: data.fileName // Store the filename, not the signed URL
+            }
+          };
+        }
+        return oldData;
       });
+
+      // Also manually update the avatar cache with the new signed URL
+      queryClient.setQueryData(['avatar', userId], data.url);
+
+      console.log('[UserProfileModal] Avatar updated in modal, NavPanel refresh deferred until modal close');
     },
     onError: (error) => {
-      console.error('Avatar upload failed:', error);
+      console.error('[UserProfileModal] Avatar upload mutation onError:', error);
       // You could add a toast notification here
     },
   });
@@ -195,6 +227,16 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
     event.target.value = '';
   };
 
+  // Handle modal close with NavPanel refresh if needed
+  const handleModalClose = () => {
+    if (avatarPendingRefresh) {
+      console.log('[UserProfileModal] Modal closing, triggering NavPanel avatar refresh');
+      forceAvatarRefresh(userId);
+      setAvatarPendingRefresh(false);
+    }
+    onClose();
+  };
+
   if (isLoading) {
     return null;
   }
@@ -215,7 +257,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
     : currentUser.full_name || 'User Profile';
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleModalClose}>
       <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
         <div
           className="relative rounded-2xl p-5 border border-white/20"
@@ -256,6 +298,15 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                   <User className="w-6 h-6" />
                 )}
               </div>
+
+              {/* Avatar Pending Refresh Indicator */}
+              {avatarPendingRefresh && (
+                <div
+                  className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-white shadow-sm"
+                  title="Avatar updated - will refresh when you close this modal"
+                />
+              )}
+
               <label
                 htmlFor="avatar-upload"
                 className={`absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110 ${

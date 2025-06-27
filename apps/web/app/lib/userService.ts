@@ -3,11 +3,30 @@
 // Owner: Backend team
 // Tags: service layer, user management, Supabase, performance optimization
 
+/**
+ * ⚠️ DEPRECATED: This userService violates our SSR-first authentication architecture
+ *
+ * 🏗️ ARCHITECTURAL COMPLIANCE VIOLATION:
+ * - Uses service role to bypass RLS policies (violates SSR-first auth)
+ * - Creates custom authentication pattern (violates single auth flow)
+ * - Bypasses established session management (violates auth consistency)
+ *
+ * ✅ MIGRATED TO SSR-COMPLIANT API ENDPOINTS:
+ * - User Profile: /api/user/[user_id]/profile (GET, PATCH)
+ * - User Preferences: /api/user/[user_id]/preferences (GET, PUT)
+ * - Navigation State: /api/user/[user_id]/navigation-state (POST)
+ * - Video Progress: /api/user/[user_id]/video-progress (POST)
+ *
+ * 🔄 TODO: Remove all remaining references to this service
+ * 📝 Use authenticated API routes with proper SSR session validation instead
+ */
+
 import type { User, VideoProgress } from './types';
 
 /**
- * Create service role Supabase client for backend operations
- * This bypasses RLS policies and provides full database access for server-side operations
+ * TEMPORARY: Service role client for backend operations
+ * TODO: Migrate all operations to SSR-authenticated API routes
+ * This violates our SSR-first architecture and should be eliminated
  */
 async function createServiceRoleSupabaseClient() {
   const { createClient } = await import('@supabase/supabase-js');
@@ -16,10 +35,6 @@ async function createServiceRoleSupabaseClient() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
-
-// Note: For user service operations, we use service role to bypass RLS policies
-// since these are backend operations that need full database access.
-// Frontend components should use the browser client for user-scoped operations.
 
 
 /**
@@ -190,7 +205,7 @@ export const userService = {
         ...currentPrefs,
         navigationState: {
           ...currentPrefs.navigationState,
-          lastContext: contextKey,
+          lastTenant: contextKey,
           lastNavOption: navOptionId,
           lastUpdated: new Date().toISOString()
         }

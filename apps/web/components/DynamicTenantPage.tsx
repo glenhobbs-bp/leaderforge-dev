@@ -115,18 +115,18 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
     const preferences = userPrefs.preferences as UserPreferences;
     const navigationState = preferences?.navigationState;
-    const lastContext = navigationState?.lastContext;
+    const lastTenant = navigationState?.lastTenant;
 
     console.log('[DynamicTenantPage] Tenant restoration:', {
-      lastContext,
+      lastTenant,
       currentTenant,
       hasRestoredContext
     });
 
           // Restore tenant if different
-      if (lastContext && lastContext !== currentTenant) {
-        console.log('[DynamicTenantPage] Restoring last tenant:', lastContext);
-        setCurrentTenant(lastContext);
+      if (lastTenant && lastTenant !== currentTenant) {
+        console.log('[DynamicTenantPage] Restoring last tenant:', lastTenant);
+        setCurrentTenant(lastTenant);
       }
 
     setHasRestoredContext(true);
@@ -152,22 +152,22 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
     const preferences = userPrefs.preferences as UserPreferences;
     const navigationState = preferences?.navigationState;
-    const lastContext = navigationState?.lastContext;
+    const lastTenant = navigationState?.lastTenant;
     const lastNavOption = navigationState?.lastNavOption;
 
     console.log('[DynamicTenantPage] 📊 Navigation restoration data:', {
       navigationState,
-      lastContext,
+      lastTenant,
       lastNavOption,
       currentTenant,
-      shouldRestore: lastNavOption && lastContext === currentTenant
+      shouldRestore: lastNavOption && lastTenant === currentTenant
     });
 
     // Only restore navigation option if we're in the correct tenant and have a saved option
-    if (lastNavOption && lastContext === currentTenant) {
+    if (lastNavOption && lastTenant === currentTenant) {
       console.log('[DynamicTenantPage] ✅ RESTORING navigation state:', {
         lastNavOption,
-        lastContext,
+        lastTenant,
         currentTenant,
         timestamp: navigationState?.lastUpdated
       });
@@ -181,9 +181,9 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     } else {
       console.log('[DynamicTenantPage] ❌ NOT restoring navigation state:', {
         hasLastNavOption: !!lastNavOption,
-        lastContext,
+        lastTenant,
         currentTenant,
-        tenantMatch: lastContext === currentTenant
+        tenantMatch: lastTenant === currentTenant
       });
     }
   }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
@@ -465,19 +465,29 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('[DynamicTenantPage] Agent API error:', errorData);
+        let errorData: { message?: string; error?: string };
+        try {
+          errorData = await response.json() as { message?: string; error?: string };
+        } catch {
+          errorData = { message: `HTTP ${response.status}: ${response.statusText}` };
+        }
+
+        console.error('[DynamicTenantPage] Agent API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData
+        });
 
         // Clear loading state
         setContentLoading(false);
 
-        // Show error state
+        // Show error state with more details
         setAgentSchema({
           type: 'error',
           content: {
             type: 'error',
             title: 'Unable to Load Content',
-            description: errorData.message || 'Please try again later.',
+            description: errorData.error || errorData.message || `Server error: ${response.status}`,
             action: 'Retry'
           }
         });

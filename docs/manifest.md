@@ -1,16 +1,16 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/26/2025, 6:21:03 PM*
+*Generated on 6/26/2025, 10:44:55 PM*
 
 ## Overview
 
-- **Total Files**: 234
-- **Total Size**: 1.96 MB
+- **Total Files**: 236
+- **Total Size**: 1.98 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 104 files
+- **.ts**: 106 files
 - **.md**: 78 files
 - **.tsx**: 33 files
 - **.json**: 16 files
@@ -19,14 +19,14 @@
 
 ## Most Common Tags
 
-- **TypeScript**: 137 files
+- **TypeScript**: 139 files
 - **AI agent**: 107 files
 - **documentation**: 80 files
-- **security**: 59 files
-- **API**: 34 files
+- **security**: 60 files
+- **API**: 35 files
+- **Next.js API**: 34 files
 - **React**: 33 files
-- **Next.js API**: 33 files
-- **utility**: 29 files
+- **utility**: 30 files
 - **UI**: 25 files
 - **React hooks**: 22 files
 
@@ -117,18 +117,18 @@ aka.ms/tsconfig to read more about this file */
 
 POST /api/agent/content
 
-**Complexity**: low • **Size**: 3.3KB
+**Complexity**: medium • **Size**: 5.2KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/25/2025
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/api/agent/context/route.ts`
 
 POST /api/agent/context
 
-**Complexity**: high • **Size**: 21.1KB
+**Complexity**: high • **Size**: 21.4KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
-**Modified**: 6/25/2025
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/api/auth/callback/route.ts`
@@ -349,38 +349,47 @@ Universal Progress API - Authenticated Endpoint
 
 ### `apps/web/app/api/user/[user_id]/navigation-state/route.ts`
 
-API endpoint for updating user navigation state
+API endpoint for updating user navigation state with SSR authentication
 
-**Owner**: Backend team • **Complexity**: low • **Size**: 1.1KB
-**Tags**: `API endpoint`, `navigation state`, `user preferences`, `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/25/2025
+**Owner**: Backend team • **Complexity**: medium • **Size**: 2.9KB
+**Tags**: `API endpoint`, `navigation state`, `user preferences`, `SSR auth`, `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/api/user/[user_id]/preferences/route.ts`
 
-User preferences API with performance optimizations and caching
+SSR-compliant user preferences API with proper authentication
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 3.9KB
-**Tags**: `API`, `user management`, `preferences`, `caching`, `performance`, `TypeScript`, `Next.js API`
-**Modified**: 6/22/2025
+**Owner**: Backend team • **Complexity**: medium • **Size**: 5.7KB
+**Tags**: `API`, `user management`, `preferences`, `SSR auth`, `TypeScript`, `Next.js API`
+**Modified**: 6/26/2025
+
+
+### `apps/web/app/api/user/[user_id]/profile/route.ts`
+
+SSR-compliant API endpoint for user profile operations
+
+**Owner**: Backend team • **Complexity**: medium • **Size**: 4.1KB
+**Tags**: `API endpoint`, `user profile`, `SSR auth`, `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/api/user/[user_id]/video-progress/route.ts`
 
-API endpoint for updating user video progress
+SSR-compliant API endpoint for updating user video progress
 
-**Owner**: Backend team • **Complexity**: low • **Size**: 1.1KB
-**Tags**: `API endpoint`, `video progress`, `user preferences`, `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/21/2025
+**Owner**: Backend team • **Complexity**: low • **Size**: 2.0KB
+**Tags**: `API endpoint`, `video progress`, `SSR auth`, `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/api/user/avatar/route.ts`
 
-Simple in-memory cache for avatar URLs
+Create service role Supabase client for backend operations
 
-**Complexity**: medium • **Size**: 7.6KB
-**Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/22/2025
+**Complexity**: high • **Size**: 11.9KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `security`
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
@@ -662,6 +671,15 @@ Service for navigation options logic. All business rules and data access for nav
 **Modified**: 6/25/2025
 
 
+### `apps/web/app/lib/networkUtils.ts`
+
+Network Utilities - Enhanced fetch with retry and timeout handling
+
+**Complexity**: medium • **Size**: 3.1KB
+**Tags**: `TypeScript`, `utility`
+**Modified**: 6/26/2025
+
+
 ### `apps/web/app/lib/organizationService.ts`
 
 Service for organization and membership logic. All business rules and data access for organizations live here.
@@ -702,9 +720,9 @@ Client-side Supabase client for auth and real-time APIs
 
 Returns a Supabase SSR client with cookie adapter
 
-**Complexity**: low • **Size**: 0.8KB
+**Complexity**: low • **Size**: 1.5KB
 **Tags**: `TypeScript`, `utility`
-**Modified**: 6/15/2025
+**Modified**: 6/26/2025
 
 
 ### `apps/web/app/lib/tenantService.ts`
@@ -756,7 +774,7 @@ User Progress Service - Web App Integration
 
 User service layer with optimized database operations and caching
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 7.5KB
+**Owner**: Backend team • **Complexity**: medium • **Size**: 8.3KB
 **Tags**: `service layer`, `user management`, `Supabase`, `performance optimization`, `TypeScript`, `utility`
 **Modified**: 6/26/2025
 
@@ -1026,7 +1044,7 @@ File: apps/web/components/widgets/VideoList.tsx
 
 VideoPlayerModal.tsx
 
-**Complexity**: high • **Size**: 21.7KB
+**Complexity**: high • **Size**: 21.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 6/26/2025
 
@@ -1836,7 +1854,7 @@ Register agent with proper typing
 
 Local LangGraph dev server",
 
-**Size**: 117.6KB
+**Size**: 118.4KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/26/2025
 
@@ -1845,7 +1863,7 @@ Local LangGraph dev server",
 
 Local LangGraph dev server
 
-**Size**: 44.2KB
+**Size**: 44.4KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/26/2025
 

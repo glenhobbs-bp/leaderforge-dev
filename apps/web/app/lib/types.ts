@@ -86,7 +86,7 @@ export interface User {
 export interface UserPreferences {
   // Navigation state - FIX: Match field names used in userService
   navigationState?: {
-    lastContext?: string;      // Changed from lastContextKey
+    lastTenant?: string;       // Updated from lastContext - tenant key for current tenant
     lastNavOption?: string;    // Changed from lastNavOptionId
     lastUpdated?: string;      // Added to match userService
   };

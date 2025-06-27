@@ -1,55 +1,41 @@
 // File: apps/web/hooks/useDashboardData.ts
-// Purpose: Optimized dashboard data hook - fetches all data in single API call
+// Purpose: React Query hook for fetching optimized dashboard data from agent/context API
 // Owner: Frontend team
-// Tags: React hooks, performance optimization, dashboard, batched queries
+// Tags: React hooks, React Query, dashboard, agent context, performance
 
 import { useQuery } from '@tanstack/react-query';
-import type { NavOption } from '../app/lib/types';
 
-interface DashboardData {
-  user: {
-    id: string;
-    email: string;
-    first_name: string | null;
-    last_name: string | null;
-    full_name: string | null;
-    avatar_url: string;
-    preferences: Record<string, unknown>;
-  } | null;
-  navOptions: NavOption[];
-  contextConfig: {
-    tenant_key: string;
-    display_name: string;
-    theme: Record<string, string>;
-    i18n: Record<string, string>;
-    logo_url: string;
-    settings: Record<string, unknown>;
-  } | null;
-  contextKey: string;
+interface DashboardResponse {
+  type: string;
+  content?: {
+    type: string;
+    data?: unknown;
+    config?: unknown;
+    style?: unknown;
+  };
+  schema?: {
+    widgets?: unknown[];
+  };
+  widgets?: unknown[];
 }
 
-/**
- * Optimized dashboard data hook
- * Fetches all dashboard data in a single API call for better performance
- */
-export function useDashboardData(userId: string | undefined, contextKey: string = 'brilliant') {
-  return useQuery<DashboardData>({
-    queryKey: ['dashboardData', userId, contextKey],
-    queryFn: async () => {
-      if (!userId) throw new Error('User ID is required');
-
-      const response = await fetch(`/api/dashboard?userId=${userId}&contextKey=${contextKey}`);
+// Hook for fetching dashboard data from agent/context endpoint
+export function useDashboardData(userId: string | undefined, tenantKey: string = 'brilliant') {
+  return useQuery<DashboardResponse>({
+    queryKey: ['dashboardData', userId, tenantKey],
+    queryFn: async (): Promise<DashboardResponse> => {
+      if (!userId) throw new Error('No user ID provided');
+      const response = await fetch(`/api/dashboard?userId=${userId}&tenantKey=${tenantKey}`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
-        throw new Error(`Dashboard API failed: ${response.statusText}`);
+        throw new Error(`Dashboard fetch failed: ${response.status} ${response.statusText}`);
       }
-
       return response.json();
     },
-    enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    gcTime: 15 * 60 * 1000, // Keep in cache for 15 minutes
-    retry: 2, // Allow 2 retries for better reliability
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    enabled: !!userId && !!tenantKey,
+    retry: 1,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }

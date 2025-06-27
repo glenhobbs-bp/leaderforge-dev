@@ -166,12 +166,22 @@ async function invokeContextAgent({ userId, userMessage, requestedContext, supab
     console.warn(`[Agent] ⚠️ Failed to load contexts:`, error);
   }
 
-  // 3. Load user's preferences/last location
+  // 3. Load user's preferences/last location using authenticated context
   let userProfile = null;
   try {
-    const { userService } = await import('../../../lib/userService');
-    userProfile = await userService.getUser(userId);
-    console.log(`[Agent] User profile loaded:`, userProfile?.preferences || {});
+    const { data: user, error: userError } = await supabase
+      .schema('core')
+      .from('users')
+      .select('id, email, first_name, last_name, full_name, avatar_url, preferences')
+      .eq('id', userId)
+      .single();
+
+    if (!userError && user) {
+      userProfile = user;
+      console.log(`[Agent] User profile loaded:`, userProfile?.preferences || {});
+    } else {
+      console.warn(`[Agent] ⚠️ Failed to load user profile:`, userError);
+    }
   } catch (error) {
     console.warn(`[Agent] ⚠️ Failed to load user profile:`, error);
   }
@@ -225,12 +235,16 @@ async function generateDynamicContextSchema({
   // 🧠 AGENT DECISION LOGIC: What contexts can this user access?
   const accessibleContexts = availableContexts.filter(context => {
     // Check if user has required entitlements for this context
-    if (!context.required_entitlements || context.required_entitlements.length === 0) {
+    const requiredEntitlements = Array.isArray(context.required_entitlements)
+      ? context.required_entitlements as string[]
+      : [];
+
+    if (requiredEntitlements.length === 0) {
       return true; // Public context
     }
 
     // Check if user has at least one required entitlement
-    return context.required_entitlements.some(reqEntitlement =>
+    return requiredEntitlements.some(reqEntitlement =>
       entitlementIds.includes(reqEntitlement)
     );
   });
@@ -251,13 +265,13 @@ async function generateDynamicContextSchema({
     }
   }
 
-  // 2. Use user's last context preference if available and accessible
+  // 2. Use user's last tenant preference if available and accessible
   if (!primaryContext) {
-    const lastContext = userProfile?.preferences?.last_context;
-    if (lastContext) {
-      primaryContext = accessibleContexts.find(c => c.tenant_key === lastContext);
+    const lastTenant = userProfile?.preferences?.navigationState?.lastTenant;
+    if (lastTenant) {
+      primaryContext = accessibleContexts.find(c => c.tenant_key === lastTenant);
       if (primaryContext) {
-        console.log(`[Agent] Using user's last context: ${lastContext}`);
+        console.log(`[Agent] Using user's last tenant: ${lastTenant}`);
       }
     }
   }

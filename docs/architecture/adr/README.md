@@ -38,6 +38,7 @@ Architecture Decision Records (ADRs) document significant architecture and techn
 | [ADR-0007](0007-api-route-organization.md) | API Route Organization Pattern | Accepted | 2024-01-15 | Low |
 | [ADR-0008](0008-pure-schema-driven-widgets.md) | Pure Schema-Driven Widgets | Accepted | 2024-01-15 | Medium |
 | [ADR-0009](0009-schema-props-boundary-separation.md) | Schema-Props Boundary Separation | Accepted | 2025-06-26 | High |
+| [ADR-0010](0010-nav-key-human-readable-identifiers.md) | Navigation Options Use nav_key Human-Readable Identifiers | Accepted | 2025-01-22 | Medium |
 
 ## Superseded ADRs
 

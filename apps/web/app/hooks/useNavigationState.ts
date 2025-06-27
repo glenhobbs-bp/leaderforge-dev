@@ -29,7 +29,7 @@ export function useNavigationState({ userId, tenantKey }: UseNavigationStateProp
   // Get last navigation state - FIX: Use correct field names that match userService
   const preferences = userPrefs?.preferences as UserPreferences;
   const navigationState = preferences?.navigationState; // Changed from 'navigation' to 'navigationState'
-  const lastNavOptionId = navigationState?.lastContext === tenantKey // Changed from 'lastContextKey' to 'lastContext'
+  const lastNavOptionId = navigationState?.lastTenant === tenantKey // Changed from 'lastContextKey' to 'lastTenant'
     ? navigationState.lastNavOption || null // Changed from 'lastNavOptionId' to 'lastNavOption'
     : null;
 

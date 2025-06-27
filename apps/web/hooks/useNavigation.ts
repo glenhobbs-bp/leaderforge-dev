@@ -25,24 +25,24 @@ interface NavigationSection {
  * Database-driven navigation hook
  * Fetches entitled navigation options from database and transforms to NavPanel schema
  */
-export function useNavigation(contextKey: string, userId?: string) {
-  const { navOptions, loading, error } = useNavOptions(contextKey);
+export function useNavigation(tenantKey: string, userId?: string) {
+  const { navOptions, loading, error } = useNavOptions(tenantKey);
 
   // Fetch user data for personalized greeting (with optimized caching)
   const { data: userData } = useQuery({
-    queryKey: ['userData', userId],
+    queryKey: ['user-navigation-data', userId],
     queryFn: async () => {
       if (!userId) return null;
-      const response = await fetch(`/api/user/${userId}/preferences`);
+      const response = await fetch(`/api/user/${userId}/profile`, {
+        credentials: 'include'
+      });
       if (!response.ok) return null;
-      return response.json();
+      const result = await response.json();
+      return result.user;
     },
     enabled: !!userId,
-    staleTime: 15 * 60 * 1000, // Cache for 15 minutes
-    gcTime: 60 * 60 * 1000, // Keep in cache for 1 hour
-    retry: 1, // Reduce retries
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1
   });
 
   const navSchema: NavPanelSchema | null = useMemo(() => {
@@ -98,7 +98,9 @@ export function useNavigation(contextKey: string, userId?: string) {
       });
 
       const sectionItems = sortedOptions.map((option) => {
-        const itemId = option.nav_key || option.id;
+        // Use database UUID as primary identifier for API calls
+        // nav_key is for human readability and debugging only
+        const itemId = option.id; // Always use database UUID
 
         // Debug: Log ID mapping for troubleshooting
         if (process.env.NODE_ENV === 'development') {
@@ -111,11 +113,12 @@ export function useNavigation(contextKey: string, userId?: string) {
         }
 
         return {
-          id: itemId, // FIX: Use nav_key to match agent API, fallback to database ID
+          id: itemId, // Always use database UUID for navigation selection
           label: option.label,
           icon: option.icon,
           href: option.href,
           description: typeof option.description === 'string' ? option.description : undefined,
+          nav_key: option.nav_key, // Add nav_key for debugging and display purposes
         };
       });
 
@@ -137,7 +140,7 @@ export function useNavigation(contextKey: string, userId?: string) {
     });
 
     // Create personalized greeting with fallback
-    const firstName = userData?.user?.first_name;
+    const firstName = userData?.first_name;
     const greeting = firstName ? `Welcome ${firstName}` : "Welcome";
 
     return {
@@ -172,11 +175,12 @@ export function useNavigation(contextKey: string, userId?: string) {
  */
 export function transformNavOption(option: NavOption) {
   return {
-    id: option.nav_key || option.id, // FIX: Use nav_key to match agent API, fallback to database ID
+    id: option.id, // Always use database UUID for navigation selection
     label: option.label,
     icon: option.icon,
     href: option.href,
     description: option.description,
-    agentId: option.agent_id
+    agentId: option.agent_id,
+    nav_key: option.nav_key // Add nav_key for debugging and display purposes
   };
 }

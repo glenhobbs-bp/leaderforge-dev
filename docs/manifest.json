@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "generated_at": "2025-06-26T22:21:03.201Z",
+    "generated_at": "2025-06-27T02:44:55.085Z",
     "generator_version": "1.0.0",
-    "total_files": 234,
-    "total_size_bytes": 2054907,
+    "total_files": 236,
+    "total_size_bytes": 2076397,
     "file_types": {
-      ".ts": 104,
+      ".ts": 106,
       ".json": 16,
       ".tsx": 33,
       ".js": 2,
@@ -13,32 +13,34 @@
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 137,
-      "API": 34,
+      "TypeScript": 139,
+      "API": 35,
       "AI agent": 107,
       "React": 33,
       "React hooks": 22,
-      "Next.js API": 33,
-      "security": 59,
+      "Next.js API": 34,
+      "security": 60,
       "test": 10,
-      "API endpoint": 2,
+      "API endpoint": 3,
       "navigation state": 2,
-      "user preferences": 5,
+      "user preferences": 4,
+      "SSR auth": 4,
       "user management": 2,
       "preferences": 1,
-      "caching": 4,
-      "performance": 3,
+      "user profile": 1,
       "video progress": 2,
       "Next.js page": 1,
       "SSR": 1,
       "entitlements": 2,
       "context management": 1,
+      "performance": 2,
       "hooks": 16,
       "React Query": 14,
+      "caching": 3,
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 29,
+      "utility": 30,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
@@ -225,10 +227,10 @@
         "../../../lib/supabaseServerClient",
         "../../../lib/agentService"
       ],
-      "last_modified": "2025-06-25T20:09:30.858Z",
-      "size_bytes": 3385,
-      "hash": "831c6b6a",
-      "complexity": "low"
+      "last_modified": "2025-06-27T02:09:35.929Z",
+      "size_bytes": 5370,
+      "hash": "598d5884",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/agent/context/route.ts",
@@ -249,9 +251,9 @@
         "../../../lib/types",
         "next/headers"
       ],
-      "last_modified": "2025-06-25T17:58:24.852Z",
-      "size_bytes": 21569,
-      "hash": "902fea88",
+      "last_modified": "2025-06-27T02:43:29.483Z",
+      "size_bytes": 21949,
+      "hash": "ca52ff56",
       "complexity": "high"
     },
     {
@@ -786,48 +788,77 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/user/[user_id]/navigation-state",
       "extension": ".ts",
-      "purpose": "API endpoint for updating user navigation state",
+      "purpose": "API endpoint for updating user navigation state with SSR authentication",
       "owner": "Backend team",
       "tags": [
         "API endpoint",
         "navigation state",
         "user preferences",
+        "SSR auth",
         "TypeScript",
         "API",
         "Next.js API"
       ],
       "dependencies": [
         "next/server",
-        "../../../../lib/userService"
+        "next/headers",
+        "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-25T12:05:52.495Z",
-      "size_bytes": 1091,
-      "hash": "da373abc",
-      "complexity": "low"
+      "last_modified": "2025-06-27T02:38:36.066Z",
+      "size_bytes": 2948,
+      "hash": "5745b890",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/user/[user_id]/preferences/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/user/[user_id]/preferences",
       "extension": ".ts",
-      "purpose": "User preferences API with performance optimizations and caching",
+      "purpose": "SSR-compliant user preferences API with proper authentication",
       "owner": "Backend team",
       "tags": [
         "API",
         "user management",
         "preferences",
-        "caching",
-        "performance",
+        "SSR auth",
         "TypeScript",
         "Next.js API"
       ],
       "dependencies": [
         "next/server",
-        "../../../../lib/userService"
+        "next/headers",
+        "../../../../lib/supabaseServerClient",
+        "../../../../lib/types"
       ],
-      "last_modified": "2025-06-22T11:41:56.167Z",
-      "size_bytes": 4015,
-      "hash": "b5761a93",
+      "last_modified": "2025-06-27T02:42:19.787Z",
+      "size_bytes": 5834,
+      "hash": "0b45a7e5",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/user/[user_id]/profile/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/user/[user_id]/profile",
+      "extension": ".ts",
+      "purpose": "SSR-compliant API endpoint for user profile operations",
+      "owner": "Backend team",
+      "tags": [
+        "API endpoint",
+        "user profile",
+        "SSR auth",
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../../lib/supabaseServerClient",
+        "../../../../lib/types"
+      ],
+      "last_modified": "2025-06-27T02:42:08.502Z",
+      "size_bytes": 4150,
+      "hash": "d56ad8a6",
       "complexity": "medium"
     },
     {
@@ -835,24 +866,24 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/user/[user_id]/video-progress",
       "extension": ".ts",
-      "purpose": "API endpoint for updating user video progress",
+      "purpose": "SSR-compliant API endpoint for updating user video progress",
       "owner": "Backend team",
       "tags": [
         "API endpoint",
         "video progress",
-        "user preferences",
+        "SSR auth",
         "TypeScript",
         "API",
         "Next.js API"
       ],
       "dependencies": [
         "next/server",
-        "../../../../lib/userService",
-        "../../../../lib/types"
+        "next/headers",
+        "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-21T16:37:22.881Z",
-      "size_bytes": 1156,
-      "hash": "986cafa6",
+      "last_modified": "2025-06-27T02:42:56.916Z",
+      "size_bytes": 2095,
+      "hash": "a0835afa",
       "complexity": "low"
     },
     {
@@ -860,21 +891,22 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/user/avatar",
       "extension": ".ts",
-      "purpose": "Simple in-memory cache for avatar URLs",
+      "purpose": "Create service role Supabase client for backend operations",
       "tags": [
         "TypeScript",
         "API",
-        "Next.js API"
+        "Next.js API",
+        "security"
       ],
       "dependencies": [
         "next/server",
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T05:53:37.988Z",
-      "size_bytes": 7823,
-      "hash": "da04f551",
-      "complexity": "medium"
+      "last_modified": "2025-06-27T02:44:35.213Z",
+      "size_bytes": 12159,
+      "hash": "4b4c7f87",
+      "complexity": "high"
     },
     {
       "path": "apps/web/app/copilotkit/page.tsx",
@@ -1575,6 +1607,21 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/app/lib/networkUtils.ts",
+      "name": "networkUtils.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "Network Utilities - Enhanced fetch with retry and timeout handling",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "last_modified": "2025-06-27T02:17:53.337Z",
+      "size_bytes": 3130,
+      "hash": "7317ce18",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/app/lib/organizationService.ts",
       "name": "organizationService.ts",
       "directory": "apps/web/app/lib",
@@ -1666,14 +1713,15 @@
         "utility"
       ],
       "dependencies": [
-        "@supabase/ssr"
+        "@supabase/ssr",
+        "next/dist/server/web/spec-extension/adapters/request-cookies"
       ],
       "exports": [
         "createSupabaseServerClient"
       ],
-      "last_modified": "2025-06-16T02:17:23.153Z",
-      "size_bytes": 769,
-      "hash": "050537d9",
+      "last_modified": "2025-06-27T02:35:35.039Z",
+      "size_bytes": 1586,
+      "hash": "fb0aca71",
       "complexity": "low"
     },
     {
@@ -1784,14 +1832,9 @@
         "TypeScript",
         "utility"
       ],
-      "dependencies": [
-        "./supabaseServerClient",
-        "next/headers",
-        "./types"
-      ],
-      "last_modified": "2025-06-26T14:34:00.941Z",
-      "size_bytes": 7673,
-      "hash": "8248b1b6",
+      "last_modified": "2025-06-27T02:44:48.630Z",
+      "size_bytes": 8477,
+      "hash": "895112ff",
       "complexity": "medium"
     },
     {
@@ -1988,7 +2031,7 @@
         "@radix-ui/react-icons",
         "../widgets"
       ],
-      "last_modified": "2025-06-26T21:43:56.875Z",
+      "last_modified": "2025-06-27T00:06:21.310Z",
       "size_bytes": 3757,
       "hash": "0ba12e79",
       "complexity": "medium"
@@ -2346,7 +2389,7 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T22:12:41.008Z",
+      "last_modified": "2025-06-27T00:06:21.310Z",
       "size_bytes": 3231,
       "hash": "c5208f3d",
       "complexity": "medium"
@@ -2418,7 +2461,7 @@
         "lucide-react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T22:18:30.897Z",
+      "last_modified": "2025-06-27T00:06:21.310Z",
       "size_bytes": 11820,
       "hash": "ec200e3b",
       "complexity": "medium"
@@ -2507,9 +2550,9 @@
         "../../app/hooks/useUniversalProgress",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T21:18:39.448Z",
-      "size_bytes": 22236,
-      "hash": "d556e0c7",
+      "last_modified": "2025-06-27T02:15:18.401Z",
+      "size_bytes": 22444,
+      "hash": "fd710f56",
       "complexity": "high"
     },
     {
@@ -2535,7 +2578,7 @@
         "./Panel",
         "./Grid"
       ],
-      "last_modified": "2025-06-26T22:20:52.384Z",
+      "last_modified": "2025-06-27T00:06:21.320Z",
       "size_bytes": 4181,
       "hash": "35e1f2ab",
       "complexity": "medium"
@@ -3856,9 +3899,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-26T16:07:45.045Z",
-      "size_bytes": 120417,
-      "hash": "5554635d"
+      "last_modified": "2025-06-26T22:21:03.208Z",
+      "size_bytes": 121248,
+      "hash": "2d5a5b19"
     },
     {
       "path": "docs/manifest.md",
@@ -3871,9 +3914,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-26T16:07:45.051Z",
-      "size_bytes": 45248,
-      "hash": "46119104"
+      "last_modified": "2025-06-26T22:21:03.264Z",
+      "size_bytes": 45482,
+      "hash": "7a28c710"
     },
     {
       "path": "docs/product-design/design-system.md",

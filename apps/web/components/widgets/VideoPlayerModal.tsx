@@ -106,7 +106,6 @@ export function VideoPlayerModal({
   // Universal Progress API integration
   const { trackVideoProgress } = useUniversalProgress({
     userId: userId || '',
-    contextKey: 'leaderforge', // Use contextKey instead of tenantKey
     onProgressUpdate: (progress) => {
       console.log('[VideoPlayerModal] Progress saved to database:', progress);
       // Progress is being tracked and saved to database, but we don't trigger

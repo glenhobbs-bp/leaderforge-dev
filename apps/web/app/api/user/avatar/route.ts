@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
+import { createSupabaseServerClient, restoreSession } from '../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
 
 // Simple in-memory cache for avatar URLs
@@ -108,16 +108,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // ✅ Service Role Operations: Use service role for database and storage access
-    const serviceClient = await createServiceRoleSupabaseClient();
-
-    // Fetch user avatar from database using service role
-    const { data: user, error: userError } = await serviceClient
+    // ✅ Database Operations: Use authenticated context for database access
+    const { data: user, error: userError } = await supabase
       .schema('core')
       .from('users')
       .select('avatar_url')
       .eq('id', userId)
       .single();
+
+    // ✅ Service Role for Storage: Only use service role for storage operations that require elevated permissions
+    const serviceClient = await createServiceRoleSupabaseClient();
 
     // Handle user fetch result
     if (userError || !user?.avatar_url) {
@@ -181,84 +181,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
     }
 
-    // ✅ Session Auth: Verify user identity using robust token refresh
+    // ✅ Session Auth: Verify user identity using robust session restoration
     const cookieStore = await nextCookies();
-    const allCookies = cookieStore.getAll();
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-
-    const supabase = createSupabaseServerClient(cookieStore);
-
-    let session = null;
-    let sessionError = null;
-
-    // Robust session restoration with token refresh handling
-    if (accessToken && refreshToken) {
-      console.log('[AVATAR API POST] Attempting session restoration...');
-
-      try {
-        const setSessionRes = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
-        if (setSessionRes.error) {
-          console.log('[AVATAR API POST] setSession failed:', setSessionRes.error.message);
-
-          // If JWT is invalid, try refresh
-          if (setSessionRes.error.message.includes('JWT') || setSessionRes.error.message.includes('expired')) {
-            console.log('[AVATAR API POST] Attempting token refresh...');
-
-            const refreshRes = await supabase.auth.refreshSession();
-            if (refreshRes.error) {
-              console.log('[AVATAR API POST] Token refresh failed:', refreshRes.error.message);
-              sessionError = refreshRes.error;
-            } else {
-              console.log('[AVATAR API POST] Token refresh successful');
-              session = refreshRes.data.session;
-            }
-          } else {
-            sessionError = setSessionRes.error;
-          }
-        } else {
-          console.log('[AVATAR API POST] Session restored successfully');
-          session = setSessionRes.data.session;
-        }
-      } catch (error) {
-        console.log('[AVATAR API POST] Session restoration threw error:', error.message);
-        sessionError = error;
-      }
-    } else {
-      console.warn('[AVATAR API POST] Missing access or refresh token in cookies');
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    // Final session check
-    if (!session) {
-      const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
-      session = currentSession;
-      if (currentError && !sessionError) {
-        sessionError = currentError;
-      }
-    }
-
-    if (!session?.user?.id) {
+    if (sessionError || !session || session.user.id !== userId) {
       console.log('[AVATAR API POST] Authentication failed:', {
         hasSession: !!session,
+        sessionUserId: session?.user?.id,
+        requestedUserId: userId,
         error: sessionError?.message
       });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Only allow user to upload their own avatar
-    if (session.user.id !== userId) {
-      console.warn('[AVATAR API] Forbidden: user tried to upload avatar for another user');
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    console.log('[AVATAR API POST] Authentication successful for user:', session.user.id);
 
-    // ✅ Service Role Operations: Use service role for storage and database operations
+    // ✅ Service Role for Storage: Only use service role for storage operations that require elevated permissions
     const serviceClient = await createServiceRoleSupabaseClient();
 
     // Generate unique filename
@@ -267,7 +206,7 @@ export async function POST(req: NextRequest) {
 
     console.log('[AVATAR API] Generated filename:', fileName);
 
-    // Upload file using service role
+    // Upload file using service role (required for storage operations)
     const { data: uploadData, error: uploadError } = await serviceClient
       .storage
       .from('avatars')
@@ -284,8 +223,8 @@ export async function POST(req: NextRequest) {
 
     console.log('[AVATAR API] Upload successful:', uploadData);
 
-    // Update user's avatar_url in database using service role
-    const { data: updateData, error: updateError } = await serviceClient
+    // ✅ Database Operations: Update user's avatar_url using authenticated context
+    const { data: updateData, error: updateError } = await supabase
       .schema('core')
       .from('users')
       .update({
@@ -315,6 +254,10 @@ export async function POST(req: NextRequest) {
     }
 
     console.log('[AVATAR API] Upload complete, returning signed URL:', signedUrlData.signedUrl);
+
+    // Clear any cached avatar for this user to ensure fresh fetches
+    avatarCache.delete(userId);
+    console.log('[AVATAR API] Cleared avatar cache for user:', userId);
 
     return NextResponse.json({
       url: signedUrlData.signedUrl,
