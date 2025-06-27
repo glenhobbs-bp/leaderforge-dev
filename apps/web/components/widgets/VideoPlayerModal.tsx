@@ -401,14 +401,14 @@ export function VideoPlayerModal({
           hlsRef.current = hls;
 
           hls.on(Hls.Events.ERROR, (event, data) => {
-            console.error('[VideoPlayerModal] HLS error event:', event);
-            console.error('[VideoPlayerModal] HLS error data:', data);
+            console.warn('[VideoPlayerModal] HLS error event:', event);
+            console.warn('[VideoPlayerModal] HLS error data:', data);
 
             // More detailed error handling based on error type
             if (data?.fatal) {
               console.error('[VideoPlayerModal] Fatal HLS error - cannot recover');
               if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                setError('Network error: Unable to load video stream');
+                setError('Network error: Unable to load video stream. Please check your internet connection.');
               } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
                 setError('Media error: Video format not supported');
               } else {
@@ -419,8 +419,10 @@ export function VideoPlayerModal({
               // Non-fatal error - try to recover
               console.warn('[VideoPlayerModal] Non-fatal HLS error, attempting recovery');
               if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                console.warn('[VideoPlayerModal] Network error - restarting load');
                 hls.startLoad();
               } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                console.warn('[VideoPlayerModal] Media error - attempting recovery');
                 hls.recoverMediaError();
               }
             }
