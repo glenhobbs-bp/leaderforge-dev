@@ -59,18 +59,19 @@ export function VideoPlayerModal({
     action.action === 'completeProgress' || action.action === 'onCompleteAction'
   );
 
-  // Remove this console.log that's causing spam on every render
-  // Only log when component first mounts
+  // Component initialization - log only once on mount in development
   useEffect(() => {
-    console.log('[VideoPlayerModal] Component mounted with Universal Schema:', {
-      id: schema.id,
-      videoUrl,
-      title,
-      poster,
-      progress,
-      hasData: !!schema.data,
-      hasConfig: !!schema.config
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[VideoPlayerModal] Component mounted with Universal Schema:', {
+        id: schema.id,
+        videoUrl,
+        title,
+        poster,
+        progress,
+        hasData: !!schema.data,
+        hasConfig: !!schema.config
+      });
+    }
   }, []); // Empty dependency array - only runs on mount
 
   // Video player state
@@ -141,7 +142,6 @@ export function VideoPlayerModal({
 
   // Mouse event handlers for dragging
   const handleDragStart = useCallback((e: React.MouseEvent) => {
-    console.log('[VideoPlayerModal] Drag start triggered', { clientX: e.clientX, clientY: e.clientY, modalPosition });
     setIsDragging(true);
     setDragStart({ x: e.clientX - modalPosition.x, y: e.clientY - modalPosition.y });
   }, [modalPosition]);
@@ -152,7 +152,7 @@ export function VideoPlayerModal({
         x: e.clientX - dragStart.x,
         y: e.clientY - dragStart.y
       };
-      console.log('[VideoPlayerModal] Dragging to position', newPosition);
+      // Removed verbose drag logging for production
       setModalPosition(newPosition);
     }
   }, [isDragging, dragStart]);
