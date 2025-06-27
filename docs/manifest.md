@@ -1,17 +1,17 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/26/2025, 10:44:55 PM*
+*Generated on 6/27/2025, 6:57:38 AM*
 
 ## Overview
 
-- **Total Files**: 236
-- **Total Size**: 1.98 MB
+- **Total Files**: 239
+- **Total Size**: 2.00 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 106 files
-- **.md**: 78 files
+- **.ts**: 107 files
+- **.md**: 80 files
 - **.tsx**: 33 files
 - **.json**: 16 files
 - **.js**: 2 files
@@ -19,16 +19,16 @@
 
 ## Most Common Tags
 
-- **TypeScript**: 139 files
-- **AI agent**: 107 files
-- **documentation**: 80 files
-- **security**: 60 files
-- **API**: 35 files
-- **Next.js API**: 34 files
+- **TypeScript**: 140 files
+- **AI agent**: 111 files
+- **documentation**: 82 files
+- **security**: 61 files
+- **API**: 36 files
+- **Next.js API**: 35 files
 - **React**: 33 files
 - **utility**: 30 files
 - **UI**: 25 files
-- **React hooks**: 22 files
+- **React hooks**: 23 files
 
 ## File Inventory
 
@@ -117,9 +117,9 @@ aka.ms/tsconfig to read more about this file */
 
 POST /api/agent/content
 
-**Complexity**: medium • **Size**: 5.2KB
+**Complexity**: medium • **Size**: 6.2KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/agent/context/route.ts`
@@ -128,7 +128,7 @@ POST /api/agent/context
 
 **Complexity**: high • **Size**: 21.4KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/auth/callback/route.ts`
@@ -165,6 +165,15 @@ localhost:8000", // Local LangGraph dev server
 **Complexity**: low • **Size**: 0.8KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
 **Modified**: 6/18/2025
+
+
+### `apps/web/app/api/debug/cookies/route.ts`
+
+Debug endpoint to examine cookies and session state
+
+**Complexity**: low • **Size**: 1.8KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/dev/apply-entitlements/route.ts`
@@ -351,45 +360,45 @@ Universal Progress API - Authenticated Endpoint
 
 API endpoint for updating user navigation state with SSR authentication
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 2.9KB
+**Owner**: Backend team • **Complexity**: low • **Size**: 2.7KB
 **Tags**: `API endpoint`, `navigation state`, `user preferences`, `SSR auth`, `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/user/[user_id]/preferences/route.ts`
 
 SSR-compliant user preferences API with proper authentication
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 5.7KB
+**Owner**: Backend team • **Complexity**: medium • **Size**: 5.5KB
 **Tags**: `API`, `user management`, `preferences`, `SSR auth`, `TypeScript`, `Next.js API`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/user/[user_id]/profile/route.ts`
 
 SSR-compliant API endpoint for user profile operations
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 4.1KB
+**Owner**: Backend team • **Complexity**: medium • **Size**: 3.8KB
 **Tags**: `API endpoint`, `user profile`, `SSR auth`, `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/user/[user_id]/video-progress/route.ts`
 
 SSR-compliant API endpoint for updating user video progress
 
-**Owner**: Backend team • **Complexity**: low • **Size**: 2.0KB
+**Owner**: Backend team • **Complexity**: low • **Size**: 1.9KB
 **Tags**: `API endpoint`, `video progress`, `SSR auth`, `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/api/user/avatar/route.ts`
 
 Create service role Supabase client for backend operations
 
-**Complexity**: high • **Size**: 11.9KB
+**Complexity**: medium • **Size**: 9.7KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
@@ -461,7 +470,7 @@ React hook for persisting navigation state with optimistic updates
 
 **Owner**: Frontend team • **Complexity**: low • **Size**: 2.7KB
 **Tags**: `React hooks`, `navigation state`, `user preferences`, `TypeScript`, `hooks`, `React Query`
-**Modified**: 6/25/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/hooks/useOrgEntitlements.ts`
@@ -520,20 +529,20 @@ React hook for video progress tracking with optimistic updates
 
 ### `apps/web/app/layout.tsx`
 
-TODO: See enhancements-and-todos.md — move metadata export to a server component or separate file for App Router compliance.
+Get initial session server-side for SSR
 
 **Complexity**: low • **Size**: 1.2KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 6/20/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/lib/agentService.ts`
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: high • **Size**: 11.4KB
+**Complexity**: high • **Size**: 12.0KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 6/25/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -720,9 +729,9 @@ Client-side Supabase client for auth and real-time APIs
 
 Returns a Supabase SSR client with cookie adapter
 
-**Complexity**: low • **Size**: 1.5KB
-**Tags**: `TypeScript`, `utility`
-**Modified**: 6/26/2025
+**Complexity**: medium • **Size**: 3.5KB
+**Tags**: `TypeScript`, `utility`, `security`
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/lib/tenantService.ts`
@@ -740,7 +749,7 @@ apps/web/app/lib/types.ts
 
 **Complexity**: medium • **Size**: 4.2KB
 **Tags**: `TypeScript`, `utility`, `AI agent`, `security`
-**Modified**: 6/25/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/lib/types/progress.ts`
@@ -776,7 +785,7 @@ User service layer with optimized database operations and caching
 
 **Owner**: Backend team • **Complexity**: medium • **Size**: 8.3KB
 **Tags**: `service layer`, `user management`, `Supabase`, `performance optimization`, `TypeScript`, `utility`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/app/lib/utils.ts`
@@ -857,16 +866,16 @@ File: apps/web/components/ai/UniversalSchemaRenderer.tsx
 
 **Complexity**: medium • **Size**: 3.7KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/DynamicTenantPage.tsx`
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 29.2KB
+**Complexity**: high • **Size**: 29.7KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/SupabaseProvider.tsx`
@@ -927,9 +936,9 @@ Transform content into our Training format
 
 Navigation panel for agent-native app, themed via contextConfig
 
-**Owner**: Frontend team • **Complexity**: high • **Size**: 18.9KB
+**Owner**: Frontend team • **Complexity**: high • **Size**: 19.3KB
 **Tags**: `UI`, `navigation`, `context-based`, `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 6/25/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/ui/ProgressBar.tsx`
@@ -963,9 +972,9 @@ Three-panel layout component with theme context and collapsible navigation
 
 Fetch user data from API
 
-**Complexity**: high • **Size**: 15.9KB
+**Complexity**: high • **Size**: 17.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`
-**Modified**: 6/21/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/ui/xxxChatPanel.tsx`
@@ -983,7 +992,7 @@ File: apps/web/components/widgets/Grid.tsx
 
 **Complexity**: medium • **Size**: 3.2KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/widgets/index.ts`
@@ -1017,9 +1026,9 @@ LeaderForgeCard.tsx
 
 File: apps/web/components/widgets/Panel.tsx
 
-**Complexity**: low • **Size**: 2.4KB
+**Complexity**: low • **Size**: 2.5KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/widgets/StatCard.tsx`
@@ -1044,9 +1053,9 @@ File: apps/web/components/widgets/VideoList.tsx
 
 VideoPlayerModal.tsx
 
-**Complexity**: high • **Size**: 21.9KB
+**Complexity**: high • **Size**: 22.0KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/components/widgets/WidgetDispatcher.tsx`
@@ -1055,7 +1064,7 @@ File: apps/web/components/widgets/WidgetDispatcher.tsx
 
 **Complexity**: medium • **Size**: 4.1KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/hooks/useAvatar.ts`
@@ -1064,7 +1073,7 @@ React Query hook for optimized avatar fetching with caching
 
 **Owner**: Frontend team • **Complexity**: low • **Size**: 2.1KB
 **Tags**: `React hooks`, `React Query`, `avatar`, `performance`, `caching`, `TypeScript`, `hooks`
-**Modified**: 6/21/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/hooks/useContextConfig.ts`
@@ -1087,29 +1096,29 @@ Don't revalidate immediately if we have initial data
 
 ### `apps/web/hooks/useDashboardData.ts`
 
-Optimized dashboard data hook - fetches all data in single API call
+React Query hook for fetching optimized dashboard data from agent/context API
 
-**Owner**: Frontend team • **Complexity**: low • **Size**: 1.7KB
-**Tags**: `React hooks`, `performance optimization`, `dashboard`, `batched queries`, `TypeScript`, `hooks`, `React Query`
-**Modified**: 6/25/2025
+**Owner**: Frontend team • **Complexity**: low • **Size**: 1.3KB
+**Tags**: `React hooks`, `React Query`, `dashboard`, `agent context`, `performance`, `TypeScript`, `hooks`, `AI agent`
+**Modified**: 6/27/2025
 
 
 ### `apps/web/hooks/useNavigation.ts`
 
 Database-driven navigation hook that transforms NavOption[] to NavPanelSchema
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.6KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.8KB
 **Tags**: `React hooks`, `navigation`, `database-driven`, `entitlements`, `React Query`, `TypeScript`, `hooks`, `AI agent`, `security`
-**Modified**: 6/22/2025
+**Modified**: 6/27/2025
 
 
 ### `apps/web/hooks/useNavOptions.ts`
 
-Custom hook to fetch entitlement-filtered nav options for a given context from the API, using SWR. Used to drive schema-driven NavPanel.
+React hook for fetching navigation options from the database
 
-**Complexity**: low • **Size**: 1.7KB
-**Tags**: `TypeScript`, `hooks`, `security`
-**Modified**: 6/21/2025
+**Owner**: Frontend team • **Complexity**: low • **Size**: 1.4KB
+**Tags**: `React hooks`, `navigation`, `SWR`, `database`, `TypeScript`, `hooks`
+**Modified**: 6/27/2025
 
 
 ### `apps/web/lib/server/loadContextConfig.ts`
@@ -1715,6 +1724,15 @@ Content processing jobs
 **Modified**: 6/26/2025
 
 
+### `docs/architecture/adr/0010-nav-key-human-readable-identifiers.md`
+
+—
+
+**Size**: 8.4KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/27/2025
+
+
 ### `docs/architecture/adr/adr-template.md`
 
 —
@@ -1728,9 +1746,9 @@ Content processing jobs
 
 —
 
-**Size**: 3.6KB
+**Size**: 3.7KB
 **Tags**: `documentation`, `AI agent`
-**Modified**: 6/26/2025
+**Modified**: 6/27/2025
 
 
 ### `docs/architecture/architecture-compliance-checklist.md`
@@ -1767,6 +1785,15 @@ Examples of base components
 **Size**: 7.0KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/26/2025
+
+
+### `docs/engineering/future-enhancements.md`
+
+—
+
+**Size**: 6.2KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/27/2025
 
 
 ### `docs/engineering/how-to/README.md`
@@ -1809,9 +1836,9 @@ File: apps/web/components/widgets/MyWidget.tsx
 
 Register agent with proper typing
 
-**Size**: 9.6KB
+**Size**: 11.4KB
 **Tags**: `documentation`, `Next.js API`, `AI agent`
-**Modified**: 6/24/2025
+**Modified**: 6/27/2025
 
 
 ### `docs/governance/cursor-rules-reference.md`
@@ -1854,7 +1881,7 @@ Register agent with proper typing
 
 Local LangGraph dev server",
 
-**Size**: 118.4KB
+**Size**: 119.7KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/26/2025
 
@@ -1863,7 +1890,7 @@ Local LangGraph dev server",
 
 Local LangGraph dev server
 
-**Size**: 44.4KB
+**Size**: 45.0KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/26/2025
 

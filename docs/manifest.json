@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-06-27T02:44:55.085Z",
+    "generated_at": "2025-06-27T10:57:38.055Z",
     "generator_version": "1.0.0",
-    "total_files": 236,
-    "total_size_bytes": 2076397,
+    "total_files": 239,
+    "total_size_bytes": 2100560,
     "file_types": {
-      ".ts": 106,
+      ".ts": 107,
       ".json": 16,
       ".tsx": 33,
       ".js": 2,
-      ".md": 78,
+      ".md": 80,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 139,
-      "API": 35,
-      "AI agent": 107,
+      "TypeScript": 140,
+      "API": 36,
+      "AI agent": 111,
       "React": 33,
-      "React hooks": 22,
-      "Next.js API": 34,
-      "security": 60,
+      "React hooks": 23,
+      "Next.js API": 35,
+      "security": 61,
       "test": 10,
       "API endpoint": 3,
       "navigation state": 2,
@@ -33,7 +33,7 @@
       "SSR": 1,
       "entitlements": 2,
       "context management": 1,
-      "performance": 2,
+      "performance": 3,
       "hooks": 16,
       "React Query": 14,
       "caching": 3,
@@ -47,12 +47,12 @@
       "Supabase": 2,
       "service layer": 2,
       "session management": 1,
-      "performance optimization": 2,
+      "performance optimization": 1,
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
       "UI": 25,
-      "navigation": 3,
+      "navigation": 4,
       "context-based": 1,
       "UI component": 1,
       "progress tracking": 1,
@@ -61,9 +61,11 @@
       "theme": 1,
       "avatar": 1,
       "dashboard": 1,
-      "batched queries": 1,
+      "agent context": 1,
+      "SWR": 1,
+      "database": 1,
       "database-driven": 1,
-      "documentation": 80,
+      "documentation": 82,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -227,9 +229,9 @@
         "../../../lib/supabaseServerClient",
         "../../../lib/agentService"
       ],
-      "last_modified": "2025-06-27T02:09:35.929Z",
-      "size_bytes": 5370,
-      "hash": "598d5884",
+      "last_modified": "2025-06-27T10:02:44.773Z",
+      "size_bytes": 6366,
+      "hash": "117ae817",
       "complexity": "medium"
     },
     {
@@ -251,9 +253,9 @@
         "../../../lib/types",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T02:43:29.483Z",
-      "size_bytes": 21949,
-      "hash": "ca52ff56",
+      "last_modified": "2025-06-27T10:03:13.488Z",
+      "size_bytes": 21958,
+      "hash": "37129241",
       "complexity": "high"
     },
     {
@@ -338,6 +340,28 @@
       "last_modified": "2025-06-19T01:39:21.137Z",
       "size_bytes": 798,
       "hash": "af1b2088",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/cookies/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/cookies",
+      "extension": ".ts",
+      "purpose": "Debug endpoint to examine cookies and session state",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-27T08:57:45.025Z",
+      "size_bytes": 1794,
+      "hash": "c6e066f9",
       "complexity": "low"
     },
     {
@@ -804,10 +828,10 @@
         "next/headers",
         "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-27T02:38:36.066Z",
-      "size_bytes": 2948,
-      "hash": "5745b890",
-      "complexity": "medium"
+      "last_modified": "2025-06-27T10:02:50.580Z",
+      "size_bytes": 2797,
+      "hash": "7027abf6",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/api/user/[user_id]/preferences/route.ts",
@@ -830,9 +854,9 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-06-27T02:42:19.787Z",
-      "size_bytes": 5834,
-      "hash": "0b45a7e5",
+      "last_modified": "2025-06-27T08:52:00.271Z",
+      "size_bytes": 5632,
+      "hash": "0900febc",
       "complexity": "medium"
     },
     {
@@ -856,9 +880,9 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-06-27T02:42:08.502Z",
-      "size_bytes": 4150,
-      "hash": "d56ad8a6",
+      "last_modified": "2025-06-27T08:51:54.259Z",
+      "size_bytes": 3942,
+      "hash": "fe21d067",
       "complexity": "medium"
     },
     {
@@ -881,9 +905,9 @@
         "next/headers",
         "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-27T02:42:56.916Z",
-      "size_bytes": 2095,
-      "hash": "a0835afa",
+      "last_modified": "2025-06-27T08:51:58.776Z",
+      "size_bytes": 1984,
+      "hash": "1dbc176a",
       "complexity": "low"
     },
     {
@@ -903,10 +927,10 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T02:44:35.213Z",
-      "size_bytes": 12159,
-      "hash": "4b4c7f87",
-      "complexity": "high"
+      "last_modified": "2025-06-27T09:25:49.889Z",
+      "size_bytes": 9980,
+      "hash": "c38d60b5",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/copilotkit/page.tsx",
@@ -1100,9 +1124,9 @@
         "./useUserPreferences",
         "../lib/types"
       ],
-      "last_modified": "2025-06-25T12:05:54.548Z",
-      "size_bytes": 2806,
-      "hash": "fcb559cc",
+      "last_modified": "2025-06-27T10:03:10.096Z",
+      "size_bytes": 2804,
+      "hash": "9ab41e57",
       "complexity": "low"
     },
     {
@@ -1257,7 +1281,7 @@
       "name": "layout.tsx",
       "directory": "apps/web/app",
       "extension": ".tsx",
-      "purpose": "TODO: See enhancements-and-todos.md — move metadata export to a server component or separate file for App Router compliance.",
+      "purpose": "Get initial session server-side for SSR",
       "tags": [
         "React",
         "TypeScript"
@@ -1267,11 +1291,16 @@
         "./QueryClientProvider",
         "../components/SupabaseProvider",
         "next/headers",
-        "./lib/supabaseServerClient"
+        "./lib/supabaseServerClient",
+        "next",
+        "react"
       ],
-      "last_modified": "2025-06-21T00:20:20.723Z",
-      "size_bytes": 1208,
-      "hash": "60e16bb4",
+      "exports": [
+        "metadata"
+      ],
+      "last_modified": "2025-06-27T10:51:30.605Z",
+      "size_bytes": 1184,
+      "hash": "d6d38e4c",
       "complexity": "low"
     },
     {
@@ -1289,9 +1318,9 @@
         "@supabase/supabase-js",
         "../../../../packages/agent-core/tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-25T20:09:27.102Z",
-      "size_bytes": 11659,
-      "hash": "fe3b1c95",
+      "last_modified": "2025-06-27T10:43:04.293Z",
+      "size_bytes": 12296,
+      "hash": "71ad92ff",
       "complexity": "high"
     },
     {
@@ -1710,7 +1739,8 @@
       "purpose": "Returns a Supabase SSR client with cookie adapter",
       "tags": [
         "TypeScript",
-        "utility"
+        "utility",
+        "security"
       ],
       "dependencies": [
         "@supabase/ssr",
@@ -1719,10 +1749,10 @@
       "exports": [
         "createSupabaseServerClient"
       ],
-      "last_modified": "2025-06-27T02:35:35.039Z",
-      "size_bytes": 1586,
-      "hash": "fb0aca71",
-      "complexity": "low"
+      "last_modified": "2025-06-27T08:57:54.646Z",
+      "size_bytes": 3630,
+      "hash": "dfae8903",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/lib/tenantService.ts",
@@ -1760,9 +1790,9 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-25T13:43:20.914Z",
-      "size_bytes": 4299,
-      "hash": "593c85fb",
+      "last_modified": "2025-06-27T10:02:56.857Z",
+      "size_bytes": 4328,
+      "hash": "0d56c604",
       "complexity": "medium"
     },
     {
@@ -1832,9 +1862,9 @@
         "TypeScript",
         "utility"
       ],
-      "last_modified": "2025-06-27T02:44:48.630Z",
-      "size_bytes": 8477,
-      "hash": "895112ff",
+      "last_modified": "2025-06-27T10:02:53.859Z",
+      "size_bytes": 8476,
+      "hash": "112aaa35",
       "complexity": "medium"
     },
     {
@@ -2031,9 +2061,9 @@
         "@radix-ui/react-icons",
         "../widgets"
       ],
-      "last_modified": "2025-06-27T00:06:21.310Z",
-      "size_bytes": 3757,
-      "hash": "0ba12e79",
+      "last_modified": "2025-06-27T10:30:49.788Z",
+      "size_bytes": 3820,
+      "hash": "d8babbaf",
       "complexity": "medium"
     },
     {
@@ -2064,9 +2094,9 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-26T21:55:26.519Z",
-      "size_bytes": 29942,
-      "hash": "f57100ea",
+      "last_modified": "2025-06-27T10:30:52.913Z",
+      "size_bytes": 30375,
+      "hash": "b7816a51",
       "complexity": "high"
     },
     {
@@ -2251,9 +2281,9 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-25T12:05:56.238Z",
-      "size_bytes": 19331,
-      "hash": "253146e4",
+      "last_modified": "2025-06-27T09:36:40.944Z",
+      "size_bytes": 19724,
+      "hash": "f64bd9cf",
       "complexity": "high"
     },
     {
@@ -2348,9 +2378,9 @@
         "@tanstack/react-query",
         "./NavPanel"
       ],
-      "last_modified": "2025-06-21T12:41:04.190Z",
-      "size_bytes": 16332,
-      "hash": "c39cc2ab",
+      "last_modified": "2025-06-27T09:25:54.794Z",
+      "size_bytes": 18303,
+      "hash": "de1e8ea5",
       "complexity": "high"
     },
     {
@@ -2389,9 +2419,9 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T00:06:21.310Z",
-      "size_bytes": 3231,
-      "hash": "c5208f3d",
+      "last_modified": "2025-06-27T10:30:55.977Z",
+      "size_bytes": 3302,
+      "hash": "fa544818",
       "complexity": "medium"
     },
     {
@@ -2483,9 +2513,9 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T22:20:46.170Z",
-      "size_bytes": 2487,
-      "hash": "3fe177ea",
+      "last_modified": "2025-06-27T10:30:59.647Z",
+      "size_bytes": 2554,
+      "hash": "12b52db4",
       "complexity": "low"
     },
     {
@@ -2550,9 +2580,9 @@
         "../../app/hooks/useUniversalProgress",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T02:15:18.401Z",
-      "size_bytes": 22444,
-      "hash": "fd710f56",
+      "last_modified": "2025-06-27T10:30:43.771Z",
+      "size_bytes": 22481,
+      "hash": "89a73f56",
       "complexity": "high"
     },
     {
@@ -2578,9 +2608,9 @@
         "./Panel",
         "./Grid"
       ],
-      "last_modified": "2025-06-27T00:06:21.320Z",
-      "size_bytes": 4181,
-      "hash": "35e1f2ab",
+      "last_modified": "2025-06-27T10:30:46.651Z",
+      "size_bytes": 4246,
+      "hash": "ce70b66a",
       "complexity": "medium"
     },
     {
@@ -2605,7 +2635,7 @@
       "exports": [
         "useAvatar"
       ],
-      "last_modified": "2025-06-21T12:17:14.939Z",
+      "last_modified": "2025-06-27T09:22:21.839Z",
       "size_bytes": 2100,
       "hash": "fb74cfc0",
       "complexity": "low"
@@ -2659,24 +2689,24 @@
       "name": "useDashboardData.ts",
       "directory": "apps/web/hooks",
       "extension": ".ts",
-      "purpose": "Optimized dashboard data hook - fetches all data in single API call",
+      "purpose": "React Query hook for fetching optimized dashboard data from agent/context API",
       "owner": "Frontend team",
       "tags": [
         "React hooks",
-        "performance optimization",
+        "React Query",
         "dashboard",
-        "batched queries",
+        "agent context",
+        "performance",
         "TypeScript",
         "hooks",
-        "React Query"
+        "AI agent"
       ],
       "dependencies": [
-        "@tanstack/react-query",
-        "../app/lib/types"
+        "@tanstack/react-query"
       ],
-      "last_modified": "2025-06-25T17:58:28.861Z",
-      "size_bytes": 1720,
-      "hash": "1def0240",
+      "last_modified": "2025-06-27T09:35:56.566Z",
+      "size_bytes": 1309,
+      "hash": "e9f9507a",
       "complexity": "low"
     },
     {
@@ -2704,9 +2734,9 @@
         "../components/ui/NavPanel",
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-06-22T09:25:07.959Z",
-      "size_bytes": 5720,
-      "hash": "4720be01",
+      "last_modified": "2025-06-27T10:21:40.652Z",
+      "size_bytes": 5913,
+      "hash": "e9a7b21a",
       "complexity": "medium"
     },
     {
@@ -2714,11 +2744,15 @@
       "name": "useNavOptions.ts",
       "directory": "apps/web/hooks",
       "extension": ".ts",
-      "purpose": "Custom hook to fetch entitlement-filtered nav options for a given context from the API, using SWR. Used to drive schema-driven NavPanel.",
+      "purpose": "React hook for fetching navigation options from the database",
+      "owner": "Frontend team",
       "tags": [
+        "React hooks",
+        "navigation",
+        "SWR",
+        "database",
         "TypeScript",
-        "hooks",
-        "security"
+        "hooks"
       ],
       "dependencies": [
         "swr"
@@ -2726,9 +2760,9 @@
       "exports": [
         "useNavOptions"
       ],
-      "last_modified": "2025-06-22T01:51:44.260Z",
-      "size_bytes": 1690,
-      "hash": "6dd85206",
+      "last_modified": "2025-06-27T09:35:28.197Z",
+      "size_bytes": 1389,
+      "hash": "86ca99f5",
       "complexity": "low"
     },
     {
@@ -3678,6 +3712,20 @@
       "hash": "b9c32ce8"
     },
     {
+      "path": "docs/architecture/adr/0010-nav-key-human-readable-identifiers.md",
+      "name": "0010-nav-key-human-readable-identifiers.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-27T09:53:22.198Z",
+      "size_bytes": 8629,
+      "hash": "81d1991f"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -3700,9 +3748,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-26T20:41:06.682Z",
-      "size_bytes": 3640,
-      "hash": "b3f76032"
+      "last_modified": "2025-06-27T09:53:24.671Z",
+      "size_bytes": 3792,
+      "hash": "0c009aab"
     },
     {
       "path": "docs/architecture/architecture-compliance-checklist.md",
@@ -3760,6 +3808,21 @@
       "last_modified": "2025-06-26T15:40:39.921Z",
       "size_bytes": 7156,
       "hash": "972cd2ec"
+    },
+    {
+      "path": "docs/engineering/future-enhancements.md",
+      "name": "future-enhancements.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-27T10:57:20.978Z",
+      "size_bytes": 6375,
+      "hash": "1900249a"
     },
     {
       "path": "docs/engineering/how-to/README.md",
@@ -3829,9 +3892,9 @@
         "Next.js API",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:40:06.118Z",
-      "size_bytes": 9844,
-      "hash": "a3af7bc8"
+      "last_modified": "2025-06-27T10:56:31.731Z",
+      "size_bytes": 11698,
+      "hash": "17cf591f"
     },
     {
       "path": "docs/governance/cursor-rules-reference.md",
@@ -3899,9 +3962,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-26T22:21:03.208Z",
-      "size_bytes": 121248,
-      "hash": "2d5a5b19"
+      "last_modified": "2025-06-27T02:44:55.095Z",
+      "size_bytes": 122616,
+      "hash": "c39ca8ba"
     },
     {
       "path": "docs/manifest.md",
@@ -3914,9 +3977,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-26T22:21:03.264Z",
-      "size_bytes": 45482,
-      "hash": "7a28c710"
+      "last_modified": "2025-06-27T02:44:55.127Z",
+      "size_bytes": 46055,
+      "hash": "58e952f5"
     },
     {
       "path": "docs/product-design/design-system.md",
