@@ -9,14 +9,21 @@ echo "================================================="
 # Check if required environment variables are set
 echo "🔍 Checking environment variables..."
 
-if [ -z "$LANGCHAIN_API_KEY" ]; then
-    echo "❌ Error: LANGCHAIN_API_KEY not set"
+# Check for either LANGSMITH_API_KEY or LANGCHAIN_API_KEY (they're the same)
+if [ -z "$LANGSMITH_API_KEY" ] && [ -z "$LANGCHAIN_API_KEY" ]; then
+    echo "❌ Error: Neither LANGSMITH_API_KEY nor LANGCHAIN_API_KEY is set"
     echo "   Get your API key from: https://smith.langchain.com/settings"
-    echo "   Then run: export LANGCHAIN_API_KEY='your-key'"
+    echo "   Then run: export LANGSMITH_API_KEY='your-key'"
     exit 1
 fi
 
-echo "✅ LANGCHAIN_API_KEY is set"
+# Use LANGSMITH_API_KEY if available, otherwise fall back to LANGCHAIN_API_KEY
+if [ -n "$LANGSMITH_API_KEY" ]; then
+    export LANGCHAIN_API_KEY="$LANGSMITH_API_KEY"
+    echo "✅ Using LANGSMITH_API_KEY"
+else
+    echo "✅ Using LANGCHAIN_API_KEY"
+fi
 
 # Check if LangGraph CLI is installed
 if ! command -v langgraph &> /dev/null; then

@@ -24,8 +24,8 @@ LangGraph Cloud is LangChain's hosted service for deploying LangGraph applicatio
 # Install LangGraph CLI
 npm install -g @langchain/langgraph-cli
 
-# Login to LangGraph Cloud
-export LANGCHAIN_API_KEY="your-api-key"
+# Login to LangGraph Cloud (use your existing LANGSMITH_API_KEY)
+export LANGCHAIN_API_KEY="$LANGSMITH_API_KEY"  # Uses your existing key
 langgraph auth
 ```
 
@@ -47,7 +47,7 @@ langgraph deployments list
 In Vercel, set:
 ```bash
 LANGGRAPH_URL=https://your-deployment.langchain.app
-LANGCHAIN_API_KEY=your-api-key
+LANGSMITH_API_KEY=your-existing-api-key  # You already have this
 ```
 
 ## 📋 Detailed Setup
