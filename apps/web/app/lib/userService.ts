@@ -3,33 +3,23 @@
 // Owner: Backend team
 // Tags: service layer, user management, Supabase, performance optimization
 
-import { createSupabaseServerClient } from './supabaseServerClient';
-import { cookies } from 'next/headers';
 import type { User, VideoProgress } from './types';
 
 /**
- * Create authenticated Supabase client following our standard SSR authentication pattern
- * This is our single source of truth for server-side authentication
+ * Create service role Supabase client for backend operations
+ * This bypasses RLS policies and provides full database access for server-side operations
  */
-async function createAuthenticatedSupabaseClient() {
-  const cookieStore = await cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
-
-  // Standard session hydration following our established SSR pattern
-  const allCookies = cookieStore.getAll();
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-
-  if (accessToken && refreshToken) {
-    await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-  }
-
-  return supabase;
+async function createServiceRoleSupabaseClient() {
+  const { createClient } = await import('@supabase/supabase-js');
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 }
+
+// Note: For user service operations, we use service role to bypass RLS policies
+// since these are backend operations that need full database access.
+// Frontend components should use the browser client for user-scoped operations.
 
 
 /**
@@ -39,10 +29,11 @@ async function createAuthenticatedSupabaseClient() {
 export const userService = {
     /**
    * Get a single user by ID.
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async getUser(userId: string): Promise<User | null> {
     try {
-      const supabase = await createAuthenticatedSupabaseClient();
+      const supabase = await createServiceRoleSupabaseClient();
 
       const { data, error } = await supabase
         .schema('core')
@@ -65,9 +56,10 @@ export const userService = {
 
   /**
    * Get a single user by email.
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async getUserByEmail(email: string): Promise<User | null> {
-    const supabase = await createAuthenticatedSupabaseClient();
+    const supabase = await createServiceRoleSupabaseClient();
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -83,10 +75,11 @@ export const userService = {
 
   /**
    * Get multiple users by their IDs.
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async getUsersByIds(userIds: string[]): Promise<User[]> {
     if (!userIds.length) return [];
-    const supabase = await createAuthenticatedSupabaseClient();
+    const supabase = await createServiceRoleSupabaseClient();
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -101,9 +94,10 @@ export const userService = {
 
   /**
    * Update user preferences (partial update).
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async updateUserPreferences(userId: string, preferences: Partial<User['preferences']>): Promise<User | null> {
-    const supabase = await createAuthenticatedSupabaseClient();
+    const supabase = await createServiceRoleSupabaseClient();
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -120,10 +114,11 @@ export const userService = {
 
   /**
    * Update user profile information (first_name, last_name, full_name, etc.)
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async updateUserProfile(userId: string, profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>): Promise<User | null> {
     try {
-      const supabase = await createAuthenticatedSupabaseClient();
+      const supabase = await createServiceRoleSupabaseClient();
 
       const { data, error } = await supabase
         .schema('core')
@@ -150,13 +145,14 @@ export const userService = {
 
   /**
    * Update both user profile and preferences in a single transaction
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async updateUserProfileAndPreferences(
     userId: string,
     profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>,
     preferences: Partial<User['preferences']>
   ): Promise<User | null> {
-    const supabase = await createAuthenticatedSupabaseClient();
+    const supabase = await createServiceRoleSupabaseClient();
 
     const { data, error } = await supabase
       .schema('core')
@@ -180,10 +176,11 @@ export const userService = {
 
   /**
    * Update user navigation state (optimized for frequent updates)
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async updateNavigationState(userId: string, contextKey: string, navOptionId: string): Promise<void> {
     try {
-      const supabase = await createAuthenticatedSupabaseClient();
+      const supabase = await createServiceRoleSupabaseClient();
 
       // Update user preferences with navigation state
       const user = await this.getUser(userId);
@@ -217,10 +214,11 @@ export const userService = {
 
   /**
    * Update video progress (optimized for frequent updates)
+   * Uses service role for backend operations to bypass RLS policies.
    */
   async updateVideoProgress(userId: string, contentId: string, progress: Partial<VideoProgress>): Promise<void> {
     try {
-      const supabase = await createAuthenticatedSupabaseClient();
+      const supabase = await createServiceRoleSupabaseClient();
 
       // Get current preferences
       const user = await this.getUser(userId);
