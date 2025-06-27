@@ -183,7 +183,7 @@ export const userService = {
       const supabase = await createServiceRoleSupabaseClient();
 
       // Update user preferences with navigation state
-      const user = await this.getUser(userId);
+      const user = await userService.getUser(userId);
       const currentPrefs = user?.preferences || {};
 
       const updatedPrefs = {
@@ -221,7 +221,7 @@ export const userService = {
       const supabase = await createServiceRoleSupabaseClient();
 
       // Get current preferences
-      const user = await this.getUser(userId);
+      const user = await userService.getUser(userId);
       const currentPrefs = user?.preferences || {};
       const currentVideoProgress = currentPrefs.videoProgress || {};
 
