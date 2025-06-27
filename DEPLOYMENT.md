@@ -46,7 +46,7 @@
 
 ### 2. **Project Configuration**
 
-**Recommended Approach (Simplified for Vercel):**
+**Recommended Approach (Simplest):**
 ```bash
 # Build Configuration
 Framework Preset: Next.js
@@ -64,12 +64,12 @@ If you prefer to use a `vercel.json` configuration file:
 2. Set Root Directory to: `./` (project root)
 3. Vercel will automatically use the configuration from the file
 
-**Manual Configuration (if needed):**
+**Manual Configuration (troubleshooting):**
 ```bash
 # Build Configuration
 Framework Preset: Next.js
 Root Directory: ./
-Build Command: cd apps/web && npm run build
+Build Command: npm run build --prefix apps/web
 Output Directory: apps/web/.next
 Install Command: npm install --legacy-peer-deps
 
