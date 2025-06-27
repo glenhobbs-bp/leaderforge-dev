@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx src/index.ts",
     "server": "tsx src/server.ts",
-    "start": "npx @langchain/langgraph-api@latest serve --port 8000"
+    "start": "node -r ts-node/register src/server.ts",
+    "start:langgraph": "npx @langchain/langgraph-api@latest serve --port 8000"
   },
   "keywords": [],
   "author": "Glen Hobbs <glen@rockstar-ventures.com>",
