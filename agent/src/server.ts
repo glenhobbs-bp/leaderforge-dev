@@ -4,7 +4,7 @@
 // Tags: HTTP server, LangGraph wrapper, testing
 
 import { createServer } from 'http';
-import graph from './index';
+import graph from './index.js';
 
 const PORT = 8000;
 
