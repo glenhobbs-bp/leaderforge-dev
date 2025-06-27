@@ -4,7 +4,7 @@
   "description": "LangGraph agent service for LeaderForge",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json --skipLibCheck --noEmitOnError false",
+    "build": "tsc --project ./tsconfig.build.json --skipLibCheck --noEmitOnError false --incremental false",
     "start": "node dist/server.js",
     "dev": "nodemon --exec \"npm run start:dev\"",
     "start:dev": "node -r ts-node/register src/server.ts",
