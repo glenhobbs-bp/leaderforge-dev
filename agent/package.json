@@ -4,6 +4,7 @@
   "type": "module",
   "description": "LangGraph agent service for LeaderForge",
   "main": "dist/index.js",
+  "_deploymentTrigger": "force-deploy-2025-01-06",
   "scripts": {
     "build": "tsc --project ./tsconfig.build.json --skipLibCheck --noEmitOnError false --incremental false",
     "start": "node dist/server.js",
