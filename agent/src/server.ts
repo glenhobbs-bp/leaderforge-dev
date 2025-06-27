@@ -66,7 +66,7 @@ const server = createServer(async (req, res) => {
           progressMap: {},
           agentConfig: {},
           agentParameters: {},
-          schema: null,
+          schema: {},
           messages: input.messages || []
         });
 
@@ -83,10 +83,11 @@ const server = createServer(async (req, res) => {
         }));
 
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         console.error('[Agent Server] Error:', error);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
-          error: error.message,
+          error: errorMessage,
           status: 'error'
         }));
       }

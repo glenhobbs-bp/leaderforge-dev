@@ -1,15 +1,13 @@
 {
   "name": "agent",
   "version": "0.1.0",
-  "description": "LangGraph Agent for Leaderforge",
-  "main": "src/index.ts",
+  "description": "LangGraph agent service for LeaderForge",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx src/index.ts",
-    "server": "tsx src/server.ts",
-    "build": "tsc --noEmit --skipLibCheck && echo 'TypeScript compilation check passed'",
+    "build": "tsc --project tsconfig.build.json --skipLibCheck --noEmitOnError false",
     "start": "node -r ts-node/register src/server.ts",
-    "start:langgraph": "npx @langchain/langgraph-api@latest serve --port 8000"
+    "dev": "nodemon --exec \"npm start\"",
+    "test": "jest"
   },
   "keywords": [
     "langgraph",
@@ -19,22 +17,21 @@
   "author": "Leaderforge",
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.34.0",
-    "@langchain/anthropic": "^0.5.2",
-    "@langchain/community": "^0.5.0",
-    "@langchain/core": "^0.7.24",
-    "@langchain/langgraph": "^0.2.39",
-    "@langchain/openai": "^0.4.1",
-    "@types/node": "^20.19.1",
-    "express": "^4.21.2",
-    "langsmith": "~0.2.16",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.8.3"
+    "@anthropic-ai/sdk": "^0.33.0",
+    "@langchain/anthropic": "^0.3.7",
+    "@langchain/core": "^0.3.21",
+    "@langchain/langgraph": "^0.2.19",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.19.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   }
 }
