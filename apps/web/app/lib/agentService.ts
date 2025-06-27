@@ -232,6 +232,20 @@ export class AgentService {
     const startTime = Date.now();
 
     try {
+      // Check if LangGraph service is available
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const healthCheck = await fetch(`${this.langGraphUrl}/`, {
+        method: 'GET',
+        signal: controller.signal
+      }).catch(() => null).finally(() => clearTimeout(timeoutId));
+
+      if (!healthCheck || !healthCheck.ok) {
+        console.warn(`[AgentService] LangGraph service unavailable at ${this.langGraphUrl}, using fallback content`);
+        return this.getLangGraphFallbackContent(agent, request);
+      }
+
       // Create thread
       const threadResponse = await fetch(`${this.langGraphUrl}/threads`, {
         method: 'POST',
@@ -335,8 +349,90 @@ export class AgentService {
     } catch (error) {
       const totalTime = Date.now() - startTime;
       console.error(`[AgentService] LangGraph invocation error after ${totalTime}ms:`, error);
-      throw new Error(`LangGraph agent failed: ${error.message}`);
+
+      // Try fallback content if LangGraph fails
+      console.warn(`[AgentService] LangGraph failed, attempting fallback for agent: ${agent.name}`);
+      return this.getLangGraphFallbackContent(agent, request);
     }
+  }
+
+  /**
+   * Get fallback content when LangGraph service is unavailable
+   */
+  private async getLangGraphFallbackContent(
+    agent: Agent,
+    request: AgentInvocationRequest
+  ): Promise<AgentInvocationResponse> {
+    console.log(`[AgentService] Generating fallback content for agent: ${agent.name}`);
+
+    // Generate appropriate fallback content based on tenant and nav context
+    const tenantConfig = {
+      leaderforge: {
+        name: 'LeaderForge',
+        primaryColor: '#667eea',
+        description: 'Leadership development content',
+      },
+      brilliant: {
+        name: 'Brilliant Perspectives',
+        primaryColor: '#764ba2',
+        description: 'Strategic insights and analysis',
+      }
+    };
+
+    const config = tenantConfig[request.tenantKey as keyof typeof tenantConfig] || tenantConfig.leaderforge;
+
+    const fallbackContent = {
+      type: 'content_schema',
+      data: {
+        components: [
+          {
+            type: 'Grid',
+            config: {
+              columns: { default: 1, md: 2, lg: 3 },
+              gap: 6
+            },
+            data: {
+              items: [
+                {
+                  type: 'Card',
+                  config: {
+                    title: 'Service Temporarily Unavailable',
+                    variant: 'elevated',
+                    maxWidth: '400px'
+                  },
+                  data: {
+                    description: `The ${config.name} content service is currently being prepared for you.`,
+                    action: {
+                      label: 'Try Again',
+                      variant: 'primary',
+                      onClick: 'reload'
+                    },
+                    stats: {
+                      status: 'pending',
+                      message: 'Content service initializing...'
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    };
+
+    // Return the fallback content with enrichment
+    const enrichedContent = await this.enrichWithProgressData(fallbackContent, request.userId, request.tenantKey);
+
+    return {
+      type: 'content_schema',
+      content: enrichedContent,
+      metadata: {
+        agentId: agent.id,
+        agentName: agent.name,
+        fallback: true,
+        reason: 'LangGraph service unavailable'
+      }
+    };
   }
 
   /**
