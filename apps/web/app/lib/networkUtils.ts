@@ -46,8 +46,6 @@ export async function fetchWithRetry(
         signal: AbortSignal.timeout(opts.timeout),
         headers: {
           ...(options.headers || {}),
-          'Keep-Alive': 'timeout=30, max=100',
-          'Connection': 'keep-alive',
         },
       });
 
