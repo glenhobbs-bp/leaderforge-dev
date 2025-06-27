@@ -40,7 +40,7 @@ export class WidgetRegistry extends AssetRegistry<WidgetMetadata> {
 
     // Store transformation function if provided
     if (definition.schemaToProps) {
-      this.transformers.set(definition.metadata.id, definition.schemaToProps);
+      this.transformers.set(definition.metadata.id, definition.schemaToProps as SchemaToPropsTransformer);
     }
   }
 

@@ -104,8 +104,7 @@ export class AgentService {
     }
 
     try {
-      const progressRepository = new SupabaseUserProgressRepository(this.supabase);
-      const progressTool = new UserProgressTool(progressRepository);
+      // Note: Direct progress tool access replaced with optimized batch API
 
       // Collect all content IDs that need progress data
       const contentIds: string[] = [];
@@ -127,16 +126,33 @@ export class AgentService {
       // First pass: collect all content IDs
       collectContentIds(content);
 
-      // Batch fetch progress data for all content IDs
+      // Batch fetch progress data for all content IDs using optimized API
       let progressMap: Record<string, any> = {};
       if (contentIds.length > 0) {
         console.log(`[AgentService] Batch fetching progress for ${contentIds.length} content items:`, contentIds);
         try {
-          progressMap = await progressTool.listProgressForContentIds(userId, contentIds, tenantKey);
-          console.log(`[AgentService] Successfully fetched progress for ${Object.keys(progressMap).length} items`);
+          // Use new optimized batch progress API (reduces 19 queries to 1)
+          const response = await fetch(`/api/user/${userId}/progress-batch`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contentIds,
+              contextKey: tenantKey,
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            progressMap = data.progress || {};
+            console.log(`[AgentService] Successfully fetched progress for ${Object.keys(progressMap).length} items`);
+          } else {
+            console.warn(`[AgentService] Batch progress API failed:`, response.status);
+            progressMap = {};
+          }
         } catch (error) {
           console.warn(`[AgentService] Batch progress fetch failed:`, error);
           // Continue with empty progress map - don't fail the entire enrichment
+          progressMap = {};
         }
       }
 
