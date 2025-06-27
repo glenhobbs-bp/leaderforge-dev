@@ -1,7 +1,13 @@
 {
+  "node_version": "20",
+  "dependencies": ["."],
   "graphs": {
-    "default": "./src/index.ts:default"
+    "content_agent": "./src/index.ts:default"
   },
-  "port": 8000,
-  "host": "localhost"
+  "env": {
+    "SUPABASE_SERVICE_ROLE_KEY": "env:SUPABASE_SERVICE_ROLE_KEY",
+    "ANTHROPIC_API_KEY": "env:ANTHROPIC_API_KEY",
+    "TRIBE_SOCIAL_TOKEN": "env:TRIBE_SOCIAL_TOKEN",
+    "TRIBE_SOCIAL_API_URL": "env:TRIBE_SOCIAL_API_URL"
+  }
 }

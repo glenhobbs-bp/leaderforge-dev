@@ -5,9 +5,25 @@
 LeaderForge uses a **two-service architecture**:
 
 1. **Web Application** (Next.js) → Deploy to **Vercel**
-2. **LangGraph Agent Service** → Deploy to **Railway** (or other container platform)
+2. **LangGraph Agent Service** → Deploy to **LangGraph Cloud** (recommended) or self-host
 
 The web app communicates with the LangGraph service via HTTP API calls.
+
+## 🏆 **Recommended: LangGraph Cloud**
+
+For most use cases, we recommend starting with **LangGraph Cloud** for faster deployment and better observability. See `LANGGRAPH_CLOUD_SETUP.md` for detailed instructions.
+
+### Quick LangGraph Cloud Setup
+```bash
+# 1. Get API key from smith.langchain.com
+export LANGCHAIN_API_KEY="your-key"
+
+# 2. Deploy agent
+./deploy-langgraph-cloud.sh
+
+# 3. Update Vercel environment variables
+# 4. Redeploy Vercel
+```
 
 ## 🚀 Quick Deployment Steps
 
