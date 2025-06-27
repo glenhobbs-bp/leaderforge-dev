@@ -42,6 +42,7 @@
 2. Click "New Project"
 3. Import from GitHub: `glenhobbs-bp/leaderforge-dev`
 4. Select repository and continue
+5. **IMPORTANT**: Ensure the branch is set to `main` (or `master` - both now have the same code)
 
 ### 2. **Project Configuration**
 
