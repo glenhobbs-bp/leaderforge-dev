@@ -432,38 +432,120 @@ export class AgentService {
 
   /**
    * Invoke simple LLM agent (single prompt + tools)
+   * ✅ GRACEFUL FALLBACK: Returns informative content instead of crashing
    */
   private async invokeLLMAgent(
     agent: Agent,
     request: AgentInvocationRequest
   ): Promise<AgentInvocationResponse> {
-    // TODO: Implement direct LLM invocation with prompt and tools
-    // This would use Claude/OpenAI directly with the agent's prompt and tools
-    throw new Error('LLM agent type not yet implemented');
+    console.log(`[AgentService] LLM agent type not yet implemented for agent: ${agent.name}`);
+
+    return this.createNotImplementedResponse(agent, request, 'LLM',
+      'Direct LLM agents will provide single-step AI interactions using prompts and tools.');
   }
 
   /**
    * Invoke tool agent (direct tool execution)
+   * ✅ GRACEFUL FALLBACK: Returns informative content instead of crashing
    */
   private async invokeToolAgent(
     agent: Agent,
     request: AgentInvocationRequest
   ): Promise<AgentInvocationResponse> {
-    // TODO: Implement direct tool invocation
-    // This would execute tools directly without LLM orchestration
-    throw new Error('Tool agent type not yet implemented');
+    console.log(`[AgentService] Tool agent type not yet implemented for agent: ${agent.name}`);
+
+    return this.createNotImplementedResponse(agent, request, 'Tool',
+      'Tool agents will execute specific functions directly without LLM orchestration.');
   }
 
   /**
    * Invoke workflow agent (custom workflow)
+   * ✅ GRACEFUL FALLBACK: Returns informative content instead of crashing
    */
   private async invokeWorkflowAgent(
     agent: Agent,
     request: AgentInvocationRequest
   ): Promise<AgentInvocationResponse> {
-    // TODO: Implement custom workflow execution
-    // This would handle complex multi-step workflows
-    throw new Error('Workflow agent type not yet implemented');
+    console.log(`[AgentService] Workflow agent type not yet implemented for agent: ${agent.name}`);
+
+    return this.createNotImplementedResponse(agent, request, 'Workflow',
+      'Workflow agents will handle complex multi-step business processes and automations.');
+  }
+
+  /**
+   * Create a user-friendly "not implemented" response
+   * ✅ GRACEFUL DEGRADATION: Informative UI instead of error crashes
+   */
+  private async createNotImplementedResponse(
+    agent: Agent,
+    request: AgentInvocationRequest,
+    agentType: string,
+    description: string
+  ): Promise<AgentInvocationResponse> {
+    const fallbackContent = {
+      type: 'content_schema',
+      data: {
+        components: [
+          {
+            type: 'Grid',
+            config: {
+              columns: { default: 1 },
+              gap: 4
+            },
+            data: {
+              items: [
+                {
+                  type: 'Card',
+                  config: {
+                    title: `${agentType} Agent - Coming Soon`,
+                    variant: 'outlined',
+                    maxWidth: '600px'
+                  },
+                  data: {
+                    description: `The ${agent.display_name || agent.name} agent uses the ${agentType.toLowerCase()} type, which is planned but not yet implemented.`,
+                    content: [
+                      {
+                        type: 'text',
+                        content: description
+                      },
+                      {
+                        type: 'text',
+                        content: `Agent: ${agent.name} (${agentType} type)`
+                      }
+                    ],
+                    action: {
+                      label: 'Notify When Ready',
+                      variant: 'secondary',
+                      disabled: true
+                    },
+                    stats: {
+                      status: 'planned',
+                      message: `${agentType} agents are in development`
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    };
+
+    // Apply progress enrichment even to fallback content
+    const enrichedContent = await this.enrichWithProgressData(fallbackContent, request.userId);
+
+    return {
+      type: 'content_schema',
+      content: enrichedContent,
+      metadata: {
+        agentId: agent.id,
+        agentName: agent.name,
+        agentType,
+        implemented: false,
+        plannedFeature: true,
+        message: `${agentType} agent type is planned but not yet implemented`
+      }
+    };
   }
 }
 
