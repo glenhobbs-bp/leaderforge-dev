@@ -65,6 +65,13 @@ export class AgentService {
   }
 
   /**
+   * Set authentication headers for server-side API calls
+   */
+  setAuthHeaders(authHeaders: Record<string, string>): void {
+    this.authHeaders = authHeaders;
+  }
+
+  /**
    * Invoke agent based on its type
    */
   async invokeAgent(
@@ -605,9 +612,23 @@ export class AgentService {
   }
 }
 
-// Singleton instance for the application
-export const agentService = new AgentService(
-  ENV.SUPABASE_URL,
-  ENV.SUPABASE_SERVICE_ROLE_KEY,
-  ENV.LANGGRAPH_API_URL
-);
+// Lazy singleton getter to avoid build-time environment variable access
+let _agentServiceInstance: AgentService | null = null;
+
+export function getAgentService(): AgentService {
+  if (!_agentServiceInstance) {
+    _agentServiceInstance = new AgentService(
+      ENV.SUPABASE_URL,
+      ENV.SUPABASE_SERVICE_ROLE_KEY,
+      ENV.LANGGRAPH_API_URL
+    );
+  }
+  return _agentServiceInstance;
+}
+
+// Legacy export for backward compatibility - use getAgentService() instead
+export const agentService = {
+  get instance() {
+    return getAgentService();
+  }
+};

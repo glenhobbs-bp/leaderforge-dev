@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
-import { AgentService } from '../../../lib/agentService';
+import { getAgentService } from '../../../lib/agentService';
 import { ENV } from '../../../../../../packages/env';
 
 /**
@@ -160,20 +160,17 @@ export async function POST(req: NextRequest) {
     console.log('[API/agent/content] 🧪 TESTING: Local → Render connection');
     console.log('[API/agent/content] Target URL:', ENV.LANGGRAPH_API_URL);
 
-    // Prepare authentication headers to forward for server-side API calls
-    const authHeaders: Record<string, string> = {};
-    if (accessToken) {
-      authHeaders['Cookie'] = cookieStore.getAll()
-        .map(cookie => `${cookie.name}=${cookie.value}`)
-        .join('; ');
-    }
+    const agentService = getAgentService();
 
-    const agentService = new AgentService(
-      ENV.SUPABASE_URL,
-      ENV.SUPABASE_SERVICE_ROLE_KEY,
-      ENV.LANGGRAPH_API_URL,
-      authHeaders
-    );
+    // Set authentication headers for this request
+    if (accessToken) {
+      const authHeaders: Record<string, string> = {
+        'Cookie': cookieStore.getAll()
+          .map(cookie => `${cookie.name}=${cookie.value}`)
+          .join('; ')
+      };
+      agentService.setAuthHeaders(authHeaders);
+    }
 
     const agentResponse = await agentService.invokeAgent(navOption.agent_id, {
       message: intent?.message || `Show me content for ${navOption.label}`,
