@@ -328,9 +328,12 @@ export class AgentService {
           throw new Error('LangGraph agent completed successfully but returned no schema');
         }
 
+        // Enrich schema with user progress data
+        const enrichedContent = await this.enrichWithProgressData(schema, request.userId, request.tenantKey);
+
         return {
           type: 'content_schema',
-          content: schema,
+          content: enrichedContent,
           metadata: {
             threadId,
             runId: runResult.run_id || `run_${Date.now()}`,
