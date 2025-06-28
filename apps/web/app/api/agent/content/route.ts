@@ -13,10 +13,10 @@ import { ENV } from '../../../../../../packages/env';
  * Deployment: Updated 2025-06-28 with improved environment detection
  */
 export async function POST(req: NextRequest) {
-  const cookieStore = await cookies();
-  const supabase = createSupabaseServerClient(cookieStore);
-
   try {
+    const cookieStore = await cookies();
+    const supabase = createSupabaseServerClient(cookieStore);
+
     const body = await req.json();
     const { userId, tenantKey, navOptionId, intent } = body;
 
