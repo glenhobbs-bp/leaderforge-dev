@@ -55,8 +55,15 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
     actions = [],
   } = config;
 
-  // Determine the best image to use
-  const cardImage = imageUrl || featuredImage || coverImage || "/icons/placeholder.png";
+  // Determine the best image to use - filter out empty strings and invalid URLs
+  const getValidImageUrl = () => {
+    const candidates = [imageUrl, featuredImage, coverImage].filter(url =>
+      url && typeof url === 'string' && url.trim() !== ''
+    );
+    return candidates.length > 0 ? candidates[0] : "/icons/placeholder.png";
+  };
+
+  const cardImage = getValidImageUrl();
 
   // Progress and completion logic
   const actualProgress = progress || 0;
@@ -119,13 +126,16 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
           })}
         >
           <Image
-            src={cardImage}
+            src={cardImage || '/icons/placeholder.png'}
             alt={title || 'Content'}
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
             sizes="(max-width: 768px) 100vw, 400px"
             priority={false}
-            onError={e => (e.currentTarget.src = '/icons/placeholder.png')}
+            onError={e => {
+              console.warn('[LeaderForgeCard] Image load error for:', cardImage);
+              e.currentTarget.src = '/icons/placeholder.png';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500"></div>
 
