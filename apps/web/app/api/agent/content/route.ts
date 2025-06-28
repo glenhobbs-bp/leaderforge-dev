@@ -148,6 +148,9 @@ export async function POST(req: NextRequest) {
       NODE_ENV: ENV.NODE_ENV,
       IS_PRODUCTION: ENV.IS_PRODUCTION,
       VERCEL_ENV: process.env.VERCEL_ENV,
+      VERCEL: process.env.VERCEL,
+      VERCEL_URL: process.env.VERCEL_URL,
+      LANGGRAPH_URL_OVERRIDE: process.env.LANGGRAPH_URL,
       LANGGRAPH_API_URL: ENV.LANGGRAPH_API_URL
     });
 

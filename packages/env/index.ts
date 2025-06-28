@@ -53,8 +53,14 @@ export const ENV = {
       return process.env.LANGGRAPH_URL;
     }
 
-    // Production environment detection
-    if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    // Production environment detection - More robust for Vercel
+    const isProduction =
+      process.env.NODE_ENV === 'production' ||
+      process.env.VERCEL_ENV === 'production' ||
+      process.env.VERCEL === '1' ||
+      process.env.VERCEL_URL !== undefined;
+
+    if (isProduction) {
       return 'https://leaderforge-langgraph-2.onrender.com';
     }
 
