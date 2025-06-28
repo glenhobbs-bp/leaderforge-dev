@@ -6,6 +6,8 @@
     "packages/agent-core/**/*",
     "packages/asset-core/**/*",
     "packages/env/**/*",
-    "agent/**/*"
+    "agent/**/*",
+    "vitest.config.ts",
+    "vitest.setup.ts"
   ]
 }
