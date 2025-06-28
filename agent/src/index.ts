@@ -98,7 +98,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
         actions: [
           {
             action: 'openVideoModal',
-            label: 'Watch Video',
+            label: 'Watch',
             primary: true,
             parameters: {
               videoUrl: (content.props as Record<string, unknown>)?.videoUrl || content.videoUrl,

@@ -19,7 +19,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { userId, tenantKey, navOptionId, intent } = body;
 
-    console.log('[API/agent/content] Request:', { userId, tenantKey, navOptionId, intent });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[API/agent/content] Request:', { userId, tenantKey, navOptionId, intent });
+    }
 
     if (!userId || !tenantKey || !navOptionId) {
       console.error('[API/agent/content] Missing required fields:', { userId, tenantKey, navOptionId });

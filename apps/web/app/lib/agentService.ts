@@ -369,131 +369,122 @@ export class AgentService {
     request: AgentInvocationRequest,
     startTime: number
   ): Promise<AgentInvocationResponse> {
-    console.log(`[AgentService] Attempting to connect to LangGraph service at: ${this.langGraphUrl}`);
+    const isDev = process.env.NODE_ENV === 'development';
 
-    // Check if LangGraph service is available
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    if (isDev) {
+      console.log(`[AgentService] Invoking langgraph agent: ${agent.id}`);
+      console.log(`[AgentService] Attempting to connect to LangGraph service at: ${this.langGraphUrl}`);
+    }
 
     try {
-      const healthCheck = await fetch(`${this.langGraphUrl}/`, {
+      // Health check first
+      const healthResponse = await fetch(`${this.langGraphUrl}/health`, {
         method: 'GET',
-        signal: controller.signal
+        headers: {
+          'Accept': 'application/json',
+          ...this.authHeaders
+        }
       });
 
-      clearTimeout(timeoutId);
-
-      if (!healthCheck || !healthCheck.ok) {
-        console.warn(`[AgentService] LangGraph health check failed. Status: ${healthCheck?.status}, URL: ${this.langGraphUrl}`);
-        throw new Error(`LangGraph service health check failed: ${healthCheck?.status || 'no response'}`);
+      if (!healthResponse.ok) {
+        throw new Error(`LangGraph service health check failed: ${healthResponse.status}`);
       }
 
-      console.log(`[AgentService] LangGraph service health check passed at ${this.langGraphUrl}`);
-    } catch (error) {
-      clearTimeout(timeoutId);
-      console.error(`[AgentService] LangGraph service connection failed:`, {
-        url: this.langGraphUrl,
-        error: error.message,
-        isAborted: error.name === 'AbortError'
-      });
-      throw new Error('Local LangGraph service unavailable');
-    }
+      if (isDev) {
+        console.log(`[AgentService] LangGraph service health check passed at ${this.langGraphUrl}`);
+      }
 
-    // Create thread
-    const threadResponse = await fetch(`${this.langGraphUrl}/threads`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
-    });
+      // Create a new thread for this run
+      const threadId = `thread_${Date.now()}`;
+      const runId = `run_${Date.now()}`;
 
-    if (!threadResponse.ok) {
-      throw new Error(`Failed to create thread: ${threadResponse.statusText}`);
-    }
-
-    const thread = await threadResponse.json();
-
-    // Send message to LangGraph
-    const invokeResponse = await fetch(`${this.langGraphUrl}/threads/${thread.thread_id}/runs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        assistant_id: 'default', // LangGraph graph ID
+      const requestBody = {
+        threadId,
         input: {
-          messages: [{
-            role: 'user',
-            content: request.message
-          }],
-          // Flatten context to root level for easier access in agent
-          userId: request.userId,
-          tenantKey: request.tenantKey,
-          navOptionId: request.navOptionId,
-          agentConfig: agent.config
+          ...request,
+          messages: 1 // Simple input to trigger agent
         }
-      })
-    });
+      };
 
-    if (!invokeResponse.ok) {
-      throw new Error(`LangGraph invocation failed: ${invokeResponse.statusText}`);
-    }
+      // Start the run
+      const createResponse = await fetch(`${this.langGraphUrl}/threads/${threadId}/runs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          ...this.authHeaders
+        },
+        body: JSON.stringify(requestBody)
+      });
 
-    const runResponse = await invokeResponse.json();
-    const runId = runResponse.run_id;
-
-    console.log(`[AgentService] Created LangGraph run: ${runId}, waiting for completion...`);
-
-    // Optimized polling with exponential backoff
-    let attempts = 0;
-    const maxAttempts = 20;
-    let pollInterval = 200;
-    const maxPollInterval = 2000;
-
-    while (attempts < maxAttempts) {
-      const statusResponse = await fetch(`${this.langGraphUrl}/threads/${thread.thread_id}/runs/${runId}`);
-
-      if (!statusResponse.ok) {
-        throw new Error(`Failed to check run status: ${statusResponse.statusText}`);
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        throw new Error(`Failed to create LangGraph run: ${createResponse.status} - ${errorText}`);
       }
 
-      const runStatus = await statusResponse.json();
-      console.log(`[AgentService] Run ${runId} status: ${runStatus.status} (attempt ${attempts + 1}/${maxAttempts})`);
+      const createResult = await createResponse.json();
+      const actualRunId = createResult.run_id || runId;
 
-      if (runStatus.status === 'success') {
-        const stateResponse = await fetch(`${this.langGraphUrl}/threads/${thread.thread_id}/state`);
+      if (isDev) {
+        console.log(`[AgentService] Created LangGraph run: ${actualRunId}, waiting for completion...`);
+      }
 
-        if (!stateResponse.ok) {
-          throw new Error(`Failed to get thread state: ${stateResponse.statusText}`);
-        }
+      // Wait for completion with timeout
+      const maxAttempts = 20;
+      const pollInterval = 500; // 500ms
 
-        const state = await stateResponse.json();
-        const totalTime = Date.now() - startTime;
-        console.log(`[AgentService] LangGraph completed successfully in ${totalTime}ms, final state:`, state);
-
-        const finalResult = state.values?.schema || state.values?.messages?.[state.values.messages?.length - 1] || state.values;
-        const enrichedContent = await this.enrichWithProgressData(finalResult, request.userId, request.tenantKey);
-
-        return {
-          type: 'content_schema',
-          content: enrichedContent,
-          metadata: {
-            threadId: thread.thread_id,
-            runId: runId,
-            agentId: agent.id,
-            agentName: agent.name,
-            executionTime: totalTime,
-            platform: 'langgraph-local'
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const statusResponse = await fetch(`${this.langGraphUrl}/threads/${threadId}/runs/${actualRunId}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            ...this.authHeaders
           }
-        };
-      } else if (runStatus.status === 'error') {
-        throw new Error(`LangGraph run failed: ${runStatus.error || 'Unknown error'}`);
+        });
+
+        if (!statusResponse.ok) {
+          throw new Error(`Failed to check run status: ${statusResponse.status}`);
+        }
+
+        const statusResult = await statusResponse.json();
+
+        if (isDev) {
+          console.log(`[AgentService] Run ${actualRunId} status: ${statusResult.status} (attempt ${attempt}/${maxAttempts})`);
+        }
+
+        if (statusResult.status === 'success') {
+          const executionTime = Date.now() - parseInt(threadId.split('_')[1]);
+
+          if (isDev) {
+            console.log(`[AgentService] LangGraph completed successfully in ${executionTime}ms, final state:`, statusResult.values);
+          }
+
+          return {
+            type: 'content_schema',
+            content: statusResult.values.schema,
+            metadata: {
+              threadId,
+              runId: actualRunId,
+              agentId: agent.id,
+              agentName: statusResult.values.agentName || agent.id,
+              executionTime,
+              platform: 'langgraph-local'
+            }
+          };
+        } else if (statusResult.status === 'error') {
+          throw new Error(`LangGraph run failed: ${statusResult.error || 'Unknown error'}`);
+        }
+
+        // Wait before next poll
+        await new Promise(resolve => setTimeout(resolve, pollInterval));
       }
 
-      await new Promise(resolve => setTimeout(resolve, pollInterval + Math.random() * 100));
-      pollInterval = Math.min(pollInterval * 1.5, maxPollInterval);
-      attempts++;
-    }
+      throw new Error(`LangGraph run timed out after ${maxAttempts} attempts`);
 
-    const totalTime = Date.now() - startTime;
-    throw new Error(`LangGraph run timed out after ${totalTime}ms (${maxAttempts} attempts)`);
+    } catch (error) {
+      console.error(`[AgentService] LangGraph invocation failed:`, error);
+      throw error;
+    }
   }
 
   /**
