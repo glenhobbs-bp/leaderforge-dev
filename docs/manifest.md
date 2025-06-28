@@ -1,33 +1,33 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/27/2025, 8:08:25 PM*
+*Generated on 6/28/2025, 4:57:14 PM*
 
 ## Overview
 
-- **Total Files**: 253
-- **Total Size**: 2.14 MB
+- **Total Files**: 264
+- **Total Size**: 2.23 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 110 files
-- **.md**: 82 files
-- **.tsx**: 33 files
+- **.ts**: 117 files
+- **.md**: 83 files
+- **.tsx**: 36 files
 - **.json**: 17 files
 - **.js**: 10 files
 - **.sql**: 1 files
 
 ## Most Common Tags
 
-- **TypeScript**: 143 files
-- **AI agent**: 116 files
-- **documentation**: 84 files
-- **security**: 62 files
-- **API**: 38 files
-- **Next.js API**: 37 files
-- **React**: 33 files
+- **TypeScript**: 153 files
+- **AI agent**: 123 files
+- **documentation**: 85 files
+- **security**: 64 files
+- **API**: 45 files
+- **Next.js API**: 43 files
+- **React**: 36 files
 - **utility**: 31 files
-- **UI**: 26 files
+- **UI**: 29 files
 - **React hooks**: 23 files
 
 ## File Inventory
@@ -115,20 +115,47 @@ aka.ms/tsconfig to read more about this file */
 
 ### `apps/web/app/api/agent/content/route.ts`
 
-POST /api/agent/content
+Agent Content API Route
 
-**Complexity**: medium • **Size**: 6.5KB
+**Complexity**: medium • **Size**: 7.2KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/api/agent/context/route.ts`
 
 POST /api/agent/context
 
-**Complexity**: high • **Size**: 21.4KB
+**Complexity**: high • **Size**: 21.5KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
+
+
+### `apps/web/app/api/assets/compositions/route.ts`
+
+Purpose: Asset Compositions API - Hierarchical context-aware layouts
+
+**Complexity**: medium • **Size**: 4.4KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/28/2025
+
+
+### `apps/web/app/api/assets/discovery/route.ts`
+
+File: apps/web/app/api/assets/discovery/route.ts
+
+**Complexity**: medium • **Size**: 8.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 6/28/2025
+
+
+### `apps/web/app/api/assets/registry/widgets/route.ts`
+
+File: apps/web/app/api/assets/registry/widgets/route.ts
+
+**Complexity**: high • **Size**: 15.7KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/api/auth/callback/route.ts`
@@ -182,6 +209,42 @@ Debug endpoint to examine cookies and session state
 
 **Complexity**: low • **Size**: 1.8KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 6/27/2025
+
+
+### `apps/web/app/api/debug/env-check/route.ts`
+
+Check all Supabase-related environment variables
+
+**Complexity**: low • **Size**: 1.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/28/2025
+
+
+### `apps/web/app/api/debug/env-simple/route.ts`
+
+—
+
+**Complexity**: low • **Size**: 0.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/28/2025
+
+
+### `apps/web/app/api/debug/nav-check/route.ts`
+
+Debug Navigation Options API Route
+
+**Complexity**: low • **Size**: 1.9KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 6/27/2025
+
+
+### `apps/web/app/api/debug/nav-raw/route.ts`
+
+—
+
+**Complexity**: low • **Size**: 0.0KB
+**Tags**: `TypeScript`, `API`
 **Modified**: 6/27/2025
 
 
@@ -414,9 +477,9 @@ SSR-compliant API endpoint for updating user video progress
 
 Create service role Supabase client for backend operations
 
-**Complexity**: medium • **Size**: 9.7KB
+**Complexity**: medium • **Size**: 10.0KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
@@ -558,9 +621,9 @@ Get initial session server-side for SSR
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: high • **Size**: 18.8KB
+**Complexity**: high • **Size**: 18.1KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -756,9 +819,9 @@ Client-side Supabase client for auth and real-time APIs
 
 Returns a Supabase SSR client with cookie adapter
 
-**Complexity**: medium • **Size**: 3.5KB
+**Complexity**: medium • **Size**: 4.0KB
 **Tags**: `TypeScript`, `utility`, `security`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/lib/tenantService.ts`
@@ -810,9 +873,9 @@ User Progress Service - Web App Integration
 
 User service layer with optimized database operations and caching
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 8.3KB
-**Tags**: `service layer`, `user management`, `Supabase`, `performance optimization`, `TypeScript`, `utility`
-**Modified**: 6/27/2025
+**Owner**: Backend team • **Complexity**: medium • **Size**: 7.9KB
+**Tags**: `service layer`, `user management`, `Supabase`, `performance optimization`, `TypeScript`, `utility`, `security`
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/lib/utils.ts`
@@ -1013,6 +1076,33 @@ Fetch user data from API
 **Modified**: 6/27/2025
 
 
+### `apps/web/components/widgets/__tests__/StatCard.test.tsx`
+
+File: apps/web/components/widgets/__tests__/StatCard.test.tsx
+
+**Complexity**: high • **Size**: 8.9KB
+**Tags**: `React`, `TypeScript`, `UI`, `test`, `AI agent`
+**Modified**: 6/28/2025
+
+
+### `apps/web/components/widgets/__tests__/UniversalSchemaRenderer.integration.test.tsx`
+
+File: apps/web/components/widgets/__tests__/UniversalSchemaRenderer.integration.test.tsx
+
+**Complexity**: high • **Size**: 11.0KB
+**Tags**: `React`, `TypeScript`, `UI`, `test`, `AI agent`
+**Modified**: 6/28/2025
+
+
+### `apps/web/components/widgets/__tests__/WidgetDispatcher.test.tsx`
+
+File: apps/web/components/widgets/__tests__/WidgetDispatcher.test.tsx
+
+**Complexity**: medium • **Size**: 8.1KB
+**Tags**: `React`, `TypeScript`, `UI`, `test`, `AI agent`
+**Modified**: 6/28/2025
+
+
 ### `apps/web/components/widgets/Grid.tsx`
 
 File: apps/web/components/widgets/Grid.tsx
@@ -1044,9 +1134,9 @@ File: apps/web/components/widgets/Leaderboard.tsx
 
 LeaderForgeCard.tsx
 
-**Complexity**: medium • **Size**: 11.5KB
+**Complexity**: medium • **Size**: 11.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `apps/web/components/widgets/Panel.tsx`
@@ -1935,7 +2025,7 @@ Register agent with proper typing
 
 Local LangGraph dev server",
 
-**Size**: 121.2KB
+**Size**: 127.7KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/27/2025
 
@@ -1944,7 +2034,7 @@ Local LangGraph dev server",
 
 Local LangGraph dev server
 
-**Size**: 45.4KB
+**Size**: 48.0KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/27/2025
 
@@ -1956,6 +2046,15 @@ React component example
 **Size**: 28.9KB
 **Tags**: `documentation`
 **Modified**: 6/27/2025
+
+
+### `docs/product-design/LEADERFORGE_VISION.md`
+
+—
+
+**Size**: 16.7KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 6/28/2025
 
 
 ### `docs/product-design/README.md`
@@ -2286,18 +2385,18 @@ File: packages/asset-core/src/types/WidgetSchema.ts
 
 Environment Configuration
 
-**Complexity**: low • **Size**: 3.5KB
+**Complexity**: medium • **Size**: 5.6KB
 **Tags**: `TypeScript`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `packages/env/package.json`
 
 —
 
-**Size**: 0.1KB
+**Size**: 0.2KB
 **Tags**: None
-**Modified**: 5/27/2025
+**Modified**: 6/27/2025
 
 
 ### `packages/env/tsconfig.json`

@@ -1,26 +1,26 @@
 {
   "metadata": {
-    "generated_at": "2025-06-28T00:08:25.541Z",
+    "generated_at": "2025-06-28T20:57:14.537Z",
     "generator_version": "1.0.0",
-    "total_files": 253,
-    "total_size_bytes": 2248591,
+    "total_files": 264,
+    "total_size_bytes": 2339933,
     "file_types": {
-      ".ts": 110,
+      ".ts": 117,
       ".json": 17,
-      ".tsx": 33,
+      ".tsx": 36,
       ".js": 10,
-      ".md": 82,
+      ".md": 83,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 143,
-      "API": 38,
-      "AI agent": 116,
-      "React": 33,
+      "TypeScript": 153,
+      "API": 45,
+      "AI agent": 123,
+      "React": 36,
       "React hooks": 23,
-      "Next.js API": 37,
-      "security": 62,
-      "test": 10,
+      "Next.js API": 43,
+      "security": 64,
+      "test": 13,
       "API endpoint": 3,
       "navigation state": 2,
       "user preferences": 4,
@@ -51,7 +51,7 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 26,
+      "UI": 29,
       "navigation": 4,
       "context-based": 1,
       "UI component": 1,
@@ -65,7 +65,7 @@
       "SWR": 1,
       "database": 1,
       "database-driven": 1,
-      "documentation": 84,
+      "documentation": 85,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -216,7 +216,7 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/agent/content",
       "extension": ".ts",
-      "purpose": "POST /api/agent/content",
+      "purpose": "Agent Content API Route",
       "tags": [
         "TypeScript",
         "API",
@@ -227,12 +227,11 @@
         "next/server",
         "next/headers",
         "../../../lib/supabaseServerClient",
-        "../../../lib/agentService",
         "../../../../../../packages/env"
       ],
-      "last_modified": "2025-06-28T00:07:40.602Z",
-      "size_bytes": 6665,
-      "hash": "5869564b",
+      "last_modified": "2025-06-28T18:55:46.341Z",
+      "size_bytes": 7347,
+      "hash": "0667eacf",
       "complexity": "medium"
     },
     {
@@ -254,9 +253,70 @@
         "../../../lib/types",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T21:33:11.936Z",
-      "size_bytes": 21958,
-      "hash": "37129241",
+      "last_modified": "2025-06-28T18:55:48.163Z",
+      "size_bytes": 22015,
+      "hash": "f112ee23",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/app/api/assets/compositions/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/assets/compositions",
+      "extension": ".ts",
+      "purpose": "Purpose: Asset Compositions API - Hierarchical context-aware layouts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-28T20:57:05.698Z",
+      "size_bytes": 4542,
+      "hash": "c39357bf",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/assets/discovery/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/assets/discovery",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/assets/discovery/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-28T19:14:05.543Z",
+      "size_bytes": 8750,
+      "hash": "7cb573db",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/assets/registry/widgets/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/assets/registry/widgets",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/assets/registry/widgets/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-28T19:14:00.007Z",
+      "size_bytes": 16046,
+      "hash": "0c514910",
       "complexity": "high"
     },
     {
@@ -384,6 +444,81 @@
       "last_modified": "2025-06-27T21:33:11.939Z",
       "size_bytes": 1794,
       "hash": "c6e066f9",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/env-check/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/env-check",
+      "extension": ".ts",
+      "purpose": "Check all Supabase-related environment variables",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-28T14:19:40.925Z",
+      "size_bytes": 1493,
+      "hash": "b0567998",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/env-simple/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/env-simple",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-06-28T14:27:40.874Z",
+      "size_bytes": 549,
+      "hash": "925654cc",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/nav-check/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/nav-check",
+      "extension": ".ts",
+      "purpose": "Debug Navigation Options API Route",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-28T00:14:11.370Z",
+      "size_bytes": 1952,
+      "hash": "075576e5",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/nav-raw/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/nav-raw",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "API"
+      ],
+      "last_modified": "2025-06-28T00:33:41.400Z",
+      "size_bytes": 1,
+      "hash": "36a9e7f1",
       "complexity": "low"
     },
     {
@@ -970,9 +1105,9 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T21:33:11.962Z",
-      "size_bytes": 9980,
-      "hash": "c38d60b5",
+      "last_modified": "2025-06-28T14:27:21.858Z",
+      "size_bytes": 10198,
+      "hash": "2bd72623",
       "complexity": "medium"
     },
     {
@@ -1358,12 +1493,11 @@
         "AI agent"
       ],
       "dependencies": [
-        "@supabase/supabase-js",
         "../../../../packages/env"
       ],
-      "last_modified": "2025-06-28T00:07:38.381Z",
-      "size_bytes": 19302,
-      "hash": "616ad5b2",
+      "last_modified": "2025-06-28T19:04:17.025Z",
+      "size_bytes": 18562,
+      "hash": "a5e4d1b2",
       "complexity": "high"
     },
     {
@@ -1812,9 +1946,9 @@
       "exports": [
         "createSupabaseServerClient"
       ],
-      "last_modified": "2025-06-27T21:33:12.019Z",
-      "size_bytes": 3630,
-      "hash": "dfae8903",
+      "last_modified": "2025-06-28T14:27:13.585Z",
+      "size_bytes": 4055,
+      "hash": "be3d30a8",
       "complexity": "medium"
     },
     {
@@ -1923,11 +2057,12 @@
         "Supabase",
         "performance optimization",
         "TypeScript",
-        "utility"
+        "utility",
+        "security"
       ],
-      "last_modified": "2025-06-27T21:33:12.031Z",
-      "size_bytes": 8476,
-      "hash": "112aaa35",
+      "last_modified": "2025-06-28T18:55:51.851Z",
+      "size_bytes": 8045,
+      "hash": "5412a184",
       "complexity": "medium"
     },
     {
@@ -2466,6 +2601,78 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/components/widgets/__tests__/StatCard.test.tsx",
+      "name": "StatCard.test.tsx",
+      "directory": "apps/web/components/widgets/__tests__",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/__tests__/StatCard.test.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "test",
+        "AI agent"
+      ],
+      "dependencies": [
+        "@testing-library/react",
+        "vitest",
+        "../StatCard",
+        "../../../../../packages/agent-core/types/UniversalWidgetSchema"
+      ],
+      "last_modified": "2025-06-28T15:14:48.276Z",
+      "size_bytes": 9133,
+      "hash": "343ecf36",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/widgets/__tests__/UniversalSchemaRenderer.integration.test.tsx",
+      "name": "UniversalSchemaRenderer.integration.test.tsx",
+      "directory": "apps/web/components/widgets/__tests__",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/__tests__/UniversalSchemaRenderer.integration.test.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "test",
+        "AI agent"
+      ],
+      "dependencies": [
+        "@testing-library/react",
+        "vitest",
+        "../../ai/UniversalSchemaRenderer",
+        "../../../../../packages/agent-core/types/UniversalWidgetSchema"
+      ],
+      "last_modified": "2025-06-28T15:15:33.827Z",
+      "size_bytes": 11255,
+      "hash": "9181785a",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/widgets/__tests__/WidgetDispatcher.test.tsx",
+      "name": "WidgetDispatcher.test.tsx",
+      "directory": "apps/web/components/widgets/__tests__",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/__tests__/WidgetDispatcher.test.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "test",
+        "AI agent"
+      ],
+      "dependencies": [
+        "@testing-library/react",
+        "vitest",
+        "../WidgetDispatcher",
+        "../../../../../packages/agent-core/types/UniversalWidgetSchema"
+      ],
+      "last_modified": "2025-06-28T15:14:01.960Z",
+      "size_bytes": 8337,
+      "hash": "af5ed58f",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/components/widgets/Grid.tsx",
       "name": "Grid.tsx",
       "directory": "apps/web/components/widgets",
@@ -2554,9 +2761,9 @@
         "lucide-react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T21:33:12.085Z",
-      "size_bytes": 11820,
-      "hash": "ec200e3b",
+      "last_modified": "2025-06-28T11:44:34.595Z",
+      "size_bytes": 12212,
+      "hash": "c797258e",
       "complexity": "medium"
     },
     {
@@ -3838,7 +4045,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-28T00:08:17.978Z",
+      "last_modified": "2025-06-28T00:08:27.280Z",
       "size_bytes": 3919,
       "hash": "adfcbd41"
     },
@@ -4066,9 +4273,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-27T21:33:12.255Z",
-      "size_bytes": 124083,
-      "hash": "0fa0fe9c"
+      "last_modified": "2025-06-28T00:08:25.548Z",
+      "size_bytes": 130745,
+      "hash": "6b25d920"
     },
     {
       "path": "docs/manifest.md",
@@ -4081,9 +4288,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-27T21:33:12.256Z",
-      "size_bytes": 46501,
-      "hash": "961d647d"
+      "last_modified": "2025-06-28T00:08:25.575Z",
+      "size_bytes": 49115,
+      "hash": "abff8c72"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -4097,6 +4304,21 @@
       "last_modified": "2025-06-27T21:33:12.257Z",
       "size_bytes": 29556,
       "hash": "2a51764e"
+    },
+    {
+      "path": "docs/product-design/LEADERFORGE_VISION.md",
+      "name": "LEADERFORGE_VISION.md",
+      "directory": "docs/product-design",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-28T20:50:24.751Z",
+      "size_bytes": 17125,
+      "hash": "7ba6141b"
     },
     {
       "path": "docs/product-design/README.md",
@@ -4711,17 +4933,13 @@
         "TypeScript",
         "AI agent"
       ],
-      "dependencies": [
-        "dotenv",
-        "path"
-      ],
       "exports": [
         "ENV"
       ],
-      "last_modified": "2025-06-28T00:07:33.936Z",
-      "size_bytes": 3555,
-      "hash": "0a3bd93c",
-      "complexity": "low"
+      "last_modified": "2025-06-28T14:20:07.478Z",
+      "size_bytes": 5749,
+      "hash": "1d52b0fe",
+      "complexity": "medium"
     },
     {
       "path": "packages/env/package.json",
@@ -4730,9 +4948,9 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-05-27T21:40:57.087Z",
-      "size_bytes": 90,
-      "hash": "cec35a8a"
+      "last_modified": "2025-06-28T01:04:13.069Z",
+      "size_bytes": 176,
+      "hash": "d59743bb"
     },
     {
       "path": "packages/env/tsconfig.json",
