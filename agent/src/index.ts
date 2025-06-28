@@ -30,7 +30,7 @@ async function fetchContent(state: typeof StateAnnotation.State) {
   console.log('[ContentAgent] Fetching content for tenant:', state.tenantKey);
 
   try {
-    const content = await tribeContentTool.getContentForContext(state.tenantKey || 'leaderforge');
+    const content = await tribeContentTool.getContentForTenant(state.tenantKey || 'leaderforge');
     console.log('[ContentAgent] Retrieved content count:', content.length);
 
     // Ensure state.messages is an array before spreading

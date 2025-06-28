@@ -187,18 +187,18 @@ export class TribeSocialContentTool {
   }
 
   /**
-   * Fetches all content for a given contextKey from TribeSocial (via proxy).
+   * Fetches all content for a given tenantKey from TribeSocial (via proxy).
    * PATCH: For 'leaderforge', fetch directly from TribeSocial using collectionId 99735660.
    * Ignore Supabase for now.
    */
-  async getContentForContext(contextKey: string): Promise<any[]> {
-    // Map contextKey to collectionId
+  async getContentForTenant(tenantKey: string): Promise<any[]> {
+    // Map tenantKey to collectionId
     let collectionId: number | undefined = undefined;
-    if (contextKey === 'leaderforge') {
+    if (tenantKey === 'leaderforge') {
       collectionId = 99735660;
     } else {
-      // TODO: Map other contextKeys to collectionIds as needed
-      throw new Error(`No collectionId mapping for contextKey: ${contextKey}`);
+      // TODO: Map other tenantKeys to collectionIds as needed
+      throw new Error(`No collectionId mapping for tenantKey: ${tenantKey}`);
     }
     // Fetch from proxy/TribeSocial
     const data = await this.listContentAsComponentSchema(collectionId);
