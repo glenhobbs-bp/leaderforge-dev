@@ -239,136 +239,13 @@ export class AgentService {
   }
 
   /**
-   * Invoke LangGraph agent via HTTP API
+   * Invoke LangGraph agent (unified for all deployments - Render service)
    */
   private async invokeLangGraphAgent(
     agent: Agent,
     request: AgentInvocationRequest
   ): Promise<AgentInvocationResponse> {
     const startTime = Date.now();
-
-    try {
-      // Detect if using LangGraph Cloud or local server
-      const isCloudDeployment = this.langGraphUrl.includes('langchain.app');
-
-      if (isCloudDeployment) {
-        return this.invokeLangGraphCloud(agent, request, startTime);
-      } else {
-        return this.invokeLangGraphLocal(agent, request, startTime);
-      }
-
-    } catch (error) {
-      const totalTime = Date.now() - startTime;
-      console.error(`[AgentService] LangGraph invocation error after ${totalTime}ms:`, error);
-
-      // Try fallback content if LangGraph fails
-      console.warn(`[AgentService] LangGraph failed, attempting fallback for agent: ${agent.name}`);
-      return this.getLangGraphFallbackContent(agent, request);
-    }
-  }
-
-  /**
-   * Invoke LangGraph Cloud deployment
-   */
-  private async invokeLangGraphCloud(
-    agent: Agent,
-    request: AgentInvocationRequest,
-    startTime: number
-  ): Promise<AgentInvocationResponse> {
-    const apiKey = process.env.LANGCHAIN_API_KEY || process.env.LANGSMITH_API_KEY;
-
-    if (!apiKey) {
-      throw new Error('LANGCHAIN_API_KEY or LANGSMITH_API_KEY required for LangGraph Cloud');
-    }
-
-    // LangGraph Cloud uses the SDK pattern
-    const runResponse = await fetch(`${this.langGraphUrl}/runs`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        assistant_id: 'content_agent', // From langgraph.json
-        input: {
-          messages: [{
-            role: 'user',
-            content: request.message
-          }],
-          userId: request.userId,
-          tenantKey: request.tenantKey,
-          navOptionId: request.navOptionId,
-          agentConfig: agent.config
-        }
-      })
-    });
-
-    if (!runResponse.ok) {
-      throw new Error(`LangGraph Cloud invocation failed: ${runResponse.statusText}`);
-    }
-
-    const runData = await runResponse.json();
-    const runId = runData.id;
-
-    console.log(`[AgentService] Created LangGraph Cloud run: ${runId}, waiting for completion...`);
-
-    // Poll for completion
-    let attempts = 0;
-    const maxAttempts = 20;
-    let pollInterval = 500; // Cloud might be slower than local
-
-    while (attempts < maxAttempts) {
-      const statusResponse = await fetch(`${this.langGraphUrl}/runs/${runId}`, {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
-        }
-      });
-
-      if (!statusResponse.ok) {
-        throw new Error(`Failed to check run status: ${statusResponse.statusText}`);
-      }
-
-      const runStatus = await statusResponse.json();
-      console.log(`[AgentService] Cloud run ${runId} status: ${runStatus.status} (attempt ${attempts + 1}/${maxAttempts})`);
-
-      if (runStatus.status === 'success') {
-        const totalTime = Date.now() - startTime;
-        console.log(`[AgentService] LangGraph Cloud completed successfully in ${totalTime}ms`);
-
-        // Extract the result from the Cloud response
-        const finalResult = runStatus.output || runStatus.data;
-        const enrichedContent = await this.enrichWithProgressData(finalResult, request.userId, request.tenantKey);
-
-        return {
-          type: 'content_schema',
-          content: enrichedContent,
-          metadata: {
-            runId: runId,
-            agentId: agent.id,
-            agentName: agent.name,
-            executionTime: totalTime,
-            platform: 'langgraph-cloud'
-          }
-        };
-      } else if (runStatus.status === 'error') {
-        throw new Error(`LangGraph Cloud run failed: ${runStatus.error || 'Unknown error'}`);
-      }
-
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
-      attempts++;
-    }
-
-    throw new Error(`LangGraph Cloud run timed out after ${maxAttempts} attempts`);
-  }
-
-  /**
-   * Invoke local LangGraph server (for development)
-   */
-  private async invokeLangGraphLocal(
-    agent: Agent,
-    request: AgentInvocationRequest,
-    startTime: number
-  ): Promise<AgentInvocationResponse> {
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev) {
@@ -487,7 +364,7 @@ export class AgentService {
               agentId: agent.id,
               agentName,
               executionTime,
-              platform: 'langgraph-local',
+              platform: 'langgraph-render',
               responseFormat: statusResult.result ? 'result' : 'values'
             }
           };
@@ -502,10 +379,16 @@ export class AgentService {
       throw new Error(`LangGraph run timed out after ${maxAttempts} attempts`);
 
     } catch (error) {
-      console.error(`[AgentService] LangGraph invocation failed:`, error);
-      throw error;
+      const totalTime = Date.now() - startTime;
+      console.error(`[AgentService] LangGraph invocation error after ${totalTime}ms:`, error);
+
+      // Try fallback content if LangGraph fails
+      console.warn(`[AgentService] LangGraph failed, attempting fallback for agent: ${agent.name}`);
+      return this.getLangGraphFallbackContent(agent, request);
     }
   }
+
+
 
   /**
    * Get fallback content when LangGraph service is unavailable
