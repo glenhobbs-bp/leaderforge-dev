@@ -107,7 +107,7 @@ export class AgentService {
   /**
    * Enrich content with progress data from database
    */
-  private async enrichWithProgressData(content: any, userId: string, tenantKey: string): Promise<any> {
+  private async enrichWithProgressData(content: any, userId: string): Promise<any> {
     try {
       // First, extract all content IDs from the schema
       const contentIds: string[] = [];
@@ -125,48 +125,38 @@ export class AgentService {
 
       collectContentIds(content);
 
-      // Batch fetch progress data if we have content IDs
+      // Batch fetch progress data directly from database (no server-to-server call)
       let progressMap: Record<string, any> = {};
       if (contentIds.length > 0) {
         console.log(`[AgentService] Batch fetching progress for ${contentIds.length} content items:`, contentIds);
         try {
-          // Use new optimized batch progress API (reduces 19 queries to 1)
-          // Fix: Use absolute URL for server-side fetch calls
-          const baseUrl = process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : process.env.NODE_ENV === 'production'
-              ? 'https://leaderforge.vercel.app'
-              : 'http://localhost:3000';
+          // Direct database query using authenticated Supabase client (more efficient)
+          const { data: progressData, error: queryError } = await this.supabase
+            .schema('core')
+            .from('user_progress')
+            .select('content_id, progress_percentage, metadata, last_viewed_at, completed_at, started_at')
+            .eq('user_id', userId)
+            .in('content_id', contentIds);
 
-          // Prepare headers including authentication
-          const headers: Record<string, string> = {
-            'Content-Type': 'application/json'
-          };
-
-          // Forward authentication headers if available
-          if (this.authHeaders) {
-            Object.assign(headers, this.authHeaders);
-          }
-
-          const response = await fetch(`${baseUrl}/api/user/${userId}/progress-batch`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              contentIds,
-              contextKey: tenantKey,
-            }),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            progressMap = data.progress || {};
-            console.log(`[AgentService] Successfully fetched progress for ${Object.keys(progressMap).length} items`);
-          } else {
-            console.warn(`[AgentService] Batch progress API failed:`, response.status);
+          if (queryError) {
+            console.warn(`[AgentService] Progress query failed:`, queryError);
             progressMap = {};
+          } else {
+            // Transform to expected format
+            progressData?.forEach((item) => {
+              progressMap[item.content_id] = {
+                progress_percentage: item.progress_percentage,
+                metadata: item.metadata,
+                last_viewed_at: item.last_viewed_at,
+                completed_at: item.completed_at,
+                started_at: item.started_at,
+                lastUpdated: item.last_viewed_at
+              };
+            });
+            console.log(`[AgentService] Successfully fetched progress for ${progressData?.length || 0} items`);
           }
         } catch (error) {
-          console.warn(`[AgentService] Batch progress fetch failed:`, error);
+          console.warn(`[AgentService] Progress fetch failed:`, error);
           // Continue with empty progress map - don't fail the entire enrichment
           progressMap = {};
         }
@@ -329,7 +319,7 @@ export class AgentService {
         }
 
         // Enrich schema with user progress data
-        const enrichedContent = await this.enrichWithProgressData(schema, request.userId, request.tenantKey);
+        const enrichedContent = await this.enrichWithProgressData(schema, request.userId);
 
         return {
           type: 'content_schema',
@@ -427,7 +417,7 @@ export class AgentService {
     };
 
     // Return the fallback content with enrichment
-    const enrichedContent = await this.enrichWithProgressData(fallbackContent, request.userId, request.tenantKey);
+    const enrichedContent = await this.enrichWithProgressData(fallbackContent, request.userId);
 
     return {
       type: 'content_schema',
