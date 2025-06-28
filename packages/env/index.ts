@@ -59,13 +59,35 @@ export const ENV = {
       console.log('[ENV DEBUG] SUPABASE_SERVICE_ROLE_KEY check:', {
         exists: !!key,
         keyLength: key ? key.length : 0,
+        keyPreview: key ? key.substring(0, 10) + '...' : 'NOT_FOUND',
         allEnvKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE')),
         vercelEnv: process.env.VERCEL_ENV,
-        nodeEnv: process.env.NODE_ENV
+        nodeEnv: process.env.NODE_ENV,
+        vercel: process.env.VERCEL,
+        allEnvCount: Object.keys(process.env).length
       });
     }
 
     if (!key) {
+      // Instead of immediately throwing, let's try to provide a fallback or more information
+      console.error('[ENV ERROR] SUPABASE_SERVICE_ROLE_KEY is missing. Available environment variables:',
+        Object.keys(process.env).filter(k => k.includes('SUPABASE')));
+
+      // TEMPORARY: Try different possible environment variable names
+      const alternatives = [
+        'SUPABASE_SERVICE_ROLE',
+        'SUPABASE_SERVICE_KEY',
+        'SUPABASE_SERVICE_ROLE_KEY'
+      ];
+
+      for (const alt of alternatives) {
+        const altValue = process.env[alt];
+        if (altValue) {
+          console.log(`[ENV FALLBACK] Found alternative: ${alt}`);
+          return altValue;
+        }
+      }
+
       throw new Error('Missing required environment variable: SUPABASE_SERVICE_ROLE_KEY');
     }
     return key;
