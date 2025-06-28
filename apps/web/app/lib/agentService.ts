@@ -276,7 +276,6 @@ export class AgentService {
       const runId = `run_${Date.now()}`;
 
       const requestBody = {
-        threadId,
         input: {
           messages: [{
             role: 'user',
@@ -290,8 +289,8 @@ export class AgentService {
         }
       };
 
-      // Start the run
-      const createResponse = await fetch(`${this.langGraphUrl}/threads/${threadId}/runs`, {
+      // Execute run directly (simplified pattern that works with our deployment)
+      const runResponse = await fetch(`${this.langGraphUrl}/threads/${threadId}/runs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -301,82 +300,52 @@ export class AgentService {
         body: JSON.stringify(requestBody)
       });
 
-      if (!createResponse.ok) {
-        const errorText = await createResponse.text();
-        throw new Error(`Failed to create LangGraph run: ${createResponse.status} - ${errorText}`);
+      if (!runResponse.ok) {
+        const errorText = await runResponse.text();
+        throw new Error(`Failed to execute LangGraph run: ${runResponse.status} - ${errorText}`);
       }
 
-      const createResult = await createResponse.json();
-      const actualRunId = createResult.run_id || runId;
+      const runResult = await runResponse.json();
+      const executionTime = Date.now() - parseInt(threadId.split('_')[1]);
 
       if (isDev) {
-        console.log(`[AgentService] Created LangGraph run: ${actualRunId}, waiting for completion...`);
+        console.log(`[AgentService] LangGraph execution completed in ${executionTime}ms:`, runResult.status);
       }
 
-      // Wait for completion with timeout
-      const maxAttempts = 20;
-      const pollInterval = 500; // 500ms
-
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        const statusResponse = await fetch(`${this.langGraphUrl}/threads/${threadId}/runs/${actualRunId}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            ...this.authHeaders
-          }
-        });
-
-        if (!statusResponse.ok) {
-          throw new Error(`Failed to check run status: ${statusResponse.status}`);
-        }
-
-        const statusResult = await statusResponse.json();
+      if (runResult.status === 'success') {
+        // Extract schema from result
+        const responseData = runResult.result || runResult.values || {};
+        const schema = responseData.schema;
+        const agentName = responseData.agentName || agent.id;
 
         if (isDev) {
-          console.log(`[AgentService] Run ${actualRunId} status: ${statusResult.status} (attempt ${attempt}/${maxAttempts})`);
+          console.log(`[AgentService] LangGraph completed successfully, final state:`, responseData);
+          console.log(`[AgentService] Response format detected:`, runResult.result ? 'result' : runResult.values ? 'values' : 'unknown');
         }
 
-        if (statusResult.status === 'success') {
-          const executionTime = Date.now() - parseInt(threadId.split('_')[1]);
-
-          // Defensive handling: LangGraph response format has changed over time
-          // Support both legacy 'values' and current 'result' formats
-          const responseData = statusResult.result || statusResult.values || {};
-          const schema = responseData.schema;
-          const agentName = responseData.agentName || agent.id;
-
-          if (isDev) {
-            console.log(`[AgentService] LangGraph completed successfully in ${executionTime}ms, final state:`, responseData);
-            console.log(`[AgentService] Response format detected:`, statusResult.result ? 'result' : statusResult.values ? 'values' : 'unknown');
-          }
-
-          if (!schema) {
-            console.warn(`[AgentService] No schema found in LangGraph response. Response structure:`, JSON.stringify(statusResult, null, 2));
-            throw new Error('LangGraph agent completed successfully but returned no schema');
-          }
-
-          return {
-            type: 'content_schema',
-            content: schema,
-            metadata: {
-              threadId,
-              runId: actualRunId,
-              agentId: agent.id,
-              agentName,
-              executionTime,
-              platform: 'langgraph-render',
-              responseFormat: statusResult.result ? 'result' : 'values'
-            }
-          };
-        } else if (statusResult.status === 'error') {
-          throw new Error(`LangGraph run failed: ${statusResult.error || 'Unknown error'}`);
+        if (!schema) {
+          console.warn(`[AgentService] No schema found in LangGraph response. Response structure:`, JSON.stringify(runResult, null, 2));
+          throw new Error('LangGraph agent completed successfully but returned no schema');
         }
 
-        // Wait before next poll
-        await new Promise(resolve => setTimeout(resolve, pollInterval));
+        return {
+          type: 'content_schema',
+          content: schema,
+          metadata: {
+            threadId,
+            runId: runResult.run_id || `run_${Date.now()}`,
+            agentId: agent.id,
+            agentName,
+            executionTime,
+            platform: 'langgraph-render',
+            responseFormat: runResult.result ? 'result' : 'values'
+          }
+        };
+      } else if (runResult.status === 'error') {
+        throw new Error(`LangGraph run failed: ${runResult.error || 'Unknown error'}`);
+      } else {
+        throw new Error(`LangGraph run returned unexpected status: ${runResult.status}`);
       }
-
-      throw new Error(`LangGraph run timed out after ${maxAttempts} attempts`);
 
     } catch (error) {
       const totalTime = Date.now() - startTime;
