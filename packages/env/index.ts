@@ -53,6 +53,18 @@ export const ENV = {
   },
   get SUPABASE_SERVICE_ROLE_KEY() {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // Debug logging for production troubleshooting
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
+      console.log('[ENV DEBUG] SUPABASE_SERVICE_ROLE_KEY check:', {
+        exists: !!key,
+        keyLength: key ? key.length : 0,
+        allEnvKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE')),
+        vercelEnv: process.env.VERCEL_ENV,
+        nodeEnv: process.env.NODE_ENV
+      });
+    }
+
     if (!key) {
       throw new Error('Missing required environment variable: SUPABASE_SERVICE_ROLE_KEY');
     }
