@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
-import { getAgentService } from '../../../lib/agentService';
 import { ENV } from '../../../../../../packages/env';
 
 /**
@@ -160,6 +159,8 @@ export async function POST(req: NextRequest) {
     console.log('[API/agent/content] 🧪 TESTING: Local → Render connection');
     console.log('[API/agent/content] Target URL:', ENV.LANGGRAPH_API_URL);
 
+    // Import AgentService dynamically to avoid import-time environment variable access
+    const { getAgentService } = await import('../../../lib/agentService');
     const agentService = getAgentService();
 
     // Set authentication headers for this request

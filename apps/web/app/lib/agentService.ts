@@ -617,11 +617,20 @@ let _agentServiceInstance: AgentService | null = null;
 
 export function getAgentService(): AgentService {
   if (!_agentServiceInstance) {
-    _agentServiceInstance = new AgentService(
-      ENV.SUPABASE_URL,
-      ENV.SUPABASE_SERVICE_ROLE_KEY,
-      ENV.LANGGRAPH_API_URL
-    );
+    // Add debug logging here before creating the service
+    console.log('[AgentService] Creating singleton instance...');
+
+    try {
+      _agentServiceInstance = new AgentService(
+        ENV.SUPABASE_URL,
+        ENV.SUPABASE_SERVICE_ROLE_KEY,
+        ENV.LANGGRAPH_API_URL
+      );
+      console.log('[AgentService] Singleton instance created successfully');
+    } catch (error) {
+      console.error('[AgentService] Failed to create singleton instance:', error);
+      throw error;
+    }
   }
   return _agentServiceInstance;
 }
