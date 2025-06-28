@@ -144,6 +144,12 @@ export async function POST(req: NextRequest) {
 
     // ✅ INVOKE THE CORRECT AGENT
     console.log('[API/agent/content] Calling LangGraph agent...');
+    console.log('[API/agent/content] Environment debug:', {
+      NODE_ENV: ENV.NODE_ENV,
+      IS_PRODUCTION: ENV.IS_PRODUCTION,
+      VERCEL_ENV: process.env.VERCEL_ENV,
+      LANGGRAPH_API_URL: ENV.LANGGRAPH_API_URL
+    });
 
     // Prepare authentication headers to forward for server-side API calls
     const authHeaders: Record<string, string> = {};

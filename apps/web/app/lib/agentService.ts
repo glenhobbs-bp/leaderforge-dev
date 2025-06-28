@@ -362,17 +362,33 @@ export class AgentService {
     request: AgentInvocationRequest,
     startTime: number
   ): Promise<AgentInvocationResponse> {
+    console.log(`[AgentService] Attempting to connect to LangGraph service at: ${this.langGraphUrl}`);
+
     // Check if LangGraph service is available
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const healthCheck = await fetch(`${this.langGraphUrl}/`, {
-      method: 'GET',
-      signal: controller.signal
-    }).catch(() => null).finally(() => clearTimeout(timeoutId));
+    try {
+      const healthCheck = await fetch(`${this.langGraphUrl}/`, {
+        method: 'GET',
+        signal: controller.signal
+      });
 
-    if (!healthCheck || !healthCheck.ok) {
-      console.warn(`[AgentService] LangGraph service unavailable at ${this.langGraphUrl}, using fallback content`);
+      clearTimeout(timeoutId);
+
+      if (!healthCheck || !healthCheck.ok) {
+        console.warn(`[AgentService] LangGraph health check failed. Status: ${healthCheck?.status}, URL: ${this.langGraphUrl}`);
+        throw new Error(`LangGraph service health check failed: ${healthCheck?.status || 'no response'}`);
+      }
+
+      console.log(`[AgentService] LangGraph service health check passed at ${this.langGraphUrl}`);
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.error(`[AgentService] LangGraph service connection failed:`, {
+        url: this.langGraphUrl,
+        error: error.message,
+        isAborted: error.name === 'AbortError'
+      });
       throw new Error('Local LangGraph service unavailable');
     }
 
