@@ -36,10 +36,28 @@ export const ENV = {
     CACHE_OPERATIONS: process.env.DEBUG_CACHE === 'true',
   },
 
-  // Supabase
-  SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  // Supabase - Lazy-loaded to avoid build-time errors
+  get SUPABASE_URL() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!url) {
+      throw new Error('Missing required environment variable: NEXT_PUBLIC_SUPABASE_URL');
+    }
+    return url;
+  },
+  get SUPABASE_ANON_KEY() {
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!key) {
+      throw new Error('Missing required environment variable: NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    }
+    return key;
+  },
+  get SUPABASE_SERVICE_ROLE_KEY() {
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!key) {
+      throw new Error('Missing required environment variable: SUPABASE_SERVICE_ROLE_KEY');
+    }
+    return key;
+  },
 
   // Agent configuration - Environment-aware URL selection
   LANGGRAPH_API_URL: (() => {
@@ -67,7 +85,13 @@ export const ENV = {
   })(),
 
   // External services
-  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY!,
+  get ANTHROPIC_API_KEY() {
+    const key = process.env.ANTHROPIC_API_KEY;
+    if (!key) {
+      throw new Error('Missing required environment variable: ANTHROPIC_API_KEY');
+    }
+    return key;
+  },
 };
 
 // Utility functions for controlled logging
