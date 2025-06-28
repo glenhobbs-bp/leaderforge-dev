@@ -5,7 +5,7 @@
 
 import { BaseMessage, AIMessage } from "@langchain/core/messages";
 import { StateGraph, Annotation } from "@langchain/langgraph";
-import { TribeSocialContentTool } from "./TribeSocialContentTool";
+import { TribeSocialContentTool } from "./TribeSocialContentTool.js";
 
 // Initialize the original TribeSocialContentTool
 const tribeContentTool = new TribeSocialContentTool();
