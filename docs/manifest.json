@@ -1,15 +1,15 @@
 {
   "metadata": {
-    "generated_at": "2025-06-28T20:57:14.537Z",
+    "generated_at": "2025-06-28T21:11:48.775Z",
     "generator_version": "1.0.0",
-    "total_files": 264,
-    "total_size_bytes": 2339933,
+    "total_files": 265,
+    "total_size_bytes": 2360100,
     "file_types": {
       ".ts": 117,
       ".json": 17,
       ".tsx": 36,
       ".js": 10,
-      ".md": 83,
+      ".md": 84,
       ".sql": 1
     },
     "tags": {
@@ -65,7 +65,7 @@
       "SWR": 1,
       "database": 1,
       "database-driven": 1,
-      "documentation": 85,
+      "documentation": 86,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -4273,9 +4273,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-28T00:08:25.548Z",
-      "size_bytes": 130745,
-      "hash": "6b25d920"
+      "last_modified": "2025-06-28T20:57:14.545Z",
+      "size_bytes": 136991,
+      "hash": "13f39b93"
     },
     {
       "path": "docs/manifest.md",
@@ -4288,9 +4288,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-28T00:08:25.575Z",
-      "size_bytes": 49115,
-      "hash": "abff8c72"
+      "last_modified": "2025-06-28T20:57:14.573Z",
+      "size_bytes": 51538,
+      "hash": "4f17fd22"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -4347,6 +4347,19 @@
       "last_modified": "2025-06-27T21:33:12.258Z",
       "size_bytes": 3234,
       "hash": "4db59066"
+    },
+    {
+      "path": "docs/product-management/prds/user-input-response-system.md",
+      "name": "user-input-response-system.md",
+      "directory": "docs/product-management/prds",
+      "extension": ".md",
+      "purpose": "Links to specific video content",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-06-28T21:11:43.606Z",
+      "size_bytes": 11498,
+      "hash": "66ea305a"
     },
     {
       "path": "docs/product-management/README.md",

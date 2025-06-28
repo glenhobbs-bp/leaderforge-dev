@@ -1,17 +1,17 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/28/2025, 4:57:14 PM*
+*Generated on 6/28/2025, 5:11:48 PM*
 
 ## Overview
 
-- **Total Files**: 264
-- **Total Size**: 2.23 MB
+- **Total Files**: 265
+- **Total Size**: 2.25 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
 - **.ts**: 117 files
-- **.md**: 83 files
+- **.md**: 84 files
 - **.tsx**: 36 files
 - **.json**: 17 files
 - **.js**: 10 files
@@ -21,7 +21,7 @@
 
 - **TypeScript**: 153 files
 - **AI agent**: 123 files
-- **documentation**: 85 files
+- **documentation**: 86 files
 - **security**: 64 files
 - **API**: 45 files
 - **Next.js API**: 43 files
@@ -2025,18 +2025,18 @@ Register agent with proper typing
 
 Local LangGraph dev server",
 
-**Size**: 127.7KB
+**Size**: 133.8KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `docs/manifest.md`
 
 Local LangGraph dev server
 
-**Size**: 48.0KB
+**Size**: 50.3KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/27/2025
+**Modified**: 6/28/2025
 
 
 ### `docs/product-design/design-system.md`
@@ -2073,6 +2073,15 @@ React component example
 **Size**: 3.2KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/27/2025
+
+
+### `docs/product-management/prds/user-input-response-system.md`
+
+Links to specific video content
+
+**Size**: 11.2KB
+**Tags**: `documentation`
+**Modified**: 6/28/2025
 
 
 ### `docs/product-management/README.md`
