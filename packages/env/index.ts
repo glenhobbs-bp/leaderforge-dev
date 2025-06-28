@@ -1,8 +1,3 @@
-import * as dotenv from "dotenv";
-import path from "path";
-
-dotenv.config({ path: path.resolve(__dirname, "../../.env.local") });
-
 /**
  * Environment Configuration
  *
@@ -53,10 +48,6 @@ export const ENV = {
       return process.env.LANGGRAPH_URL;
     }
 
-    // TEMPORARY: Force use of Render service for local testing
-    // This will help us verify the Render service works before fixing Vercel
-    return 'https://leaderforge-langgraph-2.onrender.com';
-
     // Production environment detection - More robust for Vercel
     const isProduction =
       process.env.NODE_ENV === 'production' ||
@@ -68,8 +59,11 @@ export const ENV = {
       return 'https://leaderforge-langgraph-2.onrender.com';
     }
 
-    // Development fallback
-    return 'http://127.0.0.1:8000';
+    // TEMPORARY: Force use of Render service for local testing
+    // This will help us verify the Render service works before fixing Vercel
+    return 'https://leaderforge-langgraph-2.onrender.com';
+
+    // Development fallback would be: 'http://127.0.0.1:8000'
   })(),
 
   // External services

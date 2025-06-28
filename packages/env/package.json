@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "main": "index.ts",
   "license": "MIT",
-  "dependencies": {
-    "dotenv": "^16.4.7"
-  },
   "devDependencies": {
     "@types/node": "^20.19.1",
     "typescript": "^5.8.3"
