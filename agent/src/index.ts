@@ -3,101 +3,11 @@
 // Owner: AI team
 // Tags: LangGraph, agent, content-generation
 
-import { StateGraph, Annotation } from "@langchain/langgraph";
 import { BaseMessage, AIMessage } from "@langchain/core/messages";
+import { StateGraph, Annotation } from "@langchain/langgraph";
+import { TribeSocialContentTool } from "./TribeSocialContentTool";
 
-// Environment-aware web app URL configuration
-function getWebAppUrl(): string {
-  // Check if we're in production (Render deployment)
-  const isProduction = process.env.NODE_ENV === 'production' ||
-                      process.env.RENDER === 'true' ||
-                      process.env.VERCEL_ENV === 'production';
-
-  // Allow override via environment variable
-  if (process.env.WEB_APP_URL) {
-    return process.env.WEB_APP_URL;
-  }
-
-  // Production URL (Vercel deployment)
-  if (isProduction) {
-    return 'https://leaderforge-dev-web-l3u8.vercel.app';
-  }
-
-  // Development URL
-  return 'http://localhost:3000';
-}
-
-// Simple content fetching tool
-class TribeSocialContentTool {
-  async getContentForContext(tenantKey: string): Promise<Record<string, unknown>[]> {
-    const webAppUrl = getWebAppUrl();
-    const apiUrl = `${webAppUrl}/api/tribe/content/99735660`;
-
-    console.log('[TribeSocialContentTool] Fetching from proxy:', apiUrl);
-    console.log('[TribeSocialContentTool] For tenant:', tenantKey);
-    console.log('[TribeSocialContentTool] Headers:', { Accept: 'application/json' });
-
-    const response = await fetch(apiUrl, {
-      headers: { Accept: 'application/json' }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch content: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    // Extract the Contents array from the collection response
-    const contents = (data.Contents || []) as Record<string, unknown>[];
-    console.log('[TribeSocialContentTool] Extracted contents count:', contents.length);
-
-    // Process image URLs for each content item (restore original logic)
-    const processedContents = contents.map((item: any) => {
-      // Image selection logic (restored from original TribeSocialContentTool)
-      let image: string | undefined = undefined;
-      if (item.collectionBGImage) {
-        image = `https://cdn.tribesocial.io/${item.collectionBGImage}`;
-      } else if (item.featuredImage) {
-        image = item.featuredImage.startsWith('http') ? item.featuredImage : `https://cdn.tribesocial.io/${item.featuredImage}`;
-      } else if (item.coverImage) {
-        image = item.coverImage.startsWith('http') ? item.coverImage : `https://cdn.tribesocial.io/${item.coverImage}`;
-      } else if (item.imageUrl && typeof item.imageUrl === 'string') {
-        image = item.imageUrl;
-      }
-
-      // Video URL logic (restored from original)
-      let videoUrl = undefined;
-      if (item.transcodingDataLP) {
-        try {
-          const transcoding = typeof item.transcodingDataLP === 'string' ? JSON.parse(item.transcodingDataLP) : item.transcodingDataLP;
-          if (transcoding && transcoding.hls) {
-            videoUrl = transcoding.hls.startsWith('http') ? transcoding.hls : `https://cdn.tribesocial.io/${transcoding.hls}`;
-          }
-        } catch {
-          // Ignore transcoding parsing errors
-        }
-      } else if (item.video) {
-        videoUrl = item.video.startsWith('http') ? item.video : `https://cdn.tribesocial.io/${item.video}`;
-      }
-
-      return {
-        ...item,
-        // Override with processed URLs
-        processedImage: image,
-        processedVideoUrl: videoUrl,
-        // Keep original fields for fallback
-        originalFeaturedImage: item.featuredImage,
-        originalCoverImage: item.coverImage,
-        originalImageUrl: item.imageUrl
-      };
-    });
-
-    console.log('[TribeSocialContentTool] Processed image URLs for', processedContents.length, 'items');
-    return processedContents;
-  }
-}
-
-// Initialize tools
+// Initialize the original TribeSocialContentTool
 const tribeContentTool = new TribeSocialContentTool();
 
 // Define the agent state
@@ -160,19 +70,18 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
   console.log('[ContentAgent] Generating Universal Widget Schema (ADR-0009 compliant)');
 
   try {
-        // Transform content items to Card format
-    // @ts-expect-error - Temporary disable for content item processing
-    const cardItems = (state.contentList || []).map((content: any) => ({
-        type: 'Card',
-        id: `card-${content.props?.id || content.id}-${Date.now()}`,
-        data: {
-          // Content data - use processed URLs
-          imageUrl: content.processedImage || content.props?.image || content.props?.imageUrl || content.imageUrl,
-          videoUrl: content.processedVideoUrl || content.props?.videoUrl || content.videoUrl,
-          description: content.props?.description || content.description || content.descriptionPlain,
-          duration: content.props?.duration || content.duration,
-          featuredImage: content.processedImage || content.props?.featuredImage || content.featuredImage,
-          coverImage: content.processedImage || content.props?.coverImage || content.coverImage,
+    // Transform content items to Card format - content now comes from original TribeSocialContentTool
+    const cardItems = (state.contentList || []).map((content: Record<string, unknown>) => ({
+      type: 'Card',
+      id: `card-${(content.props as Record<string, unknown>)?.id || content.id}-${Date.now()}`,
+      data: {
+        // Content data - use properly processed URLs from original tool
+        imageUrl: (content.props as Record<string, unknown>)?.image || (content.props as Record<string, unknown>)?.imageUrl || content.imageUrl,
+        videoUrl: (content.props as Record<string, unknown>)?.videoUrl || content.videoUrl,
+        description: (content.props as Record<string, unknown>)?.description || content.description || content.descriptionPlain,
+        duration: (content.props as Record<string, unknown>)?.duration || content.duration,
+        featuredImage: (content.props as Record<string, unknown>)?.featuredImage || content.featuredImage,
+        coverImage: (content.props as Record<string, unknown>)?.coverImage || content.coverImage,
         // Progress data (placeholder - will be enriched by web layer)
         progress: 0, // Will be replaced with real data by AgentService
         value: 0, // Will be replaced with real data by AgentService
@@ -184,17 +93,17 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
       },
       config: {
         // Display configuration
-        title: content.props?.title || content.title,
-        subtitle: content.props?.subtitle || content.subtitle || 'Learning Content',
+        title: (content.props as Record<string, unknown>)?.title || content.title,
+        subtitle: (content.props as Record<string, unknown>)?.subtitle || content.subtitle || 'Learning Content',
         actions: [
           {
             action: 'openVideoModal',
             label: 'Watch Video',
             primary: true,
             parameters: {
-              videoUrl: content.processedVideoUrl || content.props?.videoUrl || content.videoUrl,
-              title: content.props?.title || content.title,
-              poster: content.processedImage || content.props?.image || content.props?.imageUrl || content.imageUrl
+              videoUrl: (content.props as Record<string, unknown>)?.videoUrl || content.videoUrl,
+              title: (content.props as Record<string, unknown>)?.title || content.title,
+              poster: (content.props as Record<string, unknown>)?.image || (content.props as Record<string, unknown>)?.imageUrl || content.imageUrl
             }
           },
           {
@@ -203,7 +112,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             primary: false,
             parameters: {
               worksheetUrl: '#worksheet', // Placeholder
-              contentId: content.props?.id || content.id
+              contentId: (content.props as Record<string, unknown>)?.id || content.id
             }
           }
         ]
@@ -294,6 +203,6 @@ const workflow = new StateGraph(StateAnnotation)
 
 const graph = workflow.compile();
 
-console.log('[Agent] Initializing content agent with API-only access');
+console.log('[Agent] Initializing content agent with original TribeSocialContentTool');
 
 export default graph;
