@@ -5,9 +5,12 @@ import { AgentService } from '../../../lib/agentService';
 import { ENV } from '../../../../../../packages/env';
 
 /**
- * POST /api/agent/content
- * Agent-native: Thin API that looks up the agent from navigation and invokes it.
- * Follows the architectural principle: APIs only invoke agents and return their schema.
+ * Agent Content API Route
+ *
+ * Purpose: Central endpoint for agent content generation and schema composition
+ * Owner: Engineering Team
+ * Tags: #agents #content #schema #api
+ * Deployment: Updated 2025-06-28 with improved environment detection
  */
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
