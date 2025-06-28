@@ -33,20 +33,27 @@ async function fetchContent(state: typeof StateAnnotation.State) {
     const content = await tribeContentTool.getContentForContext(state.tenantKey || 'leaderforge');
     console.log('[ContentAgent] Retrieved content count:', content.length);
 
+    // Ensure state.messages is an array before spreading
+    const currentMessages = Array.isArray(state.messages) ? state.messages : [];
+
     return {
       contentList: content,
       messages: [
-        ...state.messages,
+        ...currentMessages,
         new AIMessage(`Found ${content.length} content items for ${state.tenantKey}`)
       ]
     };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.log('[ContentAgent] Error fetching content:', error);
+
+    // Ensure state.messages is an array before spreading
+    const currentMessages = Array.isArray(state.messages) ? state.messages : [];
+
     return {
       contentList: [],
       messages: [
-        ...state.messages,
+        ...currentMessages,
         new AIMessage(`Error fetching content: ${errorMessage}`)
       ]
     };
@@ -56,11 +63,14 @@ async function fetchContent(state: typeof StateAnnotation.State) {
 async function fetchProgressData(state: typeof StateAnnotation.State) {
   console.log('[ContentAgent] Progress fetching delegated to web server - agent does not access database directly');
 
+  // Ensure state.messages is an array before spreading
+  const currentMessages = Array.isArray(state.messages) ? state.messages : [];
+
   // Progress data will be enriched by the AgentService after the agent response
   return {
     progressMap: {},
     messages: [
-      ...state.messages,
+      ...currentMessages,
       new AIMessage('Progress data will be handled by the web application')
     ]
   };
@@ -154,7 +164,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
     return {
       schema: universalSchema,
       messages: [
-        ...state.messages,
+        ...Array.isArray(state.messages) ? state.messages : [],
         new AIMessage(`Generated schema with ${cardItems.length} cards for ${state.tenantKey}`)
       ]
     };
@@ -184,7 +194,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
     return {
       schema: fallbackSchema,
       messages: [
-        ...state.messages,
+        ...Array.isArray(state.messages) ? state.messages : [],
         new AIMessage(`Error generating schema: ${errorMessage}`)
       ]
     };

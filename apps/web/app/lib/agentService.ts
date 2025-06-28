@@ -401,8 +401,15 @@ export class AgentService {
       const requestBody = {
         threadId,
         input: {
-          ...request,
-          messages: 1 // Simple input to trigger agent
+          messages: [{
+            role: 'user',
+            content: request.message
+          }],
+          // Flatten context to root level for easier access in agent
+          userId: request.userId,
+          tenantKey: request.tenantKey,
+          navOptionId: request.navOptionId,
+          agentConfig: agent.config
         }
       };
 
