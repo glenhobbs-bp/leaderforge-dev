@@ -6,13 +6,37 @@
 import { StateGraph, Annotation } from "@langchain/langgraph";
 import { BaseMessage, AIMessage } from "@langchain/core/messages";
 
+// Environment-aware web app URL configuration
+function getWebAppUrl(): string {
+  // Check if we're in production (Render deployment)
+  const isProduction = process.env.NODE_ENV === 'production' ||
+                      process.env.RENDER === 'true' ||
+                      process.env.VERCEL_ENV === 'production';
+
+  // Allow override via environment variable
+  if (process.env.WEB_APP_URL) {
+    return process.env.WEB_APP_URL;
+  }
+
+  // Production URL (Vercel deployment)
+  if (isProduction) {
+    return 'https://leaderforge-dev-web-l3u8.vercel.app';
+  }
+
+  // Development URL
+  return 'http://localhost:3000';
+}
+
 // Simple content fetching tool
 class TribeSocialContentTool {
   async getContentForContext(_tenantKey: string): Promise<any[]> {
-    console.log('[TribeSocialContentTool] Fetching from proxy: http://localhost:3000/api/tribe/content/99735660');
+    const webAppUrl = getWebAppUrl();
+    const apiUrl = `${webAppUrl}/api/tribe/content/99735660`;
+
+    console.log('[TribeSocialContentTool] Fetching from proxy:', apiUrl);
     console.log('[TribeSocialContentTool] Headers:', { Accept: 'application/json' });
 
-    const response = await fetch('http://localhost:3000/api/tribe/content/99735660', {
+    const response = await fetch(apiUrl, {
       headers: { Accept: 'application/json' }
     });
 
