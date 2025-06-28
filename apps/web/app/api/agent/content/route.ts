@@ -157,6 +157,9 @@ export async function POST(req: NextRequest) {
       LANGGRAPH_API_URL: ENV.LANGGRAPH_API_URL
     });
 
+    console.log('[API/agent/content] 🧪 TESTING: Local → Render connection');
+    console.log('[API/agent/content] Target URL:', ENV.LANGGRAPH_API_URL);
+
     // Prepare authentication headers to forward for server-side API calls
     const authHeaders: Record<string, string> = {};
     if (accessToken) {

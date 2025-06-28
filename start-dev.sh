@@ -77,28 +77,27 @@ if [ ! -d "agent" ]; then
     LANGGRAPH_PID="N/A"
 else
     echo "✅ Agent directory found!"
-    # Start LangGraph server
-    echo "Starting LangGraph server..."
-    cd agent
+    # Skip LangGraph server - using Render deployment instead
+    echo "🌐 Using Render-deployed LangGraph service instead of local server"
+    echo "🔗 LangGraph URL: https://leaderforge-langgraph-2.onrender.com"
+    LANGGRAPH_PID="N/A"
 
-    # Check if langgraph CLI is available
-    if ! command -v npx &> /dev/null; then
-        echo "❌ Error: npx not found"
-        read -p "Press Enter to exit..."
-        exit 1
-    fi
-
-    echo "Running: npx @langchain/langgraph-cli dev --host 127.0.0.1 --port 8000"
-    # Pass environment variables from .env.local to the LangGraph server
-    if [ -f "../.env.local" ]; then
-        export $(grep -v '^#' ../.env.local | xargs)
-    fi
-    npx @langchain/langgraph-cli dev --host 127.0.0.1 --port 8000 &
-    LANGGRAPH_PID=$!
-    echo "LangGraph server started with PID: $LANGGRAPH_PID"
-
-    # Return to project root
-    cd ..
+    # Comment out the local LangGraph startup code
+    # echo "Starting LangGraph server..."
+    # cd agent
+    # if ! command -v npx &> /dev/null; then
+    #     echo "❌ Error: npx not found"
+    #     read -p "Press Enter to exit..."
+    #     exit 1
+    # fi
+    # echo "Running: npx @langchain/langgraph-cli dev --host 127.0.0.1 --port 8000"
+    # if [ -f "../.env.local" ]; then
+    #     export $(grep -v '^#' ../.env.local | xargs)
+    # fi
+    # npx @langchain/langgraph-cli dev --host 127.0.0.1 --port 8000 &
+    # LANGGRAPH_PID=$!
+    # echo "LangGraph server started with PID: $LANGGRAPH_PID"
+    # cd ..
 fi
 
 # Wait for services to initialize
@@ -108,19 +107,12 @@ sleep 5
 # Test endpoints
 echo "Testing endpoints..."
 WEB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "000")
-if [ "$LANGGRAPH_PID" != "N/A" ]; then
-    LANGGRAPH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/info || echo "000")
-else
-    LANGGRAPH_STATUS="N/A"
-fi
+# Test Render-deployed LangGraph service
+RENDER_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://leaderforge-langgraph-2.onrender.com/health || echo "000")
 
 echo "📊 Service Status:"
 echo "  Web server (port 3000): HTTP $WEB_STATUS"
-if [ "$LANGGRAPH_PID" != "N/A" ]; then
-    echo "  LangGraph server (port 8000): HTTP $LANGGRAPH_STATUS"
-else
-    echo "  LangGraph server: Skipped"
-fi
+echo "  LangGraph server (Render): HTTP $RENDER_STATUS"
 
 # Save PIDs for easy cleanup later
 echo "$WEB_PID" > .web-dev.pid
@@ -131,9 +123,7 @@ fi
 echo ""
 echo "✅ Development environment ready!"
 echo "📱 Web: http://localhost:3000"
-if [ "$LANGGRAPH_PID" != "N/A" ]; then
-    echo "🤖 LangGraph: http://localhost:8000"
-fi
+echo "🤖 LangGraph: https://leaderforge-langgraph-2.onrender.com (Render deployment)"
 echo ""
 echo "🛑 To stop services, run: ./stop-dev.sh"
 echo "📋 To view logs, check the terminal output above"
