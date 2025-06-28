@@ -462,20 +462,33 @@ export class AgentService {
         if (statusResult.status === 'success') {
           const executionTime = Date.now() - parseInt(threadId.split('_')[1]);
 
+          // Defensive handling: LangGraph response format has changed over time
+          // Support both legacy 'values' and current 'result' formats
+          const responseData = statusResult.result || statusResult.values || {};
+          const schema = responseData.schema;
+          const agentName = responseData.agentName || agent.id;
+
           if (isDev) {
-            console.log(`[AgentService] LangGraph completed successfully in ${executionTime}ms, final state:`, statusResult.values);
+            console.log(`[AgentService] LangGraph completed successfully in ${executionTime}ms, final state:`, responseData);
+            console.log(`[AgentService] Response format detected:`, statusResult.result ? 'result' : statusResult.values ? 'values' : 'unknown');
+          }
+
+          if (!schema) {
+            console.warn(`[AgentService] No schema found in LangGraph response. Response structure:`, JSON.stringify(statusResult, null, 2));
+            throw new Error('LangGraph agent completed successfully but returned no schema');
           }
 
           return {
             type: 'content_schema',
-            content: statusResult.values.schema,
+            content: schema,
             metadata: {
               threadId,
               runId: actualRunId,
               agentId: agent.id,
-              agentName: statusResult.values.agentName || agent.id,
+              agentName,
               executionTime,
-              platform: 'langgraph-local'
+              platform: 'langgraph-local',
+              responseFormat: statusResult.result ? 'result' : 'values'
             }
           };
         } else if (statusResult.status === 'error') {
