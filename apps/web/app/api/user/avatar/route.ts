@@ -12,10 +12,15 @@ const AVATAR_CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
  */
 async function createServiceRoleSupabaseClient() {
   const { createClient } = await import('@supabase/supabase-js');
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing required Supabase environment variables for service role client');
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
 }
 
 export async function GET(req: NextRequest) {

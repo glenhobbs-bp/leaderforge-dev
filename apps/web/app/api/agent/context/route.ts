@@ -81,15 +81,20 @@ export async function POST(req: NextRequest) {
 
     console.log('[API] ✅ Authenticated user:', userId);
 
-    // If we used fallback authentication, create a service account client for database access
+    // Use authenticated client if available, otherwise use service account for DB access
     let dbClient = supabase;
     if (!session?.user?.id && userId) {
       console.log('[API] 🔧 Using service account client for database access (fallback auth)');
       const { createClient } = await import('@supabase/supabase-js');
-      dbClient = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
+
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+      if (!supabaseUrl || !supabaseServiceKey) {
+        throw new Error('Missing required Supabase environment variables for service role client');
+      }
+
+      dbClient = createClient(supabaseUrl, supabaseServiceKey);
     }
 
     // 🤖 AGENT-DRIVEN: Let the agent determine what context/UI to show
