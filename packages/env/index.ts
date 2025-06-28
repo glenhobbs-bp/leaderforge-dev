@@ -53,6 +53,10 @@ export const ENV = {
       return process.env.LANGGRAPH_URL;
     }
 
+    // TEMPORARY: Force use of Render service for local testing
+    // This will help us verify the Render service works before fixing Vercel
+    return 'https://leaderforge-langgraph-2.onrender.com';
+
     // Production environment detection - More robust for Vercel
     const isProduction =
       process.env.NODE_ENV === 'production' ||
