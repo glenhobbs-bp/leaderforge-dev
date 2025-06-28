@@ -80,15 +80,43 @@ The platform renders what agents determine is most valuable, not what developers
 - **Context Inheritance**: Organizational context flows down to teams and individuals
 - **Custom Content**: Organizations can add their own training materials and frameworks
 
+### Hierarchical Context & Prompting System
+Inspired by Anthropic Claude's "master prompt" capability, LeaderForge implements a sophisticated hierarchy of contextual intelligence that shapes every AI interaction:
+
+**Layer 1: LeaderForge Foundation Context**
+- Core leadership principles, methodologies, and frameworks
+- Universal approaches to leadership development and behavioral change
+- Base prompting that ensures all AI interactions are leadership-focused and valuable
+
+**Layer 2: Tenant/Organization Context**
+- Company-specific culture, values, and leadership philosophy
+- Organizational terminology, communication style, and decision-making processes
+- Custom frameworks and approaches unique to that organization
+- Equivalent to Claude's "master prompt" but for organizational leadership development
+
+**Layer 3: Team/Function Context**
+- Role-specific expertise and prompting ("do AI marketing", "engineering leadership", "sales enablement")
+- Team dynamics, challenges, and specific functional requirements
+- Function-specific tools, processes, and success metrics
+
+**Layer 4: Individual Context** (Dynamic)
+- Personal leadership style, preferences, and development goals
+- Current challenges, growth areas, and learning velocity
+- Individual progress patterns and contextual circumstances
+
+**Cascading Intelligence**: Every chat interaction, content generation, and AI response is automatically informed by all relevant context layers, ensuring organizational alignment while maintaining personal relevance.
+
 ## User Experience Vision
 
 ### Conversational Leadership Development
-Moving away from rigid traditional UIs toward natural, conversational interaction:
+Moving away from rigid traditional UIs toward natural, conversational interaction enhanced by hierarchical context:
 
-**Primary Chat Interface**: "Show me my team's progress on emotional intelligence development"
+**Context-Aware Chat Interface**: "Show me my team's progress on emotional intelligence development" → Response informed by LeaderForge methodologies, organizational culture, team dynamics, and individual needs
 **Micro-UI Responses**: Rich widgets showing team progress, individual insights, recommended actions
-**Context Continuity**: Conversations build on previous interactions and context
+**Hierarchical Context Integration**: Every conversation automatically incorporates all relevant context layers (LeaderForge → Organization → Team → Individual)
+**Context Continuity**: Conversations build on previous interactions and maintain contextual awareness
 **Multi-Modal Input**: Voice, text, and structured input seamlessly integrated
+**Function-Specific Activation**: Prompts like "do AI marketing" trigger specialized context and expertise
 
 ### Adaptive Journaling System
 Context-aware journaling that supports growth and reflection:
@@ -98,11 +126,17 @@ Context-aware journaling that supports growth and reflection:
 - Context-specific views (Leadership, Habits, Prayers, Testimonies for Brilliant tenant)
 - Cross-context insights and connections
 
+**Multi-Modal Capture**:
+- Speech-to-text transcription for easy voice capture
+- Text input for traditional journaling
+- Image/photo integration for visual reflection and documentation
+- Seamless switching between input modes
+
 **AI-Enhanced Reflection**:
-- Speech-to-text transcription for easy capture
 - Rich search: "Find where I wrote about 'a river that never runs dry'"
 - AI engagement: Summarize patterns, suggest blog posts, identify growth themes
 - Context connections: Link journal insights to training progress
+- Hierarchical context awareness in all AI interactions with journal content
 
 **Secure Local Storage**: Privacy-first approach with local encryption and offline access
 
@@ -136,9 +170,10 @@ Context-aware journaling that supports growth and reflection:
 - Dynamic forms and interactions generated from schema
 
 ### Context-Aware Data Model
-- Rich context metadata captured and utilized
-- Hierarchical permissions and data access
-- Multi-dimensional progress tracking
+- Rich context metadata captured and utilized across all hierarchy levels
+- Hierarchical permissions and data access (LeaderForge → Tenant → Team → Individual)
+- Multi-dimensional progress tracking with contextual correlation
+- Cascading prompt management and context inheritance system
 
 ### Integration-Ready Architecture
 - Tool-based agent integration system
@@ -182,10 +217,9 @@ Context-aware journaling that supports growth and reflection:
 ## Innovation Horizons
 
 ### Emerging Technologies
-- **MCP Server Integration**: Leverage Model Context Protocol for rich external integrations
+- **MCP Server Integration**: Leverage Model Context Protocol for rich external integrations and future opportunities for interconnection
 - **Advanced Analytics**: Predictive insights about leadership development needs
-- **VR/AR Integration**: Immersive leadership scenario training
-- **Biometric Integration**: Stress and engagement monitoring for learning optimization
+- **External System Integration**: Flexible integration approach through MCP architecture enables connection to yet-to-be-determined future platforms and capabilities
 
 ### Content Evolution
 - **AI Content Generation**: Agents creating contextual training materials
