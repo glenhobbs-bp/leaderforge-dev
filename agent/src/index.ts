@@ -51,7 +51,49 @@ class TribeSocialContentTool {
     const contents = (data.Contents || []) as Record<string, unknown>[];
     console.log('[TribeSocialContentTool] Extracted contents count:', contents.length);
 
-    return contents;
+    // Process image URLs for each content item (restore original logic)
+    const processedContents = contents.map((item: any) => {
+      // Image selection logic (restored from original TribeSocialContentTool)
+      let image: string | undefined = undefined;
+      if (item.collectionBGImage) {
+        image = `https://cdn.tribesocial.io/${item.collectionBGImage}`;
+      } else if (item.featuredImage) {
+        image = item.featuredImage.startsWith('http') ? item.featuredImage : `https://cdn.tribesocial.io/${item.featuredImage}`;
+      } else if (item.coverImage) {
+        image = item.coverImage.startsWith('http') ? item.coverImage : `https://cdn.tribesocial.io/${item.coverImage}`;
+      } else if (item.imageUrl && typeof item.imageUrl === 'string') {
+        image = item.imageUrl;
+      }
+
+      // Video URL logic (restored from original)
+      let videoUrl = undefined;
+      if (item.transcodingDataLP) {
+        try {
+          const transcoding = typeof item.transcodingDataLP === 'string' ? JSON.parse(item.transcodingDataLP) : item.transcodingDataLP;
+          if (transcoding && transcoding.hls) {
+            videoUrl = transcoding.hls.startsWith('http') ? transcoding.hls : `https://cdn.tribesocial.io/${transcoding.hls}`;
+          }
+        } catch {
+          // Ignore transcoding parsing errors
+        }
+      } else if (item.video) {
+        videoUrl = item.video.startsWith('http') ? item.video : `https://cdn.tribesocial.io/${item.video}`;
+      }
+
+      return {
+        ...item,
+        // Override with processed URLs
+        processedImage: image,
+        processedVideoUrl: videoUrl,
+        // Keep original fields for fallback
+        originalFeaturedImage: item.featuredImage,
+        originalCoverImage: item.coverImage,
+        originalImageUrl: item.imageUrl
+      };
+    });
+
+    console.log('[TribeSocialContentTool] Processed image URLs for', processedContents.length, 'items');
+    return processedContents;
   }
 }
 
@@ -119,18 +161,18 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
 
   try {
         // Transform content items to Card format
-    // @ts-ignore - Temporary disable for content item processing
+    // @ts-expect-error - Temporary disable for content item processing
     const cardItems = (state.contentList || []).map((content: any) => ({
         type: 'Card',
         id: `card-${content.props?.id || content.id}-${Date.now()}`,
         data: {
-          // Content data
-          imageUrl: content.props?.image || content.props?.imageUrl || content.imageUrl,
-          videoUrl: content.props?.videoUrl || content.videoUrl,
-          description: content.props?.description || content.description,
+          // Content data - use processed URLs
+          imageUrl: content.processedImage || content.props?.image || content.props?.imageUrl || content.imageUrl,
+          videoUrl: content.processedVideoUrl || content.props?.videoUrl || content.videoUrl,
+          description: content.props?.description || content.description || content.descriptionPlain,
           duration: content.props?.duration || content.duration,
-          featuredImage: content.props?.featuredImage || content.featuredImage,
-          coverImage: content.props?.coverImage || content.coverImage,
+          featuredImage: content.processedImage || content.props?.featuredImage || content.featuredImage,
+          coverImage: content.processedImage || content.props?.coverImage || content.coverImage,
         // Progress data (placeholder - will be enriched by web layer)
         progress: 0, // Will be replaced with real data by AgentService
         value: 0, // Will be replaced with real data by AgentService
@@ -150,9 +192,9 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             label: 'Watch Video',
             primary: true,
             parameters: {
-              videoUrl: content.props?.videoUrl || content.videoUrl,
+              videoUrl: content.processedVideoUrl || content.props?.videoUrl || content.videoUrl,
               title: content.props?.title || content.title,
-              poster: content.props?.image || content.props?.imageUrl || content.imageUrl
+              poster: content.processedImage || content.props?.image || content.props?.imageUrl || content.imageUrl
             }
           },
           {
