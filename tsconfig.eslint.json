@@ -5,6 +5,7 @@
     "apps/api/**/*",
     "packages/agent-core/**/*",
     "packages/asset-core/**/*",
+    "packages/env/**/*",
     "agent/**/*"
   ]
 }

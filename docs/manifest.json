@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-06-27T10:57:38.055Z",
+    "generated_at": "2025-06-28T00:08:25.541Z",
     "generator_version": "1.0.0",
-    "total_files": 239,
-    "total_size_bytes": 2100560,
+    "total_files": 253,
+    "total_size_bytes": 2248591,
     "file_types": {
-      ".ts": 107,
-      ".json": 16,
+      ".ts": 110,
+      ".json": 17,
       ".tsx": 33,
-      ".js": 2,
-      ".md": 80,
+      ".js": 10,
+      ".md": 82,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 140,
-      "API": 36,
-      "AI agent": 111,
+      "TypeScript": 143,
+      "API": 38,
+      "AI agent": 116,
       "React": 33,
       "React hooks": 23,
-      "Next.js API": 35,
-      "security": 61,
+      "Next.js API": 37,
+      "security": 62,
       "test": 10,
       "API endpoint": 3,
       "navigation state": 2,
@@ -40,7 +40,7 @@
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 30,
+      "utility": 31,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
@@ -51,7 +51,7 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 25,
+      "UI": 26,
       "navigation": 4,
       "context-based": 1,
       "UI component": 1,
@@ -65,7 +65,7 @@
       "SWR": 1,
       "database": 1,
       "database-driven": 1,
-      "documentation": 82,
+      "documentation": 84,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -84,7 +84,7 @@
         "TypeScript",
         "API"
       ],
-      "last_modified": "2025-06-01T11:14:57.833Z",
+      "last_modified": "2025-06-27T21:33:11.926Z",
       "size_bytes": 213,
       "hash": "7dea1a8e",
       "complexity": "low"
@@ -98,7 +98,7 @@
       "tags": [
         "API"
       ],
-      "last_modified": "2025-06-01T11:38:37.979Z",
+      "last_modified": "2025-06-27T21:33:11.927Z",
       "size_bytes": 201,
       "hash": "41e6c1b2"
     },
@@ -115,7 +115,7 @@
       "dependencies": [
         "next"
       ],
-      "last_modified": "2025-06-08T14:02:42.515Z",
+      "last_modified": "2025-06-27T21:33:11.928Z",
       "size_bytes": 1372,
       "hash": "8e5706ef",
       "complexity": "low"
@@ -129,7 +129,7 @@
       "tags": [
         "API"
       ],
-      "last_modified": "2025-06-01T11:14:57.833Z",
+      "last_modified": "2025-06-27T21:33:11.929Z",
       "size_bytes": 515,
       "hash": "c6c44fca"
     },
@@ -142,7 +142,7 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-05-31T10:19:39.136Z",
+      "last_modified": "2025-06-27T21:33:11.930Z",
       "size_bytes": 157,
       "hash": "885eeb80"
     },
@@ -155,7 +155,7 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-05-31T10:19:39.136Z",
+      "last_modified": "2025-06-27T21:33:11.930Z",
       "size_bytes": 704,
       "hash": "2a3e04c8"
     },
@@ -181,7 +181,7 @@
         "@copilotkit/sdk-js/langgraph",
         "@copilotkit/sdk-js/langgraph"
       ],
-      "last_modified": "2025-06-01T09:16:52.232Z",
+      "last_modified": "2025-06-27T21:33:11.932Z",
       "size_bytes": 3954,
       "hash": "e21efa97",
       "complexity": "medium"
@@ -195,7 +195,7 @@
       "tags": [
         "TypeScript"
       ],
-      "last_modified": "2025-05-31T10:19:39.133Z",
+      "last_modified": "2025-06-27T21:33:11.932Z",
       "size_bytes": 0,
       "hash": "e3b0c442",
       "complexity": "low"
@@ -207,7 +207,7 @@
       "extension": ".json",
       "purpose": "aka.ms/tsconfig to read more about this file */",
       "tags": [],
-      "last_modified": "2025-05-31T10:19:39.136Z",
+      "last_modified": "2025-06-27T21:33:11.932Z",
       "size_bytes": 12404,
       "hash": "2f2b7059"
     },
@@ -227,11 +227,12 @@
         "next/server",
         "next/headers",
         "../../../lib/supabaseServerClient",
-        "../../../lib/agentService"
+        "../../../lib/agentService",
+        "../../../../../../packages/env"
       ],
-      "last_modified": "2025-06-27T10:02:44.773Z",
-      "size_bytes": 6366,
-      "hash": "117ae817",
+      "last_modified": "2025-06-28T00:07:40.602Z",
+      "size_bytes": 6665,
+      "hash": "5869564b",
       "complexity": "medium"
     },
     {
@@ -253,7 +254,7 @@
         "../../../lib/types",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T10:03:13.488Z",
+      "last_modified": "2025-06-27T21:33:11.936Z",
       "size_bytes": 21958,
       "hash": "37129241",
       "complexity": "high"
@@ -275,7 +276,7 @@
       "exports": [
         "dynamic"
       ],
-      "last_modified": "2025-06-16T02:07:35.177Z",
+      "last_modified": "2025-06-27T21:33:11.937Z",
       "size_bytes": 1171,
       "hash": "7dfd1369",
       "complexity": "low"
@@ -294,7 +295,7 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-13T22:01:44.244Z",
+      "last_modified": "2025-06-27T21:33:11.937Z",
       "size_bytes": 1758,
       "hash": "2ee2e8a8",
       "complexity": "low"
@@ -317,7 +318,7 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-25T11:40:21.392Z",
+      "last_modified": "2025-06-27T21:33:11.938Z",
       "size_bytes": 1768,
       "hash": "0b8fd27f",
       "complexity": "low"
@@ -337,9 +338,30 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-19T01:39:21.137Z",
+      "last_modified": "2025-06-27T21:33:11.938Z",
       "size_bytes": 798,
       "hash": "af1b2088",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/check-progress-schema/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/check-progress-schema",
+      "extension": ".ts",
+      "purpose": "Try to get a sample record to see what columns exist",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-27T21:33:11.939Z",
+      "size_bytes": 2091,
+      "hash": "9b52dd8f",
       "complexity": "low"
     },
     {
@@ -359,7 +381,7 @@
         "next/headers",
         "../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-27T08:57:45.025Z",
+      "last_modified": "2025-06-27T21:33:11.939Z",
       "size_bytes": 1794,
       "hash": "c6e066f9",
       "complexity": "low"
@@ -379,7 +401,7 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-18T23:48:10.787Z",
+      "last_modified": "2025-06-27T21:33:11.940Z",
       "size_bytes": 5364,
       "hash": "62eb9d08",
       "complexity": "medium"
@@ -399,7 +421,7 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-18T23:48:12.865Z",
+      "last_modified": "2025-06-27T21:33:11.940Z",
       "size_bytes": 3320,
       "hash": "48ded82a",
       "complexity": "low"
@@ -419,7 +441,7 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-18T23:48:14.960Z",
+      "last_modified": "2025-06-27T21:33:11.941Z",
       "size_bytes": 2636,
       "hash": "00501a0a",
       "complexity": "low"
@@ -443,7 +465,7 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-21T00:59:16.138Z",
+      "last_modified": "2025-06-27T21:33:11.942Z",
       "size_bytes": 1457,
       "hash": "a72ba2b1",
       "complexity": "low"
@@ -464,7 +486,7 @@
         "next/server",
         "../../../lib/entitlementService"
       ],
-      "last_modified": "2025-06-18T23:47:33.331Z",
+      "last_modified": "2025-06-27T21:33:11.942Z",
       "size_bytes": 970,
       "hash": "90daa89d",
       "complexity": "low"
@@ -488,9 +510,9 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-25T11:40:19.533Z",
-      "size_bytes": 3765,
-      "hash": "8f93d1d6",
+      "last_modified": "2025-06-27T21:33:11.943Z",
+      "size_bytes": 4580,
+      "hash": "1e08699e",
       "complexity": "medium"
     },
     {
@@ -511,7 +533,7 @@
         "../../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-21T00:59:11.708Z",
+      "last_modified": "2025-06-27T21:33:11.943Z",
       "size_bytes": 2061,
       "hash": "b4cab1cb",
       "complexity": "low"
@@ -534,7 +556,7 @@
         "../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-18T18:07:44.210Z",
+      "last_modified": "2025-06-27T21:33:11.944Z",
       "size_bytes": 3685,
       "hash": "00c75143",
       "complexity": "low"
@@ -557,7 +579,7 @@
         "../../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-18T18:38:24.097Z",
+      "last_modified": "2025-06-27T21:33:11.944Z",
       "size_bytes": 2721,
       "hash": "b7c68dca",
       "complexity": "low"
@@ -581,7 +603,7 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-25T13:43:25.286Z",
+      "last_modified": "2025-06-27T21:33:11.945Z",
       "size_bytes": 3199,
       "hash": "20a6115b",
       "complexity": "low"
@@ -604,7 +626,7 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-18T17:53:40.795Z",
+      "last_modified": "2025-06-27T21:33:11.945Z",
       "size_bytes": 2296,
       "hash": "1b5c3412",
       "complexity": "low"
@@ -627,7 +649,7 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T16:43:56.982Z",
+      "last_modified": "2025-06-27T21:33:11.946Z",
       "size_bytes": 4710,
       "hash": "ed4b9b12",
       "complexity": "medium"
@@ -649,7 +671,7 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T16:25:08.814Z",
+      "last_modified": "2025-06-27T21:33:11.947Z",
       "size_bytes": 1886,
       "hash": "e003a35b",
       "complexity": "low"
@@ -671,7 +693,7 @@
         "next/headers",
         "../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-25T20:09:22.738Z",
+      "last_modified": "2025-06-27T21:33:11.948Z",
       "size_bytes": 3374,
       "hash": "9b108bb9",
       "complexity": "medium"
@@ -694,7 +716,7 @@
         "@supabase/ssr",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T20:19:48.840Z",
+      "last_modified": "2025-06-27T21:33:11.948Z",
       "size_bytes": 2949,
       "hash": "82916d92",
       "complexity": "medium"
@@ -716,7 +738,7 @@
         "@supabase/ssr",
         "next/headers"
       ],
-      "last_modified": "2025-06-25T20:09:24.292Z",
+      "last_modified": "2025-06-27T21:33:11.948Z",
       "size_bytes": 2987,
       "hash": "9156884a",
       "complexity": "medium"
@@ -739,7 +761,7 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T20:45:27.253Z",
+      "last_modified": "2025-06-27T21:33:11.949Z",
       "size_bytes": 2012,
       "hash": "853fdec1",
       "complexity": "low"
@@ -760,7 +782,7 @@
         "next/server",
         "../../../lib/userProgressService"
       ],
-      "last_modified": "2025-06-23T02:29:40.951Z",
+      "last_modified": "2025-06-27T21:33:11.950Z",
       "size_bytes": 2391,
       "hash": "50da16ab",
       "complexity": "low"
@@ -779,7 +801,7 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-21T00:59:22.243Z",
+      "last_modified": "2025-06-27T21:33:11.951Z",
       "size_bytes": 1594,
       "hash": "cc54b516",
       "complexity": "low"
@@ -802,7 +824,7 @@
         "../../lib/supabaseServerClient",
         "../../../../../packages/agent-core/tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-24T09:43:51.063Z",
+      "last_modified": "2025-06-27T21:33:11.952Z",
       "size_bytes": 6684,
       "hash": "715acc4d",
       "complexity": "medium"
@@ -828,7 +850,7 @@
         "next/headers",
         "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-27T10:02:50.580Z",
+      "last_modified": "2025-06-27T21:33:11.954Z",
       "size_bytes": 2797,
       "hash": "7027abf6",
       "complexity": "low"
@@ -854,7 +876,7 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-06-27T08:52:00.271Z",
+      "last_modified": "2025-06-27T21:33:11.955Z",
       "size_bytes": 5632,
       "hash": "0900febc",
       "complexity": "medium"
@@ -880,9 +902,30 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-06-27T08:51:54.259Z",
+      "last_modified": "2025-06-27T21:33:11.956Z",
       "size_bytes": 3942,
       "hash": "fe21d067",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/user/[user_id]/progress-batch/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/user/[user_id]/progress-batch",
+      "extension": ".ts",
+      "purpose": "Batch Video Progress API Route",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-27T21:33:11.960Z",
+      "size_bytes": 3300,
+      "hash": "82bdbe60",
       "complexity": "medium"
     },
     {
@@ -905,7 +948,7 @@
         "next/headers",
         "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-27T08:51:58.776Z",
+      "last_modified": "2025-06-27T21:33:11.961Z",
       "size_bytes": 1984,
       "hash": "1dbc176a",
       "complexity": "low"
@@ -927,7 +970,7 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T09:25:49.889Z",
+      "last_modified": "2025-06-27T21:33:11.962Z",
       "size_bytes": 9980,
       "hash": "c38d60b5",
       "complexity": "medium"
@@ -951,7 +994,7 @@
       "exports": [
         "CopilotKitPage"
       ],
-      "last_modified": "2025-06-01T09:16:52.264Z",
+      "last_modified": "2025-06-27T21:33:11.963Z",
       "size_bytes": 5827,
       "hash": "2e3a961d",
       "complexity": "medium"
@@ -974,7 +1017,7 @@
       "exports": [
         "CopilotKitProvider"
       ],
-      "last_modified": "2025-06-19T19:58:20.768Z",
+      "last_modified": "2025-06-27T21:33:11.933Z",
       "size_bytes": 302,
       "hash": "38ac2445",
       "complexity": "low"
@@ -996,7 +1039,7 @@
         "../../components/SupabaseProvider",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-25T01:34:53.365Z",
+      "last_modified": "2025-06-27T21:33:11.963Z",
       "size_bytes": 2967,
       "hash": "e521a189",
       "complexity": "medium"
@@ -1026,7 +1069,7 @@
         "../lib/entitlementService",
         "../lib/tenantService"
       ],
-      "last_modified": "2025-06-25T13:43:22.375Z",
+      "last_modified": "2025-06-27T21:33:11.964Z",
       "size_bytes": 3677,
       "hash": "6ec3fef3",
       "complexity": "medium"
@@ -1050,7 +1093,7 @@
       "exports": [
         "useContentForContext"
       ],
-      "last_modified": "2025-06-09T23:06:18.650Z",
+      "last_modified": "2025-06-27T21:33:11.967Z",
       "size_bytes": 771,
       "hash": "2e95708e",
       "complexity": "low"
@@ -1074,7 +1117,7 @@
       "exports": [
         "useContextConfig"
       ],
-      "last_modified": "2025-06-10T00:49:13.897Z",
+      "last_modified": "2025-06-27T21:33:11.977Z",
       "size_bytes": 745,
       "hash": "909a915b",
       "complexity": "low"
@@ -1098,7 +1141,7 @@
       "exports": [
         "useNavForContext"
       ],
-      "last_modified": "2025-06-09T23:06:20.709Z",
+      "last_modified": "2025-06-27T21:33:11.979Z",
       "size_bytes": 735,
       "hash": "33d36a73",
       "complexity": "low"
@@ -1124,7 +1167,7 @@
         "./useUserPreferences",
         "../lib/types"
       ],
-      "last_modified": "2025-06-27T10:03:10.096Z",
+      "last_modified": "2025-06-27T21:33:11.981Z",
       "size_bytes": 2804,
       "hash": "9ab41e57",
       "complexity": "low"
@@ -1148,7 +1191,7 @@
       "exports": [
         "useOrgEntitlements"
       ],
-      "last_modified": "2025-06-09T23:03:35.809Z",
+      "last_modified": "2025-06-27T21:33:11.982Z",
       "size_bytes": 634,
       "hash": "b85f5bff",
       "complexity": "low"
@@ -1171,7 +1214,7 @@
       "exports": [
         "useProvisioningAction"
       ],
-      "last_modified": "2025-06-09T23:06:25.268Z",
+      "last_modified": "2025-06-27T21:33:11.984Z",
       "size_bytes": 627,
       "hash": "8b05409b",
       "complexity": "low"
@@ -1192,7 +1235,7 @@
         "react",
         "../lib/userProgressService.client"
       ],
-      "last_modified": "2025-06-23T15:04:24.195Z",
+      "last_modified": "2025-06-27T21:33:11.986Z",
       "size_bytes": 9208,
       "hash": "08ddea84",
       "complexity": "high"
@@ -1216,7 +1259,7 @@
       "exports": [
         "useUserEntitlements"
       ],
-      "last_modified": "2025-06-09T21:54:45.314Z",
+      "last_modified": "2025-06-27T21:33:11.990Z",
       "size_bytes": 639,
       "hash": "6fdd3f0a",
       "complexity": "low"
@@ -1244,7 +1287,7 @@
       "exports": [
         "useUserPreferences"
       ],
-      "last_modified": "2025-06-26T12:33:08.236Z",
+      "last_modified": "2025-06-27T21:33:11.991Z",
       "size_bytes": 2553,
       "hash": "7f950c50",
       "complexity": "low"
@@ -1271,7 +1314,7 @@
         "./useUserPreferences",
         "../lib/types"
       ],
-      "last_modified": "2025-06-21T16:28:19.833Z",
+      "last_modified": "2025-06-27T21:33:11.991Z",
       "size_bytes": 4614,
       "hash": "2c8c5c48",
       "complexity": "medium"
@@ -1298,7 +1341,7 @@
       "exports": [
         "metadata"
       ],
-      "last_modified": "2025-06-27T10:51:30.605Z",
+      "last_modified": "2025-06-27T21:33:11.992Z",
       "size_bytes": 1184,
       "hash": "d6d38e4c",
       "complexity": "low"
@@ -1316,11 +1359,11 @@
       ],
       "dependencies": [
         "@supabase/supabase-js",
-        "../../../../packages/agent-core/tools/UserProgressTool"
+        "../../../../packages/env"
       ],
-      "last_modified": "2025-06-27T10:43:04.293Z",
-      "size_bytes": 12296,
-      "hash": "71ad92ff",
+      "last_modified": "2025-06-28T00:07:38.381Z",
+      "size_bytes": 19302,
+      "hash": "616ad5b2",
       "complexity": "high"
     },
     {
@@ -1337,7 +1380,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-18T18:38:35.649Z",
+      "last_modified": "2025-06-27T21:33:11.993Z",
       "size_bytes": 2902,
       "hash": "94977994",
       "complexity": "low"
@@ -1356,7 +1399,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-18T17:37:57.127Z",
+      "last_modified": "2025-06-27T21:33:11.993Z",
       "size_bytes": 1000,
       "hash": "b8581b84",
       "complexity": "low"
@@ -1374,7 +1417,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-18T17:40:27.235Z",
+      "last_modified": "2025-06-27T21:33:11.993Z",
       "size_bytes": 1036,
       "hash": "937e3aa0",
       "complexity": "low"
@@ -1393,7 +1436,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-18T17:39:08.983Z",
+      "last_modified": "2025-06-27T21:33:11.994Z",
       "size_bytes": 842,
       "hash": "665835db",
       "complexity": "low"
@@ -1412,7 +1455,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-18T17:41:34.774Z",
+      "last_modified": "2025-06-27T21:33:11.995Z",
       "size_bytes": 982,
       "hash": "8f512b8b",
       "complexity": "low"
@@ -1428,7 +1471,7 @@
         "utility",
         "security"
       ],
-      "last_modified": "2025-06-11T21:04:52.032Z",
+      "last_modified": "2025-06-27T21:33:11.999Z",
       "size_bytes": 795,
       "hash": "381dab26",
       "complexity": "low"
@@ -1443,7 +1486,7 @@
         "TypeScript",
         "utility"
       ],
-      "last_modified": "2025-06-11T21:05:04.070Z",
+      "last_modified": "2025-06-27T21:33:12.001Z",
       "size_bytes": 994,
       "hash": "8a453f1e",
       "complexity": "low"
@@ -1466,7 +1509,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-06-21T12:17:54.430Z",
+      "last_modified": "2025-06-27T21:33:12.002Z",
       "size_bytes": 2197,
       "hash": "10c21d3d",
       "complexity": "low"
@@ -1492,7 +1535,7 @@
       "exports": [
         "authService"
       ],
-      "last_modified": "2025-06-21T12:17:19.447Z",
+      "last_modified": "2025-06-27T21:33:12.003Z",
       "size_bytes": 1504,
       "hash": "801d4098",
       "complexity": "low"
@@ -1519,7 +1562,7 @@
       "exports": [
         "batchService"
       ],
-      "last_modified": "2025-06-25T13:43:27.036Z",
+      "last_modified": "2025-06-27T21:33:12.003Z",
       "size_bytes": 6079,
       "hash": "d7e9a7ab",
       "complexity": "medium"
@@ -1543,7 +1586,7 @@
       "exports": [
         "contentService"
       ],
-      "last_modified": "2025-06-25T12:06:07.454Z",
+      "last_modified": "2025-06-27T21:33:12.004Z",
       "size_bytes": 4546,
       "hash": "66f1c950",
       "complexity": "medium"
@@ -1566,7 +1609,7 @@
       "exports": [
         "tenantService"
       ],
-      "last_modified": "2025-06-25T13:43:14.801Z",
+      "last_modified": "2025-06-27T21:33:12.005Z",
       "size_bytes": 2323,
       "hash": "08216892",
       "complexity": "low"
@@ -1589,7 +1632,7 @@
       "exports": [
         "entitlementService"
       ],
-      "last_modified": "2025-06-25T12:05:47.751Z",
+      "last_modified": "2025-06-27T21:33:12.005Z",
       "size_bytes": 5329,
       "hash": "dd4df464",
       "complexity": "medium"
@@ -1606,7 +1649,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-25T13:43:17.250Z",
+      "last_modified": "2025-06-27T21:33:12.006Z",
       "size_bytes": 616,
       "hash": "af4f8e02",
       "complexity": "low"
@@ -1630,7 +1673,7 @@
       "exports": [
         "navService"
       ],
-      "last_modified": "2025-06-25T12:05:45.434Z",
+      "last_modified": "2025-06-27T21:33:12.006Z",
       "size_bytes": 5237,
       "hash": "04b9f33f",
       "complexity": "medium"
@@ -1645,7 +1688,7 @@
         "TypeScript",
         "utility"
       ],
-      "last_modified": "2025-06-27T02:17:53.337Z",
+      "last_modified": "2025-06-27T21:33:12.010Z",
       "size_bytes": 3130,
       "hash": "7317ce18",
       "complexity": "medium"
@@ -1667,7 +1710,7 @@
       "exports": [
         "organizationService"
       ],
-      "last_modified": "2025-06-18T17:47:31.264Z",
+      "last_modified": "2025-06-27T21:33:12.011Z",
       "size_bytes": 3010,
       "hash": "89c4895d",
       "complexity": "low"
@@ -1690,7 +1733,7 @@
       "exports": [
         "provisioningService"
       ],
-      "last_modified": "2025-06-18T17:45:43.085Z",
+      "last_modified": "2025-06-27T21:33:12.011Z",
       "size_bytes": 3247,
       "hash": "eafdf1e2",
       "complexity": "low"
@@ -1705,10 +1748,30 @@
         "TypeScript",
         "utility"
       ],
-      "last_modified": "2025-06-18T18:48:29.471Z",
+      "last_modified": "2025-06-27T21:33:12.014Z",
       "size_bytes": 3899,
       "hash": "1a1b68de",
       "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/lib/supabaseClient.js",
+      "name": "supabaseClient.js",
+      "directory": "apps/web/app/lib",
+      "extension": ".js",
+      "purpose": "Client-side Supabase client for auth and real-time APIs",
+      "tags": [
+        "utility"
+      ],
+      "dependencies": [
+        "@supabase/ssr"
+      ],
+      "exports": [
+        "supabase"
+      ],
+      "last_modified": "2025-06-27T21:43:32.325Z",
+      "size_bytes": 457,
+      "hash": "ec3e12c1",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/lib/supabaseClient.ts",
@@ -1726,7 +1789,7 @@
       "exports": [
         "supabase"
       ],
-      "last_modified": "2025-06-13T20:42:07.288Z",
+      "last_modified": "2025-06-27T21:33:12.016Z",
       "size_bytes": 462,
       "hash": "4c1424bc",
       "complexity": "low"
@@ -1749,7 +1812,7 @@
       "exports": [
         "createSupabaseServerClient"
       ],
-      "last_modified": "2025-06-27T08:57:54.646Z",
+      "last_modified": "2025-06-27T21:33:12.019Z",
       "size_bytes": 3630,
       "hash": "dfae8903",
       "complexity": "medium"
@@ -1770,7 +1833,7 @@
       "exports": [
         "tenantService"
       ],
-      "last_modified": "2025-06-25T13:58:43.927Z",
+      "last_modified": "2025-06-27T21:33:12.021Z",
       "size_bytes": 2318,
       "hash": "7c1b09fb",
       "complexity": "low"
@@ -1790,7 +1853,7 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-27T10:02:56.857Z",
+      "last_modified": "2025-06-27T21:33:12.025Z",
       "size_bytes": 4328,
       "hash": "0d56c604",
       "complexity": "medium"
@@ -1806,7 +1869,7 @@
         "utility",
         "AI agent"
       ],
-      "last_modified": "2025-06-25T17:58:26.706Z",
+      "last_modified": "2025-06-27T21:33:12.025Z",
       "size_bytes": 2319,
       "hash": "79ccdd63",
       "complexity": "low"
@@ -1822,7 +1885,7 @@
         "utility",
         "AI agent"
       ],
-      "last_modified": "2025-06-23T02:29:49.341Z",
+      "last_modified": "2025-06-27T21:33:12.027Z",
       "size_bytes": 7447,
       "hash": "972bba22",
       "complexity": "high"
@@ -1842,7 +1905,7 @@
         "./supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-22T20:45:30.111Z",
+      "last_modified": "2025-06-27T21:33:12.029Z",
       "size_bytes": 5224,
       "hash": "82eca00e",
       "complexity": "medium"
@@ -1862,7 +1925,7 @@
         "TypeScript",
         "utility"
       ],
-      "last_modified": "2025-06-27T10:02:53.859Z",
+      "last_modified": "2025-06-27T21:33:12.031Z",
       "size_bytes": 8476,
       "hash": "112aaa35",
       "complexity": "medium"
@@ -1884,7 +1947,7 @@
       "exports": [
         "cn"
       ],
-      "last_modified": "2025-06-01T09:16:52.280Z",
+      "last_modified": "2025-06-27T21:33:12.034Z",
       "size_bytes": 169,
       "hash": "d1f1e0d6",
       "complexity": "low"
@@ -1915,7 +1978,7 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-06-22T05:53:48.886Z",
+      "last_modified": "2025-06-27T21:33:12.039Z",
       "size_bytes": 5877,
       "hash": "ed489e69",
       "complexity": "medium"
@@ -1935,7 +1998,7 @@
         "next/headers",
         "next/navigation"
       ],
-      "last_modified": "2025-06-14T03:08:54.914Z",
+      "last_modified": "2025-06-27T21:33:12.042Z",
       "size_bytes": 555,
       "hash": "e2e6c851",
       "complexity": "low"
@@ -1958,7 +2021,7 @@
       "exports": [
         "QueryClientProvider"
       ],
-      "last_modified": "2025-06-22T05:16:45.727Z",
+      "last_modified": "2025-06-27T21:33:11.933Z",
       "size_bytes": 1051,
       "hash": "c04a4448",
       "complexity": "low"
@@ -1981,7 +2044,7 @@
       "exports": [
         "TestWidgetsPage"
       ],
-      "last_modified": "2025-06-25T10:37:06.942Z",
+      "last_modified": "2025-06-27T21:33:12.044Z",
       "size_bytes": 10173,
       "hash": "33aea2ef",
       "complexity": "medium"
@@ -1993,7 +2056,7 @@
       "extension": ".json",
       "purpose": "ui.shadcn.com/schema.json\",",
       "tags": [],
-      "last_modified": "2025-05-31T10:19:17.507Z",
+      "last_modified": "2025-06-27T21:33:12.045Z",
       "size_bytes": 444,
       "hash": "b93fd4ca"
     },
@@ -2016,7 +2079,7 @@
       "exports": [
         "AIExperience"
       ],
-      "last_modified": "2025-06-18T18:33:43.310Z",
+      "last_modified": "2025-06-27T21:33:12.056Z",
       "size_bytes": 685,
       "hash": "615569af",
       "complexity": "low"
@@ -2038,7 +2101,7 @@
       "exports": [
         "ClientRoot"
       ],
-      "last_modified": "2025-06-01T09:16:52.310Z",
+      "last_modified": "2025-06-27T21:33:12.057Z",
       "size_bytes": 486,
       "hash": "619ba483",
       "complexity": "low"
@@ -2061,7 +2124,7 @@
         "@radix-ui/react-icons",
         "../widgets"
       ],
-      "last_modified": "2025-06-27T10:30:49.788Z",
+      "last_modified": "2025-06-27T21:33:12.060Z",
       "size_bytes": 3820,
       "hash": "d8babbaf",
       "complexity": "medium"
@@ -2094,9 +2157,9 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-27T10:30:52.913Z",
-      "size_bytes": 30375,
-      "hash": "b7816a51",
+      "last_modified": "2025-06-27T21:33:12.051Z",
+      "size_bytes": 30380,
+      "hash": "960a458e",
       "complexity": "high"
     },
     {
@@ -2120,7 +2183,7 @@
       "exports": [
         "SupabaseProvider"
       ],
-      "last_modified": "2025-06-19T21:48:22.922Z",
+      "last_modified": "2025-06-27T21:33:12.053Z",
       "size_bytes": 3425,
       "hash": "a89b2dbb",
       "complexity": "medium"
@@ -2139,7 +2202,7 @@
       "exports": [
         "ContentPanel"
       ],
-      "last_modified": "2025-06-02T16:31:38.565Z",
+      "last_modified": "2025-06-27T21:33:12.065Z",
       "size_bytes": 312,
       "hash": "2c291e49",
       "complexity": "low"
@@ -2162,7 +2225,7 @@
       "exports": [
         "ContextSelector"
       ],
-      "last_modified": "2025-06-10T21:32:18.605Z",
+      "last_modified": "2025-06-27T21:33:12.067Z",
       "size_bytes": 4160,
       "hash": "81f395e4",
       "complexity": "medium"
@@ -2187,7 +2250,7 @@
         "Dialog",
         "DialogContent"
       ],
-      "last_modified": "2025-06-26T17:59:00.197Z",
+      "last_modified": "2025-06-27T21:33:12.079Z",
       "size_bytes": 1586,
       "hash": "917d83a1",
       "complexity": "low"
@@ -2210,7 +2273,7 @@
         "lucide-react",
         "../../app/hooks/useVideoProgress"
       ],
-      "last_modified": "2025-06-23T10:59:56.648Z",
+      "last_modified": "2025-06-27T21:33:12.081Z",
       "size_bytes": 6961,
       "hash": "dd1da36d",
       "complexity": "medium"
@@ -2245,7 +2308,7 @@
         "hls.js",
         "@/components/ui/dialog"
       ],
-      "last_modified": "2025-06-06T14:12:26.147Z",
+      "last_modified": "2025-06-27T21:33:12.082Z",
       "size_bytes": 18568,
       "hash": "3f12e648",
       "complexity": "high"
@@ -2281,9 +2344,9 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-27T09:36:40.944Z",
-      "size_bytes": 19724,
-      "hash": "f64bd9cf",
+      "last_modified": "2025-06-27T21:33:12.069Z",
+      "size_bytes": 19804,
+      "hash": "466572e3",
       "complexity": "high"
     },
     {
@@ -2304,7 +2367,7 @@
       "exports": [
         "ProgressBar"
       ],
-      "last_modified": "2025-06-21T16:30:29.431Z",
+      "last_modified": "2025-06-27T21:33:12.071Z",
       "size_bytes": 1016,
       "hash": "761f054f",
       "complexity": "low"
@@ -2327,7 +2390,7 @@
         "ThemeProvider",
         "useTheme"
       ],
-      "last_modified": "2025-06-01T09:16:52.398Z",
+      "last_modified": "2025-06-27T21:33:12.073Z",
       "size_bytes": 375,
       "hash": "c1c983b8",
       "complexity": "low"
@@ -2353,7 +2416,7 @@
         "./ThemeContext",
         "../ai/AIExperience"
       ],
-      "last_modified": "2025-06-21T14:56:31.973Z",
+      "last_modified": "2025-06-27T21:33:12.075Z",
       "size_bytes": 2480,
       "hash": "8395c1fe",
       "complexity": "low"
@@ -2378,7 +2441,7 @@
         "@tanstack/react-query",
         "./NavPanel"
       ],
-      "last_modified": "2025-06-27T09:25:54.794Z",
+      "last_modified": "2025-06-27T21:33:12.077Z",
       "size_bytes": 18303,
       "hash": "de1e8ea5",
       "complexity": "high"
@@ -2397,7 +2460,7 @@
       "exports": [
         "xxxChatPanel"
       ],
-      "last_modified": "2025-06-01T09:16:52.407Z",
+      "last_modified": "2025-06-27T21:33:12.083Z",
       "size_bytes": 334,
       "hash": "4301a58a",
       "complexity": "low"
@@ -2419,7 +2482,7 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T10:30:55.977Z",
+      "last_modified": "2025-06-27T21:33:12.084Z",
       "size_bytes": 3302,
       "hash": "fa544818",
       "complexity": "medium"
@@ -2435,7 +2498,7 @@
         "UI"
       ],
       "dependencies": [
-        "@leaderforge/asset-core",
+        "./types",
         "./StatCard",
         "./Leaderboard",
         "./VideoList",
@@ -2447,9 +2510,9 @@
       "exports": [
         "widgetRegistry"
       ],
-      "last_modified": "2025-06-25T09:27:44.974Z",
-      "size_bytes": 5643,
-      "hash": "75536815",
+      "last_modified": "2025-06-27T21:33:12.098Z",
+      "size_bytes": 5627,
+      "hash": "e949a47c",
       "complexity": "medium"
     },
     {
@@ -2468,7 +2531,7 @@
         "react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T22:19:36.726Z",
+      "last_modified": "2025-06-27T21:33:12.086Z",
       "size_bytes": 4046,
       "hash": "27ce5077",
       "complexity": "medium"
@@ -2491,7 +2554,7 @@
         "lucide-react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T00:06:21.310Z",
+      "last_modified": "2025-06-27T21:33:12.085Z",
       "size_bytes": 11820,
       "hash": "ec200e3b",
       "complexity": "medium"
@@ -2513,7 +2576,7 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T10:30:59.647Z",
+      "last_modified": "2025-06-27T21:33:12.087Z",
       "size_bytes": 2554,
       "hash": "12b52db4",
       "complexity": "low"
@@ -2534,9 +2597,24 @@
         "react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T22:19:07.213Z",
+      "last_modified": "2025-06-27T21:33:12.088Z",
       "size_bytes": 2191,
       "hash": "db5a0bde",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/widgets/types.ts",
+      "name": "types.ts",
+      "directory": "apps/web/components/widgets",
+      "extension": ".ts",
+      "purpose": "Local Widget Types",
+      "tags": [
+        "TypeScript",
+        "UI"
+      ],
+      "last_modified": "2025-06-27T21:33:12.102Z",
+      "size_bytes": 1330,
+      "hash": "5077070b",
       "complexity": "low"
     },
     {
@@ -2556,7 +2634,7 @@
         "next/image",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-26T22:20:12.963Z",
+      "last_modified": "2025-06-27T21:33:12.090Z",
       "size_bytes": 4777,
       "hash": "ffac4eef",
       "complexity": "medium"
@@ -2580,9 +2658,9 @@
         "../../app/hooks/useUniversalProgress",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T10:30:43.771Z",
-      "size_bytes": 22481,
-      "hash": "89a73f56",
+      "last_modified": "2025-06-27T21:33:12.092Z",
+      "size_bytes": 22377,
+      "hash": "88ce951b",
       "complexity": "high"
     },
     {
@@ -2608,7 +2686,7 @@
         "./Panel",
         "./Grid"
       ],
-      "last_modified": "2025-06-27T10:30:46.651Z",
+      "last_modified": "2025-06-27T21:33:12.094Z",
       "size_bytes": 4246,
       "hash": "ce70b66a",
       "complexity": "medium"
@@ -2635,7 +2713,7 @@
       "exports": [
         "useAvatar"
       ],
-      "last_modified": "2025-06-27T09:22:21.839Z",
+      "last_modified": "2025-06-27T21:33:12.107Z",
       "size_bytes": 2100,
       "hash": "fb74cfc0",
       "complexity": "low"
@@ -2656,7 +2734,7 @@
       "exports": [
         "useContextConfig"
       ],
-      "last_modified": "2025-06-18T18:25:28.231Z",
+      "last_modified": "2025-06-27T21:33:12.108Z",
       "size_bytes": 537,
       "hash": "8a053f74",
       "complexity": "low"
@@ -2679,7 +2757,7 @@
       "exports": [
         "useContextList"
       ],
-      "last_modified": "2025-06-17T12:34:07.589Z",
+      "last_modified": "2025-06-27T21:33:12.108Z",
       "size_bytes": 883,
       "hash": "eee259c4",
       "complexity": "low"
@@ -2704,7 +2782,7 @@
       "dependencies": [
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-06-27T09:35:56.566Z",
+      "last_modified": "2025-06-27T21:33:12.108Z",
       "size_bytes": 1309,
       "hash": "e9f9507a",
       "complexity": "low"
@@ -2734,7 +2812,7 @@
         "../components/ui/NavPanel",
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-06-27T10:21:40.652Z",
+      "last_modified": "2025-06-27T21:33:12.109Z",
       "size_bytes": 5913,
       "hash": "e9a7b21a",
       "complexity": "medium"
@@ -2760,7 +2838,7 @@
       "exports": [
         "useNavOptions"
       ],
-      "last_modified": "2025-06-27T09:35:28.197Z",
+      "last_modified": "2025-06-27T21:33:12.109Z",
       "size_bytes": 1389,
       "hash": "86ca99f5",
       "complexity": "low"
@@ -2779,7 +2857,7 @@
         "fs/promises",
         "path"
       ],
-      "last_modified": "2025-06-01T09:16:52.411Z",
+      "last_modified": "2025-06-27T21:33:12.110Z",
       "size_bytes": 277,
       "hash": "d901b247",
       "complexity": "low"
@@ -2805,7 +2883,7 @@
       "extension": ".js",
       "purpose": "Root of apps/web",
       "tags": [],
-      "last_modified": "2025-06-22T06:20:42.646Z",
+      "last_modified": "2025-06-27T21:33:12.110Z",
       "size_bytes": 1090,
       "hash": "ef5c4975",
       "complexity": "low"
@@ -2819,9 +2897,9 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-05-31T10:40:14.481Z",
-      "size_bytes": 497458,
-      "hash": "c70dd064"
+      "last_modified": "2025-06-27T21:33:12.113Z",
+      "size_bytes": 552674,
+      "hash": "58f9103b"
     },
     {
       "path": "apps/web/package.json",
@@ -2829,12 +2907,10 @@
       "directory": "apps/web",
       "extension": ".json",
       "purpose": "—",
-      "tags": [
-        "AI agent"
-      ],
-      "last_modified": "2025-06-24T20:44:48.292Z",
-      "size_bytes": 1032,
-      "hash": "d21600b4"
+      "tags": [],
+      "last_modified": "2025-06-27T21:33:12.114Z",
+      "size_bytes": 1195,
+      "hash": "eb749469"
     },
     {
       "path": "apps/web/postcss.config.js",
@@ -2860,7 +2936,7 @@
       "dependencies": [
         "tailwindcss"
       ],
-      "last_modified": "2025-06-26T19:59:59.201Z",
+      "last_modified": "2025-06-27T21:33:12.171Z",
       "size_bytes": 2484,
       "hash": "d2c154a1",
       "complexity": "low"
@@ -2872,7 +2948,7 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-06-18T15:04:00.843Z",
+      "last_modified": "2025-06-27T21:33:12.173Z",
       "size_bytes": 184,
       "hash": "ab7736bb"
     },
@@ -2896,7 +2972,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T13:57:44.897Z",
+      "last_modified": "2025-06-27T21:33:12.187Z",
       "size_bytes": 3637,
       "hash": "85366393"
     },
@@ -2910,7 +2986,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-21T13:40:02.935Z",
+      "last_modified": "2025-06-27T21:33:12.188Z",
       "size_bytes": 6608,
       "hash": "f26b9d2e"
     },
@@ -2924,7 +3000,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T11:32:06.383Z",
+      "last_modified": "2025-06-27T21:33:12.189Z",
       "size_bytes": 10926,
       "hash": "59e7402f"
     },
@@ -2938,7 +3014,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-20T22:29:17.532Z",
+      "last_modified": "2025-06-27T21:33:12.190Z",
       "size_bytes": 4506,
       "hash": "a00417bd"
     },
@@ -2952,7 +3028,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-07T02:31:01.846Z",
+      "last_modified": "2025-06-27T21:33:12.191Z",
       "size_bytes": 2002,
       "hash": "5bbf598f"
     },
@@ -2966,7 +3042,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-07T10:22:05.416Z",
+      "last_modified": "2025-06-27T21:33:12.191Z",
       "size_bytes": 4718,
       "hash": "d37826df"
     },
@@ -2980,7 +3056,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T13:57:55.708Z",
+      "last_modified": "2025-06-27T21:33:12.193Z",
       "size_bytes": 3133,
       "hash": "34397f6c"
     },
@@ -2994,7 +3070,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:30:56.229Z",
+      "last_modified": "2025-06-27T21:33:12.195Z",
       "size_bytes": 7678,
       "hash": "e06eeff5"
     },
@@ -3010,7 +3086,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-09T23:21:22.211Z",
+      "last_modified": "2025-06-27T21:33:12.198Z",
       "size_bytes": 5143,
       "hash": "93ef4760"
     },
@@ -3024,7 +3100,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-20T10:57:39.304Z",
+      "last_modified": "2025-06-27T21:33:12.199Z",
       "size_bytes": 10733,
       "hash": "a2af5808"
     },
@@ -3038,7 +3114,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-03T10:07:59.668Z",
+      "last_modified": "2025-06-27T21:33:12.199Z",
       "size_bytes": 6891,
       "hash": "2fb781d5"
     },
@@ -3052,7 +3128,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-01T09:16:52.490Z",
+      "last_modified": "2025-06-27T21:33:12.200Z",
       "size_bytes": 19214,
       "hash": "b80b1952"
     },
@@ -3067,7 +3143,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-20T15:31:09.982Z",
+      "last_modified": "2025-06-27T21:33:12.200Z",
       "size_bytes": 18867,
       "hash": "8baa2d36"
     },
@@ -3082,7 +3158,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-20T15:31:18.370Z",
+      "last_modified": "2025-06-27T21:33:12.201Z",
       "size_bytes": 24628,
       "hash": "305794e1"
     },
@@ -3095,7 +3171,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-01T09:16:52.648Z",
+      "last_modified": "2025-06-27T21:33:12.201Z",
       "size_bytes": 2430,
       "hash": "9cbf446b"
     },
@@ -3108,7 +3184,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-15T15:51:52.288Z",
+      "last_modified": "2025-06-27T21:33:12.202Z",
       "size_bytes": 4515,
       "hash": "903c47a4"
     },
@@ -3123,7 +3199,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-01T09:16:52.667Z",
+      "last_modified": "2025-06-27T21:33:12.203Z",
       "size_bytes": 2817,
       "hash": "ed0db005"
     },
@@ -3138,7 +3214,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-02T10:37:42.431Z",
+      "last_modified": "2025-06-27T21:33:12.204Z",
       "size_bytes": 42798,
       "hash": "2e63c3ae"
     },
@@ -3152,7 +3228,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-01T09:16:52.747Z",
+      "last_modified": "2025-06-27T21:33:12.206Z",
       "size_bytes": 8281,
       "hash": "e9d815f0"
     },
@@ -3166,7 +3242,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-01T09:16:52.774Z",
+      "last_modified": "2025-06-27T21:33:12.208Z",
       "size_bytes": 14522,
       "hash": "58c24f33"
     },
@@ -3181,7 +3257,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T13:40:00.317Z",
+      "last_modified": "2025-06-27T21:33:12.210Z",
       "size_bytes": 5683,
       "hash": "d8beacd5"
     },
@@ -3194,7 +3270,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-01T09:16:52.805Z",
+      "last_modified": "2025-06-27T21:33:12.211Z",
       "size_bytes": 28966,
       "hash": "62be70e2"
     },
@@ -3208,7 +3284,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-01T09:16:52.820Z",
+      "last_modified": "2025-06-27T21:33:12.211Z",
       "size_bytes": 2717,
       "hash": "256bd01b"
     },
@@ -3223,7 +3299,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-01T09:16:52.837Z",
+      "last_modified": "2025-06-27T21:33:12.213Z",
       "size_bytes": 2941,
       "hash": "dae47f8d"
     },
@@ -3238,7 +3314,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-10T16:25:10.330Z",
+      "last_modified": "2025-06-27T21:33:12.215Z",
       "size_bytes": 17653,
       "hash": "f193505f"
     },
@@ -3253,7 +3329,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-01T09:16:52.879Z",
+      "last_modified": "2025-06-27T21:33:12.215Z",
       "size_bytes": 25735,
       "hash": "f269ccdf"
     },
@@ -3268,7 +3344,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T07:02:45.262Z",
+      "last_modified": "2025-06-27T21:33:12.216Z",
       "size_bytes": 13656,
       "hash": "172e1569"
     },
@@ -3282,7 +3358,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-01T09:16:52.906Z",
+      "last_modified": "2025-06-27T21:33:12.217Z",
       "size_bytes": 10142,
       "hash": "c97166bd"
     },
@@ -3296,7 +3372,7 @@
         "documentation",
         "security"
       ],
-      "last_modified": "2025-06-09T21:12:01.874Z",
+      "last_modified": "2025-06-27T21:33:12.218Z",
       "size_bytes": 4061,
       "hash": "669e1599"
     },
@@ -3311,7 +3387,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-20T15:30:54.869Z",
+      "last_modified": "2025-06-27T21:33:12.219Z",
       "size_bytes": 10066,
       "hash": "6fda1fd5"
     },
@@ -3326,7 +3402,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-10T01:09:17.841Z",
+      "last_modified": "2025-06-27T21:33:12.221Z",
       "size_bytes": 8445,
       "hash": "c9db900e"
     },
@@ -3339,7 +3415,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-13T11:24:04.634Z",
+      "last_modified": "2025-06-27T21:33:12.220Z",
       "size_bytes": 2383,
       "hash": "3b8170ed"
     },
@@ -3353,7 +3429,7 @@
         "documentation",
         "security"
       ],
-      "last_modified": "2025-06-01T19:01:38.088Z",
+      "last_modified": "2025-06-27T21:33:12.222Z",
       "size_bytes": 114724,
       "hash": "e0f32bfa"
     },
@@ -3366,7 +3442,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-01T09:16:52.918Z",
+      "last_modified": "2025-06-27T21:33:12.223Z",
       "size_bytes": 4581,
       "hash": "e86d0cb0"
     },
@@ -3380,7 +3456,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:00:02.400Z",
+      "last_modified": "2025-06-27T21:33:12.223Z",
       "size_bytes": 11331,
       "hash": "d4401db7"
     },
@@ -3394,7 +3470,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:40:12.533Z",
+      "last_modified": "2025-06-27T21:33:12.223Z",
       "size_bytes": 8352,
       "hash": "14b0c725"
     },
@@ -3417,7 +3493,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-21T12:24:56.779Z",
+      "last_modified": "2025-06-27T21:33:12.224Z",
       "size_bytes": 2955,
       "hash": "878235ec"
     },
@@ -3431,7 +3507,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-03T12:15:58.440Z",
+      "last_modified": "2025-06-27T21:33:12.224Z",
       "size_bytes": 2000,
       "hash": "9fedda61"
     },
@@ -3445,7 +3521,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-06T17:11:58.959Z",
+      "last_modified": "2025-06-27T21:33:12.225Z",
       "size_bytes": 2817,
       "hash": "976d630b"
     },
@@ -3458,7 +3534,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-03T12:16:01.748Z",
+      "last_modified": "2025-06-27T21:33:12.226Z",
       "size_bytes": 2001,
       "hash": "ac1b5720"
     },
@@ -3472,7 +3548,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-03T12:16:07.049Z",
+      "last_modified": "2025-06-27T21:33:12.227Z",
       "size_bytes": 2237,
       "hash": "318f8942"
     },
@@ -3485,7 +3561,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-03T12:16:03.443Z",
+      "last_modified": "2025-06-27T21:33:12.227Z",
       "size_bytes": 1356,
       "hash": "6952929e"
     },
@@ -3498,7 +3574,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-03T12:16:04.981Z",
+      "last_modified": "2025-06-27T21:33:12.228Z",
       "size_bytes": 1582,
       "hash": "e2fe58a1"
     },
@@ -3512,7 +3588,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-06T14:03:30.641Z",
+      "last_modified": "2025-06-27T21:33:12.228Z",
       "size_bytes": 2261,
       "hash": "02367c59"
     },
@@ -3526,7 +3602,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T13:57:51.641Z",
+      "last_modified": "2025-06-27T21:33:12.229Z",
       "size_bytes": 3234,
       "hash": "4db59066"
     },
@@ -3540,7 +3616,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:43:36.020Z",
+      "last_modified": "2025-06-27T21:33:12.187Z",
       "size_bytes": 6003,
       "hash": "1bbc7e0a"
     },
@@ -3554,7 +3630,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T13:58:02.549Z",
+      "last_modified": "2025-06-27T21:33:12.229Z",
       "size_bytes": 7052,
       "hash": "6f5f39e2"
     },
@@ -3568,7 +3644,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T13:57:48.757Z",
+      "last_modified": "2025-06-27T21:33:12.229Z",
       "size_bytes": 9303,
       "hash": "6338b74f"
     },
@@ -3582,7 +3658,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-22T20:45:47.921Z",
+      "last_modified": "2025-06-27T21:33:12.232Z",
       "size_bytes": 9348,
       "hash": "a48f13f5"
     },
@@ -3596,7 +3672,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:00:27.360Z",
+      "last_modified": "2025-06-27T21:33:12.236Z",
       "size_bytes": 9792,
       "hash": "5eff0ed0"
     },
@@ -3610,7 +3686,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:00:33.163Z",
+      "last_modified": "2025-06-27T21:33:12.236Z",
       "size_bytes": 9158,
       "hash": "bd8c92be"
     },
@@ -3624,7 +3700,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:25:14.374Z",
+      "last_modified": "2025-06-27T21:33:12.237Z",
       "size_bytes": 8632,
       "hash": "7be5a34d"
     },
@@ -3639,7 +3715,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T14:25:16.367Z",
+      "last_modified": "2025-06-27T21:33:12.238Z",
       "size_bytes": 9096,
       "hash": "fd52f086"
     },
@@ -3652,7 +3728,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T14:25:18.141Z",
+      "last_modified": "2025-06-27T21:33:12.238Z",
       "size_bytes": 9686,
       "hash": "e1712d8c"
     },
@@ -3665,7 +3741,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T14:25:20.806Z",
+      "last_modified": "2025-06-27T21:33:12.239Z",
       "size_bytes": 9350,
       "hash": "c0f3f432"
     },
@@ -3679,7 +3755,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:25:22.414Z",
+      "last_modified": "2025-06-27T21:33:12.240Z",
       "size_bytes": 9554,
       "hash": "542419f9"
     },
@@ -3693,7 +3769,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-25T10:16:28.542Z",
+      "last_modified": "2025-06-27T21:33:12.240Z",
       "size_bytes": 2877,
       "hash": "1606bd4b"
     },
@@ -3707,7 +3783,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-26T20:40:50.881Z",
+      "last_modified": "2025-06-27T21:33:12.241Z",
       "size_bytes": 7599,
       "hash": "b9c32ce8"
     },
@@ -3721,9 +3797,23 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T09:53:22.198Z",
+      "last_modified": "2025-06-27T21:33:12.242Z",
       "size_bytes": 8629,
       "hash": "81d1991f"
+    },
+    {
+      "path": "docs/architecture/adr/0013-production-deployment-architecture.md",
+      "name": "0013-production-deployment-architecture.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "leaderforge-langgraph-2.onrender.com`",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-28T00:08:15.060Z",
+      "size_bytes": 6147,
+      "hash": "ecc14506"
     },
     {
       "path": "docs/architecture/adr/adr-template.md",
@@ -3734,7 +3824,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T14:07:44.505Z",
+      "last_modified": "2025-06-27T21:33:12.243Z",
       "size_bytes": 3637,
       "hash": "85366393"
     },
@@ -3748,9 +3838,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T09:53:24.671Z",
-      "size_bytes": 3792,
-      "hash": "0c009aab"
+      "last_modified": "2025-06-28T00:08:17.978Z",
+      "size_bytes": 3919,
+      "hash": "adfcbd41"
     },
     {
       "path": "docs/architecture/architecture-compliance-checklist.md",
@@ -3763,7 +3853,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-26T20:50:42.561Z",
+      "last_modified": "2025-06-27T21:33:12.244Z",
       "size_bytes": 12086,
       "hash": "075383c1"
     },
@@ -3777,7 +3867,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T19:58:48.347Z",
+      "last_modified": "2025-06-27T21:33:12.244Z",
       "size_bytes": 11252,
       "hash": "f5e41ce8"
     },
@@ -3791,7 +3881,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:07:36.792Z",
+      "last_modified": "2025-06-27T21:33:12.245Z",
       "size_bytes": 10926,
       "hash": "59e7402f"
     },
@@ -3805,7 +3895,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-26T15:40:39.921Z",
+      "last_modified": "2025-06-27T21:33:12.233Z",
       "size_bytes": 7156,
       "hash": "972cd2ec"
     },
@@ -3820,7 +3910,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-27T10:57:20.978Z",
+      "last_modified": "2025-06-27T21:33:12.246Z",
       "size_bytes": 6375,
       "hash": "1900249a"
     },
@@ -3834,7 +3924,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-25T10:35:48.158Z",
+      "last_modified": "2025-06-27T21:33:12.248Z",
       "size_bytes": 2862,
       "hash": "8bae38bd"
     },
@@ -3848,7 +3938,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-26T20:51:03.241Z",
+      "last_modified": "2025-06-27T21:33:12.249Z",
       "size_bytes": 16743,
       "hash": "1f389fb1"
     },
@@ -3863,9 +3953,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T19:58:55.653Z",
-      "size_bytes": 25488,
-      "hash": "37f45659"
+      "last_modified": "2025-06-27T21:33:12.251Z",
+      "size_bytes": 35800,
+      "hash": "648e5d66"
     },
     {
       "path": "docs/engineering/implementation-plans/component-system-refactor-plan.md",
@@ -3877,9 +3967,23 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-25T10:40:37.445Z",
+      "last_modified": "2025-06-27T21:33:12.251Z",
       "size_bytes": 10728,
       "hash": "7520263c"
+    },
+    {
+      "path": "docs/engineering/performance-analysis-report.md",
+      "name": "performance-analysis-report.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-27T21:33:12.252Z",
+      "size_bytes": 11499,
+      "hash": "b6fe5928"
     },
     {
       "path": "docs/engineering/README.md",
@@ -3892,7 +3996,7 @@
         "Next.js API",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T10:56:31.731Z",
+      "last_modified": "2025-06-27T21:33:12.246Z",
       "size_bytes": 11698,
       "hash": "17cf591f"
     },
@@ -3906,7 +4010,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:49:21.501Z",
+      "last_modified": "2025-06-27T21:33:12.253Z",
       "size_bytes": 5990,
       "hash": "63efeaee"
     },
@@ -3919,7 +4023,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T15:49:21.501Z",
+      "last_modified": "2025-06-27T21:33:12.252Z",
       "size_bytes": 5705,
       "hash": "d026c8b0"
     },
@@ -3934,7 +4038,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-24T15:21:51.408Z",
+      "last_modified": "2025-06-27T21:33:12.254Z",
       "size_bytes": 11283,
       "hash": "bc9d5528"
     },
@@ -3947,7 +4051,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-24T15:43:31.236Z",
+      "last_modified": "2025-06-27T21:33:12.254Z",
       "size_bytes": 4777,
       "hash": "dd2a7e41"
     },
@@ -3962,9 +4066,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-27T02:44:55.095Z",
-      "size_bytes": 122616,
-      "hash": "c39ca8ba"
+      "last_modified": "2025-06-27T21:33:12.255Z",
+      "size_bytes": 124083,
+      "hash": "0fa0fe9c"
     },
     {
       "path": "docs/manifest.md",
@@ -3977,9 +4081,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-27T02:44:55.127Z",
-      "size_bytes": 46055,
-      "hash": "58e952f5"
+      "last_modified": "2025-06-27T21:33:12.256Z",
+      "size_bytes": 46501,
+      "hash": "961d647d"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -3990,7 +4094,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-26T16:07:06.064Z",
+      "last_modified": "2025-06-27T21:33:12.257Z",
       "size_bytes": 29556,
       "hash": "2a51764e"
     },
@@ -4004,7 +4108,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:29:28.340Z",
+      "last_modified": "2025-06-27T21:33:12.256Z",
       "size_bytes": 8383,
       "hash": "5434584f"
     },
@@ -4018,7 +4122,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:24:57.597Z",
+      "last_modified": "2025-06-27T21:33:12.258Z",
       "size_bytes": 3234,
       "hash": "4db59066"
     },
@@ -4032,7 +4136,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T14:40:01.795Z",
+      "last_modified": "2025-06-27T21:33:12.257Z",
       "size_bytes": 8697,
       "hash": "d45062de"
     },
@@ -4046,7 +4150,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-24T15:43:29.586Z",
+      "last_modified": "2025-06-27T21:33:12.233Z",
       "size_bytes": 6514,
       "hash": "4e1e780f"
     },
@@ -4065,7 +4169,7 @@
         "../tools/TribeSocialContentTool",
         "../tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-08T12:48:54.234Z",
+      "last_modified": "2025-06-27T21:33:12.265Z",
       "size_bytes": 1821,
       "hash": "0dc4cf7e",
       "complexity": "low"
@@ -4084,10 +4188,27 @@
         "../tools/TribeSocialContentTool",
         "../types/ComponentSchema"
       ],
-      "last_modified": "2025-06-08T14:21:01.190Z",
+      "last_modified": "2025-06-27T21:33:12.266Z",
       "size_bytes": 3169,
       "hash": "78f7daee",
       "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/agents/ProgressAwareAgent.js",
+      "name": "ProgressAwareAgent.js",
+      "directory": "packages/agent-core/agents",
+      "extension": ".js",
+      "purpose": "Progress-Aware Agent - Agent Integration for Universal Progress Tool",
+      "tags": [
+        "AI agent"
+      ],
+      "exports": [
+        "ProgressAwareAgent"
+      ],
+      "last_modified": "2025-06-27T21:43:32.351Z",
+      "size_bytes": 9633,
+      "hash": "8f47a671",
+      "complexity": "medium"
     },
     {
       "path": "packages/agent-core/agents/ProgressAwareAgent.ts",
@@ -4103,10 +4224,28 @@
         "../tools/ToolRegistry",
         "../tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-25T20:09:13.725Z",
+      "last_modified": "2025-06-27T21:33:12.266Z",
       "size_bytes": 10436,
       "hash": "42dc9b8c",
       "complexity": "high"
+    },
+    {
+      "path": "packages/agent-core/featureFlags.js",
+      "name": "featureFlags.js",
+      "directory": "packages/agent-core",
+      "extension": ".js",
+      "purpose": "app.posthog.com\";",
+      "tags": [],
+      "dependencies": [
+        "posthog-node"
+      ],
+      "exports": [
+        "client"
+      ],
+      "last_modified": "2025-06-27T21:43:32.344Z",
+      "size_bytes": 816,
+      "hash": "0748842a",
+      "complexity": "low"
     },
     {
       "path": "packages/agent-core/featureFlags.ts",
@@ -4123,7 +4262,7 @@
       "exports": [
         "client"
       ],
-      "last_modified": "2025-06-07T11:06:59.382Z",
+      "last_modified": "2025-06-27T21:33:12.266Z",
       "size_bytes": 938,
       "hash": "4ac2dd1a",
       "complexity": "low"
@@ -4138,7 +4277,7 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-25T10:01:24.918Z",
+      "last_modified": "2025-06-27T21:33:12.267Z",
       "size_bytes": 205,
       "hash": "cdc9a327",
       "complexity": "low"
@@ -4152,7 +4291,7 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-06-22T15:48:20.132Z",
+      "last_modified": "2025-06-27T21:33:12.267Z",
       "size_bytes": 262,
       "hash": "16e21e5f"
     },
@@ -4169,7 +4308,7 @@
       "exports": [
         "SchemaProcessor"
       ],
-      "last_modified": "2025-06-25T10:01:22.253Z",
+      "last_modified": "2025-06-27T21:33:12.267Z",
       "size_bytes": 10719,
       "hash": "606ad558",
       "complexity": "high"
@@ -4191,7 +4330,7 @@
         "../ToolRegistry",
         "../UserProgressTool"
       ],
-      "last_modified": "2025-06-22T20:46:22.731Z",
+      "last_modified": "2025-06-27T21:33:12.269Z",
       "size_bytes": 12591,
       "hash": "c777622a",
       "complexity": "high"
@@ -4210,7 +4349,7 @@
         "vitest",
         "../UserProgressTool"
       ],
-      "last_modified": "2025-06-22T16:13:19.249Z",
+      "last_modified": "2025-06-27T21:33:12.269Z",
       "size_bytes": 5711,
       "hash": "b3b70c1f",
       "complexity": "medium"
@@ -4229,10 +4368,32 @@
       "dependencies": [
         "vitest"
       ],
-      "last_modified": "2025-06-22T21:05:48.617Z",
+      "last_modified": "2025-06-27T21:33:12.269Z",
       "size_bytes": 11859,
       "hash": "4fb402dc",
       "complexity": "high"
+    },
+    {
+      "path": "packages/agent-core/tools/ToolRegistry.js",
+      "name": "ToolRegistry.js",
+      "directory": "packages/agent-core/tools",
+      "extension": ".js",
+      "purpose": "Note: This tool registry will be initialized with proper supabase client by the app",
+      "tags": [
+        "security"
+      ],
+      "dependencies": [
+        "../featureFlags",
+        "./UserProgressTool"
+      ],
+      "exports": [
+        "echoTool",
+        "universalProgressTool"
+      ],
+      "last_modified": "2025-06-27T21:43:32.347Z",
+      "size_bytes": 5848,
+      "hash": "e388c0dd",
+      "complexity": "medium"
     },
     {
       "path": "packages/agent-core/tools/ToolRegistry.ts",
@@ -4251,9 +4412,24 @@
       "exports": [
         "echoTool"
       ],
-      "last_modified": "2025-06-25T20:09:37.663Z",
+      "last_modified": "2025-06-27T21:33:12.268Z",
       "size_bytes": 5698,
       "hash": "75dc2ae9",
+      "complexity": "medium"
+    },
+    {
+      "path": "packages/agent-core/tools/TribeSocialContentTool.js",
+      "name": "TribeSocialContentTool.js",
+      "directory": "packages/agent-core/tools",
+      "extension": ".js",
+      "purpose": "TribeSocialContentTool",
+      "tags": [],
+      "exports": [
+        "TribeSocialContentTool"
+      ],
+      "last_modified": "2025-06-27T21:43:32.332Z",
+      "size_bytes": 7681,
+      "hash": "fff9d073",
       "complexity": "medium"
     },
     {
@@ -4269,10 +4445,27 @@
         "../types/ComponentSchema",
         "../../../apps/web/app/lib/supabaseClient"
       ],
-      "last_modified": "2025-06-19T01:31:41.576Z",
+      "last_modified": "2025-06-27T21:33:12.268Z",
       "size_bytes": 7157,
       "hash": "c8f1333a",
       "complexity": "medium"
+    },
+    {
+      "path": "packages/agent-core/tools/UserProgressTool.js",
+      "name": "UserProgressTool.js",
+      "directory": "packages/agent-core/tools",
+      "extension": ".js",
+      "purpose": "Agent-native, production-ready user progress tool for modular agent orchestration.",
+      "tags": [
+        "AI agent"
+      ],
+      "exports": [
+        "SupabaseUserProgressRepository"
+      ],
+      "last_modified": "2025-06-27T21:43:32.342Z",
+      "size_bytes": 18986,
+      "hash": "bb395585",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/tools/UserProgressTool.ts",
@@ -4284,7 +4477,7 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-26T12:28:20.287Z",
+      "last_modified": "2025-06-27T21:33:12.268Z",
       "size_bytes": 22366,
       "hash": "2a6d5df3",
       "complexity": "high"
@@ -4296,9 +4489,23 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-06-22T15:46:03.559Z",
+      "last_modified": "2025-06-27T21:33:12.270Z",
       "size_bytes": 328,
       "hash": "120170f3"
+    },
+    {
+      "path": "packages/agent-core/types/ComponentSchema.js",
+      "name": "ComponentSchema.js",
+      "directory": "packages/agent-core/types",
+      "extension": ".js",
+      "purpose": "ComponentSchema.ts",
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-06-27T21:43:32.323Z",
+      "size_bytes": 123,
+      "hash": "05221a13",
+      "complexity": "low"
     },
     {
       "path": "packages/agent-core/types/ComponentSchema.ts",
@@ -4313,9 +4520,21 @@
       "dependencies": [
         "./contentSchema"
       ],
-      "last_modified": "2025-06-06T18:33:45.310Z",
+      "last_modified": "2025-06-27T21:33:12.270Z",
       "size_bytes": 2084,
       "hash": "84c53703",
+      "complexity": "low"
+    },
+    {
+      "path": "packages/agent-core/types/contentSchema.js",
+      "name": "contentSchema.js",
+      "directory": "packages/agent-core/types",
+      "extension": ".js",
+      "purpose": "All schema types are props-wrapped. Do not use flat schemas.",
+      "tags": [],
+      "last_modified": "2025-06-27T21:43:32.322Z",
+      "size_bytes": 75,
+      "hash": "02a01b60",
       "complexity": "low"
     },
     {
@@ -4327,7 +4546,7 @@
       "tags": [
         "TypeScript"
       ],
-      "last_modified": "2025-06-03T11:37:39.185Z",
+      "last_modified": "2025-06-27T21:33:12.271Z",
       "size_bytes": 1183,
       "hash": "02cc0e76",
       "complexity": "low"
@@ -4345,7 +4564,7 @@
       "dependencies": [
         "../tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-22T20:45:36.268Z",
+      "last_modified": "2025-06-27T21:33:12.271Z",
       "size_bytes": 9159,
       "hash": "97a6b1e4",
       "complexity": "high"
@@ -4360,7 +4579,7 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-26T20:41:19.484Z",
+      "last_modified": "2025-06-27T21:33:12.271Z",
       "size_bytes": 6532,
       "hash": "a39916b9",
       "complexity": "medium"
@@ -4374,9 +4593,9 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-06-24T19:59:49.249Z",
-      "size_bytes": 685,
-      "hash": "5c5082e2"
+      "last_modified": "2025-06-27T21:33:12.272Z",
+      "size_bytes": 763,
+      "hash": "900657a7"
     },
     {
       "path": "packages/asset-core/src/index.ts",
@@ -4387,7 +4606,7 @@
       "tags": [
         "TypeScript"
       ],
-      "last_modified": "2025-06-24T20:44:53.010Z",
+      "last_modified": "2025-06-27T21:33:12.272Z",
       "size_bytes": 353,
       "hash": "26ceae40",
       "complexity": "low"
@@ -4404,7 +4623,7 @@
       "dependencies": [
         "../types/AssetMetadata"
       ],
-      "last_modified": "2025-06-24T20:40:49.139Z",
+      "last_modified": "2025-06-27T21:33:12.273Z",
       "size_bytes": 5937,
       "hash": "14590503",
       "complexity": "medium"
@@ -4423,9 +4642,9 @@
         "./AssetRegistry",
         "../types/WidgetSchema"
       ],
-      "last_modified": "2025-06-26T20:42:10.041Z",
-      "size_bytes": 5204,
-      "hash": "9b4ad801",
+      "last_modified": "2025-06-27T21:33:12.274Z",
+      "size_bytes": 5232,
+      "hash": "6f002b8e",
       "complexity": "medium"
     },
     {
@@ -4443,7 +4662,7 @@
       "exports": [
         "BaseAssetMetadataSchema"
       ],
-      "last_modified": "2025-06-24T20:40:34.102Z",
+      "last_modified": "2025-06-27T21:33:12.275Z",
       "size_bytes": 3018,
       "hash": "541e7c96",
       "complexity": "medium"
@@ -4466,7 +4685,7 @@
       "exports": [
         "WidgetMetadataSchema"
       ],
-      "last_modified": "2025-06-26T20:41:31.502Z",
+      "last_modified": "2025-06-27T21:33:12.275Z",
       "size_bytes": 4113,
       "hash": "4618f8a8",
       "complexity": "medium"
@@ -4478,29 +4697,30 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-06-24T19:59:52.985Z",
-      "size_bytes": 509,
-      "hash": "0c8892f2"
+      "last_modified": "2025-06-27T21:33:12.275Z",
+      "size_bytes": 650,
+      "hash": "3545029c"
     },
     {
       "path": "packages/env/index.ts",
       "name": "index.ts",
       "directory": "packages/env",
       "extension": ".ts",
-      "purpose": "—",
+      "purpose": "Environment Configuration",
       "tags": [
-        "TypeScript"
+        "TypeScript",
+        "AI agent"
       ],
       "dependencies": [
         "dotenv",
         "path"
       ],
       "exports": [
-        "env"
+        "ENV"
       ],
-      "last_modified": "2025-05-27T21:40:57.087Z",
-      "size_bytes": 271,
-      "hash": "7b37eb00",
+      "last_modified": "2025-06-28T00:07:33.936Z",
+      "size_bytes": 3555,
+      "hash": "0a3bd93c",
       "complexity": "low"
     },
     {
@@ -4513,6 +4733,17 @@
       "last_modified": "2025-05-27T21:40:57.087Z",
       "size_bytes": 90,
       "hash": "cec35a8a"
+    },
+    {
+      "path": "packages/env/tsconfig.json",
+      "name": "tsconfig.json",
+      "directory": "packages/env",
+      "extension": ".json",
+      "purpose": "—",
+      "tags": [],
+      "last_modified": "2025-06-27T21:33:12.276Z",
+      "size_bytes": 698,
+      "hash": "d64438fa"
     }
   ]
 }

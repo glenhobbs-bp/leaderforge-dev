@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
 import { AgentService } from '../../../lib/agentService';
+import { ENV } from '../../../../../../packages/env';
 
 /**
  * POST /api/agent/content
@@ -153,9 +154,9 @@ export async function POST(req: NextRequest) {
     }
 
     const agentService = new AgentService(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      process.env.LANGGRAPH_URL || 'http://localhost:8000',
+      ENV.SUPABASE_URL,
+      ENV.SUPABASE_SERVICE_ROLE_KEY,
+      ENV.LANGGRAPH_API_URL,
       authHeaders
     );
 

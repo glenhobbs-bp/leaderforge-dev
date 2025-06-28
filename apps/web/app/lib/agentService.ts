@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { UserProgressTool, SupabaseUserProgressRepository } from '../../../../packages/agent-core/tools/UserProgressTool';
+import { ENV } from '../../../../packages/env';
 
 /**
  * AgentService - Central service for invoking agents based on type
@@ -591,7 +591,7 @@ export class AgentService {
 
 // Singleton instance for the application
 export const agentService = new AgentService(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  process.env.LANGGRAPH_URL || 'http://localhost:8000'
+  ENV.SUPABASE_URL,
+  ENV.SUPABASE_SERVICE_ROLE_KEY,
+  ENV.LANGGRAPH_API_URL
 );

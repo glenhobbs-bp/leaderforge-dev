@@ -46,8 +46,21 @@ export const ENV = {
   SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY!,
 
-  // Agent configuration
-  LANGGRAPH_API_URL: process.env.LANGGRAPH_API_URL || 'http://127.0.0.1:8000',
+  // Agent configuration - Environment-aware URL selection
+  LANGGRAPH_API_URL: (() => {
+    // Explicit override takes precedence
+    if (process.env.LANGGRAPH_URL) {
+      return process.env.LANGGRAPH_URL;
+    }
+
+    // Production environment detection
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+      return 'https://leaderforge-langgraph-2.onrender.com';
+    }
+
+    // Development fallback
+    return 'http://127.0.0.1:8000';
+  })(),
 
   // External services
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY!,

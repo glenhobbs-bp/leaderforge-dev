@@ -2,254 +2,180 @@
 
 ## Architecture Overview
 
-LeaderForge uses a **two-service architecture**:
+LeaderForge uses a **two-service architecture** with automatic environment detection:
 
 1. **Web Application** (Next.js) → Deploy to **Vercel**
-2. **LangGraph Agent Service** → Deploy to **LangGraph Cloud** (recommended) or self-host
+2. **LangGraph Agent Service** → Deploy to **Render**
 
-The web app communicates with the LangGraph service via HTTP API calls.
+The system automatically detects production vs development environments and uses the appropriate service URLs.
 
-## 🏆 **Recommended: LangGraph Cloud**
+## 🏆 **Current Production Architecture: Vercel + Render**
 
-For most use cases, we recommend starting with **LangGraph Cloud** for faster deployment and better observability. See `LANGGRAPH_CLOUD_SETUP.md` for detailed instructions.
+### ✅ **Deployed Services**
+- **Web App**: `https://leaderforge.vercel.app` (Vercel)
+- **Agent Service**: `https://leaderforge-langgraph-2.onrender.com` (Render)
 
-### Quick LangGraph Cloud Setup
+### 🔧 **Automatic Environment Detection**
+The system automatically uses the correct URLs based on environment:
+- **Production**: `https://leaderforge-langgraph-2.onrender.com`
+- **Development**: `http://127.0.0.1:8000`
+- **Override**: Set `LANGGRAPH_URL` environment variable to override
+
+## 🚀 Quick Production Deployment
+
+### Prerequisites
+- GitHub repository connected to Vercel
+- GitHub repository connected to Render
+- All environment variables configured
+
+### Deployment Process
+1. **Push to main branch** - Both services auto-deploy
+2. **Vercel** deploys web app automatically
+3. **Render** deploys agent service automatically
+4. **Environment detection** handles URL configuration
+
+### No Manual Configuration Required
+- ✅ URLs are automatically configured for production
+- ✅ Development still uses localhost
+- ✅ Override capability available if needed
+
+## 📋 Service Configuration
+
+### Vercel (Web Application)
+**Repository**: Auto-deploy from `main` branch
+**Build Settings**:
+- Framework Preset: **Next.js**
+- Build Command: `npm run build`
+- Root Directory: `apps/web`
+- Node.js Version: **18.x**
+
+**Environment Variables**:
 ```bash
-# 1. Get API key from smith.langchain.com
-export LANGCHAIN_API_KEY="your-key"
-
-# 2. Deploy agent
-./deploy-langgraph-cloud.sh
-
-# 3. Update Vercel environment variables
-# 4. Redeploy Vercel
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+TRIBE_SOCIAL_TOKEN=your_tribe_token
+# LANGGRAPH_URL=custom_url  # Optional override
 ```
 
-## 🚀 Quick Deployment Steps
-
-### 1. Deploy LangGraph Service to Railway
-
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login to Railway
-railway login
-
-# Deploy the agent service
-railway up
-
-# Note the deployed URL (e.g., https://your-service.railway.app)
-```
-
-### 2. Update Vercel Environment Variables
-
-In your Vercel dashboard, add:
-
-```bash
-LANGGRAPH_URL=https://your-service.railway.app
-```
-
-### 3. Redeploy Vercel
-
-Push your changes to trigger a new Vercel deployment.
-
-## 📋 Detailed Setup
-
-### Railway Deployment
-
-1. **Create Railway Account**: Visit [railway.app](https://railway.app)
-
-2. **Deploy from GitHub**:
-   - Connect your GitHub repository
-   - Railway will auto-detect the `agent/` directory
-   - Use the provided `railway.json` configuration
-
-3. **Environment Variables** (set in Railway dashboard):
-   ```bash
-   NODE_ENV=production
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   ANTHROPIC_API_KEY=your_anthropic_api_key
-   TRIBE_SOCIAL_TOKEN=your_tribe_token
-   TRIBE_SOCIAL_API_URL=https://edge.tribesocial.io
-   ```
-
-4. **Custom Domain** (optional):
-   - Railway provides: `https://your-service.railway.app`
-   - Or configure custom domain in Railway settings
-
-### Vercel Configuration
-
-1. **Environment Variables**:
-   ```bash
-   LANGGRAPH_URL=https://your-service.railway.app
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   ```
-
-2. **Build Settings**:
-   - Framework Preset: **Next.js**
-   - Build Command: `npm run build`
-   - Root Directory: `apps/web`
-   - Node.js Version: **18.x**
-
-## 🔍 Verification
-
-### Test LangGraph Service
-
-```bash
-# Health check
-curl https://your-service.railway.app/health
-
-# Expected response:
-{"status": "ok", "service": "langgraph-agent"}
-```
-
-### Test Web Application
-
-1. Visit your Vercel URL
-2. Navigate to any content section
-3. Should see either:
-   - ✅ Real content (if LangGraph working)
-   - ⚠️ Fallback message (if LangGraph unavailable)
-
-## 🔧 Alternative Deployment Options
-
-### Option 1: Railway (Recommended)
-- ✅ Easy setup with GitHub integration
-- ✅ Automatic scaling
-- ✅ Built-in monitoring
-- ✅ Free tier available
-
-### Option 2: Render
-```bash
-# Render configuration (render.yaml)
+### Render (Agent Service)
+**Repository**: Auto-deploy from `main` branch, `agent/` directory
+**Configuration** (via `render.yaml`):
+```yaml
 services:
   - type: web
-    name: langgraph-agent
-    env: node
-    buildCommand: cd agent && npm install
-    startCommand: cd agent && npm start
+    name: leaderforge-langgraph
+    runtime: node
+    plan: free
+    rootDir: agent
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
+    healthCheckPath: /health
 ```
 
-### Option 3: Google Cloud Run
+**Environment Variables** (set in Render dashboard):
 ```bash
-# Build and deploy
-cd agent
-docker build -t gcr.io/YOUR_PROJECT/langgraph-agent .
-docker push gcr.io/YOUR_PROJECT/langgraph-agent
-gcloud run deploy --image gcr.io/YOUR_PROJECT/langgraph-agent --port 8000
+NODE_ENV=production
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+TRIBE_SOCIAL_TOKEN=your_tribe_token
+TRIBE_SOCIAL_API_URL=https://edge.tribesocial.io
 ```
 
-### Option 4: Self-hosted VPS
+## 🔍 Verification
+
+### Test Agent Service Health
 ```bash
-# On your server
-git clone your-repo
-cd leaderforge-dev/agent
-npm install
-npm start
-
-# Use PM2 for process management
-npm install -g pm2
-pm2 start npm --name "langgraph-agent" -- start
-pm2 startup
-pm2 save
+curl https://leaderforge-langgraph-2.onrender.com/health
+# Expected: {"status": "ok", "service": "langgraph-agent"}
 ```
+
+### Test Web Application
+1. Visit `https://leaderforge.vercel.app`
+2. Navigate to any content section
+3. Should see real content (agent service working) or fallback (agent service unavailable)
+
+### Check Environment Detection
+The system logs will show which URL is being used:
+- **Production**: `Using agent service: https://leaderforge-langgraph-2.onrender.com`
+- **Development**: `Using agent service: http://127.0.0.1:8000`
 
 ## 🚨 Troubleshooting
 
-### LangGraph Service Issues
+### Agent Service Issues
+**Cold Starts**: Render free tier may have 10-30 second delays after inactivity
+- **Solution**: First request may be slow, subsequent requests are fast
+- **Mitigation**: Consider upgrading to paid tier for production scale
 
-1. **Service won't start**:
-   ```bash
-   # Check logs in Railway dashboard
-   # Verify all environment variables are set
-   # Ensure port 8000 is exposed
-   ```
+**Service Unavailable**: Check Render dashboard for deployment status
+- **Logs**: View real-time logs in Render dashboard
+- **Health Check**: Verify `/health` endpoint responds
 
-2. **Health check failing**:
-   ```bash
-   # Test locally first
-   cd agent
-   npm start
-   curl http://localhost:8000/health
-   ```
+### Web Application Issues
+**Environment Variables**: Verify all required variables are set in Vercel
+**Build Errors**: Check Vercel deployment logs for build failures
+**API Errors**: Check Vercel function logs for runtime errors
 
-3. **Web app can't connect**:
-   ```bash
-   # Verify LANGGRAPH_URL in Vercel settings
-   # Check Railway service is running
-   # Test direct connection to Railway URL
-   ```
+### Cross-Service Communication
+**Network Errors**: Verify agent service is accessible from Vercel
+**Authentication**: Ensure auth headers are properly forwarded
+**Timeouts**: Check for network latency issues between services
 
-### Environment Variables
+## 🔧 Alternative Deployment Options
 
+### Option 1: LangGraph Cloud (Future)
 ```bash
-# Required for LangGraph service:
-NODE_ENV=production
-SUPABASE_SERVICE_ROLE_KEY=your_key
-ANTHROPIC_API_KEY=your_key
+# When scale justifies the cost ($39/month)
+langgraph deploy
+# Update LANGGRAPH_URL to LangGraph Cloud URL
+```
 
-# Required for Web app:
-LANGGRAPH_URL=https://your-service.railway.app
-NEXT_PUBLIC_SUPABASE_URL=your_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
-SUPABASE_SERVICE_ROLE_KEY=your_key
+### Option 2: Railway
+```bash
+# Alternative to Render
+railway up
+# Update LANGGRAPH_URL to Railway URL
+```
+
+### Option 3: Self-hosted
+```bash
+# For full control
+docker build -t langgraph-agent agent/
+docker run -p 8000:8000 langgraph-agent
+# Update LANGGRAPH_URL to your server URL
 ```
 
 ## 📊 Monitoring
 
-### Railway Monitoring
-- View logs in Railway dashboard
-- Monitor resource usage
-- Set up alerts for downtime
+### Key Metrics
+- **Vercel**: Function duration, error rates, build times
+- **Render**: Service uptime, response times, memory usage
+- **Cross-service**: Request success rates, latency
 
-### Vercel Monitoring
-- Function logs in Vercel dashboard
-- Performance metrics
-- Error tracking
+### Health Checks
+- **Agent Service**: `GET /health` every 5 minutes
+- **Web App**: Monitor error rates and response times
+- **Database**: Monitor Supabase connection health
 
-## 🔄 CI/CD Pipeline
+## 💰 Cost Optimization
 
-### Automatic Deployments
+### Current Setup (Free Tier)
+- **Vercel**: Free tier (100GB bandwidth, 1000 serverless functions)
+- **Render**: Free tier (750 hours/month, automatic sleep)
+- **Total**: $0/month for MVP scale
 
-1. **Railway**: Auto-deploys on push to main branch
-2. **Vercel**: Auto-deploys on push to main branch
-3. **Environment sync**: Update environment variables in both platforms
+### Scaling Considerations
+- **Render Pro**: $7/month for no sleep, faster builds
+- **Vercel Pro**: $20/month for team features, analytics
+- **LangGraph Cloud**: $39/month for enterprise agent hosting
 
-### Manual Deployment
-
-```bash
-# Deploy LangGraph service
-railway up
-
-# Deploy web app
-vercel --prod
-```
-
-## 💰 Cost Estimation
-
-### Railway (LangGraph Service)
-- **Hobby Plan**: $5/month (512MB RAM, 1GB storage)
-- **Pro Plan**: $20/month (8GB RAM, 100GB storage)
-
-### Vercel (Web App)
-- **Hobby Plan**: Free (100GB bandwidth)
-- **Pro Plan**: $20/month (1TB bandwidth)
-
-**Total**: ~$25-40/month for full production deployment
-
-## ✅ Success Criteria
-
-Deployment is successful when:
-
-- [ ] Railway service responds to health checks
-- [ ] Vercel app loads without errors
-- [ ] Navigation options work with real content
-- [ ] Fallback mechanism works when service unavailable
-- [ ] All environment variables configured correctly
-- [ ] HTTPS/SSL working on both services
+## 📚 Related Documentation
+- [ADR-0013: Production Deployment Architecture](docs/architecture/adr/0013-production-deployment-architecture.md)
+- [Architecture Overview](docs/architecture/overview/agent-native-composition-architecture.md)
+- [Environment Configuration](packages/env/index.ts)
