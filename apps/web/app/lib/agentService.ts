@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { ENV } from '../../../../packages/env';
 
 /**
@@ -39,8 +38,8 @@ export class AgentService {
   private langGraphUrl: string;
   private authHeaders?: Record<string, string>;
 
-  constructor(supabaseUrl: string, supabaseKey: string, langGraphUrl: string = 'http://localhost:8000', authHeaders?: Record<string, string>) {
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+  constructor(supabase: any, langGraphUrl: string = 'http://localhost:8000', authHeaders?: Record<string, string>) {
+    this.supabase = supabase; // ✅ Accept user-authenticated client, not service role
     this.langGraphUrl = langGraphUrl;
     this.authHeaders = authHeaders;
   }
@@ -471,29 +470,16 @@ export class AgentService {
 // Lazy singleton getter to avoid build-time environment variable access
 let _agentServiceInstance: AgentService | null = null;
 
-export function getAgentService(): AgentService {
-  if (!_agentServiceInstance) {
-    // Add debug logging here before creating the service
-    console.log('[AgentService] Creating singleton instance...');
+// ❌ REMOVED: This pattern violated SSR architecture by using service role
+// AgentService now requires a user-authenticated Supabase client
+// Use createAgentService(supabase) instead where supabase is from SSR auth
 
-    try {
-      _agentServiceInstance = new AgentService(
-        ENV.SUPABASE_URL,
-        ENV.SUPABASE_SERVICE_ROLE_KEY,
-        ENV.LANGGRAPH_API_URL
-      );
-      console.log('[AgentService] Singleton instance created successfully');
-    } catch (error) {
-      console.error('[AgentService] Failed to create singleton instance:', error);
-      throw error;
-    }
-  }
-  return _agentServiceInstance;
+export function createAgentService(supabase: any): AgentService {
+  return new AgentService(
+    supabase, // ✅ User-authenticated client from SSR
+    ENV.LANGGRAPH_API_URL
+  );
 }
 
-// Legacy export for backward compatibility - use getAgentService() instead
-export const agentService = {
-  get instance() {
-    return getAgentService();
-  }
-};
+// ❌ REMOVED: Legacy singleton pattern violated SSR architecture
+// Use createAgentService(supabase) instead with user-authenticated client

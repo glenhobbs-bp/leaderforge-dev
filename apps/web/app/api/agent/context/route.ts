@@ -82,20 +82,16 @@ export async function POST(req: NextRequest) {
     console.log('[API] ✅ Authenticated user:', userId);
 
     // Use authenticated client if available, otherwise use service account for DB access
-    let dbClient = supabase;
-    if (!session?.user?.id && userId) {
-      console.log('[API] 🔧 Using service account client for database access (fallback auth)');
-      const { createClient } = await import('@supabase/supabase-js');
-
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-      if (!supabaseUrl || !supabaseServiceKey) {
-        throw new Error('Missing required Supabase environment variables for service role client');
-      }
-
-      dbClient = createClient(supabaseUrl, supabaseServiceKey);
+    // ✅ SSR COMPLIANCE: No service role fallback - all operations must use authenticated client
+    if (!session?.user?.id) {
+      console.log('[API] ❌ No valid session - rejecting request');
+      return NextResponse.json({
+        error: 'Authentication required',
+        details: 'SSR session is required for all operations'
+      }, { status: 401 });
     }
+
+    const dbClient = supabase; // ✅ Always use authenticated client
 
     // 🤖 AGENT-DRIVEN: Let the agent determine what context/UI to show
     const agentResponse = await invokeContextAgent({

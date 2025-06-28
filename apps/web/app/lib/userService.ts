@@ -27,33 +27,22 @@ import type { User, VideoProgress } from './types';
  * Create a Supabase client with service role permissions
  * ⚠️ Use sparingly - only for operations that require elevated permissions
  */
-async function createServiceRoleSupabaseClient() {
-  const { createClient } = await import('@supabase/supabase-js');
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Missing required Supabase environment variables for service role client');
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey);
-}
+// ❌ REMOVED: Service role helper violated SSR-only architecture
+// All user operations must use authenticated Supabase client from SSR
 
 
 /**
  * Service for user profile and preferences logic. All business rules and data access for users live here.
+ * ✅ ARCHITECTURE COMPLIANCE: Always requires user-authenticated Supabase client (SSR)
  * Optimized for performance with minimal logging.
  */
 export const userService = {
     /**
    * Get a single user by ID.
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async getUser(userId: string): Promise<User | null> {
+  async getUser(supabase: any, userId: string): Promise<User | null> {
     try {
-      const supabase = await createServiceRoleSupabaseClient();
-
       const { data, error } = await supabase
         .schema('core')
         .from('users')
@@ -75,10 +64,9 @@ export const userService = {
 
   /**
    * Get a single user by email.
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async getUserByEmail(email: string): Promise<User | null> {
-    const supabase = await createServiceRoleSupabaseClient();
+  async getUserByEmail(supabase: any, email: string): Promise<User | null> {
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -94,11 +82,10 @@ export const userService = {
 
   /**
    * Get multiple users by their IDs.
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async getUsersByIds(userIds: string[]): Promise<User[]> {
+  async getUsersByIds(supabase: any, userIds: string[]): Promise<User[]> {
     if (!userIds.length) return [];
-    const supabase = await createServiceRoleSupabaseClient();
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -113,10 +100,9 @@ export const userService = {
 
   /**
    * Update user preferences (partial update).
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async updateUserPreferences(userId: string, preferences: Partial<User['preferences']>): Promise<User | null> {
-    const supabase = await createServiceRoleSupabaseClient();
+  async updateUserPreferences(supabase: any, userId: string, preferences: Partial<User['preferences']>): Promise<User | null> {
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -133,12 +119,10 @@ export const userService = {
 
   /**
    * Update user profile information (first_name, last_name, full_name, etc.)
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async updateUserProfile(userId: string, profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>): Promise<User | null> {
+  async updateUserProfile(supabase: any, userId: string, profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>): Promise<User | null> {
     try {
-      const supabase = await createServiceRoleSupabaseClient();
-
       const { data, error } = await supabase
         .schema('core')
         .from('users')
@@ -164,15 +148,14 @@ export const userService = {
 
   /**
    * Update both user profile and preferences in a single transaction
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
   async updateUserProfileAndPreferences(
+    supabase: any,
     userId: string,
     profile: Partial<Pick<User, 'first_name' | 'last_name' | 'full_name' | 'avatar_url'>>,
     preferences: Partial<User['preferences']>
   ): Promise<User | null> {
-    const supabase = await createServiceRoleSupabaseClient();
-
     const { data, error } = await supabase
       .schema('core')
       .from('users')
@@ -195,14 +178,12 @@ export const userService = {
 
   /**
    * Update user navigation state (optimized for frequent updates)
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async updateNavigationState(userId: string, contextKey: string, navOptionId: string): Promise<void> {
+  async updateNavigationState(supabase: any, userId: string, contextKey: string, navOptionId: string): Promise<void> {
     try {
-      const supabase = await createServiceRoleSupabaseClient();
-
       // Update user preferences with navigation state
-      const user = await userService.getUser(userId);
+      const user = await userService.getUser(supabase, userId);
       const currentPrefs = user?.preferences || {};
 
       const updatedPrefs = {
@@ -233,14 +214,12 @@ export const userService = {
 
   /**
    * Update video progress (optimized for frequent updates)
-   * Uses service role for backend operations to bypass RLS policies.
+   * ✅ SSR COMPLIANCE: Uses authenticated client, not service role
    */
-  async updateVideoProgress(userId: string, contentId: string, progress: Partial<VideoProgress>): Promise<void> {
+  async updateVideoProgress(supabase: any, userId: string, contentId: string, progress: Partial<VideoProgress>): Promise<void> {
     try {
-      const supabase = await createServiceRoleSupabaseClient();
-
       // Get current preferences
-      const user = await userService.getUser(userId);
+      const user = await userService.getUser(supabase, userId);
       const currentPrefs = user?.preferences || {};
       const currentVideoProgress = currentPrefs.videoProgress || {};
 
