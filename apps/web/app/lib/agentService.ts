@@ -10,7 +10,7 @@ export interface Agent {
   id: string;
   name: string;
   display_name: string | null;
-  type: 'llm' | 'langgraph' | 'tool' | 'workflow';
+  type: 'llm' | 'langgraph' | 'tool' | 'workflow' | 'mockup';
   prompt: string | null;
   tools: string[] | null;
   model: string | null;
@@ -97,6 +97,9 @@ export class AgentService {
 
       case 'workflow':
         return this.invokeWorkflowAgent(agent, request);
+
+      case 'mockup':
+        return this.invokeMockupAgent(agent, request);
 
       default:
         throw new Error(`Unsupported agent type: ${agent.type}`);
@@ -470,6 +473,45 @@ export class AgentService {
 
     return this.createNotImplementedResponse(agent, request, 'Workflow',
       'Workflow agents will handle complex multi-step business processes and automations.');
+  }
+
+  /**
+   * Invoke mockup agent - returns schema for rendering JSX mockup components
+   * ✅ AGENT-NATIVE MOCKUPS: Renders mockup components through ContentPanel
+   */
+  private async invokeMockupAgent(
+    agent: Agent,
+    request: AgentInvocationRequest
+  ): Promise<AgentInvocationResponse> {
+    console.log(`[AgentService] Invoking mockup agent: ${agent.name}`);
+
+    // Extract component name from agent config
+    const componentName = agent.config?.component;
+    if (!componentName) {
+      throw new Error(`Mockup agent ${agent.name} missing component config`);
+    }
+
+    // Return schema that tells the frontend to render the mockup component
+    return {
+      type: 'mockup',
+      content: {
+        component: componentName,
+        title: `Mockup: ${agent.name}`,
+        subtitle: 'Interactive prototype for UX validation',
+        metadata: {
+          agentId: agent.id,
+          agentName: agent.name,
+          componentName,
+          timestamp: new Date().toISOString()
+        }
+      },
+      metadata: {
+        agentType: 'mockup',
+        executionTime: Date.now(),
+        userId: request.userId,
+        tenantKey: request.tenantKey
+      }
+    };
   }
 
   /**

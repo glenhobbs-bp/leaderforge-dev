@@ -17,16 +17,17 @@ import type { UserPreferences } from '../app/lib/types';
 // Diagnostic: Track module load
 console.log('[DynamicTenantPage] Module loaded - Database-driven mode');
 
-// Agent schema types - pure content_schema responses only
+// Agent schema types - includes mockup support for agent-native mockups
 interface AgentSchema {
-  type: 'content_schema' | 'no_agent' | 'error';
-  content?: unknown; // ComponentSchema or simple content objects
+  type: 'content_schema' | 'no_agent' | 'error' | 'mockup';
+  content?: unknown; // ComponentSchema, mockup data, or simple content objects
   message?: string; // For no_agent responses
   metadata?: {
     threadId?: string;
     runId?: string;
     agentId?: string;
     agentName?: string;
+    agentType?: string;
   };
 }
 
@@ -278,33 +279,41 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
   // Memoize content component to prevent video re-mounting - MUST be at top level before any returns
   const contentComponent = useMemo(() => {
+    console.log('[DynamicTenantPage] contentComponent memo triggered:', {
+      contentLoading,
+      agentSchemaType: agentSchema?.type,
+      content,
+      hasComponent: content && typeof content === 'object' && 'component' in content
+    });
+
     if (contentLoading) {
       return createLoadingContent();
     }
 
-    // Check for mockup content
-    if (content && typeof content === 'object' && 'type' in content && content.type === 'mockup') {
-      console.log('[DynamicTenantPage] Rendering mockup content:', content);
-      const mockupContent = content as { navOptionId: string; userId: string };
+    // Check for mockup agent response
+    if (agentSchema?.type === 'mockup' && content && typeof content === 'object' && 'component' in content) {
+      console.log('[DynamicTenantPage] Rendering mockup agent response:', content);
+      const mockupContent = content as {
+        component: string;
+        title?: string;
+        subtitle?: string;
+        metadata?: Record<string, unknown>
+      };
 
-      // Dynamically import MockupRouter to avoid circular imports
-      const MockupRouter = React.lazy(() => import('../lib/mockups/MockupRouter'));
+      // Dynamically import MockupRenderer
+      const MockupRenderer = React.lazy(() => import('./ui/MockupRenderer'));
 
       return (
-        <React.Suspense fallback={createLoadingContent()}>
-          <MockupRouter
-            navOptionId={mockupContent.navOptionId}
-            userId={mockupContent.userId}
-          >
-            {/* Fallback content if mockup fails */}
-            <div className="p-6">
-              <div className="text-center">
-                <div className="text-gray-500 mb-4">⚠️</div>
-                <p className="text-gray-600">Mockup failed to load</p>
-              </div>
-            </div>
-          </MockupRouter>
-        </React.Suspense>
+        <div className="p-6">
+          <React.Suspense fallback={createLoadingContent()}>
+            <MockupRenderer
+              componentName={mockupContent.component}
+              title={mockupContent.title}
+              subtitle={mockupContent.subtitle}
+              metadata={mockupContent.metadata}
+            />
+          </React.Suspense>
+        </div>
       );
     }
 
@@ -364,7 +373,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         </div>
       </div>
     );
-  }, [contentLoading, isComponentSchema, isWelcomeContent, content]);
+  }, [contentLoading, isComponentSchema, isWelcomeContent, content, agentSchema]);
 
   // 🤖 AGENT-NATIVE: Single API call to get complete UI schema
   useEffect(() => {
@@ -470,27 +479,6 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       setSelectedNavOptionId(navId);
     }
 
-    // Check for mockup routing first
-    const { isMockupEnabled } = await import('../lib/mockups/MockupRegistry');
-    const mockupEnabled = isMockupEnabled(navId, session.user.id);
-
-    if (mockupEnabled) {
-      console.log(`[DynamicTenantPage] 🎭 Using mockup for nav option: ${navId}`);
-
-      // Set mockup flag in schema to trigger MockupRouter rendering
-      setAgentSchema({
-        type: 'content_schema',
-        content: {
-          type: 'mockup',
-          navOptionId: navId,
-          userId: session.user.id
-        }
-      });
-
-      setContentLoading(false);
-      return;
-    }
-
     // Show loading state while fetching content
     setContentLoading(true);
 
@@ -560,16 +548,24 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             action: 'Check back soon!'
           }
         });
+      } else if (agentResponse.type === 'mockup') {
+        // Mockup agent response - preserve type and content structure
+        console.log('[DynamicTenantPage] Setting mockup agent schema:', agentResponse);
+        setAgentSchema({
+          type: 'mockup',
+          content: agentResponse.content,
+          metadata: agentResponse.metadata
+        });
       } else if (agentResponse.type === 'content_schema' || agentResponse.schema) {
         // Agent returned content schema
         setAgentSchema(agentResponse);
       } else {
-              // Transform agent response to expected format
-      setAgentSchema({
-        type: 'content_schema',
-        content: agentResponse
-      });
-    }
+        // Transform agent response to expected format
+        setAgentSchema({
+          type: 'content_schema',
+          content: agentResponse
+        });
+      }
 
     // Persist navigation state to database (always persist when content loads successfully)
     if (session?.user?.id) {
@@ -699,7 +695,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   console.log('[DynamicTenantPage] Checking agentSchema type:', agentSchema?.type, 'has content:', !!agentSchema?.content, 'contentLoading:', contentLoading);
 
   // If we're loading content or have content, show the layout with navigation
-  if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error') && agentSchema.content)) {
+  if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error' || agentSchema?.type === 'mockup') && agentSchema.content)) {
     console.log('[DynamicTenantPage] Handling content_schema response or loading state');
     console.log('[DynamicTenantPage] agentSchema.content:', agentSchema?.content);
 

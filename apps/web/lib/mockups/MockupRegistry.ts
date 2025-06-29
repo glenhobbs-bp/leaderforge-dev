@@ -6,7 +6,7 @@
 import { ComponentType } from 'react';
 
 // Import mockup components
-import MarcusDashboard from '../../app/test-dashboard/page';
+import MarcusDashboard from '../../components/mockups/MarcusDashboardMockup';
 
 // Mockup registry interface
 export interface MockupConfig {
@@ -14,7 +14,7 @@ export interface MockupConfig {
   name: string;
   description: string;
   featureFlag?: string;
-  enabledUsers?: string[]; // User IDs who can see this mockup
+  entitlementName?: string; // Entitlement required to see this mockup
   enabledForAll?: boolean; // Enable for all users (careful!)
 }
 
@@ -26,11 +26,7 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     name: 'Marcus Dashboard',
     description: 'Mockup dashboard for user experience validation',
     featureFlag: 'ENABLE_DASHBOARD_MOCKUP',
-    enabledUsers: [
-      'bb893b34-8a5e-4f4e-a55e-cd8c2e0f1f3b', // Marcus test user
-      '47f9db16-f24f-4868-8155-256cfa2edc2c', // Glen user
-      // Add other user IDs as needed
-    ],
+    entitlementName: 'user-dashboard-mockup',
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true', // Environment variable control
   },
 
@@ -45,20 +41,33 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
 };
 
 // Feature flag checker
-export function isMockupEnabled(
+export async function isMockupEnabled(
   navOptionId: string,
   userId: string,
   featureFlags: Record<string, boolean> = {}
-): boolean {
+): Promise<boolean> {
   const mockupConfig = MOCKUP_REGISTRY[navOptionId];
   if (!mockupConfig) return false;
 
   // Check if enabled for all users (via environment variable)
   if (mockupConfig.enabledForAll) return true;
 
-  // Check if user is in enabled users list
-  if (mockupConfig.enabledUsers?.includes(userId)) {
-    return true;
+  // Check if user has required entitlement
+  if (mockupConfig.entitlementName) {
+    try {
+      const response = await fetch(`/api/entitlements/${userId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (response.ok) {
+        const entitlements = await response.json();
+        const hasEntitlement = entitlements.some((ent: { name: string }) => ent.name === mockupConfig.entitlementName);
+        if (hasEntitlement) return true;
+      }
+    } catch (error) {
+      console.warn('[MockupRegistry] Entitlement check failed:', error);
+    }
   }
 
   // Check feature flag (if provided)
@@ -92,9 +101,9 @@ export function getAllMockups(): Array<{
 }
 
 // Debug function to log mockup status (works in production for mockup debugging)
-export function debugMockupStatus(navOptionId: string, userId: string): void {
+export async function debugMockupStatus(navOptionId: string, userId: string): Promise<void> {
   const mockupConfig = MOCKUP_REGISTRY[navOptionId];
-  const isEnabled = isMockupEnabled(navOptionId, userId);
+  const isEnabled = await isMockupEnabled(navOptionId, userId);
 
   console.log('[MockupRegistry] Status check:', {
     navOptionId,
@@ -104,7 +113,7 @@ export function debugMockupStatus(navOptionId: string, userId: string): void {
     isEnabled,
     featureFlag: mockupConfig?.featureFlag,
     enabledForAll: mockupConfig?.enabledForAll,
-    enabledUsers: mockupConfig?.enabledUsers,
+    entitlementName: mockupConfig?.entitlementName,
     environment: process.env.NODE_ENV,
     enableMockupsForAll: process.env.ENABLE_MOCKUPS_FOR_ALL,
   });

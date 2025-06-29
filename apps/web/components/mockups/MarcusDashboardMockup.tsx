@@ -1,15 +1,15 @@
 /**
- * Purpose: Marcus Dashboard UI - World-class dashboard design with mock data
- * Owner: Dashboard System
- * Tags: [dashboard, ui, marcus, design]
+ * Purpose: Marcus Dashboard Mockup - Agent-native mockup component for UX validation
+ * Owner: Mockup System
+ * Tags: [mockup, dashboard, marcus, agent-native]
  */
 
 "use client";
 
 import React, { useState } from 'react';
-import { LeaderForgeCard } from '../../components/widgets/LeaderForgeCard';
-import StatCard from '../../components/widgets/StatCard';
-import List from '../../components/widgets/List';
+import { LeaderForgeCard } from '../widgets/LeaderForgeCard';
+import StatCard from '../widgets/StatCard';
+import List from '../widgets/List';
 
 // Mock data matching our Universal Widget Schema
 const mockVideoData = {
@@ -730,7 +730,7 @@ function JournalModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 }
 
-export default function TestDashboard() {
+export default function MarcusDashboardMockup() {
   const [isWorksheetOpen, setIsWorksheetOpen] = useState(false);
   const [isStandupModalOpen, setIsStandupModalOpen] = useState(false);
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
