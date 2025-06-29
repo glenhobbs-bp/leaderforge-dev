@@ -28,6 +28,7 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     featureFlag: 'ENABLE_DASHBOARD_MOCKUP',
     enabledUsers: [
       'bb893b34-8a5e-4f4e-a55e-cd8c2e0f1f3b', // Marcus test user
+      '47f9db16-f24f-4868-8155-256cfa2edc2c', // Glen user
       // Add other user IDs as needed
     ],
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true', // Environment variable control
