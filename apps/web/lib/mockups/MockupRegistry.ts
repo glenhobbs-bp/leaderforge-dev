@@ -30,7 +30,7 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
       'bb893b34-8a5e-4f4e-a55e-cd8c2e0f1f3b', // Marcus test user
       // Add other user IDs as needed
     ],
-    enabledForAll: process.env.NODE_ENV === 'development', // Enable for all in dev
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true', // Environment variable control
   },
 
   // Future mockups will be added here:
@@ -52,20 +52,25 @@ export function isMockupEnabled(
   const mockupConfig = MOCKUP_REGISTRY[navOptionId];
   if (!mockupConfig) return false;
 
-  // Check if enabled for all users
+  // Check if enabled for all users (via environment variable)
   if (mockupConfig.enabledForAll) return true;
 
-  // Check feature flag
-  if (mockupConfig.featureFlag && !featureFlags[mockupConfig.featureFlag]) {
-    return false;
+  // Check if user is in enabled users list
+  if (mockupConfig.enabledUsers?.includes(userId)) {
+    return true;
   }
 
-  // Check user-specific access
-  if (mockupConfig.enabledUsers && !mockupConfig.enabledUsers.includes(userId)) {
-    return false;
+  // Check feature flag (if provided)
+  if (mockupConfig.featureFlag && featureFlags[mockupConfig.featureFlag]) {
+    return true;
   }
 
-  return true;
+  // Development mode enables all mockups for debugging
+  if (process.env.NODE_ENV === 'development') {
+    return true;
+  }
+
+  return false;
 }
 
 // Get mockup component
@@ -85,21 +90,21 @@ export function getAllMockups(): Array<{
   }));
 }
 
-// Debug function to log mockup status
+// Debug function to log mockup status (works in production for mockup debugging)
 export function debugMockupStatus(navOptionId: string, userId: string): void {
-  if (process.env.NODE_ENV === 'development') {
-    const mockupConfig = MOCKUP_REGISTRY[navOptionId];
-    const isEnabled = isMockupEnabled(navOptionId, userId);
+  const mockupConfig = MOCKUP_REGISTRY[navOptionId];
+  const isEnabled = isMockupEnabled(navOptionId, userId);
 
-    console.log('[MockupRegistry] Status check:', {
-      navOptionId,
-      userId,
-      hasMockup: !!mockupConfig,
-      mockupName: mockupConfig?.name,
-      isEnabled,
-      featureFlag: mockupConfig?.featureFlag,
-      enabledForAll: mockupConfig?.enabledForAll,
-      enabledUsers: mockupConfig?.enabledUsers,
-    });
-  }
+  console.log('[MockupRegistry] Status check:', {
+    navOptionId,
+    userId,
+    hasMockup: !!mockupConfig,
+    mockupName: mockupConfig?.name,
+    isEnabled,
+    featureFlag: mockupConfig?.featureFlag,
+    enabledForAll: mockupConfig?.enabledForAll,
+    enabledUsers: mockupConfig?.enabledUsers,
+    environment: process.env.NODE_ENV,
+    enableMockupsForAll: process.env.ENABLE_MOCKUPS_FOR_ALL,
+  });
 }

@@ -35,6 +35,34 @@ NavPanel Selection → MockupRouter → [Mockup OR Agent Content]
                  [Dashboard/Team Leader/etc.]
 ```
 
+## 🚀 **Production Deployment**
+
+### **Environment Variables**
+Set these in your production environment (Vercel, etc.):
+
+```bash
+# Enable mockups for all users (use with caution!)
+ENABLE_MOCKUPS_FOR_ALL=true
+
+# Alternative: Control via feature flags in your app
+FEATURE_FLAG_ENABLE_DASHBOARD_MOCKUP=true
+```
+
+### **Access Control Levels**
+The system checks access in this order:
+
+1. **Environment Variable**: `ENABLE_MOCKUPS_FOR_ALL=true` → Show for everyone
+2. **User ID List**: User in `enabledUsers` array → Show for that user
+3. **Feature Flags**: Feature flag enabled → Show for enabled users
+4. **Development Mode**: `NODE_ENV=development` → Show for everyone (debugging)
+
+### **Production Safety**
+- ✅ Mockups only show for explicitly enabled users
+- ✅ No performance impact for non-enabled users
+- ✅ Full production context and theming
+- ✅ Debug logging available in browser console
+- ✅ Graceful fallback to agent content
+
 ## Implementation
 
 ### 1. **MockupRegistry** (`apps/web/lib/mockups/MockupRegistry.ts`)
@@ -98,9 +126,11 @@ if (mockupEnabled) {
 **Navigation:** `leaderforge` tenant → `My Dashboard` (UUID: `e51a7dde-e349-41c4-b3ed-4a8a75155f94`)
 
 **Access Control:**
-- ✅ **Development:** Enabled for all users
-- ✅ **Production:** Only user `bb893b34-8a5e-4f4e-a55e-cd8c2e0f1f3b` (Marcus)
-- ✅ **Feature Flag:** `ENABLE_DASHBOARD_MOCKUP`
+- ✅ **Production Ready:** Controlled by user IDs and environment variables
+- ✅ **Specific Users:** `bb893b34-8a5e-4f4e-a55e-cd8c2e0f1f3b` (Marcus)
+- ✅ **Environment Control:** Set `ENABLE_MOCKUPS_FOR_ALL=true` to enable for everyone
+- ✅ **Feature Flag:** `ENABLE_DASHBOARD_MOCKUP` (optional)
+- ✅ **Development Mode:** Always enabled for debugging
 
 **To Test:**
 1. Login to platform
