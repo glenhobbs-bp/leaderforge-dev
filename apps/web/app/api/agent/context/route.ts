@@ -576,7 +576,7 @@ async function generateContentSchema(contextKey: string, entitlementIds: string[
         contentRecommendations.push({
           type: 'video_grid',
           title: 'Leadership Library',
-          description: `${contents.length} training videos available`,
+          description: 'Forge ahead, Glen!',
           action: 'View Videos',
           cards: contentCards
         });

@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "generated_at": "2025-06-28T21:11:48.775Z",
+    "generated_at": "2025-06-29T11:27:54.707Z",
     "generator_version": "1.0.0",
-    "total_files": 265,
-    "total_size_bytes": 2360100,
+    "total_files": 274,
+    "total_size_bytes": 2441464,
     "file_types": {
-      ".ts": 117,
+      ".ts": 121,
       ".json": 17,
-      ".tsx": 36,
+      ".tsx": 40,
       ".js": 10,
-      ".md": 84,
+      ".md": 85,
       ".sql": 1
     },
     "tags": {
-      "TypeScript": 153,
-      "API": 45,
-      "AI agent": 123,
-      "React": 36,
-      "React hooks": 23,
-      "Next.js API": 43,
+      "TypeScript": 161,
+      "API": 47,
+      "AI agent": 126,
+      "React": 40,
+      "React hooks": 25,
+      "Next.js API": 45,
       "security": 64,
       "test": 13,
       "API endpoint": 3,
@@ -40,7 +40,7 @@
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 31,
+      "utility": 34,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
@@ -51,8 +51,8 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 29,
-      "navigation": 4,
+      "UI": 30,
+      "navigation": 6,
       "context-based": 1,
       "UI component": 1,
       "progress tracking": 1,
@@ -65,7 +65,12 @@
       "SWR": 1,
       "database": 1,
       "database-driven": 1,
-      "documentation": 86,
+      "mockups": 3,
+      "feature-flags": 3,
+      "prototyping": 1,
+      "routing": 2,
+      "exports": 1,
+      "documentation": 87,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -404,6 +409,27 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/api/dashboard/[user_id]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dashboard/[user_id]",
+      "extension": ".ts",
+      "purpose": "Purpose: User Dashboard Composition API - Marcus Dashboard with real progress data",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-06-28T22:48:38.654Z",
+      "size_bytes": 12378,
+      "hash": "b4c94fcc",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/app/api/debug/check-progress-schema/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/debug/check-progress-schema",
@@ -482,6 +508,28 @@
       "last_modified": "2025-06-28T14:27:40.874Z",
       "size_bytes": 549,
       "hash": "925654cc",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/mockups/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/mockups",
+      "extension": ".ts",
+      "purpose": "Debug Mockups API Route",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient",
+        "../../../../lib/mockups"
+      ],
+      "last_modified": "2025-06-29T11:26:35.748Z",
+      "size_bytes": 2147,
+      "hash": "7261e154",
       "complexity": "low"
     },
     {
@@ -1177,6 +1225,27 @@
       "last_modified": "2025-06-27T21:33:11.963Z",
       "size_bytes": 2967,
       "hash": "e521a189",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/dashboard/marcus/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/dashboard/marcus",
+      "extension": ".tsx",
+      "purpose": "Purpose: Marcus Dashboard Page - Composition-driven dashboard using existing widgets",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "../../../components/SupabaseProvider",
+        "../../../components/ai/UniversalSchemaRenderer"
+      ],
+      "last_modified": "2025-06-28T23:12:05.308Z",
+      "size_bytes": 4923,
+      "hash": "1f3f3f56",
       "complexity": "medium"
     },
     {
@@ -2162,6 +2231,28 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/test-dashboard/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/test-dashboard",
+      "extension": ".tsx",
+      "purpose": "Purpose: Marcus Dashboard UI - World-class dashboard design with mock data",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "../../components/widgets/LeaderForgeCard",
+        "../../components/widgets/StatCard",
+        "../../components/widgets/List"
+      ],
+      "last_modified": "2025-06-29T11:00:53.997Z",
+      "size_bytes": 34999,
+      "hash": "07f66555",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/app/test-widgets/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/test-widgets",
@@ -2292,9 +2383,9 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-27T21:33:12.051Z",
-      "size_bytes": 30380,
-      "hash": "960a458e",
+      "last_modified": "2025-06-29T11:25:44.935Z",
+      "size_bytes": 32004,
+      "hash": "e516781e",
       "complexity": "high"
     },
     {
@@ -2738,9 +2829,9 @@
         "react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T21:33:12.086Z",
-      "size_bytes": 4046,
-      "hash": "27ce5077",
+      "last_modified": "2025-06-29T09:57:56.464Z",
+      "size_bytes": 5490,
+      "hash": "3d7feeec",
       "complexity": "medium"
     },
     {
@@ -2764,6 +2855,28 @@
       "last_modified": "2025-06-28T11:44:34.595Z",
       "size_bytes": 12212,
       "hash": "c797258e",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/widgets/List.tsx",
+      "name": "List.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/List.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../../../../packages/agent-core/types/UniversalWidgetSchema",
+        "lucide-react"
+      ],
+      "last_modified": "2025-06-29T10:52:12.781Z",
+      "size_bytes": 8166,
+      "hash": "40f00f1f",
       "complexity": "medium"
     },
     {
@@ -2802,12 +2915,13 @@
       ],
       "dependencies": [
         "react",
-        "../../../../packages/agent-core/types/UniversalWidgetSchema"
+        "../../../../packages/agent-core/types/UniversalWidgetSchema",
+        "lucide-react"
       ],
-      "last_modified": "2025-06-27T21:33:12.088Z",
-      "size_bytes": 2191,
-      "hash": "db5a0bde",
-      "complexity": "low"
+      "last_modified": "2025-06-29T10:24:58.456Z",
+      "size_bytes": 3954,
+      "hash": "e2219b87",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/widgets/types.ts",
@@ -3048,6 +3162,82 @@
       "last_modified": "2025-06-27T21:33:12.109Z",
       "size_bytes": 1389,
       "hash": "86ca99f5",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/lib/mockups/index.ts",
+      "name": "index.ts",
+      "directory": "apps/web/lib/mockups",
+      "extension": ".ts",
+      "purpose": "Entry point for mockup system - exports all mockup functionality",
+      "owner": "Product Team",
+      "tags": [
+        "mockups",
+        "routing",
+        "feature-flags",
+        "exports",
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "./MockupRegistry"
+      ],
+      "last_modified": "2025-06-29T11:26:13.624Z",
+      "size_bytes": 989,
+      "hash": "618e1250",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/lib/mockups/MockupRegistry.ts",
+      "name": "MockupRegistry.ts",
+      "directory": "apps/web/lib/mockups",
+      "extension": ".ts",
+      "purpose": "Generalized mockup routing system for rapid prototyping in production context",
+      "owner": "Product Team",
+      "tags": [
+        "mockups",
+        "feature-flags",
+        "prototyping",
+        "navigation",
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "react",
+        "../../app/test-dashboard/page"
+      ],
+      "last_modified": "2025-06-29T11:24:10.652Z",
+      "size_bytes": 3279,
+      "hash": "ba7eedae",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/lib/mockups/MockupRouter.tsx",
+      "name": "MockupRouter.tsx",
+      "directory": "apps/web/lib/mockups",
+      "extension": ".tsx",
+      "purpose": "Routes navigation to mockups when enabled, falls back to agent content",
+      "owner": "Product Team",
+      "tags": [
+        "mockups",
+        "routing",
+        "feature-flags",
+        "navigation",
+        "React",
+        "TypeScript",
+        "utility",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "./MockupRegistry"
+      ],
+      "exports": [
+        "MockupRouter"
+      ],
+      "last_modified": "2025-06-29T11:24:32.548Z",
+      "size_bytes": 2210,
+      "hash": "1ad0cf67",
       "complexity": "low"
     },
     {
@@ -4273,9 +4463,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-28T20:57:14.545Z",
-      "size_bytes": 136991,
-      "hash": "13f39b93"
+      "last_modified": "2025-06-28T21:11:48.782Z",
+      "size_bytes": 137408,
+      "hash": "e6719758"
     },
     {
       "path": "docs/manifest.md",
@@ -4288,9 +4478,23 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-28T20:57:14.573Z",
-      "size_bytes": 51538,
-      "hash": "4f17fd22"
+      "last_modified": "2025-06-28T21:11:48.789Z",
+      "size_bytes": 51706,
+      "hash": "ce049265"
+    },
+    {
+      "path": "docs/mockup-system-guide.md",
+      "name": "mockup-system-guide.md",
+      "directory": "docs",
+      "extension": ".md",
+      "purpose": "Marcus Dashboard - My Learning nav option",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-29T11:27:48.767Z",
+      "size_bytes": 6857,
+      "hash": "a4cfe3cb"
     },
     {
       "path": "docs/product-design/design-system.md",
@@ -4357,7 +4561,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-28T21:11:43.606Z",
+      "last_modified": "2025-06-28T21:11:53.393Z",
       "size_bytes": 11498,
       "hash": "66ea305a"
     },

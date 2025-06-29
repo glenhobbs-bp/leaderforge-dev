@@ -282,6 +282,32 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       return createLoadingContent();
     }
 
+    // Check for mockup content
+    if (content && typeof content === 'object' && 'type' in content && content.type === 'mockup') {
+      console.log('[DynamicTenantPage] Rendering mockup content:', content);
+      const mockupContent = content as { navOptionId: string; userId: string };
+
+      // Dynamically import MockupRouter to avoid circular imports
+      const MockupRouter = React.lazy(() => import('../lib/mockups/MockupRouter'));
+
+      return (
+        <React.Suspense fallback={createLoadingContent()}>
+          <MockupRouter
+            navOptionId={mockupContent.navOptionId}
+            userId={mockupContent.userId}
+          >
+            {/* Fallback content if mockup fails */}
+            <div className="p-6">
+              <div className="text-center">
+                <div className="text-gray-500 mb-4">⚠️</div>
+                <p className="text-gray-600">Mockup failed to load</p>
+              </div>
+            </div>
+          </MockupRouter>
+        </React.Suspense>
+      );
+    }
+
     if (isComponentSchema) {
       console.log('[DynamicTenantPage] Rendering UniversalSchemaRenderer with userId:', {
         session: !!session,
@@ -442,6 +468,27 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     // Update selected navigation option if requested
     if (updateSelection) {
       setSelectedNavOptionId(navId);
+    }
+
+    // Check for mockup routing first
+    const { isMockupEnabled } = await import('../lib/mockups/MockupRegistry');
+    const mockupEnabled = isMockupEnabled(navId, session.user.id);
+
+    if (mockupEnabled) {
+      console.log(`[DynamicTenantPage] 🎭 Using mockup for nav option: ${navId}`);
+
+      // Set mockup flag in schema to trigger MockupRouter rendering
+      setAgentSchema({
+        type: 'content_schema',
+        content: {
+          type: 'mockup',
+          navOptionId: navId,
+          userId: session.user.id
+        }
+      });
+
+      setContentLoading(false);
+      return;
     }
 
     // Show loading state while fetching content

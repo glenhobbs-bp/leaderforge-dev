@@ -141,8 +141,8 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
       },
       config: {
         // Grid configuration
-        title: 'Content Library',
-        subtitle: 'Available content',
+        title: 'Leadership Library',
+        subtitle: 'Forge ahead, Glen!',
         layout: {
           type: 'grid',
           columns: 'auto-fill',

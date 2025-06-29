@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/28/2025, 5:11:48 PM*
+*Generated on 6/29/2025, 7:27:54 AM*
 
 ## Overview
 
-- **Total Files**: 265
-- **Total Size**: 2.25 MB
+- **Total Files**: 274
+- **Total Size**: 2.33 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 117 files
-- **.md**: 84 files
-- **.tsx**: 36 files
+- **.ts**: 121 files
+- **.md**: 85 files
+- **.tsx**: 40 files
 - **.json**: 17 files
 - **.js**: 10 files
 - **.sql**: 1 files
 
 ## Most Common Tags
 
-- **TypeScript**: 153 files
-- **AI agent**: 123 files
-- **documentation**: 86 files
+- **TypeScript**: 161 files
+- **AI agent**: 126 files
+- **documentation**: 87 files
 - **security**: 64 files
-- **API**: 45 files
-- **Next.js API**: 43 files
-- **React**: 36 files
-- **utility**: 31 files
-- **UI**: 29 files
-- **React hooks**: 23 files
+- **API**: 47 files
+- **Next.js API**: 45 files
+- **React**: 40 files
+- **utility**: 34 files
+- **UI**: 30 files
+- **React hooks**: 25 files
 
 ## File Inventory
 
@@ -194,6 +194,15 @@ localhost:8000", // Local LangGraph dev server
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/api/dashboard/[user_id]/route.ts`
+
+Purpose: User Dashboard Composition API - Marcus Dashboard with real progress data
+
+**Complexity**: high • **Size**: 12.1KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/28/2025
+
+
 ### `apps/web/app/api/debug/check-progress-schema/route.ts`
 
 Try to get a sample record to see what columns exist
@@ -228,6 +237,15 @@ Check all Supabase-related environment variables
 **Complexity**: low • **Size**: 0.5KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
 **Modified**: 6/28/2025
+
+
+### `apps/web/app/api/debug/mockups/route.ts`
+
+Debug Mockups API Route
+
+**Complexity**: low • **Size**: 2.1KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 6/29/2025
 
 
 ### `apps/web/app/api/debug/nav-check/route.ts`
@@ -507,6 +525,15 @@ Type definitions
 **Complexity**: medium • **Size**: 2.9KB
 **Tags**: `React`, `TypeScript`, `AI agent`, `security`
 **Modified**: 6/27/2025
+
+
+### `apps/web/app/dashboard/marcus/page.tsx`
+
+Purpose: Marcus Dashboard Page - Composition-driven dashboard using existing widgets
+
+**Complexity**: medium • **Size**: 4.8KB
+**Tags**: `React`, `TypeScript`, `React hooks`
+**Modified**: 6/28/2025
 
 
 ### `apps/web/app/dashboard/page.tsx`
@@ -914,6 +941,15 @@ SSR Root page that redirects based on session status
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/test-dashboard/page.tsx`
+
+Purpose: Marcus Dashboard UI - World-class dashboard design with mock data
+
+**Complexity**: high • **Size**: 34.2KB
+**Tags**: `React`, `TypeScript`, `React hooks`
+**Modified**: 6/29/2025
+
+
 ### `apps/web/app/test-widgets/page.tsx`
 
 File: apps/web/app/test-widgets/page.tsx
@@ -963,9 +999,9 @@ File: apps/web/components/ai/UniversalSchemaRenderer.tsx
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 29.7KB
+**Complexity**: high • **Size**: 31.3KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/29/2025
 
 
 ### `apps/web/components/SupabaseProvider.tsx`
@@ -1125,9 +1161,9 @@ File: apps/web/components/widgets/index.ts
 
 File: apps/web/components/widgets/Leaderboard.tsx
 
-**Complexity**: medium • **Size**: 4.0KB
+**Complexity**: medium • **Size**: 5.4KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/29/2025
 
 
 ### `apps/web/components/widgets/LeaderForgeCard.tsx`
@@ -1137,6 +1173,15 @@ LeaderForgeCard.tsx
 **Complexity**: medium • **Size**: 11.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
 **Modified**: 6/28/2025
+
+
+### `apps/web/components/widgets/List.tsx`
+
+File: apps/web/components/widgets/List.tsx
+
+**Complexity**: medium • **Size**: 8.0KB
+**Tags**: `React`, `TypeScript`, `UI`, `AI agent`
+**Modified**: 6/29/2025
 
 
 ### `apps/web/components/widgets/Panel.tsx`
@@ -1152,9 +1197,9 @@ File: apps/web/components/widgets/Panel.tsx
 
 File: apps/web/components/widgets/StatCard.tsx
 
-**Complexity**: low • **Size**: 2.1KB
+**Complexity**: medium • **Size**: 3.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/29/2025
 
 
 ### `apps/web/components/widgets/types.ts`
@@ -1245,6 +1290,33 @@ React hook for fetching navigation options from the database
 **Owner**: Frontend team • **Complexity**: low • **Size**: 1.4KB
 **Tags**: `React hooks`, `navigation`, `SWR`, `database`, `TypeScript`, `hooks`
 **Modified**: 6/27/2025
+
+
+### `apps/web/lib/mockups/index.ts`
+
+Entry point for mockup system - exports all mockup functionality
+
+**Owner**: Product Team • **Complexity**: low • **Size**: 1.0KB
+**Tags**: `mockups`, `routing`, `feature-flags`, `exports`, `TypeScript`, `utility`
+**Modified**: 6/29/2025
+
+
+### `apps/web/lib/mockups/MockupRegistry.ts`
+
+Generalized mockup routing system for rapid prototyping in production context
+
+**Owner**: Product Team • **Complexity**: medium • **Size**: 3.2KB
+**Tags**: `mockups`, `feature-flags`, `prototyping`, `navigation`, `TypeScript`, `utility`
+**Modified**: 6/29/2025
+
+
+### `apps/web/lib/mockups/MockupRouter.tsx`
+
+Routes navigation to mockups when enabled, falls back to agent content
+
+**Owner**: Product Team • **Complexity**: low • **Size**: 2.2KB
+**Tags**: `mockups`, `routing`, `feature-flags`, `navigation`, `React`, `TypeScript`, `utility`, `AI agent`
+**Modified**: 6/29/2025
 
 
 ### `apps/web/lib/server/loadContextConfig.ts`
@@ -2025,7 +2097,7 @@ Register agent with proper typing
 
 Local LangGraph dev server",
 
-**Size**: 133.8KB
+**Size**: 134.2KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/28/2025
 
@@ -2034,9 +2106,18 @@ Local LangGraph dev server",
 
 Local LangGraph dev server
 
-**Size**: 50.3KB
+**Size**: 50.5KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/28/2025
+
+
+### `docs/mockup-system-guide.md`
+
+Marcus Dashboard - My Learning nav option
+
+**Size**: 6.7KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/29/2025
 
 
 ### `docs/product-design/design-system.md`
