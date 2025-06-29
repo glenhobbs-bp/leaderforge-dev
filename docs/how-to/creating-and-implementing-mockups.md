@@ -181,6 +181,71 @@ Navigate to the page and check console logs:
 
 ### **Component Development Guidelines**
 
+#### **🎨 CRITICAL: Design System Adherence**
+
+**ALL mockups MUST adhere to the established design system**. This is not optional - mockups that don't follow design system patterns create inconsistent user experiences and misleading feedback.
+
+**Required Design System Elements:**
+- **Typography**: Use established heading sizes (`text-2xl`, `text-xl`, etc.)
+- **Colors**: Follow the approved color palette (primary, secondary, success, warning, error)
+- **Spacing**: Use consistent padding/margin classes (`p-6`, `mb-8`, `space-y-4`, etc.)
+- **Components**: Use existing widget components (`StatCard`, `LeaderForgeCard`, `List`)
+- **Layouts**: Follow established grid patterns (`grid-cols-1 lg:grid-cols-3`)
+- **Interactive States**: Proper hover/focus/disabled states
+- **Responsive Design**: Mobile-first, consistent breakpoints
+
+**✅ DO:**
+```typescript
+// Good: Uses design system components and patterns
+<div className="p-6">
+  <header className="mb-8">
+    <h1 className="text-2xl font-medium text-gray-900 mb-1">Dashboard Title</h1>
+    <p className="text-sm text-gray-500">Consistent subtitle</p>
+  </header>
+
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <StatCard
+      title="Metric Name"
+      value="42"
+      change="+5 this week"
+      trend="up"
+      icon="Activity"
+    />
+    <LeaderForgeCard
+      title="Feature Preview"
+      subtitle="Interactive demonstration"
+      actions={[
+        { label: 'View Details', action: 'openModal' },
+        { label: 'Learn More', action: 'openGuide' }
+      ]}
+    />
+  </div>
+</div>
+```
+
+**❌ DON'T:**
+```typescript
+// Bad: Custom styles, inconsistent patterns, random colors
+<div style={{padding: '24px'}}>
+  <h1 style={{fontSize: '28px', color: '#123456'}}>Random Title</h1>
+  <div style={{display: 'flex', gap: '10px'}}>
+    <div style={{background: '#abcdef', padding: '20px'}}>
+      Custom styled card that doesn't match anything
+    </div>
+  </div>
+</div>
+```
+
+**📝 Design System Checklist:**
+- [ ] Uses existing widget components (`StatCard`, `LeaderForgeCard`, `List`)
+- [ ] Follows established layout patterns
+- [ ] Uses consistent typography classes
+- [ ] Implements proper responsive design
+- [ ] Includes interactive states (hover, focus, disabled)
+- [ ] Matches existing color scheme
+- [ ] Uses standard spacing/padding classes
+- [ ] Integrates seamlessly with existing dashboard look
+
 #### **File Structure & Standards**
 ```typescript
 // apps/web/components/mockups/YourMockup.tsx
@@ -858,3 +923,60 @@ The new system provides better scalability, easier access management, and consis
 ---
 
 **The mockup system enables rapid user experience validation without architectural investment - perfect for iterating toward requirements and eventual implementation!**
+
+# Feedback Collection System
+
+### **Built-in Feedback Collection**
+
+The agent-native mockup system includes **built-in feedback collection** through the mockup banner. Every mockup automatically displays:
+
+- **Mockup Banner**: Always visible at the top, showing mockup name and agent info
+- **Feedback Button**: Blue "Feedback" button in the top-right corner of the banner
+- **Feedback Modal**: Complete rating and comment system
+
+**How Users Access Feedback:**
+1. **Navigate to any mockup** (e.g., My Dashboard)
+2. **Look for the blue banner** at the top: "🎭 Mockup: [ComponentName]"
+3. **Click the "Feedback" button** on the right side of the banner
+4. **Complete the feedback form** with rating (1-5) and comments
+5. **Submit feedback** - currently logged to console, ready for API integration
+
+**Feedback Data Structure:**
+```javascript
+{
+  mockupName: "MarcusDashboardMockup",
+  agentId: "d8cc993a-e1e3-4fdd-92b5-d99bf0e5c390",
+  rating: 4,
+  feedback: "Really like the layout, but the colors could be brighter",
+  timestamp: "2025-06-29T19:16:48.394Z",
+  userAgent: "Mozilla/5.0..."
+}
+```
+
+**Current Implementation:**
+- ✅ **Modal Interface**: Complete rating + comment form
+- ✅ **Always Available**: Button in every mockup banner
+- ✅ **Data Logging**: Console logging with full context
+- ✅ **Production Ready**: Works in both development and production
+- 🔄 **Future Enhancement**: API endpoint for feedback storage
+
+**Finding Feedback Data:**
+```javascript
+// Browser console - look for:
+[MockupFeedback] {
+  mockupName: "...",
+  rating: 4,
+  feedback: "User comments here...",
+  // ... full context
+}
+```
+
+**API Integration (Future):**
+```typescript
+// Ready for enhancement to:
+await fetch('/api/feedback/mockup', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(feedbackData)
+});
+```
