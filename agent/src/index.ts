@@ -10,6 +10,35 @@ import { TribeSocialContentTool } from "./TribeSocialContentTool.js";
 // Initialize the original TribeSocialContentTool
 const tribeContentTool = new TribeSocialContentTool();
 
+// Smart worksheet template selection based on content title
+function getWorksheetTemplateId(title: string): string {
+  const titleLower = title.toLowerCase();
+
+  // Project Management content
+  if (titleLower.includes('project') || titleLower.includes('management') ||
+      titleLower.includes('planning') || titleLower.includes('execution') ||
+      titleLower.includes('bucket') || titleLower.includes('cue')) {
+    return 'aa1f72eb-1234-5678-9abc-def123456789'; // Project Management Leadership
+  }
+
+  // Team Building content
+  if (titleLower.includes('team') || titleLower.includes('building') ||
+      titleLower.includes('collaboration') || titleLower.includes('people') ||
+      titleLower.includes('change agent')) {
+    return 'bb2f83ec-2345-6789-abcd-ef0123456789'; // Team Building Leadership
+  }
+
+  // Leadership Fundamentals content
+  if (titleLower.includes('fundamental') || titleLower.includes('foundation') ||
+      titleLower.includes('basics') || titleLower.includes('trust') ||
+      titleLower.includes('integrity') || titleLower.includes('character')) {
+    return 'cc3f94fd-3456-789a-bcde-f01234567890'; // Leadership Fundamentals
+  }
+
+  // Default to video reflection worksheet for all other content
+  return '663570eb-babd-41cd-9bfa-18972275863b'; // Video Reflection Worksheet
+}
+
 // Define the agent state
 const StateAnnotation = Annotation.Root({
   messages: Annotation<BaseMessage[]>({
@@ -121,8 +150,10 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             label: 'Worksheet',
             primary: false,
             parameters: {
-              worksheetUrl: '#worksheet', // Placeholder
-              contentId: (content.props as Record<string, unknown>)?.id || content.id
+              templateId: getWorksheetTemplateId((content.props as Record<string, unknown>)?.title || content.title || ''),
+              contentId: (content.props as Record<string, unknown>)?.id || content.id,
+              title: (content.props as Record<string, unknown>)?.title || content.title,
+              videoId: (content.props as Record<string, unknown>)?.id || content.id
             }
           }
         ]

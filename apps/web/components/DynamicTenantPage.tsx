@@ -8,6 +8,7 @@ import { UniversalSchemaRenderer } from "./ai/UniversalSchemaRenderer";
 import { ComponentSchema } from "../../../packages/agent-core/types/ComponentSchema";
 import { UniversalWidgetSchema } from "../../../packages/agent-core/types/UniversalWidgetSchema";
 import { VideoPlayerModal } from "./widgets/VideoPlayerModal";
+import { FormWidget } from "./forms/FormWidget";
 import { useSupabase } from './SupabaseProvider';
 import React from "react";
 import { useUserPreferences } from '../app/hooks/useUserPreferences';
@@ -67,6 +68,10 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   // Video modal state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [videoModalData, setVideoModalData] = useState<{ action: string; label: string; [key: string]: unknown } | null>(null);
+
+  // Worksheet modal state
+  const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState(false);
+  const [worksheetModalData, setWorksheetModalData] = useState<{ contentId: string; title: string; templateId?: string; [key: string]: unknown } | null>(null);
   const [currentTenant, setCurrentTenant] = useState<string>(
     props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'brilliant'
   );
@@ -263,7 +268,13 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
       case 'openWorksheet':
         console.log('[DynamicTenantPage] Opening worksheet:', action);
-        // TODO: Implement worksheet handling
+        setWorksheetModalData({
+          contentId: (action.contentId as string) || (action.parameters as any)?.contentId || 'unknown',
+          title: (action.title as string) || (action.parameters as any)?.title || 'Content Worksheet',
+          templateId: (action.templateId as string) || (action.parameters as any)?.templateId || '663570eb-babd-41cd-9bfa-18972275863b', // Default to existing template
+          ...action
+        });
+        setIsWorksheetModalOpen(true);
         break;
 
       case 'completeProgress':
@@ -796,6 +807,32 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
                 console.log('[DynamicTenantPage] Refreshing content after video progress update');
                 loadContentForNavOption(selectedNavOptionId, false);
               }
+            }}
+          />
+        )}
+
+        {/* Worksheet Modal */}
+        {isWorksheetModalOpen && worksheetModalData && (
+          <FormWidget
+            templateId={worksheetModalData.templateId || '663570eb-babd-41cd-9bfa-18972275863b'}
+            isOpen={isWorksheetModalOpen}
+            onClose={() => {
+              setIsWorksheetModalOpen(false);
+              setWorksheetModalData(null);
+            }}
+            videoContext={{
+              id: worksheetModalData.contentId,
+              title: worksheetModalData.title
+            }}
+            onSubmit={async (submissionData) => {
+              console.log('[DynamicTenantPage] Worksheet submitted:', submissionData);
+              // Refresh content when worksheet is submitted
+              if (selectedNavOptionId) {
+                console.log('[DynamicTenantPage] Refreshing content after worksheet submission');
+                loadContentForNavOption(selectedNavOptionId, false);
+              }
+              setIsWorksheetModalOpen(false);
+              setWorksheetModalData(null);
             }}
           />
         )}
