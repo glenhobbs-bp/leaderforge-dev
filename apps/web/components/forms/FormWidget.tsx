@@ -452,7 +452,8 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
         completion_percentage: 100,
         completion_timestamp: new Date().toISOString(),
         ...(videoContext && {
-          video_id: videoContext.id,
+          content_title: videoContext.title,  // ✅ Use content title as primary identifier
+          video_id: videoContext.id,          // Keep for backward compatibility
           video_title: videoContext.title,
           video_context: {
             id: videoContext.id,
@@ -461,9 +462,9 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
         })
       };
 
-      // Create source context with video information
+      // Create source context using content title (deterministic identifier)
       const sourceContext = videoContext
-        ? `worksheet:video-reflection:${videoContext.id}:${templateId}`
+        ? `worksheet:video-reflection:${videoContext.title}:${templateId}`
         : `worksheet:video-reflection:${templateId}`;
 
       // Submit through Universal Input System

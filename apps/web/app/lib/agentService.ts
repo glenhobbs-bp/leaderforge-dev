@@ -113,13 +113,53 @@ export class AgentService {
     try {
       // First, extract all content IDs from the schema
       const contentIds: string[] = [];
+      const videoIdToTitleMap: Record<string, string> = {}; // Map video IDs to content titles
 
       const collectContentIds = (obj: any) => {
         if (Array.isArray(obj)) {
           obj.forEach(collectContentIds);
         } else if (obj && typeof obj === 'object') {
           if (obj.type === 'Card' && obj.config?.title) {
-            contentIds.push(obj.config.title);
+            const title = obj.config.title;
+            contentIds.push(title);
+
+            // Extract video ID from card data for worksheet matching
+            if (obj.data?.videoUrl) {
+              // Try to extract video ID from videoUrl
+              const videoUrl = obj.data.videoUrl;
+              let videoId = null;
+
+              // Extract from various URL patterns
+              if (typeof videoUrl === 'string') {
+                // Pattern 1: Direct video ID
+                if (!videoUrl.includes('/') && !videoUrl.includes('http')) {
+                  videoId = videoUrl;
+                }
+                // Pattern 2: URL with ID parameter
+                else if (videoUrl.includes('?id=')) {
+                  const match = videoUrl.match(/[?&]id=([^&]+)/);
+                  if (match) videoId = match[1];
+                }
+                // Pattern 3: URL with video ID at end
+                else {
+                  const urlParts = videoUrl.split('/');
+                  const lastPart = urlParts[urlParts.length - 1];
+                  if (lastPart && lastPart !== '' && !lastPart.includes('.')) {
+                    videoId = lastPart.split('?')[0]; // Remove query params
+                  }
+                }
+              }
+
+              // Also check if there's a direct videoId field
+              if (!videoId && obj.data.videoId) {
+                videoId = obj.data.videoId;
+              }
+
+              if (videoId) {
+                videoIdToTitleMap[videoId] = title;
+                console.log(`[AgentService] Mapped video ID "${videoId}" to title "${title}"`);
+              }
+            }
           }
           Object.values(obj).forEach(collectContentIds);
         }
@@ -127,25 +167,41 @@ export class AgentService {
 
       collectContentIds(content);
 
-      // Batch fetch progress data directly from database (no server-to-server call)
+      // Batch fetch both progress data and worksheet completions in parallel
       let progressMap: Record<string, any> = {};
-      if (contentIds.length > 0) {
-        console.log(`[AgentService] Batch fetching progress for ${contentIds.length} content items:`, contentIds);
-        try {
-          // Direct database query using authenticated Supabase client (more efficient)
-          const { data: progressData, error: queryError } = await this.supabase
-            .schema('core')
-            .from('user_progress')
-            .select('content_id, progress_percentage, metadata, last_viewed_at, completed_at, started_at')
-            .eq('user_id', userId)
-            .in('content_id', contentIds);
+      let worksheetMap: Record<string, boolean> = {};
 
-          if (queryError) {
-            console.warn(`[AgentService] Progress query failed:`, queryError);
+      if (contentIds.length > 0) {
+        console.log(`[AgentService] Batch fetching progress and worksheet completions for ${contentIds.length} content items:`, contentIds);
+
+        try {
+          // Fetch video progress and worksheet completions in parallel
+          const [progressResult, worksheetResult] = await Promise.all([
+            // Video progress from user_progress table
+            this.supabase
+              .schema('core')
+              .from('user_progress')
+              .select('content_id, progress_percentage, metadata, last_viewed_at, completed_at, started_at')
+              .eq('user_id', userId)
+              .in('content_id', contentIds),
+
+            // Query for worksheet completions for all content IDs
+            this.supabase
+              .schema('core')
+              .from('universal_inputs')
+              .select('input_data, source_context')
+              .eq('user_id', userId)
+              .eq('input_type', 'form')
+              .like('source_context', 'worksheet:video-reflection:%')
+              .eq('status', 'completed')
+          ]);
+
+          // Process video progress data
+          if (progressResult.error) {
+            console.warn(`[AgentService] Progress query failed:`, progressResult.error);
             progressMap = {};
           } else {
-            // Transform to expected format
-            progressData?.forEach((item) => {
+            progressResult.data?.forEach((item) => {
               progressMap[item.content_id] = {
                 progress_percentage: item.progress_percentage,
                 metadata: item.metadata,
@@ -155,20 +211,93 @@ export class AgentService {
                 lastUpdated: item.last_viewed_at
               };
             });
-            console.log(`[AgentService] Successfully fetched progress for ${progressData?.length || 0} items`);
+            console.log(`[AgentService] Successfully fetched progress for ${progressResult.data?.length || 0} items`);
+          }
+
+          // Process worksheet completion data
+          if (worksheetResult.error) {
+            console.warn(`[AgentService] Worksheet query failed:`, worksheetResult.error);
+            worksheetMap = {};
+          } else {
+            // Create a map of videoId -> completed status
+            const completedVideoIds = new Set();
+
+            worksheetResult.data?.forEach((submission) => {
+              // Method 1: Extract video ID from input_data (FormWidget stores it here)
+              const videoIdFromData = submission.input_data?.video_id ||
+                                     submission.input_data?.video_context?.id;
+
+              // Method 2: Extract video ID from source_context pattern
+              // source_context format: "worksheet:video-reflection:VIDEO_ID:TEMPLATE_ID"
+              let videoIdFromContext;
+              if (submission.source_context) {
+                const parts = submission.source_context.split(':');
+                if (parts.length >= 3) {
+                  videoIdFromContext = parts[2]; // Third element is the video ID
+                }
+              }
+
+              // Add both potential video IDs to our set
+              if (videoIdFromData) completedVideoIds.add(videoIdFromData);
+              if (videoIdFromContext) completedVideoIds.add(videoIdFromContext);
+
+              console.log(`[AgentService] Found worksheet submission:`, {
+                videoIdFromData,
+                videoIdFromContext,
+                source_context: submission.source_context
+              });
+            });
+
+            // Map content titles to worksheet completion status using video IDs
+            contentIds.forEach(contentTitle => {
+              // First check if we have a direct video ID mapping for this content
+              const videoIdForThisContent = Object.keys(videoIdToTitleMap).find(
+                videoId => videoIdToTitleMap[videoId] === contentTitle
+              );
+
+              let hasWorksheet = false;
+
+              if (videoIdForThisContent) {
+                // Direct match using the mapped video ID
+                hasWorksheet = completedVideoIds.has(videoIdForThisContent);
+                if (hasWorksheet) {
+                  console.log(`[AgentService] Found worksheet for "${contentTitle}" via video ID: ${videoIdForThisContent}`);
+                }
+              }
+
+              // Fallback: Check if any worksheet submission matches content patterns
+              if (!hasWorksheet) {
+                hasWorksheet = completedVideoIds.has(contentTitle) ||
+                               Array.from(completedVideoIds).some(id =>
+                                 typeof id === 'string' &&
+                                 (id.includes(contentTitle.toLowerCase().replace(/\s+/g, '-')) ||
+                                  contentTitle.toLowerCase().replace(/\s+/g, '-').includes(id.toLowerCase()) ||
+                                  id.toLowerCase().includes(contentTitle.toLowerCase()))
+                               );
+              }
+
+              worksheetMap[contentTitle] = hasWorksheet;
+            });
+
+            console.log(`[AgentService] Successfully checked worksheet completions for ${worksheetResult.data?.length || 0} submissions`);
+            console.log(`[AgentService] Completed video IDs found:`, Array.from(completedVideoIds));
+            console.log(`[AgentService] Worksheet completion map:`, worksheetMap);
           }
         } catch (error) {
-          console.warn(`[AgentService] Progress fetch failed:`, error);
-          // Continue with empty progress map - don't fail the entire enrichment
+          console.warn(`[AgentService] Progress/worksheet fetch failed:`, error);
+          // Continue with empty maps - don't fail the entire enrichment
           progressMap = {};
+          worksheetMap = {};
         }
       }
 
-      // Helper function to enrich a single card with progress
+      // Helper function to enrich a single card with progress and worksheet data
       const enrichCard = (card: any) => {
         // Updated for Universal Widget Schema format
         if (card.type === 'Card' && card.config?.title && card.data?.videoUrl) {
           const progressData = progressMap[card.config.title];
+          const worksheetCompleted = worksheetMap[card.config.title] || false;
+
           return {
             ...card,
             data: {
@@ -179,9 +308,8 @@ export class AgentService {
               stats: {
                 ...card.data.stats,
                 watched: (progressData?.progress_percentage || 0) >= 90,
-                // Fix: Worksheet completion should not be tied to video progress
-                // Worksheets are not implemented yet, so always false
-                completed: false, // TODO: Implement actual worksheet tracking
+                // Real worksheet completion status from Universal Input System
+                completed: worksheetCompleted,
                 lastWatched: progressData?.last_viewed_at || null
               }
             }
@@ -351,8 +479,6 @@ export class AgentService {
       return this.getLangGraphFallbackContent(agent, request);
     }
   }
-
-
 
   /**
    * Get fallback content when LangGraph service is unavailable
