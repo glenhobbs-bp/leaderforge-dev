@@ -8,6 +8,7 @@
 
 import React, { Suspense, lazy, useMemo, useState } from 'react';
 import { ExclamationTriangleIcon, ChatBubbleIcon } from '@radix-ui/react-icons';
+import { useSupabase } from '../SupabaseProvider';
 
 interface MockupRendererProps {
   componentName: string;
@@ -133,6 +134,7 @@ function FeedbackModal({ isOpen, onClose, mockupName, agentId }: FeedbackModalPr
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { session } = useSupabase();
 
   if (!isOpen) return null;
 
@@ -143,29 +145,64 @@ function FeedbackModal({ isOpen, onClose, mockupName, agentId }: FeedbackModalPr
     setIsSubmitting(true);
 
     try {
-      // Log feedback to console for now - can be enhanced to send to API
-      console.log('[MockupFeedback]', {
-        mockupName,
-        agentId,
-        rating,
-        feedback,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent
+      if (!session?.access_token) {
+        alert('Please log in to submit feedback.');
+        return;
+      }
+
+      // Submit feedback to API
+      const response = await fetch('/api/feedback/mockup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          mockupName,
+          agentId,
+          rating,
+          feedback,
+          tenantKey: 'leaderforge', // TODO: Make this dynamic based on current tenant
+          sessionId: window.crypto.randomUUID(),
+          userAgent: navigator.userAgent,
+          deviceInfo: {
+            screen: `${window.screen.width}x${window.screen.height}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timestamp: new Date().toISOString()
+          }
+        })
       });
 
-      // Future: Send to feedback collection API
-      // await fetch('/api/feedback/mockup', { ... });
+      const result = await response.json();
 
-      // Show success message
-      alert('Thank you for your feedback! This helps us improve the feature.');
+      if (result.success) {
+        // Log success for debugging
+        console.log('[MockupFeedback] Feedback submitted successfully:', {
+          feedbackId: result.id,
+          mockupName,
+          rating
+        });
 
-      // Reset form
-      setFeedback('');
-      setRating(null);
-      onClose();
+        alert('Thank you for your feedback! This helps us improve the feature.');
+
+        // Reset form
+        setFeedback('');
+        setRating(null);
+        onClose();
+      } else {
+        console.error('[MockupFeedback] API error:', result.error, result.message);
+
+        // Handle specific error cases
+        if (result.error === 'DUPLICATE_FEEDBACK') {
+          alert('You have already submitted feedback for this mockup. Thank you!');
+          onClose();
+        } else {
+          alert(`Error submitting feedback: ${result.message}`);
+        }
+      }
     } catch (error) {
-      console.error('[MockupFeedback] Error submitting feedback:', error);
-      alert('Error submitting feedback. Please try again.');
+      console.error('[MockupFeedback] Network error submitting feedback:', error);
+      alert('Network error submitting feedback. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }

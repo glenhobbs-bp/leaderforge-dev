@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-06-29T11:27:54.707Z",
+    "generated_at": "2025-06-30T12:20:41.894Z",
     "generator_version": "1.0.0",
-    "total_files": 274,
-    "total_size_bytes": 2441464,
+    "total_files": 292,
+    "total_size_bytes": 2657691,
     "file_types": {
-      ".ts": 121,
+      ".ts": 126,
       ".json": 17,
-      ".tsx": 40,
+      ".tsx": 44,
       ".js": 10,
-      ".md": 85,
-      ".sql": 1
+      ".md": 93,
+      ".sql": 2
     },
     "tags": {
-      "TypeScript": 161,
-      "API": 47,
-      "AI agent": 126,
-      "React": 40,
-      "React hooks": 25,
-      "Next.js API": 45,
-      "security": 64,
+      "TypeScript": 170,
+      "API": 51,
+      "AI agent": 142,
+      "React": 44,
+      "React hooks": 31,
+      "Next.js API": 49,
+      "security": 70,
       "test": 13,
       "API endpoint": 3,
       "navigation state": 2,
@@ -51,7 +51,7 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 30,
+      "UI": 35,
       "navigation": 6,
       "context-based": 1,
       "UI component": 1,
@@ -70,7 +70,7 @@
       "prototyping": 1,
       "routing": 2,
       "exports": 1,
-      "documentation": 87,
+      "documentation": 96,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -217,6 +217,28 @@
       "hash": "2f2b7059"
     },
     {
+      "path": "apps/web/app/admin/feedback/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/admin/feedback",
+      "extension": ".tsx",
+      "purpose": "Purpose: Mockup Feedback Admin Dashboard - View and analyze user feedback on mockups",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../../../components/SupabaseProvider",
+        "@radix-ui/react-icons"
+      ],
+      "last_modified": "2025-06-29T22:35:01.007Z",
+      "size_bytes": 11445,
+      "hash": "7089fa04",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/app/api/agent/content/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/agent/content",
@@ -258,9 +280,9 @@
         "../../../lib/types",
         "next/headers"
       ],
-      "last_modified": "2025-06-28T18:55:48.163Z",
-      "size_bytes": 22015,
-      "hash": "f112ee23",
+      "last_modified": "2025-06-29T12:49:16.596Z",
+      "size_bytes": 21989,
+      "hash": "287e8b5b",
       "complexity": "high"
     },
     {
@@ -645,12 +667,11 @@
         "next/server",
         "../../../lib/entitlementService",
         "../../../lib/supabaseServerClient",
-        "next/headers",
-        "../../../lib/types"
+        "next/headers"
       ],
-      "last_modified": "2025-06-27T21:33:11.942Z",
-      "size_bytes": 1457,
-      "hash": "a72ba2b1",
+      "last_modified": "2025-06-29T17:15:44.104Z",
+      "size_bytes": 1395,
+      "hash": "bb42847f",
       "complexity": "low"
     },
     {
@@ -673,6 +694,93 @@
       "size_bytes": 970,
       "hash": "90daa89d",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/feedback/mockup/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/feedback/mockup",
+      "extension": ".ts",
+      "purpose": "Purpose: Mockup Feedback API - Handles submission and retrieval of mockup feedback",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-06-29T22:34:58.625Z",
+      "size_bytes": 6612,
+      "hash": "a1c8cfa3",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/files/upload/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/files/upload",
+      "extension": ".ts",
+      "purpose": "Purpose: File upload API endpoint for schema-driven forms system",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "@supabase/ssr",
+        "next/headers",
+        "next/server",
+        "crypto"
+      ],
+      "last_modified": "2025-06-30T12:15:41.819Z",
+      "size_bytes": 7875,
+      "hash": "f0d675c2",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/form-templates/[templateId]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/form-templates/[templateId]",
+      "extension": ".ts",
+      "purpose": "Purpose: Form templates API endpoint for schema-driven forms",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "@/lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-06-30T12:20:18.629Z",
+      "size_bytes": 4283,
+      "hash": "3d9b804b",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/input/universal/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/input/universal",
+      "extension": ".ts",
+      "purpose": "Purpose: Universal Input API - Handles all user input submissions in unified system",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "@supabase/ssr",
+        "next/headers",
+        "next/server"
+      ],
+      "last_modified": "2025-06-30T12:05:19.539Z",
+      "size_bytes": 7329,
+      "hash": "c67831d8",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/nav/[tenant_key]/route.ts",
@@ -1564,9 +1672,9 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-06-28T19:04:17.025Z",
-      "size_bytes": 18562,
-      "hash": "a5e4d1b2",
+      "last_modified": "2025-06-29T19:16:14.476Z",
+      "size_bytes": 19836,
+      "hash": "8299f933",
       "complexity": "high"
     },
     {
@@ -2231,28 +2339,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/test-dashboard/page.tsx",
-      "name": "page.tsx",
-      "directory": "apps/web/app/test-dashboard",
-      "extension": ".tsx",
-      "purpose": "Purpose: Marcus Dashboard UI - World-class dashboard design with mock data",
-      "tags": [
-        "React",
-        "TypeScript",
-        "React hooks"
-      ],
-      "dependencies": [
-        "react",
-        "../../components/widgets/LeaderForgeCard",
-        "../../components/widgets/StatCard",
-        "../../components/widgets/List"
-      ],
-      "last_modified": "2025-06-29T11:00:53.997Z",
-      "size_bytes": 34999,
-      "hash": "07f66555",
-      "complexity": "high"
-    },
-    {
       "path": "apps/web/app/test-widgets/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/test-widgets",
@@ -2383,9 +2469,94 @@
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-29T11:25:44.935Z",
-      "size_bytes": 32004,
-      "hash": "e516781e",
+      "last_modified": "2025-06-29T19:16:27.283Z",
+      "size_bytes": 32027,
+      "hash": "4a5785c6",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/forms/FormWidget.tsx",
+      "name": "FormWidget.tsx",
+      "directory": "apps/web/components/forms",
+      "extension": ".tsx",
+      "purpose": "Purpose: Schema-driven form component using React JSON Schema Form",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "@rjsf/core",
+        "@rjsf/validator-ajv8",
+        "@rjsf/utils"
+      ],
+      "last_modified": "2025-06-30T12:19:06.771Z",
+      "size_bytes": 9329,
+      "hash": "c2549efc",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/forms/index.ts",
+      "name": "index.ts",
+      "directory": "apps/web/components/forms",
+      "extension": ".ts",
+      "purpose": "Purpose: Forms index - Exports all form components for the Universal Input System",
+      "tags": [
+        "TypeScript",
+        "UI"
+      ],
+      "last_modified": "2025-06-30T12:20:26.514Z",
+      "size_bytes": 277,
+      "hash": "50cdefb2",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/forms/VideoWorksheetForm.tsx",
+      "name": "VideoWorksheetForm.tsx",
+      "directory": "apps/web/components/forms",
+      "extension": ".tsx",
+      "purpose": "Purpose: Video Worksheet Form - Captures video reflection worksheet responses for Universal Input System",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "last_modified": "2025-06-30T12:05:22.192Z",
+      "size_bytes": 11205,
+      "hash": "118ebbce",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/mockups/MarcusDashboardMockup.tsx",
+      "name": "MarcusDashboardMockup.tsx",
+      "directory": "apps/web/components/mockups",
+      "extension": ".tsx",
+      "purpose": "Purpose: Marcus Dashboard Mockup - Agent-native mockup component for UX validation",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../widgets/LeaderForgeCard",
+        "../widgets/StatCard",
+        "../widgets/List",
+        "../forms/VideoWorksheetForm"
+      ],
+      "last_modified": "2025-06-30T12:05:25.093Z",
+      "size_bytes": 27504,
+      "hash": "1cb8d4ce",
       "complexity": "high"
     },
     {
@@ -2537,6 +2708,29 @@
       "last_modified": "2025-06-27T21:33:12.082Z",
       "size_bytes": 18568,
       "hash": "3f12e648",
+      "complexity": "high"
+    },
+    {
+      "path": "apps/web/components/ui/MockupRenderer.tsx",
+      "name": "MockupRenderer.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Purpose: Mockup Renderer - Dynamically renders JSX mockup components from agent responses",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "@radix-ui/react-icons",
+        "../SupabaseProvider"
+      ],
+      "last_modified": "2025-06-29T22:34:53.552Z",
+      "size_bytes": 10466,
+      "hash": "96d44c3c",
       "complexity": "high"
     },
     {
@@ -3200,15 +3394,16 @@
         "prototyping",
         "navigation",
         "TypeScript",
-        "utility"
+        "utility",
+        "security"
       ],
       "dependencies": [
         "react",
-        "../../app/test-dashboard/page"
+        "../../components/mockups/MarcusDashboardMockup"
       ],
-      "last_modified": "2025-06-29T11:24:10.652Z",
-      "size_bytes": 3279,
-      "hash": "ba7eedae",
+      "last_modified": "2025-06-29T19:16:21.643Z",
+      "size_bytes": 3975,
+      "hash": "f460979c",
       "complexity": "medium"
     },
     {
@@ -3305,9 +3500,9 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-06-27T21:33:12.114Z",
-      "size_bytes": 1195,
-      "hash": "eb749469"
+      "last_modified": "2025-06-30T12:18:04.737Z",
+      "size_bytes": 1325,
+      "hash": "ccbe715b"
     },
     {
       "path": "apps/web/postcss.config.js",
@@ -4213,6 +4408,49 @@
       "hash": "ecc14506"
     },
     {
+      "path": "docs/architecture/adr/0014-agent-native-mockup-composition-system.md",
+      "name": "0014-agent-native-mockup-composition-system.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "apps/web/components/mockups/MarcusDashboardMockup.tsx",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-29T17:17:31.380Z",
+      "size_bytes": 10904,
+      "hash": "54b02432"
+    },
+    {
+      "path": "docs/architecture/adr/0015-universal-user-input-system.md",
+      "name": "0015-universal-user-input-system.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "e.g., ['progress_tracking', 'leaderboard_scoring']",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-30T12:05:37.824Z",
+      "size_bytes": 10944,
+      "hash": "4f6b9f5a"
+    },
+    {
+      "path": "docs/architecture/adr/0016-schema-driven-forms-architecture.md",
+      "name": "0016-schema-driven-forms-architecture.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "or current tenant when created",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-30T12:05:35.708Z",
+      "size_bytes": 11406,
+      "hash": "4e6eaf5f"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -4297,6 +4535,21 @@
       "hash": "972cd2ec"
     },
     {
+      "path": "docs/database/core-schema-current.sql",
+      "name": "core-schema-current.sql",
+      "directory": "docs/database",
+      "extension": ".sql",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-29T19:16:10.957Z",
+      "size_bytes": 14902,
+      "hash": "956b0c65"
+    },
+    {
       "path": "docs/engineering/future-enhancements.md",
       "name": "future-enhancements.md",
       "directory": "docs/engineering",
@@ -4307,9 +4560,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-27T21:33:12.246Z",
-      "size_bytes": 6375,
-      "hash": "1900249a"
+      "last_modified": "2025-06-30T12:05:32.964Z",
+      "size_bytes": 6482,
+      "hash": "2fad87a5"
     },
     {
       "path": "docs/engineering/how-to/README.md",
@@ -4340,6 +4593,35 @@
       "hash": "1f389fb1"
     },
     {
+      "path": "docs/engineering/implementation-plans/agent-native-mockup-simple-plan.md",
+      "name": "agent-native-mockup-simple-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "apps/web/app/lib/agentService.ts",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-06-29T19:16:09.350Z",
+      "size_bytes": 13481,
+      "hash": "076dec0b"
+    },
+    {
+      "path": "docs/engineering/implementation-plans/agent-native-mockup-system-plan.md",
+      "name": "agent-native-mockup-system-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "Mock data schema patterns",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-29T17:15:46.139Z",
+      "size_bytes": 12016,
+      "hash": "2d964565"
+    },
+    {
       "path": "docs/engineering/implementation-plans/asset-system-refactor-plan.md",
       "name": "asset-system-refactor-plan.md",
       "directory": "docs/engineering/implementation-plans",
@@ -4367,6 +4649,35 @@
       "last_modified": "2025-06-27T21:33:12.251Z",
       "size_bytes": 10728,
       "hash": "7520263c"
+    },
+    {
+      "path": "docs/engineering/implementation-plans/schema-driven-forms-implementation-plan.md",
+      "name": "schema-driven-forms-implementation-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "Form Templates",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-30T12:05:41.637Z",
+      "size_bytes": 11970,
+      "hash": "5f8603cf"
+    },
+    {
+      "path": "docs/engineering/implementation-plans/universal-input-worksheets-mvp.md",
+      "name": "universal-input-worksheets-mvp.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "/api/input/universal - POST endpoint",
+      "tags": [
+        "documentation",
+        "React hooks",
+        "AI agent"
+      ],
+      "last_modified": "2025-06-30T01:10:22.078Z",
+      "size_bytes": 19820,
+      "hash": "e2fb46d8"
     },
     {
       "path": "docs/engineering/performance-analysis-report.md",
@@ -4440,6 +4751,25 @@
       "hash": "bc9d5528"
     },
     {
+      "path": "docs/how-to/creating-and-implementing-mockups.md",
+      "name": "creating-and-implementing-mockups.md",
+      "directory": "docs/how-to",
+      "extension": ".md",
+      "purpose": "Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX validation",
+      "tags": [
+        "documentation",
+        "React hooks",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "last_modified": "2025-06-29T21:37:14.281Z",
+      "size_bytes": 28868,
+      "hash": "acbe9d2f"
+    },
+    {
       "path": "docs/legacy-migration-summary.md",
       "name": "legacy-migration-summary.md",
       "directory": "docs",
@@ -4463,9 +4793,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-28T21:11:48.782Z",
-      "size_bytes": 137408,
-      "hash": "e6719758"
+      "last_modified": "2025-06-30T01:36:10.235Z",
+      "size_bytes": 149686,
+      "hash": "b865b1d7"
     },
     {
       "path": "docs/manifest.md",
@@ -4478,9 +4808,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-28T21:11:48.789Z",
-      "size_bytes": 51706,
-      "hash": "ce049265"
+      "last_modified": "2025-06-30T01:36:10.262Z",
+      "size_bytes": 56741,
+      "hash": "890d9d13"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -4492,9 +4822,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-29T11:27:48.767Z",
-      "size_bytes": 6857,
-      "hash": "a4cfe3cb"
+      "last_modified": "2025-06-29T13:06:22.686Z",
+      "size_bytes": 7992,
+      "hash": "810b2f2b"
     },
     {
       "path": "docs/product-design/design-system.md",

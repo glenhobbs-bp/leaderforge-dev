@@ -74,6 +74,7 @@
 - [ ] Add admin UI validation for nav data consistency
 - [ ] Consider migration to separate nav_sections table if needed
 - [ ] Document nav data management requirements
+- [ ] **File Lifecycle Management**: Implement cleanup strategy for orphaned files in user storage buckets
 
 ---
 

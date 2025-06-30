@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { LeaderForgeCard } from '../widgets/LeaderForgeCard';
 import StatCard from '../widgets/StatCard';
 import List from '../widgets/List';
+import { FormWidget } from '../forms/FormWidget';
 
 // Mock data matching our Universal Widget Schema
 const mockVideoData = {
@@ -189,183 +190,7 @@ const mockActivityData = {
   }
 };
 
-// Worksheet Modal Component - Design System Compliant
-function WorksheetModal({ isOpen, onClose, title }: { isOpen: boolean; onClose: () => void; title: string }) {
-  const [insights, setInsights] = useState(['', '', '']);
-  const [bigIdea, setBigIdea] = useState('');
-  const [timeframe, setTimeframe] = useState('1 week');
-  const [boldAction, setBoldAction] = useState('');
-  const [futureIdeas, setFutureIdeas] = useState(['']);
 
-  if (!isOpen) return null;
-
-  const handleInsightChange = (index: number, value: string) => {
-    const newInsights = [...insights];
-    newInsights[index] = value;
-    setInsights(newInsights);
-  };
-
-  const addFutureIdea = () => {
-    setFutureIdeas([...futureIdeas, '']);
-  };
-
-  const handleFutureIdeaChange = (index: number, value: string) => {
-    const newIdeas = [...futureIdeas];
-    newIdeas[index] = value;
-    setFutureIdeas(newIdeas);
-  };
-
-  const handleSubmit = () => {
-    console.log('Worksheet submitted:', {
-      insights: insights.filter(i => i.trim()),
-      bigIdea,
-      timeframe,
-      boldAction,
-      futureIdeas: futureIdeas.filter(i => i.trim())
-    });
-    onClose();
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
-        <div
-          className="relative rounded-2xl p-6 border border-white/20 max-h-[90vh] overflow-y-auto"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
-          }}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-slate-800 tracking-tight">
-              {title} - Worksheet
-            </h2>
-            <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-lg hover:bg-white/50"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="space-y-5">
-            {/* Top 3 Insights */}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-2">
-                Top 3 Insights from this video:
-              </label>
-              <div className="space-y-3">
-                {insights.map((insight, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    placeholder={`Insight ${index + 1}`}
-                    value={insight}
-                    onChange={(e) => handleInsightChange(index, e.target.value)}
-                    className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200"
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* One Big Idea */}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-2">
-                One Big Idea I want to implement:
-              </label>
-              <textarea
-                value={bigIdea}
-                onChange={(e) => setBigIdea(e.target.value)}
-                placeholder="Describe the one big idea you want to focus on..."
-                rows={4}
-                className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200 resize-none"
-              />
-            </div>
-
-            {/* Expected Timeframe */}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-2">
-                Expected Timeframe:
-              </label>
-              <select
-                value={timeframe}
-                onChange={(e) => setTimeframe(e.target.value)}
-                className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200"
-              >
-                <option value="1 week">1 week</option>
-                <option value="2 weeks">2 weeks</option>
-                <option value="3 weeks">3 weeks</option>
-              </select>
-            </div>
-
-            {/* Bold Action */}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-2">
-                My Bold Action:
-              </label>
-              <textarea
-                value={boldAction}
-                onChange={(e) => setBoldAction(e.target.value)}
-                placeholder="What specific action will you take to implement this idea?"
-                rows={4}
-                className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200 resize-none"
-              />
-            </div>
-
-            {/* Future Ideas */}
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-2">
-                Future Ideas to explore:
-              </label>
-              <div className="space-y-3">
-                {futureIdeas.map((idea, index) => (
-                  <textarea
-                    key={index}
-                    value={idea}
-                    onChange={(e) => handleFutureIdeaChange(index, e.target.value)}
-                    placeholder={`Future idea ${index + 1}...`}
-                    rows={2}
-                    className="w-full px-3 py-2.5 text-xs border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-400/30 focus:border-slate-300 bg-white/70 backdrop-blur-sm transition-all duration-200 resize-none"
-                  />
-                ))}
-                <button
-                  onClick={addFutureIdea}
-                  className="text-slate-600 hover:text-slate-800 text-xs font-medium flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white/60 transition-all duration-200"
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add another idea
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2 mt-6 pt-4 border-t border-slate-200/50">
-            <button
-              onClick={onClose}
-              className="flex-1 px-3 py-2.5 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-white/60 rounded-xl transition-all duration-200 border border-slate-200/60 hover:border-slate-300/60"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="flex-1 px-3 py-2.5 text-xs font-medium text-white bg-slate-600 hover:bg-slate-700 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-              Submit Worksheet
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Standup Calendar Modal Component - Design System Compliant
 function StandupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -814,11 +639,20 @@ export default function MarcusDashboardMockup() {
         </div>
       </div>
 
-      {/* Worksheet Modal */}
-      <WorksheetModal
+      {/* Schema-Driven Video Worksheet Form */}
+      <FormWidget
+        templateId="663570eb-babd-41cd-9bfa-18972275863b"
         isOpen={isWorksheetOpen}
         onClose={() => setIsWorksheetOpen(false)}
-        title={mockVideoData.config.title}
+        videoContext={{
+          id: mockVideoData.data.source === 'dashboard' ? mockVideoData.id : 'leadership-fundamentals-01',
+          title: mockVideoData.config.title
+        }}
+        onSubmit={async (submissionData) => {
+          console.log('[MarcusDashboard] Schema-driven worksheet submitted:', submissionData);
+          // The leaderboard and progress will automatically update via the Universal Input System
+          setIsWorksheetOpen(false);
+        }}
       />
 
       {/* Standup Modal */}
