@@ -6,6 +6,22 @@ import { NextResponse } from 'next/server';
 const accessTokenCookie = 'sb-pcjaagjqydyqfsthsmac-auth-token';
 const refreshTokenCookie = 'sb-pcjaagjqydyqfsthsmac-refresh-token';
 
+// CORS headers for Vercel production deployment
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Credentials': 'true',
+};
+
+// Handle CORS preflight requests
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -23,6 +39,11 @@ export async function POST(req: Request) {
     console.log('[set-session] typeof refresh_token:', typeof refresh_token, '| Value:', refresh_token);
 
     const response = NextResponse.json({ success: true });
+
+    // Add CORS headers to response
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      response.headers.set(key, value);
+    });
 
     if (access_token) {
       response.cookies.set(accessTokenCookie, access_token, {
@@ -49,6 +70,13 @@ export async function POST(req: Request) {
     return response;
   } catch (err) {
     console.error('[set-session] ❌ Error setting cookies:', err);
-    return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
+    const errorResponse = NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
+
+    // Add CORS headers to error response
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      errorResponse.headers.set(key, value);
+    });
+
+    return errorResponse;
   }
 }
