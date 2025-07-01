@@ -134,6 +134,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
         // Display configuration
         title: (content.props as Record<string, unknown>)?.title || content.title,
         subtitle: (content.props as Record<string, unknown>)?.subtitle || content.subtitle || 'Learning Content',
+        content_id: String((content.props as Record<string, unknown>)?.id || content.id || ''), // Stable identifier for correlation
         actions: [
           {
             action: 'openVideoModal',
@@ -150,7 +151,7 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             label: 'Worksheet',
             primary: false,
             parameters: {
-              templateId: getWorksheetTemplateId((content.props as Record<string, unknown>)?.title || content.title || ''),
+              templateId: getWorksheetTemplateId(String((content.props as Record<string, unknown>)?.title || content.title || '')),
               contentId: (content.props as Record<string, unknown>)?.id || content.id,
               title: (content.props as Record<string, unknown>)?.title || content.title,
               videoId: (content.props as Record<string, unknown>)?.id || content.id

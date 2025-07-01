@@ -153,6 +153,30 @@ export async function POST(request: NextRequest): Promise<NextResponse<Universal
     // Get tenant_key from user metadata or default
     const tenant_key = session.user.user_metadata?.tenant_key || 'leaderforge';
 
+    // Extract content_id for Phase 1 hybrid approach (ADR-0011)
+    // Priority: video_id > source_context > content_title
+    let content_id: string | null = null;
+
+    // First, try to get video_id directly from input_data (most reliable)
+    if (body.input_data) {
+      const inputData = body.input_data as Record<string, unknown>;
+      content_id = inputData.video_id as string;
+    }
+
+    // If no video_id, extract from source context as fallback
+    if (!content_id && body.source_context.startsWith('worksheet:video-reflection:')) {
+      const parts = body.source_context.split(':');
+      if (parts.length >= 3) {
+        content_id = parts[2];
+      }
+    }
+
+    // Last resort: use content_title
+    if (!content_id && body.input_data) {
+      const inputData = body.input_data as Record<string, unknown>;
+      content_id = inputData.content_title as string;
+    }
+
     let inputRecord;
     let dbError;
 
@@ -166,6 +190,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Universal
         .from('universal_inputs')
         .update({
           input_data: body.input_data,
+          content_id, // Phase 1: Set content_id for correlation
           context_type,
           privacy_level,
           requires_agent: body.requires_agent || false,
@@ -192,6 +217,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<Universal
           session_id: body.session_id || generateSessionId(),
           input_type: body.input_type,
           input_data: body.input_data,
+          content_id, // Phase 1: Set content_id for correlation
           context_type,
           privacy_level,
           requires_agent: body.requires_agent || false,

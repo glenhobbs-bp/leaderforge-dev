@@ -73,6 +73,7 @@ export interface CardSchema {
     actions?: CardAction[];
     content?: ContentSchema; // Embed domain content if needed
     pills?: { label: string; color?: string }[];
+    content_id?: string; // Stable content identifier for correlation
   };
 }
 

@@ -274,6 +274,7 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
                   onClick={() => handleAction({
                     action: action.action,
                     label: action.label,
+                    title: title,
                     ...action.parameters
                   })}
                   className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white shadow-sm hover:shadow-md hover:scale-105"

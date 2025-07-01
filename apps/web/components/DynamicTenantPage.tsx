@@ -266,16 +266,17 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         setIsVideoModalOpen(true);
         break;
 
-      case 'openWorksheet':
-        console.log('[DynamicTenantPage] Opening worksheet:', action);
+      case 'openWorksheet': {
+        console.log('[DynamicTenantPage] Opening worksheet with action:', JSON.stringify(action, null, 2));
+        const actionParams = action.parameters as Record<string, unknown>;
         setWorksheetModalData({
-          contentId: (action.contentId as string) || (action.parameters as any)?.contentId || 'unknown',
-          title: (action.title as string) || (action.parameters as any)?.title || 'Content Worksheet',
-          templateId: (action.templateId as string) || (action.parameters as any)?.templateId || '663570eb-babd-41cd-9bfa-18972275863b', // Default to existing template
-          ...action
+          contentId: (action.contentId as string) || (actionParams?.contentId as string) || 'unknown',
+          title: (action.title as string) || (actionParams?.title as string) || 'Content Worksheet',
+          templateId: (action.templateId as string) || (actionParams?.templateId as string) || '663570eb-babd-41cd-9bfa-18972275863b'
         });
         setIsWorksheetModalOpen(true);
         break;
+      }
 
       case 'completeProgress':
         console.log('[DynamicTenantPage] Completing progress:', action);

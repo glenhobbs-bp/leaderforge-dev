@@ -645,8 +645,8 @@ export default function MarcusDashboardMockup() {
         isOpen={isWorksheetOpen}
         onClose={() => setIsWorksheetOpen(false)}
         videoContext={{
-          id: mockVideoData.data.source === 'dashboard' ? mockVideoData.id : 'leadership-fundamentals-01',
-          title: mockVideoData.config.title
+          id: '5.1 Deep Work Part 1',  // Use content title as ID for Phase 1 correlation
+          title: '5.1 Deep Work Part 1'  // This will show as "Worksheet for 5.1 Deep Work Part 1"
         }}
         onSubmit={async (submissionData) => {
           console.log('[MarcusDashboard] Schema-driven worksheet submitted:', submissionData);

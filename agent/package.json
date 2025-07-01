@@ -9,7 +9,7 @@
     "build": "tsc --project ./tsconfig.build.json --skipLibCheck --noEmitOnError false --incremental false",
     "start": "node dist/server.js",
     "dev": "nodemon --exec \"npm run start:dev\"",
-    "start:dev": "node -r ts-node/register src/server.ts",
+    "start:dev": "node --loader ts-node/esm src/server.ts",
     "test": "jest"
   },
   "keywords": [

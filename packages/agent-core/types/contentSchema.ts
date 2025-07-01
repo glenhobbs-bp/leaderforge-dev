@@ -55,5 +55,6 @@ export type ContentSchema =
         worksheetSubmitted?: boolean;
         progress?: number; // 0-100
         actions?: CardAction[];
+        content_id?: string; // Stable content identifier for correlation
       };
     };

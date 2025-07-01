@@ -6,7 +6,7 @@
  * Tags: [form, widget, rjsf, schema-driven, universal-input, design-system]
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Form, { IChangeEvent } from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
 import { RJSFSchema, UiSchema, WidgetProps, FieldTemplateProps, ArrayFieldTemplateProps, RJSFValidationError } from '@rjsf/utils';
@@ -343,20 +343,25 @@ const customWidgets = {
 };
 
 export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext }: FormWidgetProps) {
+  const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [template, setTemplate] = useState<FormTemplate | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<RJSFValidationError[]>([]);
   const [existingSubmission, setExistingSubmission] = useState<{id: string, input_data?: any} | null>(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const fetchingRef = useRef(false); // Prevent double fetching
 
   useEffect(() => {
     if (!isOpen) return;
+    if (fetchingRef.current) return; // Skip if already fetching
+
+    console.log('[FormWidget] useEffect triggered - templateId:', templateId, 'videoContext:', videoContext);
 
     const fetchTemplate = async () => {
       try {
+        fetchingRef.current = true;
         setLoading(true);
         setError(null);
 
@@ -396,13 +401,17 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
 
         // Check for existing submission if video context is provided
         if (videoContext) {
+          console.log('[FormWidget] Checking for existing submission with videoContext:', videoContext);
           await checkExistingSubmission();
+        } else {
+          console.log('[FormWidget] No videoContext provided, skipping existing submission check');
         }
       } catch (err) {
         console.error('[FormWidget] Error fetching template:', err);
         setError(err instanceof Error ? err.message : 'Failed to load form template');
       } finally {
         setLoading(false);
+        fetchingRef.current = false; // Reset fetching flag
       }
     };
 

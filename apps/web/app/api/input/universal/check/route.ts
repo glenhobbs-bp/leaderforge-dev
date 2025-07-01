@@ -87,14 +87,14 @@ export async function GET(request: NextRequest) {
 
     console.log('[UniversalInput/Check] Authenticated user:', session.user.id);
 
-    // Query for existing submission
+    // Query for existing submission (Phase 1: use content_id for correlation)
     const { data: existing, error: queryError } = await supabase
       .schema('core')
       .from('universal_inputs')
       .select('*')
       .eq('user_id', session.user.id)
       .eq('input_type', 'form')
-      .like('source_context', `worksheet:video-reflection:${videoId}:%`)
+      .eq('content_id', videoId) // Phase 1: Use content_id for direct correlation
       .contains('input_data', { template_id: templateId })
       .order('created_at', { ascending: false })
       .limit(1)
