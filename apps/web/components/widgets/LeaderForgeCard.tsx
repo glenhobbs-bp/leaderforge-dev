@@ -258,6 +258,21 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
                   onClick={() => handleAction({
                     action: action.action,
                     label: action.label,
+                    // ✅ Include all video data including progress for proper playback start position
+                    videoUrl: videoUrl || '',
+                    title: title || '',
+                    poster: cardImage || '',
+                    progress: actualProgress || 0,
+                    videoWatched: videoWatched || false,
+                    worksheetSubmitted: worksheetSubmitted || false,
+                    description: description || '',
+                    duration: duration,
+                    userId,
+                    onCompleteAction: {
+                      action: 'completeProgress',
+                      contentId: schema.id,
+                      progress: 100
+                    },
                     ...action.parameters
                   })}
                   className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md hover:scale-105"

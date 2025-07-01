@@ -838,30 +838,33 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         )}
 
         {/* Worksheet Modal */}
-        {isWorksheetModalOpen && worksheetModalData && (
-          <FormWidget
-            templateId={worksheetModalData.templateId || '663570eb-babd-41cd-9bfa-18972275863b'}
-            isOpen={isWorksheetModalOpen}
-            onClose={() => {
-              setIsWorksheetModalOpen(false);
-              setWorksheetModalData(null);
-            }}
-            videoContext={{
-              id: worksheetModalData.contentId,
-              title: worksheetModalData.title
-            }}
-            onSubmit={async (submissionData) => {
-              console.log('[DynamicTenantPage] Worksheet submitted:', submissionData);
-              // Refresh content when worksheet is submitted
-              if (selectedNavOptionId) {
-                console.log('[DynamicTenantPage] Refreshing content after worksheet submission');
-                loadContentForNavOption(selectedNavOptionId, false);
-              }
-              setIsWorksheetModalOpen(false);
-              setWorksheetModalData(null);
-            }}
-          />
-        )}
+        {isWorksheetModalOpen && worksheetModalData && (() => {
+          // ✅ Memoize videoContext to prevent unnecessary re-renders and multiple template fetches
+          const videoContext = {
+            id: worksheetModalData.contentId,
+            title: worksheetModalData.title
+          };
+
+          return (
+            <FormWidget
+              templateId={worksheetModalData.templateId || '663570eb-babd-41cd-9bfa-18972275863b'}
+              isOpen={isWorksheetModalOpen}
+              onClose={() => {
+                setIsWorksheetModalOpen(false);
+                setWorksheetModalData(null);
+              }}
+              videoContext={videoContext}
+              onSubmit={async (submissionData) => {
+                console.log('[DynamicTenantPage] Worksheet submitted:', submissionData);
+                // ✅ No content refresh needed - worksheet submission doesn't change the content state
+                // Progress tracking and leaderboard updates happen automatically via Universal Input System
+                console.log('[DynamicTenantPage] Worksheet submission complete - no ContentPanel refresh needed');
+                setIsWorksheetModalOpen(false);
+                setWorksheetModalData(null);
+              }}
+            />
+          );
+        })()}
       </div>
     );
   }

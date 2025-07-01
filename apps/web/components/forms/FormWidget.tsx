@@ -10,6 +10,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Form, { IChangeEvent } from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
 import { RJSFSchema, UiSchema, WidgetProps, FieldTemplateProps, ArrayFieldTemplateProps, RJSFValidationError } from '@rjsf/utils';
+import { X, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface FormWidgetProps {
   templateId: string;
@@ -321,10 +322,12 @@ const CustomArrayFieldTemplate = (props: ArrayFieldTemplateProps) => {
             backgroundColor: 'var(--surface, #f8fafc)'
           }}
           onMouseEnter={(e) => {
-            (e.target as HTMLButtonElement).style.backgroundColor = 'var(--border, #e2e8f0)';
+            const target = e.target as HTMLButtonElement;
+            target.style.backgroundColor = 'var(--border, #e2e8f0)';
           }}
           onMouseLeave={(e) => {
-            (e.target as HTMLButtonElement).style.backgroundColor = 'var(--surface, #f8fafc)';
+            const target = e.target as HTMLButtonElement;
+            target.style.backgroundColor = 'var(--surface, #f8fafc)';
           }}
         >
           Add Item
@@ -342,16 +345,17 @@ const customWidgets = {
   array: CustomArrayWidget,
 };
 
-export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext }: FormWidgetProps) {
-  const [formData, setFormData] = useState<Record<string, unknown>>({});
+export function FormWidget({ templateId, isOpen, onClose, videoContext }: FormWidgetProps) {
   const [template, setTemplate] = useState<FormTemplate | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [validationErrors, setValidationErrors] = useState<RJSFValidationError[]>([]);
-  const [existingSubmission, setExistingSubmission] = useState<{id: string, input_data?: any} | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
-  const fetchingRef = useRef(false); // Prevent double fetching
+  const [existingSubmission, setExistingSubmission] = useState<any>(null);
+  const [banner, setBanner] = useState<{ message: string; type: 'success' | 'error'; visible: boolean } | null>(null);
+  const fetchingRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -426,7 +430,6 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
           const existing = await response.json();
           if (existing.found) {
             console.log('[FormWidget] Found existing submission:', existing);
-            setExistingSubmission(existing.data);
             setFormData(existing.data.input_data?.responses || {});
             setIsUpdateMode(true);
           }
@@ -441,11 +444,8 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
   }, [templateId, isOpen, videoContext]);
 
   const handleError = (errors: RJSFValidationError[]) => {
-    // Handle validation errors gracefully instead of logging to console
     console.log('[FormWidget] Validation errors:', errors);
     setValidationErrors(errors);
-    // Clear errors after 5 seconds
-    setTimeout(() => setValidationErrors([]), 5000);
   };
 
   const handleSubmit = async (data: IChangeEvent) => {
@@ -502,24 +502,61 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
           derivations: result.derivations_triggered
         });
 
-        // Show success feedback
-        const action = isUpdateMode ? 'updated' : 'submitted';
-        alert(`Worksheet ${action} successfully! You earned ${result.calculated_score || 0} points.`);
+                // Show success feedback - only award points for first-time completion
+        if (isUpdateMode) {
+          // No points shown for updates - they already earned them
+          console.log('[FormWidget] Success: Worksheet updated successfully!');
+          showBanner('Worksheet updated successfully!');
+          // showToast('Worksheet updated successfully!'); // Commented for comparison
+        } else {
+          // Only show points for first-time completion
+          console.log(`[FormWidget] Success: Worksheet completed! Earned ${result.calculated_score || 0} points.`);
+          showBanner(`Great work! You completed the worksheet and earned ${result.calculated_score || 0} points.`);
+          // showToast(`Great work! You completed the worksheet and earned ${result.calculated_score || 0} points.`); // Commented for comparison
+        }
 
-        // Reset form
+                // Reset form
         setFormData({});
-        onSubmit?.(result);
-        onClose();
+
+        // ✅ Delay closing modal to show banner and allow fade out
+        setTimeout(() => {
+          onClose();
+        }, 3000); // 2.5 seconds for banner display + 0.5 seconds for fade out
       } else {
         console.error('[FormWidget] Submission error:', result.error);
-        alert(`Error submitting form: ${result.error}`);
+        showBanner(`Error submitting form: ${result.error}`, 'error');
+        // ✅ Delay closing modal to show error banner and allow fade out
+        setTimeout(() => {
+          onClose();
+        }, 3500); // 3 seconds for error display + 0.5 seconds for fade out
       }
     } catch (error) {
       console.error('[FormWidget] Network error:', error);
-      alert('Network error submitting form. Please try again.');
+      showBanner('Network error submitting form. Please try again.', 'error');
+      // ✅ Delay closing modal to show error banner and allow fade out
+      setTimeout(() => {
+        onClose();
+      }, 3500); // 3 seconds for error display + 0.5 seconds for fade out
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Toast function - commented out for banner comparison
+  // const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  //   setToast({ message, type, visible: true });
+  //   setTimeout(() => {
+  //     setToast(prev => prev ? { ...prev, visible: false } : null);
+  //     setTimeout(() => setToast(null), 300); // Remove after fade out
+  //   }, 3000);
+  // };
+
+  const showBanner = (message: string, type: 'success' | 'error' = 'success') => {
+    setBanner({ message, type, visible: true });
+    setTimeout(() => {
+      setBanner(prev => prev ? { ...prev, visible: false } : null);
+      setTimeout(() => setBanner(null), 400); // Remove after fade out
+    }, 4000); // Show banner a bit longer than toast
   };
 
   if (!isOpen) return null;
@@ -536,101 +573,135 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
             boxShadow: '0 20px 40px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
           }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2
-              className="text-lg font-semibold tracking-tight"
-              style={{ color: 'var(--text-primary, #1e293b)' }}
-            >
-              {loading
-                ? 'Loading Form...'
-                : videoContext
-                  ? `Worksheet for ${videoContext.title}`
-                  : template?.name || 'Form'
-              }
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-1 rounded-lg transition-colors"
-              style={{
-                color: 'var(--text-secondary, #64748b)'
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLButtonElement).style.color = 'var(--text-primary, #1e293b)';
-                (e.target as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLButtonElement).style.color = 'var(--text-secondary, #64748b)';
-                (e.target as HTMLButtonElement).style.backgroundColor = 'transparent';
-              }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-1 rounded-lg transition-colors"
+            style={{
+              color: 'var(--text-secondary, #64748b)'
+            }}
+            onMouseEnter={(e) => {
+              const target = e.target as HTMLButtonElement;
+              target.style.color = 'var(--text-primary, #1e293b)';
+              target.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              const target = e.target as HTMLButtonElement;
+              target.style.color = 'var(--text-secondary, #64748b)';
+              target.style.backgroundColor = 'transparent';
+            }}
+          >
+            <X className="w-5 h-5" />
+          </button>
 
-          {/* Content */}
-          {loading && (
-            <div className="text-center py-8">
-              <div style={{ color: 'var(--text-secondary, #64748b)' }}>Loading form template...</div>
+          {/* Banner Notification */}
+          {banner && banner.visible && (
+            <div
+              className={`mb-4 px-4 py-3 rounded-lg border transition-all duration-500 ease-out transform ${
+                banner.type === 'success'
+                  ? 'bg-green-50 border-green-200 text-green-800'
+                  : 'bg-red-50 border-red-200 text-red-800'
+              } animate-in slide-in-from-top-2 fade-in-0 scale-in-95`}
+              style={{
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
+              <div className="flex items-center gap-2">
+                {banner.type === 'success' ? (
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                )}
+                <span className="font-medium">{banner.message}</span>
+              </div>
             </div>
           )}
 
-          {error && (
+          {/* Loading State */}
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-16 px-6">
+              {/* Elegant Spinner */}
+              <div
+                className="w-8 h-8 border-2 rounded-full mb-6 animate-spin"
+                style={{
+                  borderColor: 'var(--border, #e2e8f0)',
+                  borderTopColor: 'var(--primary, #3b82f6)',
+                  animation: 'spin 1s linear infinite'
+                }}
+              />
+
+              {/* Loading Text */}
+              <div className="text-center">
+                <h3
+                  className="text-lg font-semibold mb-2"
+                  style={{ color: 'var(--text-primary, #1e293b)' }}
+                >
+                  Loading your worksheet...
+                </h3>
+                <p
+                  className="text-sm"
+                  style={{ color: 'var(--text-secondary, #64748b)' }}
+                >
+                  Preparing your personalized reflection questions
+                  <span className="animate-pulse">...</span>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
             <div className="text-center py-8">
-              <div style={{ color: 'var(--error-500, #ef4444)' }} className="mb-4">Error: {error}</div>
-                                <button
-                    onClick={onClose}
-                    className="px-2.5 py-1 text-xs font-medium rounded-full transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105"
-                    style={{
-                      backgroundColor: 'var(--surface, #f8fafc)',
-                      color: 'var(--text-primary, #1e293b)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'var(--border, #e2e8f0)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'var(--surface, #f8fafc)';
-                }}
+              <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-red-800 mb-2">Unable to Load Worksheet</h3>
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                Close
+                Try Again
               </button>
             </div>
           )}
 
+          {/* Form Content */}
           {template && !loading && !error && (
-            <div>
-              {template.description && (
-                <p
-                  className="text-xs mb-6"
-                  style={{ color: 'var(--text-secondary, #64748b)' }}
+            <>
+              <div className="mb-6">
+                <h2
+                  className="text-xl font-semibold mb-2"
+                  style={{ color: 'var(--text-primary, #1e293b)' }}
                 >
-                  {template.description}
-                </p>
-              )}
-
-              {/* Validation Errors Display */}
-              {validationErrors.length > 0 && (
-                <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--error-500, #ef4444)' }}>
-                  <div className="text-xs font-medium mb-2" style={{ color: 'var(--error-500, #ef4444)' }}>
-                    Please fix the following errors:
+                  {template.title || 'Video Reflection Worksheet'}
+                </h2>
+                {template.description && (
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: 'var(--text-secondary, #64748b)' }}
+                  >
+                    {template.description}
+                  </p>
+                )}
+                {videoContext && (
+                  <div
+                    className="mt-3 px-3 py-2 rounded-lg text-sm"
+                    style={{
+                      backgroundColor: 'var(--surface-secondary, rgba(59, 130, 246, 0.1))',
+                      color: 'var(--primary, #3b82f6)',
+                      border: '1px solid var(--primary-light, rgba(59, 130, 246, 0.2))'
+                    }}
+                  >
+                    <span className="font-medium">Video:</span> {videoContext.title}
                   </div>
-                  <ul className="text-xs space-y-1">
-                    {validationErrors.map((error, index) => (
-                      <li key={index} style={{ color: 'var(--error-500, #ef4444)' }}>
-                        • {error.message || error.stack || 'Validation error'}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+                )}
+              </div>
 
               <Form
                 schema={template.schema}
                 uiSchema={template.ui_schema}
                 formData={formData}
-                onChange={({ formData }) => setFormData(formData)}
+                onChange={({ formData: newData }) => setFormData(newData || {})}
                 onSubmit={handleSubmit}
                 onError={handleError}
                 validator={validator}
@@ -663,7 +734,7 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
                   >
                     {isSubmitting
                       ? (isUpdateMode ? 'Updating...' : 'Submitting...')
-                      : (isUpdateMode ? 'Update Worksheet' : 'Submit Worksheet')
+                      : (isUpdateMode ? 'Update Worksheet' : 'Complete Worksheet')
                     }
                   </button>
                   <button
@@ -691,7 +762,7 @@ export function FormWidget({ templateId, isOpen, onClose, onSubmit, videoContext
                   </button>
                 </div>
               </Form>
-            </div>
+            </>
           )}
         </div>
       </div>
