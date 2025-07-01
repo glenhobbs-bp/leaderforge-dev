@@ -15,17 +15,129 @@ import {
   Milestone
 } from './types/progress';
 
+interface PendingEvent extends ProgressEvent {
+  _resolve: (value: UserProgress) => void;
+  _reject: (reason: Error) => void;
+}
+
 /**
- * Client-side service for user progress operations.
- * This service makes API calls to authenticated endpoints
- * and is safe to use in React components.
+ * Batched Progress Service - Optimizes performance by batching progress events
+ * Accumulates events for 2-3 seconds then sends in batch to reduce API overhead
  */
-export class ClientUserProgressService {
+class BatchedProgressService {
+  private static instance: BatchedProgressService;
+  private pendingEvents: PendingEvent[] = [];
+  private batchTimer: number | null = null;
+  private readonly batchDelayMs = 2500; // 2.5 second batching window
+  private readonly maxBatchSize = 50; // Maximum events per batch
+
+  private constructor() {}
+
+  static getInstance(): BatchedProgressService {
+    if (!BatchedProgressService.instance) {
+      BatchedProgressService.instance = new BatchedProgressService();
+    }
+    return BatchedProgressService.instance;
+  }
 
   /**
-   * Track video progress - most common use case
+   * Add a progress event to the batch queue
    */
-  static async trackVideoProgress(
+  addEvent(event: ProgressEvent): Promise<UserProgress> {
+    return new Promise((resolve, reject) => {
+      // Add event with promise resolvers
+      const eventWithPromise: PendingEvent = {
+        ...event,
+        _resolve: resolve,
+        _reject: reject
+      };
+
+      this.pendingEvents.push(eventWithPromise);
+
+      // If batch is full, flush immediately
+      if (this.pendingEvents.length >= this.maxBatchSize) {
+        this.flushBatch();
+      } else {
+        // Set timer to flush batch after delay
+        this.resetBatchTimer();
+      }
+    });
+  }
+
+  /**
+   * Force immediate flush of pending events
+   */
+  async flushBatch(): Promise<void> {
+    if (this.pendingEvents.length === 0) return;
+
+    // Clear timer
+    if (this.batchTimer) {
+      window.clearTimeout(this.batchTimer);
+      this.batchTimer = null;
+    }
+
+    // Extract events and promises
+    const eventsToSend = this.pendingEvents.map(e => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _resolve, _reject, ...event } = e;
+      return event;
+    });
+    const promises = this.pendingEvents.map(e => ({
+      resolve: e._resolve,
+      reject: e._reject
+    }));
+
+    // Clear pending events
+    this.pendingEvents = [];
+
+    try {
+      // Send batch using the existing API
+      const results = await this.batchTrackProgressDirect(eventsToSend);
+
+      // Resolve individual promises with their results
+      promises.forEach((promise, index) => {
+        promise.resolve(results[index] || results[0]); // Fallback to first result
+      });
+    } catch (error) {
+      // Reject all promises with the same error
+      promises.forEach(promise => promise.reject(error instanceof Error ? error : new Error('Batch progress failed')));
+    }
+  }
+
+  private async batchTrackProgressDirect(events: ProgressEvent[]): Promise<UserProgress[]> {
+    const response = await fetch('/api/universal-progress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'batchTrackProgress',
+        events
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to batch track progress: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.data;
+  }
+
+    private resetBatchTimer(): void {
+    if (this.batchTimer) {
+      window.clearTimeout(this.batchTimer);
+    }
+
+    this.batchTimer = window.setTimeout(() => {
+      this.flushBatch();
+    }, this.batchDelayMs);
+  }
+
+  /**
+   * Track video progress with batching optimization
+   */
+  async trackVideoProgress(
     userId: string,
     contentId: string,
     contextKey: string,
@@ -33,28 +145,21 @@ export class ClientUserProgressService {
     position: number,
     duration?: number
   ): Promise<UserProgress> {
-    const response = await fetch('/api/universal-progress', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const event: ProgressEvent = {
+      userId,
+      contentId,
+      tenantKey: contextKey,
+      progressType: 'video',
+      value: duration ? Math.min(100, (position / duration) * 100) : 0,
+      metadata: {
+        watchTimeSeconds: watchTime,
+        lastPositionSeconds: position,
+        videoDurationSeconds: duration
       },
-      body: JSON.stringify({
-        action: 'trackVideoProgress',
-        userId,
-        contentId,
-        contextKey,
-        watchTime,
-        position,
-        duration
-      })
-    });
+      timestamp: new Date().toISOString()
+    };
 
-    if (!response.ok) {
-      throw new Error(`Failed to track video progress: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    return result.data;
+    return this.addEvent(event);
   }
 
   /**
@@ -309,6 +414,33 @@ export class ClientUserProgressService {
     const result = await response.json();
     return result.data;
   }
+}
+
+/**
+ * Client-side service for user progress operations.
+ * This service makes API calls to authenticated endpoints
+ * and is safe to use in React components.
+ */
+export class ClientUserProgressService {
+
+  /**
+   * Track video progress - OPTIMIZED with batching
+   */
+  static async trackVideoProgress(
+    userId: string,
+    contentId: string,
+    contextKey: string,
+    watchTime: number,
+    position: number,
+    duration?: number
+  ): Promise<UserProgress> {
+    // Use batched service for video progress (most frequent calls)
+    return BatchedProgressService.getInstance().trackVideoProgress(
+      userId, contentId, contextKey, watchTime, position, duration
+    );
+  }
+
+  // ... existing code ...
 }
 
 // Export types for components
