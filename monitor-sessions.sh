@@ -33,7 +33,6 @@ echo ""
 # Check port usage
 echo "🔌 Port usage:"
 PORT_3000=$(lsof -ti:3000 2>/dev/null)
-PORT_8000=$(lsof -ti:8000 2>/dev/null)
 
 if [ -n "$PORT_3000" ]; then
     echo "   Port 3000: ✅ In use (PID: $PORT_3000)"
@@ -41,18 +40,12 @@ else
     echo "   Port 3000: ❌ Available"
 fi
 
-if [ -n "$PORT_8000" ]; then
-    echo "   Port 8000: ✅ In use (PID: $PORT_8000)"
-else
-    echo "   Port 8000: ❌ Available"
-fi
-
 echo ""
 
 # Check service status
 echo "🌐 Service status:"
 WEB_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 2>/dev/null)
-LANGGRAPH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/info 2>/dev/null)
+RENDER_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://leaderforge-langgraph-2.onrender.com/health 2>/dev/null)
 
 if [ "$WEB_STATUS" = "200" ] || [ "$WEB_STATUS" = "307" ]; then
     echo "   Web server: ✅ Responding (HTTP $WEB_STATUS)"
@@ -60,10 +53,10 @@ else
     echo "   Web server: ❌ Not responding"
 fi
 
-if [ "$LANGGRAPH_STATUS" = "200" ]; then
-    echo "   LangGraph server: ✅ Responding (HTTP $LANGGRAPH_STATUS)"
+if [ "$RENDER_STATUS" = "200" ]; then
+    echo "   LangGraph (Render): ✅ Responding (HTTP $RENDER_STATUS)"
 else
-    echo "   LangGraph server: ❌ Not responding"
+    echo "   LangGraph (Render): ❌ Not responding"
 fi
 
 echo ""

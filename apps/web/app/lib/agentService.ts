@@ -38,7 +38,7 @@ export class AgentService {
   private langGraphUrl: string;
   private authHeaders?: Record<string, string>;
 
-  constructor(supabase: any, langGraphUrl: string = 'http://localhost:8000', authHeaders?: Record<string, string>) {
+  constructor(supabase: any, langGraphUrl: string = ENV.LANGGRAPH_API_URL, authHeaders?: Record<string, string>) {
     this.supabase = supabase; // ✅ Accept user-authenticated client, not service role
     this.langGraphUrl = langGraphUrl;
     this.authHeaders = authHeaders;

@@ -5,13 +5,14 @@ import {
   ExperimentalEmptyAdapter,
   langGraphPlatformEndpoint,
 } from "@copilotkit/runtime";
+import { ENV } from '../../../../../packages/env';
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
 
 const runtime = new CopilotRuntime({
   remoteEndpoints: [
     langGraphPlatformEndpoint({
-      deploymentUrl: "http://localhost:8000", // Local LangGraph dev server
+      deploymentUrl: ENV.LANGGRAPH_API_URL, // Use centralized environment config
       agents: [
         {
           name: "default",
