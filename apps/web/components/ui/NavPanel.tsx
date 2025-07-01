@@ -385,10 +385,10 @@ export default function NavPanel({
                           transition:
                             "background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s",
                           background: isActive
-                            ? "rgba(var(--primary-rgb, 59,130,246), 0.12)"
+                            ? "rgba(var(--primary-rgb), 0.12)"
                             : undefined,
                           color: isActive
-                            ? "var(--primary, #2563eb)"
+                            ? "var(--primary)"
                             : undefined,
                         }}
                         aria-current={isActive ? "page" : undefined}
@@ -396,8 +396,8 @@ export default function NavPanel({
                         aria-label={item.label}
                         onMouseEnter={e => {
                           if (!isActive) {
-                            e.currentTarget.style.background = "rgba(var(--primary-rgb, 59,130,246), 0.08)";
-                            e.currentTarget.style.color = "var(--primary, #2563eb)";
+                            e.currentTarget.style.background = "rgba(var(--primary-rgb), 0.08)";
+                            e.currentTarget.style.color = "var(--primary)";
                           }
                         }}
                         onMouseLeave={e => {
@@ -407,7 +407,7 @@ export default function NavPanel({
                           }
                         }}
                       >
-                        <Icon className="w-4 h-4" strokeWidth={1.6} style={{ color: isActive ? "var(--primary, #2563eb)" : "#9ca3af" }} />
+                        <Icon className="w-4 h-4" strokeWidth={1.6} style={{ color: isActive ? "var(--primary)" : "#9ca3af" }} />
                         {!isCollapsed && (
                           <span className="text-[13px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis" style={{fontWeight: isActive ? 600 : 400}}>{item.label}</span>
                         )}
@@ -442,10 +442,21 @@ export default function NavPanel({
               <button
                 type="button"
                 onClick={() => setIsProfileModalOpen(true)}
-                className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} text-gray-600 hover:bg-blue-50/80 hover:text-blue-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-blue-300`}
+                className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} transition-all font-medium focus:outline-none focus:ring-2`}
+                style={{
+                  color: 'var(--text-secondary)',
+                  justifyContent: !isCollapsed ? 'flex-start' : 'center'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = 'var(--primary)';
+                  e.currentTarget.style.backgroundColor = 'rgba(var(--primary-rgb), 0.1)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.backgroundColor = '';
+                }}
                 tabIndex={0}
                 aria-label="User Profile"
-                style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
               >
                 <img
                   src={avatarUrl}
@@ -459,10 +470,21 @@ export default function NavPanel({
               <button
                 type="button"
                 onClick={() => handleFooterAction('signOut')}
-                className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} text-gray-600 hover:bg-red-50/80 hover:text-red-700 transition-all font-medium focus:outline-none focus:ring-2 focus:ring-red-300`}
+                className={`flex items-center ${isCollapsed ? 'justify-center px-0 py-2 rounded-full' : 'gap-2 px-0 py-1.5 rounded-lg'} transition-all font-medium focus:outline-none focus:ring-2`}
+                style={{
+                  color: 'var(--text-secondary)',
+                  justifyContent: !isCollapsed ? 'flex-start' : 'center'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = '#dc2626';
+                  e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.backgroundColor = '';
+                }}
                 tabIndex={0}
                 aria-label="Sign Out"
-                style={!isCollapsed ? { justifyContent: 'flex-start' } : {}}
               >
                 <LogOut className="w-4 h-4 mr-1 text-gray-400" strokeWidth={1.6} />
                 {!isCollapsed && <span className="text-[13px]">Sign Out</span>}

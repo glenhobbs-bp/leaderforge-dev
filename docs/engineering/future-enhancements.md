@@ -120,13 +120,31 @@
 - [ ] Create admin UI for access management
 - [ ] Design integration with context-level entitlement
 
-### 16. Worksheets & Assessments
-- [ ] Design worksheet system architecture
-- [ ] Implement worksheet creation and submission
-- [ ] Add progress tracking for worksheet completion
-- [ ] Create grading and feedback systems
+### 16. Dynamic Worksheet Generation (Phase 3 - Agent-Native)
+- **Status**: Phase 2 Complete (agent-driven template selection), Phase 3 planned
+- **Current**: Agent selects from existing templates via database prompt instructions
+- **Goal**: Agent generates completely custom worksheets per video content and user context
+- **Architecture**: ADR-0017 Agent-Native Worksheet Template Architecture
+- [ ] **Content Analysis Engine**: Agent analyzes video transcripts and learning objectives
+- [ ] **Dynamic Schema Generation**: Agent creates custom JSON Schema for each video
+- [ ] **User Personalization**: Questions adapt to user's role, progress, and learning style
+- [ ] **Custom Question Generation**: AI-generated reflection questions specific to video content
+- [ ] **Quality Assurance System**: Validation and fallback for AI-generated content
+- [ ] **Performance Optimization**: Caching for generated schemas and content analysis
+- [ ] **A/B Testing Framework**: Compare static vs. dynamic worksheet effectiveness
+- **Dependencies**: Enhanced agent capabilities, video transcript access, user context data
+- **Impact**: Infinite scalability, personalized learning, no manual worksheet creation needed
 
-### 17. Real-Time Features
+### 17. Static Worksheets & Assessments (Current System)
+- [x] ~~Design worksheet system architecture~~ ✅ **Complete** (Schema-driven forms)
+- [x] ~~Implement worksheet creation and submission~~ ✅ **Complete** (FormWidget system)
+- [x] ~~Add progress tracking for worksheet completion~~ ✅ **Complete** (Universal Input System)
+- [x] ~~Agent-native template selection~~ ✅ **Complete** (Phase 2 ADR-0017)
+- [ ] Create grading and feedback systems
+- [ ] Add worksheet analytics and completion insights
+- [ ] Implement instructor/admin worksheet management UI
+
+### 18. Real-Time Features
 - [ ] Add real-time progress updates
 - [ ] Implement collaborative features
 - [ ] Add notification system
@@ -136,13 +154,13 @@
 
 ## Performance & Scalability
 
-### 18. Caching & Optimization
+### 19. Caching & Optimization
 - [ ] Implement intelligent content caching
 - [ ] Add image optimization and CDN integration
 - [ ] Optimize agent response times
 - [ ] Add progressive loading for large content sets
 
-### 19. Multi-Tenancy Enhancements
+### 20. Multi-Tenancy Enhancements
 - [ ] Optimize tenant isolation
 - [ ] Add tenant-specific customization options
 - [ ] Implement tenant analytics and reporting

@@ -57,22 +57,25 @@
 
 /* Tenant-Specific Color Variables */
 .tenant-leaderforge {
-  --primary: #1e40af;
-  --primary-hover: #1d4ed8;
-  --primary-light: #dbeafe;
-  --primary-rgb: 30, 64, 175;
-  --secondary: #059669;
-  --accent: #dc2626;
-  --background: #ffffff;
-  --surface: #f8fafc;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --border: #e2e8f0;
-  --gradient: linear-gradient(135deg, #1e40af 0%, #059669 50%, #dc2626 100%);
+  --primary: #001848 !important;
+  --primary-hover: #003366 !important;
+  --primary-light: #e0f7ff !important;
+  --primary-rgb: 0, 24, 72 !important;
+  --secondary: #008ee6 !important;
+  --accent: #008ee6 !important;
+  --background: #f7f9fc !important;
+  --surface: #ffffff !important;
+  --text-primary: #001848 !important;
+  --text-secondary: #666666 !important;
+  --border: #f0f4ff !important;
+  --bg-light: #f7f9fc !important;
+  --bg-neutral: #e0f7ff !important;
+  --card-bg: #ffffff !important;
+  --gradient: linear-gradient(135deg, #008ee6 0%, #e0f7ff 50%, #f0f4ff 100%) !important;
 }
 
 .tenant-brilliant {
-  --primary: #3e5e17;
+  --primary: #1e40af;
   --primary-hover: #4d7c1f;
   --primary-light: #f0f7e8;
   --primary-rgb: 62, 94, 23;
@@ -83,7 +86,7 @@
   --text-primary: #222222;
   --text-secondary: #666666;
   --border: #e3ddc9;
-  --gradient: linear-gradient(135deg, #74a78e 0%, #dd8d00 50%, #3e5e17 100%);
+  --gradient: linear-gradient(135deg, #3b82f6 0%, #059669 50%, #1e40af 100%);
 }
 
 /* Typography Components */
@@ -417,3 +420,127 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Loading spinner and animation utilities */
+.border-primary-spinner {
+  border-color: var(--primary);
+}
+
+.bg-primary-dot {
+  background-color: var(--primary);
+}
+
+.bg-secondary-dot {
+  background-color: var(--secondary);
+}
+
+.bg-accent-dot {
+  background-color: var(--accent);
+}
+
+/* Text color utilities using theme variables */
+.text-theme-primary {
+  color: var(--text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.text-theme-primary-button {
+  color: var(--primary);
+}
+
+/* Force correct LeaderForge navigation colors */
+.tenant-leaderforge nav button[aria-current="page"] {
+  background-color: rgba(0, 24, 72, 0.12) !important;
+  color: #001848 !important;
+}
+
+.tenant-leaderforge nav button[aria-current="page"] svg {
+  color: #001848 !important;
+}
+
+.tenant-leaderforge nav button:hover:not([aria-current="page"]) {
+  background-color: rgba(0, 24, 72, 0.08) !important;
+  color: #001848 !important;
+}
+
+/* Force CSS custom properties for LeaderForge */
+body.tenant-leaderforge {
+  --primary: #001848 !important;
+  --primary-hover: #003366 !important;
+  --primary-light: #e0f7ff !important;
+  --primary-rgb: 0, 24, 72 !important;
+  --secondary: #008ee6 !important;
+  --accent: #008ee6 !important;
+  --background: #f7f9fc !important;
+  --surface: #ffffff !important;
+  --text-primary: #001848 !important;
+  --text-secondary: #666666 !important;
+  --border: #f0f4ff !important;
+  --bg-light: #f7f9fc !important;
+  --bg-neutral: #e0f7ff !important;
+  --card-bg: #ffffff !important;
+  --gradient: linear-gradient(135deg, #008ee6 0%, #e0f7ff 50%, #f0f4ff 100%) !important;
+}
+
+/* Force CSS variables on root for global access */
+:root.tenant-leaderforge {
+  --primary: #001848 !important;
+  --primary-hover: #003366 !important;
+  --primary-light: #e0f7ff !important;
+  --primary-rgb: 0, 24, 72 !important;
+  --secondary: #008ee6 !important;
+  --accent: #008ee6 !important;
+  --background: #f7f9fc !important;
+  --surface: #ffffff !important;
+  --text-primary: #001848 !important;
+  --text-secondary: #666666 !important;
+  --border: #f0f4ff !important;
+  --bg-light: #f7f9fc !important;
+  --bg-neutral: #e0f7ff !important;
+  --card-bg: #ffffff !important;
+  --gradient: linear-gradient(135deg, #008ee6 0%, #e0f7ff 50%, #f0f4ff 100%) !important;
+}
+
+/* Force ContextSelector colors for LeaderForge - VERY SPECIFIC TARGETING */
+
+/* Target only the tenant selector dropdown button */
+.tenant-leaderforge div[class*="relative"]:first-child > button[class*="flex"] {
+  background-color: #f7f9fc !important;
+  border-color: #e0f7ff !important;
+}
+
+.tenant-leaderforge div[class*="relative"]:first-child > button[class*="flex"]:hover {
+  background-color: #e0f7ff !important;
+}
+
+.tenant-leaderforge div[class*="relative"]:first-child > button[class*="flex"] span {
+  color: #001848 !important;
+}
+
+.tenant-leaderforge div[class*="relative"]:first-child > button[class*="flex"] svg {
+  color: #001848 !important;
+}
+
+/* Target only navigation sidebar buttons */
+.tenant-leaderforge aside nav button {
+  /* Navigation-specific styles only - no background changes */
+}
+
+.tenant-leaderforge aside nav button span {
+  color: #001848 !important;
+}
+
+.tenant-leaderforge aside nav button svg {
+  color: #001848 !important;
+}
+
+/* Focus states for accessibility */
+.tenant-leaderforge button:focus {
+  outline-color: #008ee6 !important;
+  box-shadow: 0 0 0 2px rgba(0, 142, 230, 0.3) !important;
+}
+
+/* Remove overly broad button targeting */

@@ -81,13 +81,32 @@ export default function SupabaseProvider({
 
       if (!isMounted) return;
 
-      // Only update session if we've completed initial restoration
-      // or if this is a genuine auth change (not initial setup)
-      if (hasRestoredSession.current || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+      // Prevent auth loops - only update session for genuine auth events
+      if (event === 'SIGNED_OUT') {
+        console.log('[SupabaseProvider] User signed out, clearing session');
+        setSession(null);
+        setLoading(false);
+        return;
+      }
+
+      if (event === 'SIGNED_IN' && newSession) {
+        console.log('[SupabaseProvider] User signed in, updating session');
         setSession(newSession);
-        if (hasRestoredSession.current) {
-          setLoading(false);
-        }
+        setLoading(false);
+        return;
+      }
+
+      if (event === 'TOKEN_REFRESHED' && newSession) {
+        console.log('[SupabaseProvider] Token refreshed, updating session');
+        setSession(newSession);
+        setLoading(false);
+        return;
+      }
+
+      // For other events, only update if we've completed initial restoration
+      if (hasRestoredSession.current) {
+        setSession(newSession);
+        setLoading(false);
       }
     });
 

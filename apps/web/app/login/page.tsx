@@ -84,7 +84,7 @@ export default function LoginPage() {
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
           <div className="flex flex-col items-center mb-6">
-            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+            <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
           </div>
           <div className="text-center">
             <p className="text-red-600 mb-4">{error}</p>
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 setError(null);
                 setIsAuthLoaded(true);
               }}
-              className="px-4 py-2 bg-[#3E5E17] text-white rounded-xl hover:bg-[#2d4511] transition-colors"
+              className="btn btn-primary"
             >
               Try Again
             </button>
@@ -108,10 +108,10 @@ export default function LoginPage() {
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
           <div className="flex flex-col items-center mb-6">
-            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+            <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
           </div>
           <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17]"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner"></div>
             <p className="mt-4 text-sm text-gray-600">Signing you in...</p>
             <p className="mt-2 text-xs text-gray-500">This may take a moment</p>
           </div>
@@ -124,11 +124,11 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
         <div className="flex flex-col items-center mb-6">
-          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
         </div>
         {!isAuthLoaded ? (
           <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3E5E17]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-spinner"></div>
             <p className="mt-4 text-sm text-gray-600">Loading...</p>
           </div>
         ) : (
@@ -139,13 +139,13 @@ export default function LoginPage() {
               variables: {
                 default: {
                   colors: {
-                    brand: '#3E5E17', // Brilliant green
-                    brandAccent: '#DD8D00', // Brilliant orange
-                    inputBorder: '#E3DDC9',
-                    inputBackground: '#F8F4F1',
-                    inputText: '#222222',
-                    messageText: '#222222',
-                    anchorTextColor: '#3E5E17',
+                    brand: '#008ee6', // i49 primary blue
+                    brandAccent: '#007acc', // i49 primary hover
+                    inputBorder: '#f0f4ff',
+                    inputBackground: '#f7f9fc',
+                    inputText: '#001848',
+                    messageText: '#001848',
+                    anchorTextColor: '#008ee6',
                   },
                   radii: {
                     borderRadiusButton: '12px',

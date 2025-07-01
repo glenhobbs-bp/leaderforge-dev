@@ -45,18 +45,18 @@ function DashboardLoader() {
     <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
         <div className="flex flex-col items-center mb-6">
-          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
         </div>
         <div className="flex flex-col items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner mb-4"></div>
           <p className="text-sm font-medium text-gray-800 mb-2">Loading Dashboard</p>
           <p className="text-xs text-gray-600 text-center">
             Setting up your personalized experience...
           </p>
           <div className="mt-4 flex space-x-1">
-            <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="w-2 h-2 bg-primary-dot rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-secondary-dot rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-accent-dot rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
         </div>
       </div>
