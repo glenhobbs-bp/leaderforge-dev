@@ -62,6 +62,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
   // Core state
   const hasMounted = useRef(false);
+  const hasNavigationRestored = useRef(false);
   const [hasRestoredContext, setHasRestoredContext] = useState(false);
   const [shouldFetchUserPrefs, setShouldFetchUserPrefs] = useState(false);
 
@@ -80,7 +81,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     [key: string]: unknown
   } | null>(null);
   const [currentTenant, setCurrentTenant] = useState<string>(
-    props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'brilliant'
+    props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'leaderforge'
   );
   const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -136,11 +137,20 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       hasRestoredContext
     });
 
-          // Restore tenant if different
-      if (lastTenant && lastTenant !== currentTenant) {
-        console.log('[DynamicTenantPage] Restoring last tenant:', lastTenant);
-        setCurrentTenant(lastTenant);
-      }
+    // ✅ FIXED: Only restore tenant if it's actually different AND not already set
+    // Prevent infinite loops when tenant is already correct
+    if (lastTenant && lastTenant !== currentTenant && hasRestoredContext === false) {
+      console.log('[DynamicTenantPage] Restoring last tenant:', lastTenant);
+      setCurrentTenant(lastTenant);
+    } else {
+      console.log('[DynamicTenantPage] Tenant restoration skipped:', {
+        hasLastTenant: !!lastTenant,
+        tenantsDifferent: lastTenant !== currentTenant,
+        contextNotRestored: hasRestoredContext === false,
+        reason: !lastTenant ? 'no saved tenant' :
+                lastTenant === currentTenant ? 'tenant already correct' : 'context already restored'
+      });
+    }
 
     setHasRestoredContext(true);
   }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
@@ -162,6 +172,12 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     }
 
     if (!session?.user?.id || !userPrefs || !hasRestoredContext) return;
+
+    // ✅ FIXED: Only restore navigation once per component mount, not on every dependency change
+    if (hasNavigationRestored.current) {
+      console.log('[DynamicTenantPage] ⏭️ Navigation already restored, skipping');
+      return;
+    }
 
     const preferences = userPrefs.preferences as UserPreferences;
     const navigationState = preferences?.navigationState;
@@ -185,6 +201,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         timestamp: navigationState?.lastUpdated
       });
       setSelectedNavOptionId(lastNavOption);
+      hasNavigationRestored.current = true; // Mark as restored
 
       // Trigger content loading for the restored navigation option
       setTimeout(() => {
@@ -198,6 +215,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         currentTenant,
         tenantMatch: lastTenant === currentTenant
       });
+      hasNavigationRestored.current = true; // Mark as attempted even if no restoration
     }
   }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
 
@@ -237,23 +255,28 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     return content && typeof content === 'object' && 'type' in content && (content.type === 'welcome' || content.type === 'error');
   }, [content]);
 
+  // Memoize schema type separately to avoid contentComponent dependency on full agentSchema
+  const schemaType = useMemo(() => {
+    return agentSchema?.type;
+  }, [agentSchema?.type]);
+
   // Create loading content component for content panel - MUST be defined before useMemo
   const createLoadingContent = () => (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
         <div className="flex flex-col items-center mb-6">
-          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          <img src="/logos/leaderforge-icon.png" alt="LeaderForge Icon" width={40} height={40} />
         </div>
         <div className="flex flex-col items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
-          <p className="text-sm font-medium text-gray-800 mb-2">Loading Content</p>
-          <p className="text-xs text-gray-600 text-center">
-            Just a moment while we fetch your content...
-          </p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#4f49cf] mb-4"></div>
+                                  <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Loading Content</p>
+            <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
+              Just a moment while we fetch your content...
+            </p>
           <div className="mt-4 flex space-x-1">
-            <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            <div className="w-2 h-2 bg-[#4f49cf] rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-[#6d63d4] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-[#cf4f84] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
           </div>
         </div>
       </div>
@@ -316,7 +339,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   const contentComponent = useMemo(() => {
     console.log('[DynamicTenantPage] contentComponent memo triggered:', {
       contentLoading,
-      agentSchemaType: agentSchema?.type,
+      schemaType,
       content,
       hasComponent: content && typeof content === 'object' && 'component' in content
     });
@@ -326,7 +349,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     }
 
     // Check for mockup agent response
-    if (agentSchema?.type === 'mockup' && content && typeof content === 'object' && 'component' in content) {
+    if (schemaType === 'mockup' && content && typeof content === 'object' && 'component' in content) {
       console.log('[DynamicTenantPage] Rendering mockup agent response:', content);
       const mockupContent = content as {
         component: string;
@@ -367,11 +390,9 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             tenantKey={currentTenant}
             onAction={handleAction}
             onProgressUpdate={() => {
-              // Refresh content when video progress is updated
-              if (selectedNavOptionId) {
-                console.log('[DynamicTenantPage] Refreshing content after progress update');
-                loadContentForNavOption(selectedNavOptionId, false);
-              }
+              // ✅ FIXED: No need to refresh content - progress tracking is handled automatically
+              // Progress updates should not trigger content reloads as they don't change the content structure
+              console.log('[DynamicTenantPage] Video progress updated - no content refresh needed');
             }}
           />
         </div>
@@ -408,7 +429,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         </div>
       </div>
     );
-  }, [contentLoading, isComponentSchema, isWelcomeContent, content, agentSchema]);
+  }, [contentLoading, isComponentSchema, isWelcomeContent, content, schemaType]);
 
   // 🤖 AGENT-NATIVE: Single API call to get complete UI schema
   useEffect(() => {
@@ -466,6 +487,19 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
     fetchAgentSchema();
   }, [session?.user?.id, currentTenant, authLoading]);
+
+  // Apply tenant class to body and root for global CSS variable access
+  useEffect(() => {
+    // Add tenant class to body and html root
+    document.body.className = `tenant-${currentTenant}`;
+    document.documentElement.className = `tenant-${currentTenant}`;
+
+    return () => {
+      // Cleanup: remove tenant classes
+      document.body.className = '';
+      document.documentElement.className = '';
+    };
+  }, [currentTenant]);
 
   // Handle tenant change - also persist the change
   const handleTenantChange = (tenantKey: string) => {
@@ -655,21 +689,21 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
           <div className="flex flex-col items-center mb-6">
-            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+            <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
           </div>
           <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3E5E17] mb-4"></div>
-            <p className="text-sm font-medium text-gray-800 mb-2">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner mb-4"></div>
+            <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
               {!session ? 'Authenticating...' : 'Loading Experience'}
             </p>
-            <p className="text-xs text-gray-600 text-center">
+            <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
               {!session ? 'Verifying your credentials...' : 'Setting up your personalized experience...'}
             </p>
-            <div className="mt-4 flex space-x-1">
-              <div className="w-2 h-2 bg-[#3E5E17] rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-[#DD8D00] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-[#74A78E] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-            </div>
+                          <div className="mt-4 flex space-x-1">
+                <div className="w-2 h-2 bg-primary-dot rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-secondary-dot rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-accent-dot rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+              </div>
           </div>
         </div>
       </div>
@@ -682,7 +716,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
           <div className="flex flex-col items-center mb-6">
-            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+            <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
           </div>
           <div className="flex flex-col items-center justify-center py-8">
             <div className="text-red-500 mb-4 text-2xl">⚠️</div>
@@ -690,7 +724,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             <p className="text-xs text-gray-600 text-center mb-6">Invalid agent response - please refresh</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-[#3E5E17] text-white text-sm rounded-xl hover:bg-[#2d4511] transition-colors"
+              className="px-4 py-2 bg-[#4f49cf] text-white text-sm rounded-xl hover:bg-[#423db8] transition-colors"
             >
               Refresh
             </button>
@@ -708,7 +742,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
           <div className="flex flex-col items-center mb-6">
-            <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+            <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
           </div>
           <div className="flex flex-col items-center justify-center py-8">
             <div className="text-red-500 mb-4 text-2xl">⚠️</div>
@@ -716,7 +750,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             <p className="text-xs text-gray-600 text-center mb-6">Invalid agent response - please refresh</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-[#3E5E17] text-white text-sm rounded-xl hover:bg-[#2d4511] transition-colors"
+              className="px-4 py-2 bg-[#4f49cf] text-white text-sm rounded-xl hover:bg-[#423db8] transition-colors"
             >
               Refresh
             </button>
@@ -769,10 +803,43 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       text_primary: '#333333',
       bg_gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     };
-    const theme = (tenantConfig && typeof tenantConfig === 'object' && 'theme' in tenantConfig ? tenantConfig.theme as typeof defaultTheme : null) || defaultTheme;
+
+        // Get theme from database config (tenant theme should be a JSONB object)
+    let theme = defaultTheme;
+    if (tenantConfig && typeof tenantConfig === 'object' && 'theme' in tenantConfig && tenantConfig.theme) {
+      if (typeof tenantConfig.theme === 'string') {
+        // If theme is a string like "leaderforge", map it to a predefined theme
+        const predefinedThemes: Record<string, typeof defaultTheme> = {
+          leaderforge: {
+            primary: '#001848',        // Deep navy
+            secondary: '#008ee6',      // Light blue
+            accent: '#008ee6',         // Light blue
+            bg_light: '#f7f9fc',       // Light grey background
+            bg_neutral: '#e0f7ff',     // Light blue accents
+            text_primary: '#001848',   // Deep navy text
+            bg_gradient: 'linear-gradient(135deg, #008ee6 0%, #e0f7ff 50%, #f0f4ff 100%)'
+          },
+          brilliant: {
+            primary: '#3e5e17',        // Earth Green
+            secondary: '#74a78e',      // Sage Green
+            accent: '#dd8d00',         // Golden Yellow
+            bg_light: '#f8f4f1',       // Warm White
+            bg_neutral: '#e3ddc9',     // Beige
+            text_primary: '#222222',   // Dark Grey
+            bg_gradient: 'linear-gradient(135deg, #74a78e 0%, #dd8d00 50%, #3e5e17 100%)'
+          }
+        };
+        theme = predefinedThemes[tenantConfig.theme] || defaultTheme;
+      } else if (typeof tenantConfig.theme === 'object' && tenantConfig.theme !== null) {
+        // If theme is a JSONB object, use it directly
+        theme = { ...defaultTheme, ...(tenantConfig.theme as Record<string, string>) };
+      }
+    }
 
     return (
-      <div style={{
+      <div
+        className={`tenant-${currentTenant}`}
+        style={{
         '--primary': theme.primary,
         '--secondary': theme.secondary,
         '--accent': theme.accent,
@@ -780,7 +847,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         '--bg-neutral': theme.bg_neutral,
         '--text-primary': theme.text_primary,
         '--card-bg': theme.bg_light || '#ffffff'
-      } as React.CSSProperties}>
+      } as React.CSSProperties & Record<string, string>}>
         <ThreePanelLayout
           nav={<NavComponent />}
           content={contentComponent}
@@ -827,12 +894,19 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
             }}
             userId={session?.user?.id}
             tenantKey={currentTenant}
-            onProgressUpdate={() => {
-              // Refresh content when video progress is updated
-              if (selectedNavOptionId) {
-                console.log('[DynamicTenantPage] Refreshing content after video progress update');
-                loadContentForNavOption(selectedNavOptionId, false);
+            onProgressUpdate={(finalProgress: number) => {
+              console.log('[DynamicTenantPage] Video modal closed with progress:', finalProgress);
+
+              // Update the card's local progress via the onRealTimeProgressUpdate callback
+              if (videoModalData?.onRealTimeProgressUpdate && typeof videoModalData.onRealTimeProgressUpdate === 'function') {
+                console.log('[DynamicTenantPage] Updating card progress via callback:', finalProgress);
+                videoModalData.onRealTimeProgressUpdate(finalProgress);
+              } else {
+                console.warn('[DynamicTenantPage] No onRealTimeProgressUpdate callback found in videoModalData');
               }
+
+              // Progress tracking is handled automatically by the video modal
+              // No content refresh needed as progress updates don't change content structure
             }}
           />
         )}
@@ -875,7 +949,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
         <div className="flex flex-col items-center mb-6">
-          <img src="/logos/brilliant-icon.png" alt="Brilliant Icon" width={40} height={40} />
+          <img src="/logos/leaderforge-icon.png" alt="LeaderForge Icon" width={40} height={40} />
         </div>
         <div className="flex flex-col items-center justify-center py-8">
           <div className="text-red-500 mb-4 text-2xl">⚠️</div>
@@ -883,7 +957,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           <p className="text-xs text-gray-600 text-center mb-6">Unhandled response type: {agentSchema.type}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-[#3E5E17] text-white text-sm rounded-xl hover:bg-[#2d4511] transition-colors"
+            className="px-4 py-2 bg-[#4f49cf] text-white text-sm rounded-xl hover:bg-[#423db8] transition-colors"
           >
             Refresh
           </button>

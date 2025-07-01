@@ -7,7 +7,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Play } from 'lucide-react';
 import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
@@ -22,10 +22,12 @@ interface LeaderForgeCardProps {
   schema: UniversalWidgetSchema;
   userId?: string;
   onAction?: (action: CardAction) => void;
-  onProgressUpdate?: () => void;
+  onProgressUpdate?: (finalProgress: number) => void;
 }
 
 export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: LeaderForgeCardProps) {
+  // Add local state to track real-time progress updates
+  const [localProgress, setLocalProgress] = useState<number | null>(null);
 
   // Type guard to ensure we have a Card schema
   if (schema.type !== 'Card') {
@@ -66,7 +68,7 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
   const cardImage = getValidImageUrl();
 
   // Progress and completion logic
-  const actualProgress = progress || 0;
+  const actualProgress = localProgress ?? progress ?? 0;
   const videoWatched = stats.watched || actualProgress >= 90;
   const worksheetSubmitted = stats.completed || false;
   const isFullyCompleted = videoWatched && worksheetSubmitted;
@@ -96,7 +98,8 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
     // Only completeProgress should refresh content to update UI
     if (action.action === 'completeProgress') {
       console.log('[LeaderForgeCard] Triggering progress update for completion');
-      onProgressUpdate?.();
+      // ✅ REMOVED: onProgressUpdate is now only called by video modal when closing
+      // The progress will be updated when the video modal closes, not on completion
     }
   };
 
@@ -122,6 +125,10 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
               action: 'completeProgress',
               contentId: schema.id,
               progress: 100
+            },
+            onRealTimeProgressUpdate: (newProgress: number) => {
+              console.log('[LeaderForgeCard] Received real-time progress update:', newProgress);
+              setLocalProgress(newProgress);
             }
           })}
         >
@@ -272,6 +279,10 @@ export function LeaderForgeCard({ schema, userId, onAction, onProgressUpdate }: 
                       action: 'completeProgress',
                       contentId: schema.id,
                       progress: 100
+                    },
+                    onRealTimeProgressUpdate: (newProgress: number) => {
+                      console.log('[LeaderForgeCard] Received real-time progress update:', newProgress);
+                      setLocalProgress(newProgress);
                     },
                     ...action.parameters
                   })}

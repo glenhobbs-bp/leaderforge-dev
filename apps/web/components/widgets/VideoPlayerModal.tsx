@@ -19,7 +19,7 @@ interface VideoPlayerModalProps {
   onOpenChange?: (open: boolean) => void;
   userId?: string;
   tenantKey?: string;
-  onProgressUpdate?: () => void;
+  onProgressUpdate?: (finalProgress: number) => void;
 }
 
 export function VideoPlayerModal({
@@ -142,6 +142,30 @@ export function VideoPlayerModal({
 
   // Update the ref whenever the function changes
   saveProgressRef.current = saveProgressToAPI;
+
+  // ✅ ADDED: Custom close handler that updates card progress
+  const handleClose = useCallback(() => {
+    // Calculate current progress percentage
+    const video = videoRef.current;
+    if (video && video.duration > 0) {
+      const currentProgressPercent = (video.currentTime / video.duration) * 100;
+      console.log('[VideoPlayerModal] Modal closing, updating card with progress:', currentProgressPercent);
+
+      // Update card with final progress
+      if (onProgressUpdate) {
+        onProgressUpdate(currentProgressPercent);
+      }
+    } else {
+      // Fallback to localProgress if video data unavailable
+      console.log('[VideoPlayerModal] Modal closing, using local progress:', localProgress);
+      if (onProgressUpdate) {
+        onProgressUpdate(localProgress);
+      }
+    }
+
+    // Close the modal
+    onOpenChange(false);
+  }, [onProgressUpdate, onOpenChange, localProgress]);
 
   // Mouse event handlers for dragging
   const handleDragStart = useCallback((e: React.MouseEvent) => {
@@ -310,7 +334,7 @@ export function VideoPlayerModal({
         // Only trigger parent progress update on actual completion
         if (onProgressUpdate) {
           console.log('[VideoPlayerModal] Video completed, triggering parent progress update');
-          onProgressUpdate();
+          onProgressUpdate(100);
         }
       } catch (error) {
         console.error('[VideoPlayerModal] Failed to save completion:', error);
@@ -498,7 +522,7 @@ export function VideoPlayerModal({
             ? 'bg-black/80 backdrop-blur-sm'
             : 'bg-black/60'
         }`}
-        onClick={() => onOpenChange(false)}
+        onClick={handleClose}
       />
 
       {/* Modal Window */}
@@ -529,7 +553,7 @@ export function VideoPlayerModal({
 
               {/* Close button - always visible in top-right corner */}
               <button
-                onClick={() => onOpenChange(false)}
+                onClick={handleClose}
                 className="absolute top-2 right-2 z-30 w-8 h-8 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/90 transition-colors duration-200"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

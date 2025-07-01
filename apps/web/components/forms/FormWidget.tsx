@@ -26,6 +26,7 @@ interface FormWidgetProps {
 interface FormTemplate {
   id: string;
   name: string;
+  title?: string;
   description: string;
   schema: RJSFSchema;
   ui_schema: UiSchema;
