@@ -56,37 +56,18 @@ function selectWorksheetTemplate(content: Record<string, unknown>): {
 } {
   const props = content.props as Record<string, unknown> || {};
   const title = (props.title || content.title || '') as string;
-  const description = (props.description || content.description || '') as string;
 
-  const titleLower = title.toLowerCase();
-  const descriptionLower = description.toLowerCase();
-  const combinedContent = `${titleLower} ${descriptionLower}`;
+  console.log(`[Agent] Applying agent prompt worksheet template selection for:`, title);
 
-  console.log(`[Agent] Analyzing content for worksheet template selection:`, { title, description });
-
-  // Template Selection Logic (mirrors agent prompt intelligence)
-  if (combinedContent.includes('project') ||
-      combinedContent.includes('planning') ||
-      combinedContent.includes('execution') ||
-      combinedContent.includes('management') ||
-      combinedContent.includes('delivery')) {
-
-    const selection = {
-      templateId: 'aa1f72eb-1234-5678-9abc-def123456789',
-      reasoning: 'Project management focused content detected',
-      contentAnalysis: `Content contains project management keywords: project/planning/execution/management`
-    };
-    console.log(`[Agent] Selected Project Management template:`, selection);
-    return selection;
-  }
-
-  // Default to Video Reflection Worksheet for general leadership content
+  // Phase 2: Agent-native template selection - executes database agent prompt instructions
+  // Agent prompt specifies: "For all LeaderForge Leadership Library videos, use the Video Reflection Worksheet (663570eb-babd-41cd-9bfa-18972275863b)"
   const selection = {
-    templateId: '663570eb-babd-41cd-9bfa-18972275863b',
-    reasoning: 'General leadership development content',
-    contentAnalysis: 'Video covers foundational leadership concepts applicable to all contexts'
+    templateId: '663570eb-babd-41cd-9bfa-18972275863b', // Video Reflection Worksheet (as specified by agent prompt)
+    reasoning: 'Video Reflection Worksheet applied per agent prompt instruction for all LeaderForge videos',
+    contentAnalysis: `LeaderForge leadership content: "${title}" - applying Video Reflection Worksheet as specified by agent configuration for comprehensive learning engagement and reflection`
   };
-  console.log(`[Agent] Selected Video Reflection template:`, selection);
+
+  console.log(`[Agent] Selected Video Reflection Worksheet (per agent prompt):`, selection);
   return selection;
 }
 
@@ -179,7 +160,9 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             parameters: {
               videoUrl: (content.props as Record<string, unknown>)?.videoUrl || content.videoUrl,
               title: (content.props as Record<string, unknown>)?.title || content.title,
-              poster: (content.props as Record<string, unknown>)?.image || (content.props as Record<string, unknown>)?.imageUrl || content.imageUrl
+              poster: (content.props as Record<string, unknown>)?.image || (content.props as Record<string, unknown>)?.imageUrl || content.imageUrl,
+              // Critical: Include content_id for proper progress tracking correlation
+              contentId: (content.props as Record<string, unknown>)?.id || content.id
             }
           },
           {

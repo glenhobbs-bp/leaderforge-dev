@@ -807,7 +807,9 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
                 videoUrl: videoModalData.videoUrl,
                 poster: videoModalData.poster,
                 description: videoModalData.description,
-                progress: videoModalData.progress || 0
+                progress: videoModalData.progress || 0,
+                // Critical: Pass contentId for proper progress tracking correlation
+                contentId: (videoModalData.parameters as any)?.contentId || (videoModalData as any).contentId
               } as any,
               config: {
                 title: videoModalData.title,

@@ -46,6 +46,7 @@ export function VideoPlayerModal({
     description,
     progress = 0,
     duration: contentDuration,
+    contentId, // Critical: Extract contentId for proper progress tracking
   } = data;
 
   const {
@@ -122,20 +123,22 @@ export function VideoPlayerModal({
 
   // Simple progress saving - just save current position
   const saveProgressToAPI = useCallback(async (currentTime: number, duration: number) => {
-    if (!title || !userId || !currentTime || !duration) {
+    // Use contentId for progress tracking, fallback to title if not available
+    const trackingId = contentId || title;
+    if (!trackingId || !userId || !currentTime || !duration) {
       return;
     }
 
     const progressPercent = (currentTime / duration) * 100;
 
     try {
-      await trackVideoProgress(title, currentTime, currentTime, duration);
+      await trackVideoProgress(trackingId, currentTime, currentTime, duration);
       lastSavedProgressRef.current = progressPercent;
-      console.log(`[VideoPlayerModal] Progress auto-saved: ${Math.round(progressPercent)}% at ${Math.round(currentTime)}s`);
+      console.log(`[VideoPlayerModal] Progress auto-saved: ${Math.round(progressPercent)}% at ${Math.round(currentTime)}s for content: ${trackingId}`);
     } catch (error) {
       console.error('[VideoPlayerModal] Failed to save progress:', error);
     }
-  }, [title, userId, trackVideoProgress]);
+  }, [contentId, title, userId, trackVideoProgress]);
 
   // Update the ref whenever the function changes
   saveProgressRef.current = saveProgressToAPI;
@@ -288,12 +291,16 @@ export function VideoPlayerModal({
 
   // Handle video completion
   const handleVideoEnd = useCallback(async () => {
-    if (videoRef.current && title && userId) {
+    // Use contentId for progress tracking, fallback to title if not available
+    const trackingId = contentId || title;
+    if (videoRef.current && trackingId && userId) {
       try {
         const duration = videoRef.current.duration;
         // Save 100% completion
-        await trackVideoProgress(title, duration, duration, duration);
+        await trackVideoProgress(trackingId, duration, duration, duration);
         setLocalProgress(100);
+
+        console.log(`[VideoPlayerModal] Video completed and progress saved for content: ${trackingId}`);
 
         // Trigger completion action if available
         if (onCompleteAction) {
@@ -309,7 +316,7 @@ export function VideoPlayerModal({
         console.error('[VideoPlayerModal] Failed to save completion:', error);
       }
     }
-  }, [title, userId, trackVideoProgress, onCompleteAction, onProgressUpdate]);
+  }, [contentId, title, userId, trackVideoProgress, onCompleteAction, onProgressUpdate]);
 
   // Save progress when modal closes - use separate effects for tracking and saving
   const prevOpenRef = useRef(open);
@@ -321,34 +328,36 @@ export function VideoPlayerModal({
 
   useEffect(() => {
     // Only run when open changes to false (modal closing)
-    if (!open && videoRef.current && title && userId) {
+    const trackingId = contentId || title;
+    if (!open && videoRef.current && trackingId && userId) {
       const currentTime = videoRef.current.currentTime;
       const duration = videoRef.current.duration;
       if (currentTime > 0 && duration > 0) {
         console.log('[VideoPlayerModal] Modal closing, progress was auto-saved by interval');
       }
     }
-  }, [open, title, userId, saveProgressToAPI]);
+  }, [open, contentId, title, userId, saveProgressToAPI]);
 
   // Auto-save progress every 5 seconds while playing (industry standard)
   useEffect(() => {
+    const trackingId = contentId || title;
     console.log('[VideoPlayerModal] Auto-save effect triggered:', {
       isPlaying,
       hasVideo: !!videoRef.current,
-      title,
+      trackingId,
       userId,
-      willStartInterval: isPlaying && !!videoRef.current && !!title && !!userId
+      willStartInterval: isPlaying && !!videoRef.current && !!trackingId && !!userId
     });
 
-    if (!isPlaying || !videoRef.current || !title || !userId) {
+    if (!isPlaying || !videoRef.current || !trackingId || !userId) {
       console.log('[VideoPlayerModal] Auto-save not starting - missing requirements');
       return;
     }
 
-    console.log('[VideoPlayerModal] Starting auto-save interval (15 seconds)');
+    console.log('[VideoPlayerModal] Starting auto-save interval (5 seconds)');
     const interval = window.setInterval(() => {
       console.log('[VideoPlayerModal] Auto-save interval triggered');
-      if (videoRef.current && title && userId && saveProgressRef.current) {
+      if (videoRef.current && trackingId && userId && saveProgressRef.current) {
         const currentTime = videoRef.current.currentTime;
         const duration = videoRef.current.duration;
         console.log('[VideoPlayerModal] Auto-save checking:', { currentTime, duration });
@@ -359,7 +368,7 @@ export function VideoPlayerModal({
           console.log('[VideoPlayerModal] Auto-save skipped - no valid time/duration');
         }
       } else {
-        console.log('[VideoPlayerModal] Auto-save skipped - missing video/title/user/saveFunction');
+        console.log('[VideoPlayerModal] Auto-save skipped - missing video/trackingId/user/saveFunction');
       }
     }, 5000); // Save every 5 seconds (industry standard)
 
@@ -367,7 +376,7 @@ export function VideoPlayerModal({
       console.log('[VideoPlayerModal] Clearing auto-save interval');
       window.clearInterval(interval);
     };
-  }, [isPlaying, title, userId]); // Removed saveProgressToAPI dependency
+  }, [isPlaying, contentId, title, userId]); // Added contentId dependency
 
   // Initialize video player
   useEffect(() => {
