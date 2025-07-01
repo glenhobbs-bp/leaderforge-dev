@@ -10,35 +10,6 @@ import { TribeSocialContentTool } from "./TribeSocialContentTool.js";
 // Initialize the original TribeSocialContentTool
 const tribeContentTool = new TribeSocialContentTool();
 
-// Smart worksheet template selection based on content title
-function getWorksheetTemplateId(title: string): string {
-  const titleLower = title.toLowerCase();
-
-  // Project Management content
-  if (titleLower.includes('project') || titleLower.includes('management') ||
-      titleLower.includes('planning') || titleLower.includes('execution') ||
-      titleLower.includes('bucket') || titleLower.includes('cue')) {
-    return 'aa1f72eb-1234-5678-9abc-def123456789'; // Project Management Leadership
-  }
-
-  // Team Building content
-  if (titleLower.includes('team') || titleLower.includes('building') ||
-      titleLower.includes('collaboration') || titleLower.includes('people') ||
-      titleLower.includes('change agent')) {
-    return 'bb2f83ec-2345-6789-abcd-ef0123456789'; // Team Building Leadership
-  }
-
-  // Leadership Fundamentals content
-  if (titleLower.includes('fundamental') || titleLower.includes('foundation') ||
-      titleLower.includes('basics') || titleLower.includes('trust') ||
-      titleLower.includes('integrity') || titleLower.includes('character')) {
-    return 'cc3f94fd-3456-789a-bcde-f01234567890'; // Leadership Fundamentals
-  }
-
-  // Default to video reflection worksheet for all other content
-  return '663570eb-babd-41cd-9bfa-18972275863b'; // Video Reflection Worksheet
-}
-
 // Define the agent state
 const StateAnnotation = Annotation.Root({
   messages: Annotation<BaseMessage[]>({
@@ -53,6 +24,32 @@ const StateAnnotation = Annotation.Root({
   agentParameters: Annotation<Record<string, unknown>>(),
   schema: Annotation<Record<string, unknown>>(),
 });
+
+/**
+ * AGENT-NATIVE WORKSHEET ARCHITECTURE
+ *
+ * Current State (Phase 1): Static template assignment for immediate functionality
+ * - Leadership Library videos → Video Reflection Worksheet (663570eb-babd-41cd-9bfa-18972275863b)
+ *
+ * Future Evolution (Phase 2): Agent-driven template selection via prompts
+ * - Agent prompt: "For Leadership Library videos, apply the Video Reflection Worksheet template"
+ * - Agent analyzes content type, user context, and learning objectives
+ * - Agent selects optimal template ID from available template registry
+ * - Template selection becomes part of agent's schema generation response
+ *
+ * Future Vision (Phase 3): Dynamic worksheet generation
+ * - Agent prompt: "Generate contextual reflection questions based on video content"
+ * - Agent creates custom worksheet schema dynamically for each piece of content
+ * - Questions adapt to user's role, experience level, and learning history
+ * - Fully agent-native content-to-worksheet pipeline
+ *
+ * Architecture Benefits:
+ * ✅ Agent-native: Business logic in prompts, not hardcoded functions
+ * ✅ Observable: All decisions visible in agent traces (LangSmith)
+ * ✅ Adaptable: Prompts can be updated without code deployment
+ * ✅ Contextual: Can consider user state, content analysis, learning objectives
+ * ✅ Scalable: Supports infinite content types and worksheet variations
+ */
 
 // Node functions
 async function fetchContent(state: typeof StateAnnotation.State) {
@@ -151,7 +148,9 @@ async function generateProgressSchema(state: typeof StateAnnotation.State) {
             label: 'Worksheet',
             primary: false,
             parameters: {
-              templateId: getWorksheetTemplateId(String((content.props as Record<string, unknown>)?.title || content.title || '')),
+              // Phase 1: Static template assignment per agent configuration
+              // This will be moved to agent prompt intelligence in Phase 2
+              templateId: '663570eb-babd-41cd-9bfa-18972275863b', // Video Reflection Worksheet per LeaderForge agent config
               contentId: (content.props as Record<string, unknown>)?.id || content.id,
               title: (content.props as Record<string, unknown>)?.title || content.title,
               videoId: (content.props as Record<string, unknown>)?.id || content.id
