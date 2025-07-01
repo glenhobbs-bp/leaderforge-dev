@@ -1,31 +1,31 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 6/30/2025, 8:20:41 AM*
+*Generated on 7/1/2025, 6:25:37 AM*
 
 ## Overview
 
-- **Total Files**: 292
-- **Total Size**: 2.53 MB
+- **Total Files**: 297
+- **Total Size**: 2.61 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 126 files
-- **.md**: 93 files
-- **.tsx**: 44 files
+- **.ts**: 127 files
+- **.md**: 96 files
+- **.tsx**: 45 files
 - **.json**: 17 files
 - **.js**: 10 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 170 files
-- **AI agent**: 142 files
-- **documentation**: 96 files
+- **TypeScript**: 172 files
+- **AI agent**: 146 files
+- **documentation**: 99 files
 - **security**: 70 files
-- **API**: 51 files
-- **Next.js API**: 49 files
-- **React**: 44 files
+- **API**: 52 files
+- **Next.js API**: 50 files
+- **React**: 45 files
 - **UI**: 35 files
 - **utility**: 34 files
 - **React hooks**: 31 files
@@ -180,9 +180,9 @@ Handles Supabase auth redirect and sets cookies for SSR session access.
 
 File: apps/web/app/api/auth/set-session/route.ts
 
-**Complexity**: low • **Size**: 1.7KB
+**Complexity**: low • **Size**: 2.5KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 6/27/2025
+**Modified**: 6/30/2025
 
 
 ### `apps/web/app/api/content/[tenant_key]/route.ts`
@@ -342,18 +342,27 @@ Purpose: File upload API endpoint for schema-driven forms system
 
 Purpose: Form templates API endpoint for schema-driven forms
 
-**Complexity**: medium • **Size**: 4.2KB
-**Tags**: `TypeScript`, `API`, `Next.js API`
+**Complexity**: medium • **Size**: 8.0KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
 **Modified**: 6/30/2025
+
+
+### `apps/web/app/api/input/universal/check/route.ts`
+
+Purpose: Check for existing worksheet submissions for a specific video and template
+
+**Complexity**: medium • **Size**: 4.4KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 7/1/2025
 
 
 ### `apps/web/app/api/input/universal/route.ts`
 
 Purpose: Universal Input API - Handles all user input submissions in unified system
 
-**Complexity**: medium • **Size**: 7.2KB
+**Complexity**: high • **Size**: 12.1KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/30/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/app/api/nav/[tenant_key]/route.ts`
@@ -693,9 +702,9 @@ Get initial session server-side for SSR
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: high • **Size**: 19.4KB
+**Complexity**: high • **Size**: 21.8KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 6/29/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -986,6 +995,15 @@ SSR Root page that redirects based on session status
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/test-forms/page.tsx`
+
+Purpose: Test page for FormWidget component - Video Reflection Worksheet
+
+**Complexity**: low • **Size**: 1.9KB
+**Tags**: `React`, `TypeScript`
+**Modified**: 6/30/2025
+
+
 ### `apps/web/app/test-widgets/page.tsx`
 
 File: apps/web/app/test-widgets/page.tsx
@@ -1035,18 +1053,18 @@ File: apps/web/components/ai/UniversalSchemaRenderer.tsx
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 31.3KB
+**Complexity**: high • **Size**: 33.1KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`, `AI agent`
-**Modified**: 6/29/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/forms/FormWidget.tsx`
 
-Purpose: Schema-driven form component using React JSON Schema Form
+Purpose: Schema-driven form widget using React JSON Schema Form with custom LeaderForge design system styling
 
-**Complexity**: high • **Size**: 9.1KB
+**Complexity**: high • **Size**: 25.1KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 6/30/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/forms/index.ts`
@@ -1071,9 +1089,9 @@ Purpose: Video Worksheet Form - Captures video reflection worksheet responses fo
 
 Purpose: Marcus Dashboard Mockup - Agent-native mockup component for UX validation
 
-**Complexity**: high • **Size**: 26.9KB
+**Complexity**: high • **Size**: 27.1KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 6/30/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/SupabaseProvider.tsx`
@@ -1251,9 +1269,9 @@ File: apps/web/components/widgets/Leaderboard.tsx
 
 LeaderForgeCard.tsx
 
-**Complexity**: medium • **Size**: 11.9KB
+**Complexity**: medium • **Size**: 12.0KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/28/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/widgets/List.tsx`
@@ -2007,9 +2025,27 @@ Content processing jobs
 
 —
 
-**Size**: 8.4KB
+**Size**: 12.9KB
 **Tags**: `documentation`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 6/30/2025
+
+
+### `docs/architecture/adr/0010-universal-content-identification.md`
+
+50+ lines of complex video ID -> title mapping
+
+**Size**: 7.7KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/30/2025
+
+
+### `docs/architecture/adr/0011-content-identification-hybrid-approach.md`
+
+Current form schema
+
+**Size**: 11.3KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 6/30/2025
 
 
 ### `docs/architecture/adr/0013-production-deployment-architecture.md`
@@ -2046,6 +2082,15 @@ or current tenant when created
 **Size**: 11.1KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/30/2025
+
+
+### `docs/architecture/adr/0017-agent-native-worksheet-template-architecture.md`
+
+ANTI-PATTERN: Hardcoded business logic
+
+**Size**: 9.5KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/1/2025
 
 
 ### `docs/architecture/adr/adr-template.md`
@@ -2259,18 +2304,18 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX val
 
 Local LangGraph dev server",
 
-**Size**: 146.2KB
+**Size**: 149.3KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/29/2025
+**Modified**: 6/30/2025
 
 
 ### `docs/manifest.md`
 
 Local LangGraph dev server
 
-**Size**: 55.4KB
+**Size**: 56.7KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/29/2025
+**Modified**: 6/30/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -2529,9 +2574,9 @@ ComponentSchema.ts
 
 ComponentSchema.ts
 
-**Complexity**: low • **Size**: 2.0KB
+**Complexity**: low • **Size**: 2.1KB
 **Tags**: `TypeScript`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/1/2025
 
 
 ### `packages/agent-core/types/contentSchema.js`
@@ -2549,7 +2594,7 @@ All schema types are props-wrapped. Do not use flat schemas.
 
 **Complexity**: low • **Size**: 1.2KB
 **Tags**: `TypeScript`
-**Modified**: 6/27/2025
+**Modified**: 7/1/2025
 
 
 ### `packages/agent-core/types/ProgressSchema.ts`

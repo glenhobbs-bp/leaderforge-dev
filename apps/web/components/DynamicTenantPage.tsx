@@ -71,7 +71,14 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
   // Worksheet modal state
   const [isWorksheetModalOpen, setIsWorksheetModalOpen] = useState(false);
-  const [worksheetModalData, setWorksheetModalData] = useState<{ contentId: string; title: string; templateId?: string; [key: string]: unknown } | null>(null);
+  const [worksheetModalData, setWorksheetModalData] = useState<{
+    contentId: string;
+    title: string;
+    templateId?: string;
+    agentReasoning?: string;
+    contentAnalysis?: string;
+    [key: string]: unknown
+  } | null>(null);
   const [currentTenant, setCurrentTenant] = useState<string>(
     props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'brilliant'
   );
@@ -269,10 +276,26 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       case 'openWorksheet': {
         console.log('[DynamicTenantPage] Opening worksheet with action:', JSON.stringify(action, null, 2));
         const actionParams = action.parameters as Record<string, unknown>;
+
+        // Phase 2: Agent-driven template selection with observability
+        const agentReasoning = actionParams?.reasoning as string;
+        const contentAnalysis = actionParams?.contentAnalysis as string;
+
+        if (agentReasoning || contentAnalysis) {
+          console.log('[DynamicTenantPage] Agent template selection:', {
+            templateId: actionParams?.templateId,
+            reasoning: agentReasoning,
+            contentAnalysis: contentAnalysis
+          });
+        }
+
         setWorksheetModalData({
           contentId: (action.contentId as string) || (actionParams?.contentId as string) || 'unknown',
           title: (action.title as string) || (actionParams?.title as string) || 'Content Worksheet',
-          templateId: (action.templateId as string) || (actionParams?.templateId as string) || '663570eb-babd-41cd-9bfa-18972275863b'
+          templateId: (action.templateId as string) || (actionParams?.templateId as string) || '663570eb-babd-41cd-9bfa-18972275863b',
+          // Phase 2: Include agent decision metadata for observability
+          agentReasoning,
+          contentAnalysis
         });
         setIsWorksheetModalOpen(true);
         break;

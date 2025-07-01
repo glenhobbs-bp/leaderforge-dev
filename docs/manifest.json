@@ -1,24 +1,24 @@
 {
   "metadata": {
-    "generated_at": "2025-06-30T12:20:41.894Z",
+    "generated_at": "2025-07-01T10:25:37.669Z",
     "generator_version": "1.0.0",
-    "total_files": 292,
-    "total_size_bytes": 2657691,
+    "total_files": 297,
+    "total_size_bytes": 2733075,
     "file_types": {
-      ".ts": 126,
+      ".ts": 127,
       ".json": 17,
-      ".tsx": 44,
+      ".tsx": 45,
       ".js": 10,
-      ".md": 93,
+      ".md": 96,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 170,
-      "API": 51,
-      "AI agent": 142,
-      "React": 44,
+      "TypeScript": 172,
+      "API": 52,
+      "AI agent": 146,
+      "React": 45,
       "React hooks": 31,
-      "Next.js API": 49,
+      "Next.js API": 50,
       "security": 70,
       "test": 13,
       "API endpoint": 3,
@@ -70,7 +70,7 @@
       "prototyping": 1,
       "routing": 2,
       "exports": 1,
-      "documentation": 96,
+      "documentation": 99,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -382,9 +382,9 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-27T21:33:11.937Z",
-      "size_bytes": 1758,
-      "hash": "2ee2e8a8",
+      "last_modified": "2025-06-30T19:38:51.031Z",
+      "size_bytes": 2526,
+      "hash": "50d8a459",
       "complexity": "low"
     },
     {
@@ -748,16 +748,37 @@
       "tags": [
         "TypeScript",
         "API",
-        "Next.js API"
+        "Next.js API",
+        "AI agent"
       ],
       "dependencies": [
         "next/server",
         "next/headers",
         "@/lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-30T12:20:18.629Z",
-      "size_bytes": 4283,
-      "hash": "3d9b804b",
+      "last_modified": "2025-06-30T12:59:16.409Z",
+      "size_bytes": 8169,
+      "hash": "ad395245",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/input/universal/check/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/input/universal/check",
+      "extension": ".ts",
+      "purpose": "Purpose: Check for existing worksheet submissions for a specific video and template",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-07-01T09:40:25.589Z",
+      "size_bytes": 4498,
+      "hash": "def26c5e",
       "complexity": "medium"
     },
     {
@@ -777,10 +798,10 @@
         "next/headers",
         "next/server"
       ],
-      "last_modified": "2025-06-30T12:05:19.539Z",
-      "size_bytes": 7329,
-      "hash": "c67831d8",
-      "complexity": "medium"
+      "last_modified": "2025-07-01T09:40:23.312Z",
+      "size_bytes": 12382,
+      "hash": "9553a15b",
+      "complexity": "high"
     },
     {
       "path": "apps/web/app/api/nav/[tenant_key]/route.ts",
@@ -1672,9 +1693,9 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-06-29T19:16:14.476Z",
-      "size_bytes": 19836,
-      "hash": "8299f933",
+      "last_modified": "2025-07-01T09:40:20.356Z",
+      "size_bytes": 22301,
+      "hash": "9168bf38",
       "complexity": "high"
     },
     {
@@ -2339,6 +2360,28 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/test-forms/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/test-forms",
+      "extension": ".tsx",
+      "purpose": "Purpose: Test page for FormWidget component - Video Reflection Worksheet",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "react",
+        "../../components/forms/FormWidget"
+      ],
+      "exports": [
+        "TestFormsPage"
+      ],
+      "last_modified": "2025-06-30T12:25:30.280Z",
+      "size_bytes": 1924,
+      "hash": "b5543f79",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/test-widgets/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/test-widgets",
@@ -2463,15 +2506,16 @@
         "../../../packages/agent-core/types/ComponentSchema",
         "../../../packages/agent-core/types/UniversalWidgetSchema",
         "./widgets/VideoPlayerModal",
+        "./forms/FormWidget",
         "./SupabaseProvider",
         "react",
         "../app/hooks/useUserPreferences",
         "@tanstack/react-query",
         "../app/lib/types"
       ],
-      "last_modified": "2025-06-29T19:16:27.283Z",
-      "size_bytes": 32027,
-      "hash": "4a5785c6",
+      "last_modified": "2025-07-01T09:40:53.627Z",
+      "size_bytes": 33907,
+      "hash": "b72b032b",
       "complexity": "high"
     },
     {
@@ -2479,7 +2523,7 @@
       "name": "FormWidget.tsx",
       "directory": "apps/web/components/forms",
       "extension": ".tsx",
-      "purpose": "Purpose: Schema-driven form component using React JSON Schema Form",
+      "purpose": "Purpose: Schema-driven form widget using React JSON Schema Form with custom LeaderForge design system styling",
       "tags": [
         "React",
         "TypeScript",
@@ -2493,9 +2537,9 @@
         "@rjsf/validator-ajv8",
         "@rjsf/utils"
       ],
-      "last_modified": "2025-06-30T12:19:06.771Z",
-      "size_bytes": 9329,
-      "hash": "c2549efc",
+      "last_modified": "2025-07-01T09:40:46.585Z",
+      "size_bytes": 25735,
+      "hash": "444ea0ba",
       "complexity": "high"
     },
     {
@@ -2508,7 +2552,7 @@
         "TypeScript",
         "UI"
       ],
-      "last_modified": "2025-06-30T12:20:26.514Z",
+      "last_modified": "2025-06-30T18:41:53.457Z",
       "size_bytes": 277,
       "hash": "50cdefb2",
       "complexity": "low"
@@ -2552,11 +2596,11 @@
         "../widgets/LeaderForgeCard",
         "../widgets/StatCard",
         "../widgets/List",
-        "../forms/VideoWorksheetForm"
+        "../forms/FormWidget"
       ],
-      "last_modified": "2025-06-30T12:05:25.093Z",
-      "size_bytes": 27504,
-      "hash": "1cb8d4ce",
+      "last_modified": "2025-07-01T09:40:28.058Z",
+      "size_bytes": 27714,
+      "hash": "bacafa6f",
       "complexity": "high"
     },
     {
@@ -3046,9 +3090,9 @@
         "lucide-react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-28T11:44:34.595Z",
-      "size_bytes": 12212,
-      "hash": "c797258e",
+      "last_modified": "2025-07-01T09:40:49.296Z",
+      "size_bytes": 12246,
+      "hash": "7452213a",
       "complexity": "medium"
     },
     {
@@ -3500,9 +3544,9 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-06-30T12:18:04.737Z",
-      "size_bytes": 1325,
-      "hash": "ccbe715b"
+      "last_modified": "2025-06-30T12:50:44.381Z",
+      "size_bytes": 1296,
+      "hash": "4f475628"
     },
     {
       "path": "apps/web/postcss.config.js",
@@ -4389,9 +4433,37 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.242Z",
-      "size_bytes": 8629,
-      "hash": "81d1991f"
+      "last_modified": "2025-06-30T20:32:55.686Z",
+      "size_bytes": 13159,
+      "hash": "ef231fc6"
+    },
+    {
+      "path": "docs/architecture/adr/0010-universal-content-identification.md",
+      "name": "0010-universal-content-identification.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "50+ lines of complex video ID -> title mapping",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-01T01:58:04.525Z",
+      "size_bytes": 7861,
+      "hash": "af137f14"
+    },
+    {
+      "path": "docs/architecture/adr/0011-content-identification-hybrid-approach.md",
+      "name": "0011-content-identification-hybrid-approach.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "Current form schema",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-01T01:58:56.242Z",
+      "size_bytes": 11537,
+      "hash": "b29f1e84"
     },
     {
       "path": "docs/architecture/adr/0013-production-deployment-architecture.md",
@@ -4449,6 +4521,20 @@
       "last_modified": "2025-06-30T12:05:35.708Z",
       "size_bytes": 11406,
       "hash": "4e6eaf5f"
+    },
+    {
+      "path": "docs/architecture/adr/0017-agent-native-worksheet-template-architecture.md",
+      "name": "0017-agent-native-worksheet-template-architecture.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "ANTI-PATTERN: Hardcoded business logic",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-01T10:25:23.802Z",
+      "size_bytes": 9700,
+      "hash": "bef08633"
     },
     {
       "path": "docs/architecture/adr/adr-template.md",
@@ -4793,9 +4879,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-30T01:36:10.235Z",
-      "size_bytes": 149686,
-      "hash": "b865b1d7"
+      "last_modified": "2025-06-30T12:20:41.901Z",
+      "size_bytes": 152903,
+      "hash": "510ce301"
     },
     {
       "path": "docs/manifest.md",
@@ -4808,9 +4894,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-30T01:36:10.262Z",
-      "size_bytes": 56741,
-      "hash": "890d9d13"
+      "last_modified": "2025-06-30T12:20:41.928Z",
+      "size_bytes": 58041,
+      "hash": "39a8b54c"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -5289,9 +5375,9 @@
       "dependencies": [
         "./contentSchema"
       ],
-      "last_modified": "2025-06-27T21:33:12.270Z",
-      "size_bytes": 2084,
-      "hash": "84c53703",
+      "last_modified": "2025-07-01T09:40:35.653Z",
+      "size_bytes": 2154,
+      "hash": "a5c64208",
       "complexity": "low"
     },
     {
@@ -5315,9 +5401,9 @@
       "tags": [
         "TypeScript"
       ],
-      "last_modified": "2025-06-27T21:33:12.271Z",
-      "size_bytes": 1183,
-      "hash": "02cc0e76",
+      "last_modified": "2025-07-01T09:40:32.427Z",
+      "size_bytes": 1257,
+      "hash": "36fce32d",
       "complexity": "low"
     },
     {
