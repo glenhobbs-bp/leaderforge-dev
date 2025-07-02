@@ -307,14 +307,20 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                 />
               )}
 
-              <label
+              <div
                 className={`absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110 ${
                   avatarUploadMutation.isPending
                     ? 'bg-blue-500 cursor-wait'
                     : 'bg-slate-600 hover:bg-slate-700 cursor-pointer'
                 }`}
+                onClick={() => {
+                  if (!avatarUploadMutation.isPending) {
+                    document.getElementById('avatar-upload-input')?.click();
+                  }
+                }}
               >
                 <input
+                  id="avatar-upload-input"
                   type="file"
                   accept="image/*"
                   className="hidden"
@@ -325,7 +331,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                 ) : (
                   <Camera className="w-3 h-3 text-white" />
                 )}
-              </label>
+              </div>
               {/* Edit Profile Button */}
               {!isEditing && (
                 <button
