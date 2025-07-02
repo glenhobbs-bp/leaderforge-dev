@@ -308,26 +308,24 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
               )}
 
               <label
-                htmlFor="avatar-upload"
                 className={`absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110 ${
                   avatarUploadMutation.isPending
                     ? 'bg-blue-500 cursor-wait'
                     : 'bg-slate-600 hover:bg-slate-700 cursor-pointer'
                 }`}
               >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
                 {avatarUploadMutation.isPending ? (
                   <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Camera className="w-3 h-3 text-white" />
                 )}
               </label>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarUpload}
-              />
               {/* Edit Profile Button */}
               {!isEditing && (
                 <button
