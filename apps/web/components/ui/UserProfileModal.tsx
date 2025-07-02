@@ -80,6 +80,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
   });
   const [avatarPendingRefresh, setAvatarPendingRefresh] = useState(false);
 
+
   const queryClient = useQueryClient();
 
   // Fetch user data
@@ -204,7 +205,9 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
   };
 
   const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('[Avatar Upload] handleAvatarUpload called');
     const file = event.target.files?.[0];
+    console.log('[Avatar Upload] File selected:', file?.name, file?.size);
     if (!file) return;
 
     // Validate file type
@@ -257,8 +260,11 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
     : currentUser.full_name || 'User Profile';
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleModalClose}>
-      <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
+    <>
+
+
+      <Dialog open={isOpen} onOpenChange={handleModalClose}>
+        <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
         <div
           className="relative rounded-2xl p-5 border border-white/20"
           style={{
@@ -307,31 +313,39 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                 />
               )}
 
-              <div
-                className={`absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110 ${
-                  avatarUploadMutation.isPending
-                    ? 'bg-blue-500 cursor-wait'
-                    : 'bg-slate-600 hover:bg-slate-700 cursor-pointer'
-                }`}
+
+
+              {/* Simple test button */}
+              <button
+                type="button"
+                className="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 shadow-lg border-2 border-white group-hover:scale-110 bg-slate-600 hover:bg-slate-700 cursor-pointer"
                 onClick={() => {
-                  if (!avatarUploadMutation.isPending) {
-                    document.getElementById('avatar-upload-input')?.click();
-                  }
+                  console.log('[Avatar Upload] Simple button clicked');
+
+                  // Try programmatic file input creation (bypasses DOM issues)
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.style.display = 'none';
+
+                  input.onchange = (event) => {
+                    console.log('[Avatar Upload] File selected via programmatic input');
+                    handleAvatarUpload(event as any);
+                    document.body.removeChild(input);
+                  };
+
+                  document.body.appendChild(input);
+                  console.log('[Avatar Upload] Created programmatic input, triggering click...');
+                  input.click();
                 }}
+                disabled={avatarUploadMutation.isPending}
               >
-                <input
-                  id="avatar-upload-input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                />
                 {avatarUploadMutation.isPending ? (
                   <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Camera className="w-3 h-3 text-white" />
                 )}
-              </div>
+              </button>
               {/* Edit Profile Button */}
               {!isEditing && (
                 <button
@@ -475,5 +489,6 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
