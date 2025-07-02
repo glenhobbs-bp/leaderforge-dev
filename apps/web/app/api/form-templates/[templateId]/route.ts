@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
+import { restoreSession } from '@/lib/supabaseServerClient';
 
 interface FormattedTemplate {
   id: string;
@@ -51,13 +51,11 @@ export async function GET(
       });
     }
 
-    // ✅ PERFORMANCE: Streamlined authentication (remove complex session restoration)
+    // ✅ PERFORMANCE: Robust authentication with proper cookie handling
     const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const { session, supabase, error: authError } = await restoreSession(cookieStore);
 
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (!session?.user) {
+    if (!session?.user || authError) {
       return NextResponse.json({
         error: 'Authentication required'
       }, { status: 401 });
