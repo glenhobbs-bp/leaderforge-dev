@@ -3,8 +3,8 @@
 -- Safe version without ON CONFLICT clauses
 
 -- First, create missing entitlements only if they don't exist
-INSERT INTO core.entitlements (name, display_name, description, context_key, features)
-SELECT name, display_name, description, context_key, features::jsonb FROM (
+INSERT INTO core.entitlements (name, display_name, description, tenant_key, features)
+SELECT name, display_name, description, tenant_key, features::jsonb FROM (
   VALUES
     -- ADMIN ENTITLEMENTS - Comprehensive access to all features
     ('brilliant-admin', 'Brilliant Admin', 'Full administrative access to all Brilliant Movement features and content', 'brilliant', '{"allContent": true, "allFeatures": true, "coaching": true, "library": true, "community": true, "gatherings": true, "smallGroups": true, "events": true, "adminPanel": true, "userManagement": true, "analytics": true}'),
@@ -31,7 +31,7 @@ SELECT name, display_name, description, context_key, features::jsonb FROM (
     ('bsol-graduate', 'BSOL Graduate', 'Graduate access to resources and community', 'brilliant-school', '{"graduateResources": true, "mentorNetwork": true, "continuingEducation": true}'),
     ('smallgroup-member', 'Small Group Member', 'Small group participation access', 'small-group-hub', '{"groupAccess": true, "studies": true, "events": true}'),
     ('smallgroup-leader', 'Small Group Leader', 'Small group leadership tools and training', 'small-group-hub', '{"leaderTools": true, "facilitationGuides": true, "groupManagement": true}')
-) AS new_entitlements(name, display_name, description, context_key, features)
+) AS new_entitlements(name, display_name, description, tenant_key, features)
 WHERE NOT EXISTS (
   SELECT 1 FROM core.entitlements e WHERE e.name = new_entitlements.name
 );
@@ -56,11 +56,11 @@ SELECT
   u.email,
   e.name as entitlement_name,
   e.display_name,
-  e.context_key,
+  e.tenant_key,
   ue.granted_at
 FROM core.user_entitlements ue
 JOIN core.users u ON u.id = ue.user_id
 JOIN core.entitlements e ON e.id = ue.entitlement_id
 WHERE u.email = 'glen@brilliantperspectives.com'
   AND ue.revoked_at IS NULL
-ORDER BY e.context_key, e.name;
+ORDER BY e.tenant_key, e.name;

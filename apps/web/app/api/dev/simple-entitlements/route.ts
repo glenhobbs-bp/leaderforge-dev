@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await adminClient.rpc('exec_sql', {
       sql: `
         -- Create basic entitlements
-        INSERT INTO core.entitlements (name, display_name, description, context_key, features)
+        INSERT INTO core.entitlements (name, display_name, description, tenant_key, features)
         VALUES
           ('coaching-access', 'Coaching Access', 'Access to coaching features', 'brilliant', '{"coaching": true}'),
           ('library-access', 'Library Access', 'Access to video library', 'brilliant', '{"library": true}'),

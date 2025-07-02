@@ -2,7 +2,7 @@
 -- User ID: 47f9db16-f24f-4868-8155-256cfa2edc2c
 
 -- First, let's create any missing entitlements that the agent route expects
-INSERT INTO core.entitlements (name, display_name, description, context_key, features) VALUES
+INSERT INTO core.entitlements (name, display_name, description, tenant_key, features) VALUES
 -- Basic access entitlements
 ('coaching-access', 'Coaching Access', 'Access to coaching features', 'brilliant', '{"coaching": true}'),
 ('library-access', 'Library Access', 'Access to video library', 'brilliant', '{"library": true}'),

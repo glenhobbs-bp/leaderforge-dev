@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Create the specific entitlements that the navigation system looks for
     const entitlementsToCreate = [
-      { name: 'coaching-access', display_name: 'Coaching Access', description: 'Access to coaching features', context_key: 'brilliant', features: {"coaching": true} },
-      { name: 'library-access', display_name: 'Library Access', description: 'Access to video library', context_key: 'brilliant', features: {"library": true} },
-      { name: 'community-access', display_name: 'Community Access', description: 'Access to community features', context_key: 'brilliant', features: {"community": true} },
+      { name: 'coaching-access', display_name: 'Coaching Access', description: 'Access to coaching features', tenant_key: 'brilliant', features: {"coaching": true} },
+      { name: 'library-access', display_name: 'Library Access', description: 'Access to video library', tenant_key: 'brilliant', features: {"library": true} },
+      { name: 'community-access', display_name: 'Community Access', description: 'Access to community features', tenant_key: 'brilliant', features: {"community": true} },
     ];
 
     // Use raw SQL to bypass any remaining RLS issues
@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
       // Create entitlement if it doesn't exist
       const createEntitlementResult = await adminClient.rpc('exec', {
         sql: `
-          INSERT INTO core.entitlements (name, display_name, description, context_key, features)
-          VALUES ('${entitlement.name}', '${entitlement.display_name}', '${entitlement.description}', '${entitlement.context_key}', '${JSON.stringify(entitlement.features)}')
+          INSERT INTO core.entitlements (name, display_name, description, tenant_key, features)
+          VALUES ('${entitlement.name}', '${entitlement.display_name}', '${entitlement.description}', '${entitlement.tenant_key}', '${JSON.stringify(entitlement.features)}')
           ON CONFLICT (name) DO NOTHING
           RETURNING id;
         `
