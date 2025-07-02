@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { restoreSession } from '../../../lib/supabaseServerClient';
+import { createSupabaseServerClient, restoreSession } from '../../../lib/supabaseServerClient';
 import { cookies as nextCookies } from 'next/headers';
 
 // Simple in-memory cache for avatar URLs
@@ -44,11 +44,72 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // ✅ Session Auth: Use consistent restoreSession approach
+    // ✅ Session Auth: Verify user identity using robust token refresh
     const cookieStore = await nextCookies();
-    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
+    const supabase = createSupabaseServerClient(cookieStore);
 
-    if (!session?.user?.id || session.user.id !== userId || sessionError) {
+    // Robust session restoration with token refresh handling
+    const allCookies = cookieStore.getAll();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+
+    let session = null;
+    let sessionError = null;
+
+    if (accessToken && refreshToken) {
+      console.log('[AVATAR API] Attempting session restoration...');
+
+      try {
+        const setSessionRes = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (setSessionRes.error) {
+          console.log('[AVATAR API] setSession failed:', setSessionRes.error.message);
+
+          // If JWT is invalid, try refresh
+          if (setSessionRes.error.message.includes('JWT') || setSessionRes.error.message.includes('expired')) {
+            console.log('[AVATAR API] Attempting token refresh...');
+
+            const refreshRes = await supabase.auth.refreshSession();
+            if (refreshRes.error) {
+              console.log('[AVATAR API] Token refresh failed:', refreshRes.error.message);
+              sessionError = refreshRes.error;
+            } else {
+              console.log('[AVATAR API] Token refresh successful');
+              session = refreshRes.data.session;
+            }
+          } else {
+            sessionError = setSessionRes.error;
+          }
+        } else {
+          console.log('[AVATAR API] Session restored successfully');
+          session = setSessionRes.data.session;
+        }
+      } catch (error) {
+        console.log('[AVATAR API] Session restoration threw error:', error.message);
+        sessionError = error;
+      }
+    }
+
+    // Final session check
+    if (!session) {
+      const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
+      session = currentSession;
+      if (currentError && !sessionError) {
+        sessionError = currentError;
+      }
+    }
+
+    if (!session?.user?.id || session.user.id !== userId) {
+      console.log('[AVATAR API] Authentication failed:', {
+        hasSession: !!session,
+        userId,
+        sessionUserId: session?.user?.id,
+        error: sessionError?.message
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
