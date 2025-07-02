@@ -427,7 +427,9 @@ export function FormWidget({ templateId, isOpen, onClose, videoContext }: FormWi
 
       try {
         console.log('[FormWidget] Checking for existing submission:', { videoId: videoContext.id, templateId });
-        const response = await fetch(`/api/input/universal/check?videoId=${videoContext.id}&templateId=${templateId}`);
+        const response = await fetch(`/api/input/universal/check?videoId=${videoContext.id}&templateId=${templateId}`, {
+          credentials: 'include'
+        });
 
         if (response.ok) {
           const existing = await response.json();
@@ -483,6 +485,7 @@ export function FormWidget({ templateId, isOpen, onClose, videoContext }: FormWi
       const response = await fetch('/api/input/universal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           input_type: 'form',
           input_data: inputData,
