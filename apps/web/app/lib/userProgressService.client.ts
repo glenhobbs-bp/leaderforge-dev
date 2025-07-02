@@ -105,11 +105,27 @@ class BatchedProgressService {
   }
 
   private async batchTrackProgressDirect(events: ProgressEvent[]): Promise<UserProgress[]> {
+    // ✅ DEBUG: Log exactly what we're sending to the server
+    console.log('[BatchedProgressService] Sending batch events:', events.map(e => ({
+      contentId: e.contentId,
+      progressType: e.progressType,
+      metadata: e.metadata,
+      value: e.value,
+      timestamp: e.timestamp
+    })));
+
+    // ✅ DEBUG: Show raw JSON being sent to server
+    console.log('[BatchedProgressService] Raw JSON payload:', JSON.stringify({
+      action: 'batchTrackProgress',
+      events
+    }, null, 2));
+
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ CRITICAL FIX: Include cookies for authentication
       body: JSON.stringify({
         action: 'batchTrackProgress',
         events
@@ -145,16 +161,31 @@ class BatchedProgressService {
     position: number,
     duration?: number
   ): Promise<UserProgress> {
+    // ✅ FIX: Round floating-point video times to integers for database compatibility
+    const watchTimeInt = Math.round(watchTime);
+    const positionInt = Math.round(position);
+    const durationInt = duration ? Math.round(duration) : undefined;
+
+    // ✅ DEBUG: Log the conversion to verify rounding is working
+    console.log('[BatchedProgressService] Rounding video values:', {
+      original: { watchTime, position, duration },
+      rounded: { watchTimeInt, positionInt, durationInt }
+    });
+
+    // ✅ CRITICAL FIX: Round progress percentage to integer for database compatibility
+    const progressPercentage = durationInt ? Math.min(100, (positionInt / durationInt) * 100) : 0;
+    const progressValue = Math.round(progressPercentage);
+
     const event: ProgressEvent = {
       userId,
       contentId,
       tenantKey: contextKey,
       progressType: 'video',
-      value: duration ? Math.min(100, (position / duration) * 100) : 0,
+      value: progressValue,
       metadata: {
-        watchTimeSeconds: watchTime,
-        lastPositionSeconds: position,
-        videoDurationSeconds: duration
+        watchTimeSeconds: watchTimeInt,
+        lastPositionSeconds: positionInt,
+        videoDurationSeconds: durationInt
       },
       timestamp: new Date().toISOString()
     };
@@ -178,6 +209,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'trackQuizCompletion',
         userId,
@@ -212,6 +244,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'trackReadingProgress',
         userId,
@@ -239,6 +272,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'trackProgressEvent',
         event
@@ -266,6 +300,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'getProgress',
         userId,
@@ -295,6 +330,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'getProgressForContentIds',
         userId,
@@ -323,6 +359,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'getProgressSummary',
         userId,
@@ -350,6 +387,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'getCompletionStats',
         userId,
@@ -377,6 +415,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'checkMilestones',
         userId,
@@ -401,6 +440,7 @@ class BatchedProgressService {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ✅ Include cookies for authentication
       body: JSON.stringify({
         action: 'batchTrackProgress',
         events

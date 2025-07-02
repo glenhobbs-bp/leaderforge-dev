@@ -74,19 +74,30 @@ export async function POST(request: NextRequest) {
     });
 
     // Create UserProgressTool with the authenticated SSR client (like rest of platform)
-    const progressRepository = new SupabaseUserProgressRepository(supabase);
+    const supabaseAdapter = {
+      schema: (name: string) => supabase.schema(name),
+      auth: {
+        uid: () => user.id
+      }
+    };
+    const progressRepository = new SupabaseUserProgressRepository(supabaseAdapter);
     const userProgressTool = new UserProgressTool(progressRepository);
 
     // Route to appropriate UserProgressTool method
     switch (action) {
       case 'trackVideoProgress': {
+        // ✅ CRITICAL FIX: Round decimal video times to integers for database compatibility
+        const watchTimeInt = Math.round(watchTime || 0);
+        const positionInt = Math.round(position || 0);
+        const durationInt = duration ? Math.round(duration) : undefined;
+
         const result = await userProgressTool.trackVideoProgress(
           effectiveUserId,
           contentId,
           contextKey,
-          watchTime,
-          position,
-          duration
+          watchTimeInt,
+          positionInt,
+          durationInt
         );
         return NextResponse.json({ success: true, data: result });
       }
@@ -151,6 +162,13 @@ export async function POST(request: NextRequest) {
       }
 
       case 'batchTrackProgress': {
+        // ✅ DEBUG: Log what the server received to verify decimal values
+        console.log('[Universal Progress API] Received batch events:', events.map((e: { contentId: string; progressType: string; metadata: unknown }) => ({
+          contentId: e.contentId,
+          progressType: e.progressType,
+          metadata: e.metadata
+        })));
+
         const result = await userProgressTool.batchTrackProgress(events);
         return NextResponse.json({ success: true, data: result });
       }

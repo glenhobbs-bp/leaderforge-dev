@@ -114,7 +114,7 @@ export interface UserProgressRepository {
  */
 export class SupabaseUserProgressRepository implements UserProgressRepository {
   constructor(private supabase: {
-    schema: (name: string) => any;
+    schema: (name: string) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
     auth: { uid: () => string | undefined };
   }) {}
   /**
@@ -235,11 +235,22 @@ export class SupabaseUserProgressRepository implements UserProgressRepository {
     // Determine if this is a completion transition (incomplete -> complete)
     const isCompletionTransition = this.isCompletionTransition(existingProgress, event);
 
+    // ✅ CRITICAL FIX: Round decimal values for video progress events to prevent database errors
+    let processedMetadata = { ...event.metadata };
+    if (event.progressType === 'video' && event.metadata) {
+      processedMetadata = {
+        ...event.metadata,
+        watchTimeSeconds: event.metadata.watchTimeSeconds ? Math.round(Number(event.metadata.watchTimeSeconds)) : event.metadata.watchTimeSeconds,
+        lastPositionSeconds: event.metadata.lastPositionSeconds ? Math.round(Number(event.metadata.lastPositionSeconds)) : event.metadata.lastPositionSeconds,
+        videoDurationSeconds: event.metadata.videoDurationSeconds ? Math.round(Number(event.metadata.videoDurationSeconds)) : event.metadata.videoDurationSeconds,
+      };
+    }
+
     // Update progress based on event
     const updatedProgress: Partial<UserProgress> = {
       progress_type: event.progressType,
       progress_percentage: event.value,
-      metadata: { ...existingProgress?.metadata, ...event.metadata },
+      metadata: { ...existingProgress?.metadata, ...processedMetadata },
       last_viewed_at: event.timestamp || new Date().toISOString()
     };
 
@@ -481,11 +492,22 @@ export class UserProgressTool {
     // Determine if this is a completion transition (incomplete -> complete)
     const isCompletionTransition = this.isCompletionTransition(existingProgress, event);
 
+    // ✅ CRITICAL FIX: Round decimal values for video progress events to prevent database errors
+    let processedMetadata = { ...event.metadata };
+    if (event.progressType === 'video' && event.metadata) {
+      processedMetadata = {
+        ...event.metadata,
+        watchTimeSeconds: event.metadata.watchTimeSeconds ? Math.round(Number(event.metadata.watchTimeSeconds)) : event.metadata.watchTimeSeconds,
+        lastPositionSeconds: event.metadata.lastPositionSeconds ? Math.round(Number(event.metadata.lastPositionSeconds)) : event.metadata.lastPositionSeconds,
+        videoDurationSeconds: event.metadata.videoDurationSeconds ? Math.round(Number(event.metadata.videoDurationSeconds)) : event.metadata.videoDurationSeconds,
+      };
+    }
+
     // Update progress based on event
     const updatedProgress: Partial<UserProgress> = {
       progress_type: event.progressType,
       progress_percentage: event.value,
-      metadata: { ...existingProgress?.metadata, ...event.metadata },
+      metadata: { ...existingProgress?.metadata, ...processedMetadata },
       last_viewed_at: event.timestamp || new Date().toISOString()
     };
 
@@ -546,16 +568,21 @@ export class UserProgressTool {
    * Quick helper for video progress (backward compatibility).
    */
   async trackVideoProgress(userId: string, contentId: string, tenantKey: string, watchTime: number, position: number, duration?: number): Promise<UserProgress> {
+    // ✅ CRITICAL FIX: Round decimal video times to integers for database compatibility
+    const watchTimeInt = Math.round(watchTime);
+    const positionInt = Math.round(position);
+    const durationInt = duration ? Math.round(duration) : undefined;
+
     return this.trackProgressEvent({
       userId,
       contentId,
       tenantKey,
       progressType: 'video',
-      value: duration ? Math.round((watchTime / duration) * 100) : 0,
+      value: durationInt ? Math.round((positionInt / durationInt) * 100) : 0,
       metadata: {
-        watchTimeSeconds: watchTime,
-        lastPositionSeconds: position,
-        videoDurationSeconds: duration
+        watchTimeSeconds: watchTimeInt,
+        lastPositionSeconds: positionInt,
+        videoDurationSeconds: durationInt
       }
     });
   }

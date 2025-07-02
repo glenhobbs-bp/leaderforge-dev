@@ -12,7 +12,8 @@ import VideoList from './VideoList';
 import Panel from './Panel';
 import Grid from './Grid';
 import { LeaderForgeCard } from './LeaderForgeCard';
-import { VideoPlayerModal } from './VideoPlayerModal';
+// 🚀 PERFORMANCE FIX: Lazy load VideoPlayerModal to avoid bundling hls.js (400kB)
+// import { VideoPlayerModal } from './VideoPlayerModal'; // ❌ Removed static import
 
 // Create global widget registry instance
 export const widgetRegistry = new WidgetRegistry();
@@ -163,33 +164,9 @@ widgetRegistry.registerWidget({
   componentPath: './LeaderForgeCard',
 });
 
-// Register VideoPlayerModal widget
-widgetRegistry.registerWidget({
-  metadata: {
-    id: 'videoplayer-modal',
-    type: 'Widget',
-    name: 'Video Player Modal',
-    description: 'Advanced video player modal with HLS support, progress tracking, and platform compatibility',
-    version: '1.0.0',
-    category: 'content',
-    capabilities: [
-      WidgetCapabilities.VIDEO_PLAYBACK,
-      WidgetCapabilities.PROGRESS_TRACKING,
-      WidgetCapabilities.MODAL_DISPLAY,
-      'hls-support',
-      'video-modal',
-      'progress-tracking',
-      'platform-compatibility',
-      'video-player'
-    ],
-    tags: ['video', 'modal', 'player', 'hls', 'progress', 'streaming'],
-    author: 'Widget Team',
-    sizeHint: 'fullwidth',
-    themeable: true,
-  },
-  component: VideoPlayerModal,
-  componentPath: './VideoPlayerModal',
-});
+// ✅ PERFORMANCE: VideoPlayerModal registration removed to avoid SSR errors and hls.js bundle bloat
+// VideoPlayerModal is loaded dynamically in DynamicTenantPage when needed
+// This prevents the 400kB hls.js library from being included in the main bundle
 
 // Export widgets and dispatcher
 export { default as StatCard } from './StatCard';
@@ -198,5 +175,6 @@ export { default as VideoList } from './VideoList';
 export { default as Panel } from './Panel';
 export { default as Grid } from './Grid';
 export { LeaderForgeCard } from './LeaderForgeCard';
-export { VideoPlayerModal } from './VideoPlayerModal';
+// ✅ PERFORMANCE: VideoPlayerModal export removed to avoid SSR errors
+// Component is imported dynamically when needed to prevent bundle bloat
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';

@@ -9,7 +9,8 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
-import Hls from 'hls.js';
+// 🚀 PERFORMANCE FIX: Dynamic import hls.js only when needed (saves 400kB from bundle)
+// import Hls from 'hls.js'; // ❌ Removed static import
 import { useUniversalProgress } from '../../app/hooks/useUniversalProgress';
 import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
 
@@ -103,9 +104,9 @@ export function VideoPlayerModal({
 
   // Refs for video element and HLS instance
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
+  const hlsRef = useRef<unknown>(null); // ✅ HLS instance will be dynamically typed
   const lastSavedProgressRef = useRef<number>(0);
-  const saveProgressRef = useRef<typeof saveProgressToAPI>();
+  const saveProgressRef = useRef<typeof saveProgressToAPI | null>(null);
 
   // Universal Progress API integration
   const { trackVideoProgress } = useUniversalProgress({
@@ -120,6 +121,17 @@ export function VideoPlayerModal({
       console.error('[VideoPlayerModal] Progress API error:', error);
     }
   });
+
+  // 🚀 PERFORMANCE FIX: Dynamic HLS loading to reduce bundle size
+  const loadHlsLibrary = useCallback(async () => {
+    try {
+      const { default: Hls } = await import('hls.js');
+      return Hls;
+    } catch (error) {
+      console.error('[VideoPlayerModal] Failed to load HLS library:', error);
+      return null;
+    }
+  }, []);
 
   // Simple progress saving - just save current position
   const saveProgressToAPI = useCallback(async (currentTime: number, duration: number) => {
@@ -404,7 +416,7 @@ export function VideoPlayerModal({
 
   // Initialize video player
   useEffect(() => {
-    const initializeVideo = () => {
+    const initializeVideo = async () => {
       const video = videoRef.current;
       const testVideoUrl = videoUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'; // Fallback test video
 
@@ -429,6 +441,15 @@ export function VideoPlayerModal({
       // Check if HLS is supported and needed
       if (testVideoUrl.includes('.m3u8')) {
         console.log('[VideoPlayerModal] Detected HLS stream');
+
+        // ✅ PERFORMANCE FIX: Load HLS library dynamically
+        const Hls = await loadHlsLibrary();
+        if (!Hls) {
+          setError('Failed to load HLS library');
+          setIsLoading(false);
+          return;
+        }
+
         if (Hls.isSupported()) {
           const hls = new Hls();
           hls.loadSource(testVideoUrl);
@@ -504,7 +525,8 @@ export function VideoPlayerModal({
 
     return () => {
       if (hlsRef.current) {
-        hlsRef.current.destroy();
+        // ✅ Type assertion for dynamically imported HLS instance
+        (hlsRef.current as { destroy: () => void }).destroy();
         hlsRef.current = null;
       }
     };
