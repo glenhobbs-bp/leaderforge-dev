@@ -371,7 +371,9 @@ export function FormWidget({ templateId, isOpen, onClose, videoContext }: FormWi
         setError(null);
 
         console.log('[FormWidget] Fetching template:', templateId);
-        const response = await fetch(`/api/form-templates/${templateId}`);
+        const response = await fetch(`/api/form-templates/${templateId}`, {
+          credentials: 'include'
+        });
         console.log('[FormWidget] Template response status:', response.status);
 
         if (!response.ok) {
