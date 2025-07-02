@@ -327,7 +327,6 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
                 accept="image/*"
                 className="hidden"
                 onChange={handleAvatarUpload}
-                disabled={!isEditing}
               />
               {/* Edit Profile Button */}
               {!isEditing && (

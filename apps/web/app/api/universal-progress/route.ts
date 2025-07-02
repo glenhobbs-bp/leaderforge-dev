@@ -163,13 +163,20 @@ export async function POST(request: NextRequest) {
 
       case 'batchTrackProgress': {
         // ✅ DEBUG: Log what the server received to verify decimal values
-        console.log('[Universal Progress API] Received batch events:', events.map((e: { contentId: string; progressType: string; metadata: unknown }) => ({
+        console.log('[Universal Progress API] Received batch events:', events.map((e: { contentId: string; progressType: string; value: number; metadata: unknown }) => ({
           contentId: e.contentId,
           progressType: e.progressType,
+          value: e.value, // ✅ LOG THE VALUE FIELD - this is where the decimal is!
           metadata: e.metadata
         })));
 
-        const result = await userProgressTool.batchTrackProgress(events);
+        // ✅ CRITICAL FIX: Round all progress values before processing
+        const processedEvents = events.map((event: { value: number; [key: string]: unknown }) => ({
+          ...event,
+          value: Math.round(event.value) // Ensure all values are integers
+        }));
+
+        const result = await userProgressTool.batchTrackProgress(processedEvents);
         return NextResponse.json({ success: true, data: result });
       }
 
