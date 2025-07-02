@@ -1,0 +1,208 @@
+/*
+ * Browser Performance Testing Console Commands
+ * Purpose: Test client-side performance in production browser console
+ * Usage: Copy and paste these functions into browser DevTools Console
+ */
+
+// 🎯 Test 1: Measure Agent Content API Performance
+async function testAgentContentAPI() {
+  console.log('🚀 Testing Agent Content API...');
+  const startTime = performance.now();
+
+  try {
+    const response = await fetch('/api/agent/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: 'test-user-123',
+        tenantKey: 'leaderforge',
+        navOptionId: '3202016b-05fa-4db6-bbc7-c785ba898e2f'
+      })
+    });
+
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    console.log(`✅ Agent Content API: ${duration.toFixed(0)}ms`);
+    console.log(`📊 Response Status: ${response.status}`);
+
+    if (duration > 2000) {
+      console.warn('⚠️ Agent Content API > 2s - Performance issue detected!');
+    }
+
+    return { duration, status: response.status };
+  } catch (error) {
+    console.error('❌ Agent Content API failed:', error);
+    return { error };
+  }
+}
+
+// 🎯 Test 2: Test Progress API Batching
+async function testProgressBatching() {
+  console.log('🚀 Testing Progress API Batching...');
+  const startTime = performance.now();
+
+  try {
+    const response = await fetch('/api/universal-progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'batchTrackProgress',
+        events: [
+          {
+            userId: 'test-user-123',
+            contentId: 'test-video-1',
+            tenantKey: 'leaderforge',
+            progressType: 'video',
+            value: 25,
+            timestamp: new Date().toISOString()
+          },
+          {
+            userId: 'test-user-123',
+            contentId: 'test-video-2',
+            tenantKey: 'leaderforge',
+            progressType: 'video',
+            value: 75,
+            timestamp: new Date().toISOString()
+          }
+        ]
+      })
+    });
+
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    console.log(`✅ Progress Batching API: ${duration.toFixed(0)}ms`);
+    console.log(`📊 Response Status: ${response.status}`);
+
+    if (duration > 500) {
+      console.warn('⚠️ Progress API > 500ms - Batching may not be working!');
+    }
+
+    return { duration, status: response.status };
+  } catch (error) {
+    console.error('❌ Progress API failed:', error);
+    return { error };
+  }
+}
+
+// 🎯 Test 3: Full Performance Suite
+async function runFullPerformanceTest() {
+  console.log('🎯 Running Full Production Performance Test...');
+  console.log('==========================================');
+
+  const results = {};
+
+  // Test Agent Content API
+  results.agentContent = await testAgentContentAPI();
+  await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+
+  // Test Progress Batching
+  results.progressBatching = await testProgressBatching();
+  await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+
+  // Test Auth Session API
+  console.log('🚀 Testing Auth Session API...');
+  const authStart = performance.now();
+  try {
+    const authResponse = await fetch('/api/auth/set-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_token: 'test-token',
+        refresh_token: 'test-refresh'
+      })
+    });
+    const authEnd = performance.now();
+    const authDuration = authEnd - authStart;
+
+    console.log(`✅ Auth Session API: ${authDuration.toFixed(0)}ms`);
+    results.authSession = { duration: authDuration, status: authResponse.status };
+
+    if (authDuration > 100) {
+      console.warn('⚠️ Auth Session API > 100ms - Should be faster!');
+    }
+  } catch (error) {
+    console.error('❌ Auth Session API failed:', error);
+    results.authSession = { error };
+  }
+
+  // Summary
+  console.log('');
+  console.log('📊 PRODUCTION PERFORMANCE SUMMARY');
+  console.log('==================================');
+
+  if (results.agentContent?.duration) {
+    console.log(`Agent Content API: ${results.agentContent.duration.toFixed(0)}ms (target: <2000ms)`);
+  }
+  if (results.progressBatching?.duration) {
+    console.log(`Progress Batching: ${results.progressBatching.duration.toFixed(0)}ms (target: <500ms)`);
+  }
+  if (results.authSession?.duration) {
+    console.log(`Auth Session: ${results.authSession.duration.toFixed(0)}ms (target: <100ms)`);
+  }
+
+  console.log('');
+  console.log('🎯 Next Steps:');
+  if (results.agentContent?.duration > 2000) {
+    console.log('❌ Agent Content API needs optimization (agent response caching)');
+  }
+  if (results.progressBatching?.duration > 500) {
+    console.log('❌ Progress API batching needs investigation');
+  }
+  if (results.authSession?.duration > 100) {
+    console.log('❌ Auth Session API needs optimization');
+  }
+
+  return results;
+}
+
+// 🎯 Test 4: Page Load Performance Analysis
+function analyzePageLoadPerformance() {
+  console.log('🚀 Analyzing Page Load Performance...');
+
+  const navigation = performance.getEntriesByType('navigation')[0];
+  const paint = performance.getEntriesByType('paint');
+
+  if (navigation) {
+    console.log('📊 Navigation Timing:');
+    console.log(`   DNS Lookup: ${(navigation.domainLookupEnd - navigation.domainLookupStart).toFixed(0)}ms`);
+    console.log(`   Connection: ${(navigation.connectEnd - navigation.connectStart).toFixed(0)}ms`);
+    console.log(`   Request: ${(navigation.responseStart - navigation.requestStart).toFixed(0)}ms`);
+    console.log(`   Response: ${(navigation.responseEnd - navigation.responseStart).toFixed(0)}ms`);
+    console.log(`   DOM Processing: ${(navigation.domContentLoadedEventEnd - navigation.responseEnd).toFixed(0)}ms`);
+    console.log(`   Total Load: ${(navigation.loadEventEnd - navigation.navigationStart).toFixed(0)}ms`);
+  }
+
+  if (paint.length > 0) {
+    console.log('🎨 Paint Timing:');
+    paint.forEach(entry => {
+      console.log(`   ${entry.name}: ${entry.startTime.toFixed(0)}ms`);
+    });
+  }
+
+  // Check for large resources
+  const resources = performance.getEntriesByType('resource')
+    .filter(resource => resource.transferSize > 100000) // > 100KB
+    .sort((a, b) => b.transferSize - a.transferSize)
+    .slice(0, 5);
+
+  if (resources.length > 0) {
+    console.log('📦 Largest Resources (>100KB):');
+    resources.forEach(resource => {
+      console.log(`   ${resource.name.split('/').pop()}: ${(resource.transferSize / 1024).toFixed(0)}KB in ${resource.duration.toFixed(0)}ms`);
+    });
+  }
+}
+
+// 🎯 Instructions
+console.log('🎯 Production Performance Testing Tools Loaded!');
+console.log('===============================================');
+console.log('');
+console.log('Available Commands:');
+console.log('✅ testAgentContentAPI() - Test main content loading');
+console.log('✅ testProgressBatching() - Test progress API optimization');
+console.log('✅ runFullPerformanceTest() - Run complete test suite');
+console.log('✅ analyzePageLoadPerformance() - Analyze current page load');
+console.log('');
+console.log('🚀 Run: runFullPerformanceTest()');
