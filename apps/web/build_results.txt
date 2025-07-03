@@ -1,5 +1,5 @@
 
-> web@0.1.0 build
+> web@0.1.0 build /Users/glenhobbs/leaderforge-dev/apps/web
 > next build
 
    ▲ Next.js 15.3.2
@@ -10,11 +10,29 @@
    Skipping validation of types
    Skipping linting
    Collecting page data ...
+(node:19992) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19993) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19990) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19991) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19989) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19987) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19988) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
    Generating static pages (0/43) ...
    Generating static pages (10/43) 
    Generating static pages (21/43) 
+(node:20005) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
    Generating static pages (32/43) 
  ✓ Generating static pages (43/43)
+(node:20004) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
    Finalizing page optimization ...
    Collecting build traces ...
 
@@ -72,7 +90,7 @@ Route (app)                                  Size  First Load JS
 ├ ƒ /api/user/avatar                        265 B         103 kB
 ├ ƒ /copilotkit                           8.72 kB         182 kB
 ├ ƒ /dashboard                            1.74 kB         144 kB
-├ ƒ /dashboard/marcus                     6.98 kB         337 kB
+├ ƒ /dashboard/marcus                     6.87 kB         337 kB
 ├ ƒ /login                                22.3 kB         165 kB
 └ ƒ /test-forms                           1.81 kB         206 kB
 + First Load JS shared by all              102 kB

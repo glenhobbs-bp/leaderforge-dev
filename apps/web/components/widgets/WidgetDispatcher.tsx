@@ -7,7 +7,7 @@
 
 "use client";
 
-import React, { lazy, Suspense, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { UniversalWidgetSchema } from "../../../../packages/agent-core/types/UniversalWidgetSchema";
 import { widgetRegistry } from './index';
 
@@ -24,7 +24,7 @@ interface WidgetDispatcherProps {
  */
 const WIDGET_TYPE_MAP: Record<string, string> = {
   'Card': 'leaderforge-card',
-  'VideoPlayer': 'videoplayer-modal', // Will be dynamically loaded
+  'VideoPlayer': 'videoplayer-modal',
   'StatCard': 'statcard',
   'Leaderboard': 'leaderboard',
   'VideoList': 'videolist',
@@ -39,15 +39,6 @@ export function isWidgetTypeAvailable(type: string): boolean {
   const widgetId = WIDGET_TYPE_MAP[type];
   return widgetId ? !!widgetRegistry.getWidget(widgetId) : false;
 }
-
-/**
- * Dynamic VideoPlayer loader to prevent 400kB hls.js bundle bloat
- */
-const DynamicVideoPlayerModal = lazy(() =>
-  import('./VideoPlayerModal').then(module => ({
-    default: module.VideoPlayerModal
-  }))
-);
 
 /**
  * Registry-Based Widget Dispatcher (ADR-0009)
@@ -66,25 +57,6 @@ export function WidgetDispatcher({ schema, userId, tenantKey, onAction, onProgre
 
   // Get widget ID from type mapping
   const widgetId = WIDGET_TYPE_MAP[schema.type];
-
-  // Special handling for VideoPlayer (dynamic loading for performance)
-  if (schema.type === 'VideoPlayer') {
-    return (
-      <Suspense fallback={
-        <div className="flex items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">Loading video player...</span>
-        </div>
-      }>
-        <DynamicVideoPlayerModal
-          schema={schema}
-          userId={userId}
-          tenantKey={tenantKey}
-          onProgressUpdate={onProgressUpdate}
-        />
-      </Suspense>
-    );
-  }
 
   // Registry-based component lookup
   const registeredWidget = useMemo(() => {
@@ -125,11 +97,12 @@ export function WidgetDispatcher({ schema, userId, tenantKey, onAction, onProgre
       );
     }
 
-    // Standard widget rendering
+    // Standard widget rendering (includes VideoPlayer now handled by registry)
     return (
       <WidgetComponent
         schema={schema}
         userId={userId}
+        tenantKey={tenantKey}
         onAction={onAction}
         onProgressUpdate={onProgressUpdate}
       />

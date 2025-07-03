@@ -31,9 +31,8 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: [
-      "cdn.tribesocial.io"
-    ],
+    // ❌ REMOVED: domains - deprecated configuration
+    // domains: ["cdn.tribesocial.io"], // Use remotePatterns instead
     unoptimized: false,
     remotePatterns: [
       {

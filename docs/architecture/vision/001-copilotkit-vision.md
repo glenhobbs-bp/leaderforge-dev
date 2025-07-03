@@ -53,18 +53,37 @@ Define the North-Star vision, target architecture, and concrete use-cases for Co
 
 ---
 
-## 6  Use-Case Catalogue (Draft)
-### U-1  Leadership Library Search
-* **Actor:** Learner
-* **Intent:** "Find videos on servant leadership."
-* **Flow:** CopilotKit chat → SearchIntent → LangGraph Content Agent → Schema-driven cards.
+## 6  Use-Case Catalogue (Comprehensive v0.2)
 
-### U-2  Progress Nudge
-* **Actor:** Learner
-* **Intent:** "How close am I to completing Module 2?"
-* **Flow:** Chat → ProgressAgent → returns stats → CopilotKit shows inline progress widget.
+| ID | User Story (Intent) | Primary Actor | CopilotKit Feature(s) | LangGraph / Tool Role | Notes / Data Sources |
+|----|--------------------|---------------|-----------------------|-----------------------|----------------------|
+| U-01 | "Find videos on servant leadership **at minute 3:15**" → returns cards & deep-linked timestamp | Learner | Chat + Streaming; video timestamp anchors | ContentLibraryAgent resolves query, embeds `startAt` param | **NEW:** returns `location` field for HLS seek |
+| U-02 | "How close am I to completing Module 2?" | Learner | Inline widget render | ProgressAgent aggregates Supabase stats | Progress nudge |
+| U-03 | "Add this video to my Learning Path" suggestion click | Learner | Suggestions API | PathMutateTool | Inline action suggestion |
+| U-04 | AI proactively sends PowerPrompt day 3 question | Platform → Learner | PowerPrompt sequence, HITL as needed | PowerPromptAgent schedules, streams | PRD §3 |
+| U-05 | "I didn't get my commission payout this month – why?" | Customer Support Rep | External API call + explanation UI | FlightCommerceAgent → CommissionLookup tool | Looks up payout, explains $25 threshold |
+| U-06 | "How many new sign-ups in my downline this month?" | Sales Rep | External lookup answer | FlightCommerceAgent → DownlineStats tool | Returns numeric + chart |
+| U-07 | "Open Productivity Path" navigation via chat | Learner | Intent parsing | NavAgent returns nav schema | Conversational navigation |
+| U-08 | Team leader: "Meeting with Glen in 15 min – give talking points" | Leader | Context aggregation, generative summary | MeetingPrepAgent pulls completions, progress | Uses video + worksheet + action data |
+| U-09 | Conflict-resolution coaching during live chat | Leader | Real-time guidance | CoachingAgent pattern prompts | PRD §5 |
+| U-10 | Delegation planner: "Create delegation plan for project X" | Leader | Generative UI (table) | DelegationToolAgent | PRD §6 |
+| U-11 | Strategy session: "Run scenario planning for 2025" | Exec | Multi-stage workflow | StrategyAgent + ChartTool | PRD §7 |
+| U-12 | "Create marketing campaign outline" | Marketer | Content generation | MarketingAgent | PRD §9 |
+| U-13 | "Show team culture health" dashboard | Leader | Generative UI charts | CultureMetricsAgent | PRD §6 |
+| U-14 | Financial ROI analysis: "Evaluate purchase of new LMS" | Finance Lead | Data viz | FinanceAgent | PRD §10 |
+| U-15 | Background alert: compliance risk detected → chat details | Analyst | Alert surface & deep-dive | MonitoringAgent | PRD §4 |
+| U-16 | Doc summary: "Summarize attached policy PDF" | Any | File upload + doc QA | DocAgent | PRD §15 |
+| U-17 | Calendar helper: "Reschedule my 1:1s to next week" | Leader | External calendar integration | CalendarAgent | PRD §14 |
+| U-18 | HITL approval: publish AI-drafted newsletter | Comms Lead | renderAndWaitForResponse workflow | PublishAgent post-approval | PRD §12 |
+| U-19 | Real-time co-editing of goals list | Team | Shared-state CoAgent | GoalsAgent sync | PRD §21 |
+| U-20 | Kingdom leadership counsel: "Apply Matthew 20 to this decision" | Faith Leader | Specialized KB search | ScriptureAgent | PRD §17 |
+| U-21 | Outreach planning: "Plan community service event" | Outreach Coord | Workflow builder | OutreachAgent | PRD §18 |
+| U-22 | Life-coach goal review | Individual | Personal coaching flow | LifeCoachAgent | PRD §19 |
+| U-23 | Multi-agent collaboration: HR + Finance resolve hiring budget | HR & Finance | Agent hand-off | HRAgent ↔ FinanceAgent | PRD §20 |
+| U-24 | Analytics query: "CopilotKit usage last 30 days" | Admin | Usage analytics | AnalyticsAgent | PRD §22 |
+| U-25 | DevOps chat-ops: "Redeploy staging" | Engineer | Chat command → webhook | CI/CD Agent | Legacy dev-ops note |
 
-*(Additional use-cases to be added during discovery)*
+> **MVP Focus (Phase 3-4 audits):** U-01 → U-08 establish end-to-end patterns (search, progress, external API, meeting prep, suggestions, PowerPrompts).
 
 ---
 

@@ -12,11 +12,21 @@ import VideoList from './VideoList';
 import Panel from './Panel';
 import Grid from './Grid';
 import { LeaderForgeCard } from './LeaderForgeCard';
+import { FormWidget, formSchemaToProps } from './FormWidget';
+import { TableWidget, tableSchemaToProps } from './TableWidget';
 // 🚀 PERFORMANCE FIX: Lazy load VideoPlayerModal to avoid bundling hls.js (400kB)
 // import { VideoPlayerModal } from './VideoPlayerModal'; // ❌ Removed static import
 
 // Create global widget registry instance
 export const widgetRegistry = new WidgetRegistry();
+
+// Create a lazy wrapper component for registry compatibility
+import { lazy } from 'react';
+const LazyVideoPlayerModal = lazy(() =>
+  import('./VideoPlayerModal').then(module => ({
+    default: module.VideoPlayerModal
+  }))
+);
 
 // Register StatCard widget
 widgetRegistry.registerWidget({
@@ -164,7 +174,7 @@ widgetRegistry.registerWidget({
   componentPath: './LeaderForgeCard',
 });
 
-// Register VideoPlayerModal with dynamic loading to prevent bundle bloat
+// Register VideoPlayerModal with lazy wrapper instead of null component
 widgetRegistry.registerWidget({
   metadata: {
     id: 'videoplayer-modal',
@@ -185,8 +195,60 @@ widgetRegistry.registerWidget({
     sizeHint: 'fullscreen',
     themeable: true,
   },
-  component: null as unknown as React.ComponentType<unknown>, // Loaded dynamically in WidgetDispatcher
+  component: LazyVideoPlayerModal,
   componentPath: './VideoPlayerModal',
+});
+
+// Register FormWidget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'form',
+    type: 'Widget',
+    name: 'Form',
+    description: 'Dynamic form widget using React JSON Schema Form',
+    version: '1.0.0',
+    category: 'input',
+    capabilities: [
+      'form-input',
+      'validation',
+      'schema-driven',
+      'admin-action'
+    ],
+    tags: ['form', 'input', 'admin', 'rjsf', 'schema'],
+    author: 'Engineering Team',
+    sizeHint: 'flexible',
+    themeable: true,
+  },
+  component: FormWidget,
+  componentPath: './FormWidget',
+  schemaToProps: formSchemaToProps,
+});
+
+// Register TableWidget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'table',
+    type: 'Widget',
+    name: 'Table',
+    description: 'Data table widget with sorting, selection, and actions',
+    version: '1.0.0',
+    category: 'data',
+    capabilities: [
+      WidgetCapabilities.DATA_DISPLAY,
+      'table-display',
+      'sorting',
+      'selection',
+      'pagination',
+      'admin-action'
+    ],
+    tags: ['table', 'data', 'admin', 'list'],
+    author: 'Engineering Team',
+    sizeHint: 'large',
+    themeable: true,
+  },
+  component: TableWidget,
+  componentPath: './TableWidget',
+  schemaToProps: tableSchemaToProps,
 });
 
 // Export widgets and dispatcher
@@ -196,6 +258,8 @@ export { default as VideoList } from './VideoList';
 export { default as Panel } from './Panel';
 export { default as Grid } from './Grid';
 export { LeaderForgeCard } from './LeaderForgeCard';
+export { FormWidget } from './FormWidget';
+export { TableWidget } from './TableWidget';
 // ✅ PERFORMANCE: VideoPlayerModal export removed to avoid SSR errors
 // Component is imported dynamically when needed to prevent bundle bloat
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';

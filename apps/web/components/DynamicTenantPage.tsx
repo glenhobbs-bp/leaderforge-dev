@@ -7,10 +7,18 @@ import NavPanel from "./ui/NavPanel";
 import { UniversalSchemaRenderer } from "./ai/UniversalSchemaRenderer";
 import { ComponentSchema } from "../../../packages/agent-core/types/ComponentSchema";
 import { UniversalWidgetSchema } from "../../../packages/agent-core/types/UniversalWidgetSchema";
-import { VideoPlayerModal } from "./widgets/VideoPlayerModal";
+// 🚀 PERFORMANCE FIX: Dynamic import VideoPlayerModal to prevent 3.3MB HLS.js bundle bloat
+// import { VideoPlayerModal } from "./widgets/VideoPlayerModal"; // ❌ Removed static import
 import { FormWidget } from "./forms/FormWidget";
 import { useSupabase } from './SupabaseProvider';
-import React from "react";
+import React, { Suspense, lazy } from "react";
+
+// Dynamic VideoPlayerModal loader to prevent bundle bloat
+const DynamicVideoPlayerModal = lazy(() =>
+  import('./widgets/VideoPlayerModal').then(module => ({
+    default: module.VideoPlayerModal
+  }))
+);
 import { useUserPreferences } from '../app/hooks/useUserPreferences';
 import { useQueryClient } from '@tanstack/react-query';
 import type { UserPreferences } from '../app/lib/types';
@@ -866,49 +874,60 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
         {/* Video Modal */}
         {isVideoModalOpen && videoModalData && (
-          <VideoPlayerModal
-            schema={{
-              type: 'VideoPlayer',
-              id: `video-modal-${Date.now()}`,
-              data: {
-                videoUrl: videoModalData.videoUrl,
-                poster: videoModalData.poster,
-                description: videoModalData.description,
-                progress: videoModalData.progress || 0,
-                // Critical: Pass contentId for proper progress tracking correlation
-                contentId: (videoModalData.parameters as any)?.contentId || (videoModalData as any).contentId
-              } as any,
-              config: {
-                title: videoModalData.title,
-                autoplay: true,
-                actions: videoModalData.onCompleteAction ? [videoModalData.onCompleteAction] : []
-              } as any,
-              version: '1.0'
-            } as UniversalWidgetSchema}
-            open={isVideoModalOpen}
-            onOpenChange={(open) => {
-              setIsVideoModalOpen(open);
-              if (!open) {
-                setVideoModalData(null);
-              }
-            }}
-            userId={session?.user?.id}
-            tenantKey={currentTenant}
-            onProgressUpdate={(finalProgress: number) => {
-              console.log('[DynamicTenantPage] Video modal closed with progress:', finalProgress);
+          <Suspense fallback={
+            <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center">
+              <div className="bg-white rounded-xl p-6 shadow-2xl">
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <span className="ml-3 text-gray-600">Loading video player...</span>
+                </div>
+              </div>
+            </div>
+          }>
+            <DynamicVideoPlayerModal
+              schema={{
+                type: 'VideoPlayer',
+                id: `video-modal-${Date.now()}`,
+                data: {
+                  videoUrl: videoModalData.videoUrl,
+                  poster: videoModalData.poster,
+                  description: videoModalData.description,
+                  progress: videoModalData.progress || 0,
+                  // Critical: Pass contentId for proper progress tracking correlation
+                  contentId: (videoModalData.parameters as Record<string, unknown>)?.contentId || (videoModalData as Record<string, unknown>).contentId
+                },
+                config: {
+                  title: videoModalData.title,
+                  autoplay: true,
+                  actions: videoModalData.onCompleteAction ? [videoModalData.onCompleteAction] : []
+                },
+                version: '1.0'
+              } as unknown as UniversalWidgetSchema}
+              open={isVideoModalOpen}
+              onOpenChange={(open) => {
+                setIsVideoModalOpen(open);
+                if (!open) {
+                  setVideoModalData(null);
+                }
+              }}
+              userId={session?.user?.id}
+              tenantKey={currentTenant}
+              onProgressUpdate={(finalProgress: number) => {
+                console.log('[DynamicTenantPage] Video modal closed with progress:', finalProgress);
 
-              // Update the card's local progress via the onRealTimeProgressUpdate callback
-              if (videoModalData?.onRealTimeProgressUpdate && typeof videoModalData.onRealTimeProgressUpdate === 'function') {
-                console.log('[DynamicTenantPage] Updating card progress via callback:', finalProgress);
-                videoModalData.onRealTimeProgressUpdate(finalProgress);
-              } else {
-                console.warn('[DynamicTenantPage] No onRealTimeProgressUpdate callback found in videoModalData');
-              }
+                // Update the card's local progress via the onRealTimeProgressUpdate callback
+                if (videoModalData?.onRealTimeProgressUpdate && typeof videoModalData.onRealTimeProgressUpdate === 'function') {
+                  console.log('[DynamicTenantPage] Updating card progress via callback:', finalProgress);
+                  videoModalData.onRealTimeProgressUpdate(finalProgress);
+                } else {
+                  console.warn('[DynamicTenantPage] No onRealTimeProgressUpdate callback found in videoModalData');
+                }
 
-              // Progress tracking is handled automatically by the video modal
-              // No content refresh needed as progress updates don't change content structure
-            }}
-          />
+                // Progress tracking is handled automatically by the video modal
+                // No content refresh needed as progress updates don't change content structure
+              }}
+            />
+          </Suspense>
         )}
 
         {/* Worksheet Modal */}
