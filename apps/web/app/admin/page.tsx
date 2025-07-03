@@ -40,13 +40,10 @@ export default function AdminPage() {
         return;
       }
 
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('is_admin')
-        .eq('user_id', user.id)
-        .single();
+      // Check admin status from user metadata
+      const isAdminUser = user.user_metadata?.is_admin === true;
 
-      if (!profile?.is_admin) {
+      if (!isAdminUser) {
         router.push('/dashboard');
         return;
       }
