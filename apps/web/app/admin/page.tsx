@@ -41,9 +41,12 @@ export default function AdminPage() {
       }
 
       // Check admin status from user metadata
-      const isAdminUser = user.user_metadata?.is_admin === true;
+      // Supabase stores custom metadata in user_metadata during auth
+      const metadata = user.user_metadata || {};
+      const isAdminUser = metadata.is_admin === true;
 
       if (!isAdminUser) {
+        console.log('User is not admin, redirecting to dashboard');
         router.push('/dashboard');
         return;
       }

@@ -5,7 +5,7 @@ import { CopilotKit } from '@copilotkit/react-core';
 
 export default function CopilotKitProvider({ children }: { children: ReactNode }) {
   return (
-    <CopilotKit runtimeUrl="/api/copilotkit" agent="default">
+    <CopilotKit runtimeUrl="/api/copilotkit">
       {children}
     </CopilotKit>
   );

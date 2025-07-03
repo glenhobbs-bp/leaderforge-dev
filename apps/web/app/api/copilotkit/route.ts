@@ -8,15 +8,13 @@ import { cookies } from 'next/headers';
 import { restoreSession } from '../../lib/supabaseServerClient';
 import { AdminAgent, AdminAgentContext } from 'agent-core/agents/AdminAgent';
 
-interface AdminActionArgs {
+// Admin action handler
+async function handleAdminAction(args: {
   intent: string;
   currentStep?: string;
-  state?: Record<string, unknown>;
-  formData?: Record<string, unknown>;
-}
-
-// Admin action handler
-async function handleAdminAction(args: AdminActionArgs) {
+  state?: object;
+  formData?: object;
+}) {
   try {
     // Get session from cookies
     const cookieStore = await cookies();
@@ -30,7 +28,9 @@ async function handleAdminAction(args: AdminActionArgs) {
     }
 
     // Check admin status
-    const isAdmin = session.user.user_metadata?.is_admin === true;
+    const isAdmin = session.user.user_metadata?.is_admin === true ||
+                    session.user.raw_user_meta_data?.is_admin === true;
+
     if (!isAdmin) {
       return {
         error: "Forbidden - Admin access required",
@@ -46,14 +46,15 @@ async function handleAdminAction(args: AdminActionArgs) {
       isAdmin: true,
       intent: args.intent || '',
       currentStep: args.currentStep,
-      state: args.state,
+      state: args.state as Record<string, unknown>,
     };
 
     // Execute agent
     const response = await agent.processIntent(context);
     return response;
+
   } catch (error) {
-    console.error('Admin action error:', error);
+    console.error('[CopilotKit] Admin action error:', error);
     return {
       error: error instanceof Error ? error.message : 'Unknown error',
       success: false
@@ -61,39 +62,45 @@ async function handleAdminAction(args: AdminActionArgs) {
   }
 }
 
-// Use OpenAI adapter (which works with Anthropic format)
-const serviceAdapter = new OpenAIAdapter();
+// Use OpenAI adapter configured for admin tasks
+const serviceAdapter = new OpenAIAdapter({
+  model: "gpt-4",
+});
 
+// Create runtime and register the admin action
 const runtime = new CopilotRuntime({
   actions: [
     {
-      name: "adminAction",
-      description: "Handle admin operations like entitlements, tenants, and themes",
+      name: "performAdminTask",
+      description: `Administrative actions for managing the platform. This includes:
+        - Configuring user entitlements (e.g., "configure entitlements for user abc@example.com")
+        - Creating new tenants (e.g., "create a new tenant named CompanyX")
+        - Changing theme colors (e.g., "change the primary color to blue")`,
       parameters: [
         {
           name: "intent",
           type: "string",
-          description: "The admin intent/command",
+          description: "The admin task to perform",
           required: true,
         },
         {
           name: "currentStep",
           type: "string",
-          description: "Current step in multi-step operations",
+          description: "Current step in multi-step workflows",
           required: false,
         },
         {
           name: "state",
           type: "object",
-          description: "Current state of the operation",
+          description: "Current state of the workflow",
           required: false,
         },
         {
           name: "formData",
           type: "object",
-          description: "Form data submitted by user",
+          description: "Form data submitted by the user",
           required: false,
-        }
+        },
       ],
       handler: handleAdminAction,
     },
@@ -104,7 +111,7 @@ export const POST = async (req: NextRequest) => {
   const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
     runtime,
     serviceAdapter,
-    endpoint: "/api/copilotkit",
+    endpoint: req.nextUrl.pathname,
   });
 
   return handleRequest(req);
