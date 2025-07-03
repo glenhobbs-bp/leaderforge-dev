@@ -1,5 +1,6 @@
 import "./globals.css";
 import "@copilotkit/react-ui/styles.css";
+import "./copilotkit-styles.css";
 import { CopilotKitProvider } from "./CopilotKitProvider";
 import QueryClientProvider from "./QueryClientProvider";
 import SupabaseProvider from '../components/SupabaseProvider';

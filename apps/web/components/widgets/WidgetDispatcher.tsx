@@ -29,7 +29,9 @@ const WIDGET_TYPE_MAP: Record<string, string> = {
   'Leaderboard': 'leaderboard',
   'VideoList': 'videolist',
   'Panel': 'panel',
-  'Grid': 'grid'
+  'Grid': 'grid',
+  'Form': 'form',
+  'Table': 'table'
 };
 
 /**

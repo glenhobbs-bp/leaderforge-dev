@@ -14,6 +14,7 @@ async function handleAdminAction(args: {
   currentStep?: string;
   state?: object;
   formData?: object;
+  taskId?: string;
 }) {
   try {
     // Get session from cookies
@@ -34,88 +35,65 @@ async function handleAdminAction(args: {
     if (!isAdmin) {
       return {
         success: false,
-        message: "You don't have admin permissions. If you should have admin access, please contact your administrator."
+        message: "You don't have permission to perform admin actions. Please contact your administrator."
+      };
+    }
+
+    // If we have form data, process the submission
+    if (args.formData && args.taskId) {
+      const formData = args.formData as { userId: string; entitlements: string[] };
+
+      // Handle entitlement updates
+      if (args.taskId.startsWith('entitlements-')) {
+        const { EntitlementTool } = await import('agent-core/tools/EntitlementTool');
+
+        const userId = formData.userId;
+        const entitlements = formData.entitlements || [];
+
+        // Update the user's entitlements
+        const success = await EntitlementTool.updateUserEntitlements(userId, entitlements);
+
+        if (success) {
+          return {
+            success: true,
+            message: `Successfully updated entitlements for ${userId}. The user now has ${entitlements.length} entitlement(s).`,
+            refreshDashboard: true
+          };
+        } else {
+          return {
+            success: false,
+            message: "Failed to update entitlements. Please check the logs and try again."
+          };
+        }
+      }
+
+      // Handle other form submissions...
+      return {
+        success: false,
+        message: "Unknown form submission type"
       };
     }
 
     // Create AdminAgent context
     const agent = new AdminAgent();
-    const context: AdminAgentContext = {
+    const agentContext: AdminAgentContext = {
       userId: session.user.id,
-      tenantKey: 'leaderforge', // You may want to get this from user metadata
+      tenantKey: 'leaderforge',
       isAdmin: true,
-      intent: args.intent || '',
+      intent: args.intent,
       currentStep: args.currentStep,
-      state: args.state as Record<string, unknown>,
+      state: (args.state || {}) as Record<string, unknown>,
     };
 
-    // Execute agent
-    const response = await agent.processIntent(context);
+    // Process the intent
+    const result = await agent.processIntent(agentContext);
 
-    // Handle different response types
-    if (response.error) {
-      return {
-        success: false,
-        message: `Error: ${response.error}`
-      };
-    }
-
-    if (response.completed) {
-      return {
-        success: true,
-        message: "✅ Task completed successfully!",
-        completed: true
-      };
-    }
-
-    // If we have a schema (form to fill out), describe it to the user
-    if (response.schema) {
-      const schema = response.schema;
-      let formDescription = "I need some information to complete this task:\n\n";
-
-      // Extract form fields from the schema
-      if (schema.type === 'Form' && schema.data) {
-                const formData = schema.data as { jsonSchema?: { properties?: Record<string, unknown>; required?: string[] } };
-
-        if (formData.jsonSchema?.properties) {
-          const properties = formData.jsonSchema.properties;
-          const required = formData.jsonSchema.required || [];
-
-          for (const [field, config] of Object.entries(properties)) {
-            const fieldConfig = config as { title?: string; description?: string; enum?: string[] };
-            const isRequired = required.includes(field);
-
-            formDescription += `• **${fieldConfig.title || field}**`;
-            if (isRequired) formDescription += " (required)";
-            formDescription += `: ${fieldConfig.description || 'Please provide this information'}\n`;
-
-            if (fieldConfig.enum) {
-              formDescription += `  Options: ${fieldConfig.enum.join(', ')}\n`;
-            }
-          }
-        }
-      }
-
-      return {
-        success: true,
-        message: formDescription + "\nPlease provide the required information to proceed.",
-        needsInput: true,
-        taskId: response.taskId,
-        formSchema: response.schema
-      };
-    }
-
-    // Default response
-    return {
-      success: true,
-      message: "Processing your request..."
-    };
-
+    return result;
   } catch (error) {
-    console.error('[CopilotKit] Admin action error:', error);
+    console.error('[CopilotKit API] Error:', error);
     return {
       success: false,
-      message: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`
+      message: "An error occurred while processing your request. Please try again."
     };
   }
 }

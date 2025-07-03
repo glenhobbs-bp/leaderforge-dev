@@ -77,13 +77,16 @@ export class AdminAgent {
   private parseIntent(intent: string): { type: string; params: Record<string, unknown> } {
     const lowerIntent = intent.toLowerCase();
 
-    // Entitlement patterns
-    if (lowerIntent.includes('entitlement') || lowerIntent.includes('permission')) {
+    // Entitlement patterns - also check for "change entitlements"
+    if (lowerIntent.includes('entitlement') || lowerIntent.includes('permission') ||
+        (lowerIntent.includes('change') && lowerIntent.includes('entitlement'))) {
+      // Try to extract email or user ID
+      const emailMatch = intent.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
       const userMatch = intent.match(/user[:\s]+([^\s]+)/i);
       return {
         type: 'configure-entitlements',
         params: {
-          userId: userMatch?.[1]
+          userId: emailMatch?.[1] || userMatch?.[1] || ''
         }
       };
     }
@@ -123,9 +126,18 @@ export class AdminAgent {
     const taskId = `entitlements-${Date.now()}`;
     const targetUserId = action.params.userId as string || '';
 
-    // TODO: Get current entitlements from tool when implemented
-    // For now, use empty array
-    let currentEntitlements: string[] = [];
+    // Import the EntitlementTool
+    const { EntitlementTool } = await import('../tools/EntitlementTool');
+
+    // Fetch real entitlements from the database
+    const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
+    const currentEntitlements = targetUserId ? await EntitlementTool.getUserEntitlements(targetUserId) : [];
+
+    // Convert to the format expected by the schema
+    const entitlementOptions = availableEntitlements.map(e => ({
+      value: e.key,
+      label: `${e.name} - ${e.description}`
+    }));
 
     const schema: AdminUISchema = {
       type: 'Form',
@@ -140,24 +152,20 @@ export class AdminAgent {
             properties: {
               userId: {
                 type: 'string',
-                title: 'User ID',
-                description: 'The user to configure entitlements for'
+                title: 'User Email/ID',
+                description: 'Enter email address or user ID',
+                default: targetUserId
               },
               entitlements: {
                 type: 'array',
                 title: 'Entitlements',
                 items: {
                   type: 'string',
-                  enum: [
-                    'basic_access',
-                    'premium_content',
-                    'analytics_view',
-                    'team_management',
-                    'api_access',
-                    'custom_branding'
-                  ]
+                  enum: entitlementOptions.map(e => e.value),
+                  enumNames: entitlementOptions.map(e => e.label)
                 },
-                uniqueItems: true
+                uniqueItems: true,
+                default: currentEntitlements
               }
             },
             required: ['userId', 'entitlements']
@@ -165,7 +173,7 @@ export class AdminAgent {
           uiSchema: {
             userId: {
               'ui:autofocus': true,
-              'ui:help': 'Enter the user ID or email'
+              'ui:help': 'Enter the user email address or user ID'
             },
             entitlements: {
               'ui:widget': 'checkboxes'
