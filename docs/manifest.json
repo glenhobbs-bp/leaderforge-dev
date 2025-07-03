@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generated_at": "2025-07-03T21:49:38.253Z",
+    "generated_at": "2025-07-03T22:45:18.344Z",
     "generator_version": "1.0.0",
     "total_files": 313,
-    "total_size_bytes": 2864242,
+    "total_size_bytes": 2880972,
     "file_types": {
       ".ts": 133,
       ".json": 17,
@@ -407,9 +407,9 @@
         "../../lib/supabaseServerClient",
         "agent-core/agents/AdminAgent"
       ],
-      "last_modified": "2025-07-03T21:49:26.483Z",
-      "size_bytes": 4062,
-      "hash": "4df7ff36",
+      "last_modified": "2025-07-03T22:45:07.700Z",
+      "size_bytes": 8900,
+      "hash": "3af40cc9",
       "complexity": "medium"
     },
     {
@@ -5065,30 +5065,30 @@
       "name": "manifest.json",
       "directory": "docs",
       "extension": ".json",
-      "purpose": "Local LangGraph dev server\",",
+      "purpose": "docs.copilotkit.ai/guides/frontend-actions\",",
       "tags": [
         "documentation",
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-01T10:25:37.676Z",
-      "size_bytes": 155560,
-      "hash": "93d3a3b1"
+      "last_modified": "2025-07-03T21:49:38.263Z",
+      "size_bytes": 163735,
+      "hash": "489410c0"
     },
     {
       "path": "docs/manifest.md",
       "name": "manifest.md",
       "directory": "docs",
       "extension": ".md",
-      "purpose": "Local LangGraph dev server",
+      "purpose": "docs.copilotkit.ai/guides/frontend-actions",
       "tags": [
         "documentation",
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-01T10:25:37.703Z",
-      "size_bytes": 59130,
-      "hash": "f82d9032"
+      "last_modified": "2025-07-03T21:49:38.293Z",
+      "size_bytes": 62233,
+      "hash": "84c9ecdb"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -5480,9 +5480,9 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-03T21:45:18.900Z",
-      "size_bytes": 3325,
-      "hash": "b9bf1e85",
+      "last_modified": "2025-07-03T22:44:38.237Z",
+      "size_bytes": 3939,
+      "hash": "63950ed3",
       "complexity": "medium"
     },
     {

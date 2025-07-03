@@ -135,8 +135,8 @@ export class AdminAgent {
 
     // Convert to the format expected by the schema
     const entitlementOptions = availableEntitlements.map(e => ({
-      value: e.key,
-      label: `${e.name} - ${e.description}`
+      value: e.id,
+      label: `${e.display_name} - ${e.description || 'No description'}`
     }));
 
     const schema: AdminUISchema = {

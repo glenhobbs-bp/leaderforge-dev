@@ -1,11 +1,11 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/3/2025, 5:49:38 PM*
+*Generated on 7/3/2025, 6:45:18 PM*
 
 ## Overview
 
 - **Total Files**: 313
-- **Total Size**: 2.73 MB
+- **Total Size**: 2.75 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
@@ -189,7 +189,7 @@ File: apps/web/app/api/auth/set-session/route.ts
 
 Admin action handler
 
-**Complexity**: medium • **Size**: 4.0KB
+**Complexity**: medium • **Size**: 8.7KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
 **Modified**: 7/3/2025
 
@@ -2401,20 +2401,20 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX val
 
 ### `docs/manifest.json`
 
-Local LangGraph dev server",
+docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 151.9KB
+**Size**: 159.9KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/1/2025
+**Modified**: 7/3/2025
 
 
 ### `docs/manifest.md`
 
-Local LangGraph dev server
+docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 57.7KB
+**Size**: 60.8KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/1/2025
+**Modified**: 7/3/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -2628,7 +2628,7 @@ Tests for Universal Progress Tool
 
 File: packages/agent-core/tools/EntitlementTool.ts
 
-**Complexity**: medium • **Size**: 3.2KB
+**Complexity**: medium • **Size**: 3.8KB
 **Tags**: `TypeScript`, `AI agent`, `security`
 **Modified**: 7/3/2025
 

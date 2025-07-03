@@ -186,13 +186,14 @@ const runtime = new CopilotRuntime({
           const entitlements = await EntitlementTool.getUserEntitlements(userId);
           const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
 
-          // Map entitlement keys to their full details
-          const userEntitlementDetails = entitlements.map(key => {
-            const entitlement = availableEntitlements.find(e => e.key === key);
-            return entitlement ? `${entitlement.name} - ${entitlement.description}` : key;
-          });
+          const formattedEntitlements = entitlements
+            .map(id => {
+              const ent = availableEntitlements.find(e => e.id === id);
+              return ent ? ent.name : id;
+            })
+            .join(', ');
 
-          if (userEntitlementDetails.length === 0) {
+          if (formattedEntitlements.length === 0) {
             return {
               success: true,
               message: `${userId} currently has no entitlements assigned.`
@@ -201,7 +202,7 @@ const runtime = new CopilotRuntime({
 
           return {
             success: true,
-            message: `Current entitlements for ${userId}:\n${userEntitlementDetails.join('\n')}`
+            message: `${userId} currently has the following entitlements: ${formattedEntitlements || 'None'}`
           };
         } catch (error) {
           console.error('Error fetching entitlements:', error);
@@ -244,18 +245,18 @@ const runtime = new CopilotRuntime({
 
           if (availableEntitlements.length === 0) {
             return {
-              success: true,
-              message: "No entitlements are currently available in the system."
+              success: false,
+              message: `No entitlements are currently defined in the system. To create entitlements, you'll need to add them to the core.entitlements table in the database. Would you like me to help you understand what entitlements should be created?`
             };
           }
 
-          const entitlementList = availableEntitlements.map(e =>
-            `• ${e.name} (${e.key}) - ${e.description}`
-          ).join('\n');
+          const entitlementList = availableEntitlements
+            .map(e => `- ${e.display_name} (${e.tenant_key}): ${e.description || 'No description'}`)
+            .join('\n');
 
           return {
             success: true,
-            message: `Available entitlements:\n${entitlementList}`
+            message: `Here are all available entitlements in the system:\n\n${entitlementList}\n\nTo assign entitlements to a user, please let me know which ones you'd like to grant.`
           };
         } catch (error) {
           console.error('Error listing entitlements:', error);

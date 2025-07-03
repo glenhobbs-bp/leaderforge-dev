@@ -12,8 +12,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export interface Entitlement {
-  key: string;
+  id: string;
   name: string;
+  display_name: string;
   description: string;
   tenant_key: string;
 }
@@ -39,7 +40,7 @@ export class EntitlementTool {
 
       const { data, error } = await supabase
         .from('entitlements')
-        .select('key, name, description, tenant_key')
+        .select('id, name, display_name, description, tenant_key')
         .order('name');
 
       if (error) {
@@ -63,15 +64,16 @@ export class EntitlementTool {
 
       const { data, error } = await supabase
         .from('user_entitlements')
-        .select('entitlement_key')
-        .eq('user_id', userId);
+        .select('entitlement_id')
+        .eq('user_id', userId)
+        .is('revoked_at', null);
 
       if (error) {
         console.error('Error fetching user entitlements:', error);
         return [];
       }
 
-      return data?.map(e => e.entitlement_key) || [];
+      return data?.map(ue => ue.entitlement_id) || [];
     } catch (error) {
       console.error('Failed to fetch user entitlements:', error);
       return [];
@@ -81,36 +83,37 @@ export class EntitlementTool {
   /**
    * Update user entitlements
    */
-  static async updateUserEntitlements(userId: string, entitlementKeys: string[]): Promise<boolean> {
+  static async updateUserEntitlements(userId: string, entitlementIds: string[]): Promise<boolean> {
     try {
       const supabase = this.getSupabaseClient();
 
-      // First, remove all existing entitlements for the user
-      const { error: deleteError } = await supabase
+      // First, revoke all existing entitlements
+      const { error: revokeError } = await supabase
         .from('user_entitlements')
-        .delete()
-        .eq('user_id', userId);
+        .update({ revoked_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .is('revoked_at', null);
 
-      if (deleteError) {
-        console.error('Error removing existing entitlements:', deleteError);
+      if (revokeError) {
+        console.error('Error revoking entitlements:', revokeError);
         return false;
       }
 
-      // Then, add the new entitlements
-      if (entitlementKeys.length > 0) {
-        const entitlementRecords = entitlementKeys.map(key => ({
+      // Then, grant new entitlements
+      if (entitlementIds.length > 0) {
+        const newEntitlements = entitlementIds.map(entitlementId => ({
           user_id: userId,
-          entitlement_key: key,
-          granted_at: new Date().toISOString(),
-          granted_by: 'admin' // This should come from the actual admin user
+          entitlement_id: entitlementId,
+          granted_by: userId, // TODO: Use actual admin user ID
+          grant_reason: 'Admin grant via CopilotKit'
         }));
 
-        const { error: insertError } = await supabase
+        const { error: grantError } = await supabase
           .from('user_entitlements')
-          .insert(entitlementRecords);
+          .insert(newEntitlements);
 
-        if (insertError) {
-          console.error('Error adding entitlements:', insertError);
+        if (grantError) {
+          console.error('Error granting entitlements:', grantError);
           return false;
         }
       }
