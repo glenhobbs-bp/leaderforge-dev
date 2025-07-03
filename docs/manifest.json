@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generated_at": "2025-07-03T22:45:18.344Z",
+    "generated_at": "2025-07-03T23:35:53.990Z",
     "generator_version": "1.0.0",
     "total_files": 313,
-    "total_size_bytes": 2880972,
+    "total_size_bytes": 2881441,
     "file_types": {
       ".ts": 133,
       ".json": 17,
@@ -407,9 +407,9 @@
         "../../lib/supabaseServerClient",
         "agent-core/agents/AdminAgent"
       ],
-      "last_modified": "2025-07-03T22:45:07.700Z",
-      "size_bytes": 8900,
-      "hash": "3af40cc9",
+      "last_modified": "2025-07-03T23:35:43.833Z",
+      "size_bytes": 9161,
+      "hash": "8cf61b69",
       "complexity": "medium"
     },
     {
@@ -5071,9 +5071,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-03T21:49:38.263Z",
-      "size_bytes": 163735,
-      "hash": "489410c0"
+      "last_modified": "2025-07-03T22:45:18.353Z",
+      "size_bytes": 163767,
+      "hash": "97ed8bec"
     },
     {
       "path": "docs/manifest.md",
@@ -5086,9 +5086,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-03T21:49:38.293Z",
-      "size_bytes": 62233,
-      "hash": "84c9ecdb"
+      "last_modified": "2025-07-03T22:45:18.472Z",
+      "size_bytes": 62265,
+      "hash": "c65fa3a9"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -5242,9 +5242,9 @@
       "dependencies": [
         "../types/AdminUISchema"
       ],
-      "last_modified": "2025-07-03T21:32:00.970Z",
-      "size_bytes": 11122,
-      "hash": "de760b87",
+      "last_modified": "2025-07-03T23:35:43.833Z",
+      "size_bytes": 11149,
+      "hash": "58bed063",
       "complexity": "high"
     },
     {
@@ -5480,9 +5480,9 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-03T22:44:38.237Z",
-      "size_bytes": 3939,
-      "hash": "63950ed3",
+      "last_modified": "2025-07-03T23:34:55.056Z",
+      "size_bytes": 4056,
+      "hash": "14d05082",
       "complexity": "medium"
     },
     {

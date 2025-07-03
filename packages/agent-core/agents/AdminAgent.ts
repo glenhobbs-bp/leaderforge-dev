@@ -80,40 +80,46 @@ export class AdminAgent {
     // Entitlement patterns - also check for "change entitlements"
     if (lowerIntent.includes('entitlement') || lowerIntent.includes('permission') ||
         (lowerIntent.includes('change') && lowerIntent.includes('entitlement'))) {
-      // Try to extract email or user ID
+      // Try to extract email or user ID from the intent
       const emailMatch = intent.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
       const userMatch = intent.match(/user[:\s]+([^\s]+)/i);
+      const forUserMatch = intent.match(/for\s+([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|[^\s]+)/i);
+
       return {
         type: 'configure-entitlements',
         params: {
-          userId: emailMatch?.[1] || userMatch?.[1] || ''
+          userId: emailMatch?.[1] || userMatch?.[1] || forUserMatch?.[1] || ''
         }
       };
     }
 
     // Tenant creation patterns
-    if (lowerIntent.includes('create tenant') || lowerIntent.includes('new tenant')) {
-      const nameMatch = intent.match(/(?:tenant|named?)[:\s]+["']?([^"']+)["']?/i);
+    if (lowerIntent.includes('tenant') || lowerIntent.includes('organization')) {
+      const nameMatch = intent.match(/tenant[:\s]+([^,\n]+)/i) ||
+                       intent.match(/organization[:\s]+([^,\n]+)/i);
       return {
         type: 'create-tenant',
         params: {
-          tenantName: nameMatch?.[1]
+          tenantName: nameMatch?.[1]?.trim() || ''
         }
       };
     }
 
     // Theme change patterns
     if (lowerIntent.includes('theme') || lowerIntent.includes('color')) {
-      const colorMatch = intent.match(/(?:primary|color)[:\s]+([#\w]+)/i);
+      const colorMatch = intent.match(/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/);
       return {
         type: 'change-theme',
         params: {
-          primaryColor: colorMatch?.[1]
+          color: colorMatch?.[0] || ''
         }
       };
     }
 
-    return { type: 'unknown', params: {} };
+    return {
+      type: 'unknown',
+      params: {}
+    };
   }
 
   /**
@@ -133,62 +139,151 @@ export class AdminAgent {
     const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
     const currentEntitlements = targetUserId ? await EntitlementTool.getUserEntitlements(targetUserId) : [];
 
-    // Convert to the format expected by the schema
+    // If no available entitlements exist, show helpful message
+    if (availableEntitlements.length === 0) {
+      return {
+        taskId,
+        schema: this.createErrorSchema(
+          'No Entitlements Available',
+          'No entitlements are currently defined in the system. Please create entitlements in the core.entitlements table first.'
+        ),
+        error: 'No entitlements available'
+      };
+    }
+
+    // Step 1: Show current entitlements first (Discovery Phase)
+    if (!targetUserId) {
+      const schema: AdminUISchema = {
+        type: 'Form',
+        id: `entitlements-lookup-${taskId}`,
+        version: '1.0',
+        data: {
+          source: 'admin-entitlements-lookup',
+          formData: {
+            jsonSchema: {
+              type: 'object',
+              title: 'User Entitlements Lookup',
+              description: 'First, let\'s see what entitlements this user currently has',
+              properties: {
+                userId: {
+                  type: 'string',
+                  title: 'User Email or ID',
+                  description: 'Enter the email address or user ID to view current entitlements',
+                  pattern: '^[\\w\\.-]+@[\\w\\.-]+\\.[a-zA-Z]{2,}$|^[a-fA-F0-9-]{36}$'
+                }
+              },
+              required: ['userId']
+            },
+            uiSchema: {
+              userId: {
+                'ui:placeholder': 'user@example.com or user-id',
+                'ui:help': 'We\'ll show their current entitlements first, then you can modify them'
+              }
+            },
+            initialValues: {}
+          }
+        },
+        config: {
+          title: 'Entitlement Management',
+          subtitle: 'Step 1: Lookup Current Entitlements',
+          formConfig: {
+            submitButton: {
+              text: 'View Current Entitlements',
+              variant: 'primary'
+            }
+          }
+        }
+      };
+
+      return {
+        taskId,
+        schema,
+        nextStep: 'lookup-user'
+      };
+    }
+
+    // Step 2: Show current state with modification interface
+    // Create entitlement options with current state indicators
     const entitlementOptions = availableEntitlements.map(e => ({
       value: e.id,
-      label: `${e.display_name} - ${e.description || 'No description'}`
+      label: e.display_name,
+      description: e.description || 'No description available',
+      tenant: e.tenant_key,
+      isCurrentlyAssigned: currentEntitlements.includes(e.id)
     }));
 
     const schema: AdminUISchema = {
       type: 'Form',
-      id: `entitlements-form-${taskId}`,
+      id: `entitlements-modify-${taskId}`,
       version: '1.0',
       data: {
-        source: 'admin-entitlements',
+        source: 'admin-entitlements-modify',
         formData: {
           jsonSchema: {
             type: 'object',
-            title: 'User Entitlements',
+            title: `Entitlements for ${targetUserId}`,
+            description: `Current entitlements are pre-selected. Check/uncheck to modify.`,
             properties: {
               userId: {
                 type: 'string',
-                title: 'User Email/ID',
-                description: 'Enter email address or user ID',
-                default: targetUserId
+                title: 'User',
+                default: targetUserId,
+                readOnly: true
               },
-              entitlements: {
+              currentEntitlements: {
                 type: 'array',
-                title: 'Entitlements',
+                title: 'Current Entitlements',
+                description: `This user currently has ${currentEntitlements.length} entitlement(s)`,
+                items: {
+                  type: 'string'
+                },
+                default: currentEntitlements,
+                readOnly: true
+              },
+              newEntitlements: {
+                type: 'array',
+                title: 'Select Entitlements',
+                description: 'Check the entitlements this user should have. Currently assigned entitlements are pre-selected.',
                 items: {
                   type: 'string',
                   enum: entitlementOptions.map(e => e.value),
-                  enumNames: entitlementOptions.map(e => e.label)
+                  enumNames: entitlementOptions.map(e =>
+                    `${e.label}${e.isCurrentlyAssigned ? ' ✓ (currently assigned)' : ''} - ${e.description}`
+                  )
                 },
-                uniqueItems: true,
-                default: currentEntitlements
+                default: currentEntitlements,
+                uniqueItems: true
               }
             },
-            required: ['userId', 'entitlements']
+            required: ['userId', 'newEntitlements']
           },
           uiSchema: {
             userId: {
-              'ui:autofocus': true,
-              'ui:help': 'Enter the user email address or user ID'
+              'ui:widget': 'text',
+              'ui:readonly': true,
+              'ui:description': 'User being modified'
             },
-            entitlements: {
-              'ui:widget': 'checkboxes'
+            currentEntitlements: {
+              'ui:widget': 'hidden'
+            },
+            newEntitlements: {
+              'ui:widget': 'checkboxes',
+              'ui:options': {
+                inline: false
+              },
+              'ui:help': 'Changes will be applied when you submit this form'
             }
           },
           initialValues: {
             userId: targetUserId,
-            entitlements: currentEntitlements
-          },
-          submitEndpoint: '/api/agent/admin'
+            currentEntitlements: currentEntitlements,
+            newEntitlements: currentEntitlements
+          }
         }
       },
       config: {
-        title: 'Configure User Entitlements',
-        subtitle: `Set permissions and access levels for ${targetUserId || 'user'}`,
+        title: 'Modify User Entitlements',
+        subtitle: `Step 2: Update entitlements for ${targetUserId}`,
         formConfig: {
           submitButton: {
             text: 'Update Entitlements',
@@ -205,7 +300,7 @@ export class AdminAgent {
     return {
       taskId,
       schema,
-      nextStep: 'confirm'
+      nextStep: 'confirm-changes'
     };
   }
 

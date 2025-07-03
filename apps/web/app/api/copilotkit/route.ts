@@ -41,14 +41,38 @@ async function handleAdminAction(args: {
 
     // If we have form data, process the submission
     if (args.formData && args.taskId) {
-      const formData = args.formData as { userId: string; entitlements: string[] };
+      const formData = args.formData as { userId?: string; newEntitlements?: string[] };
 
-      // Handle entitlement updates
-      if (args.taskId.startsWith('entitlements-')) {
+      // Handle entitlement lookup (Step 1)
+      if (args.taskId.startsWith('entitlements-') && formData.userId && !formData.newEntitlements) {
+        // This is step 1 - user lookup, now show step 2 with current entitlements
+        const agent = new AdminAgent();
+        const agentContext: AdminAgentContext = {
+          userId: session.user.id,
+          tenantKey: 'leaderforge',
+          isAdmin: true,
+          intent: `configure entitlements for ${formData.userId}`,
+          currentStep: 'show-modification-form',
+          state: { targetUserId: formData.userId },
+        };
+
+        const agentResult = await agent.processIntent(agentContext);
+
+        if (agentResult.schema) {
+          return {
+            needsRender: true,
+            schema: agentResult.schema,
+            taskId: agentResult.taskId
+          };
+        }
+      }
+
+      // Handle entitlement updates (Step 2)
+      if (args.taskId.startsWith('entitlements-') && formData.newEntitlements) {
         const { EntitlementTool } = await import('agent-core/tools/EntitlementTool');
 
-        const userId = formData.userId;
-        const entitlements = formData.entitlements || [];
+        const userId = formData.userId!;
+        const entitlements = formData.newEntitlements || [];
 
         // Update the user's entitlements
         const success = await EntitlementTool.updateUserEntitlements(userId, entitlements);
@@ -57,17 +81,18 @@ async function handleAdminAction(args: {
           return {
             success: true,
             message: `Successfully updated entitlements for ${userId}. The user now has ${entitlements.length} entitlement(s).`,
-            shouldRefreshDashboard: true
+            taskCompleted: true
           };
         } else {
           return {
             success: false,
-            message: "Failed to update entitlements. Please check the logs for details."
+            message: `Failed to update entitlements for ${userId}. Please try again or check the logs.`
           };
         }
       }
     }
 
+    // Initial admin action request
     // Create AdminAgent context
     const agent = new AdminAgent();
     const agentContext: AdminAgentContext = {
@@ -76,34 +101,39 @@ async function handleAdminAction(args: {
       isAdmin: true,
       intent: args.intent,
       currentStep: args.currentStep,
-      state: args.state as Record<string, unknown>,
+      state: args.state as Record<string, unknown> || {},
     };
 
-    // Process the intent
-    const result = await agent.processIntent(agentContext);
+    try {
+      const agentResult = await agent.processIntent(agentContext);
 
-    if (result.error) {
+      if (agentResult.error) {
+        return {
+          success: false,
+          message: agentResult.error
+        };
+      }
+
+      if (agentResult.schema) {
+        return {
+          needsRender: true,
+          schema: agentResult.schema,
+          taskId: agentResult.taskId,
+          nextStep: agentResult.nextStep
+        };
+      }
+
       return {
         success: false,
-        message: result.error
+        message: "Unable to process the admin request. Please try again."
       };
-    }
-
-    // If we have a schema, we need to render it
-    if (result.schema) {
+    } catch (error) {
+      console.error('[API/copilotkit] Admin agent error:', error);
       return {
-        success: true,
-        needsRender: true,
-        schema: result.schema,
-        taskId: result.taskId || `task-${Date.now()}`
+        success: false,
+        message: "An error occurred while processing the admin request."
       };
     }
-
-    // Otherwise, return a success message
-    return {
-      success: true,
-      message: "Action completed successfully"
-    };
   } catch (error) {
     console.error('Admin action error:', error);
     return {

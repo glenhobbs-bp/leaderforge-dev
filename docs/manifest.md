@@ -1,6 +1,6 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/3/2025, 6:45:18 PM*
+*Generated on 7/3/2025, 7:35:53 PM*
 
 ## Overview
 
@@ -189,7 +189,7 @@ File: apps/web/app/api/auth/set-session/route.ts
 
 Admin action handler
 
-**Complexity**: medium • **Size**: 8.7KB
+**Complexity**: medium • **Size**: 8.9KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
 **Modified**: 7/3/2025
 
@@ -2628,7 +2628,7 @@ Tests for Universal Progress Tool
 
 File: packages/agent-core/tools/EntitlementTool.ts
 
-**Complexity**: medium • **Size**: 3.8KB
+**Complexity**: medium • **Size**: 4.0KB
 **Tags**: `TypeScript`, `AI agent`, `security`
 **Modified**: 7/3/2025
 
