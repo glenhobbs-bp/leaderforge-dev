@@ -1,0 +1,103 @@
+
+> web@0.1.0 build
+> next build
+
+   ▲ Next.js 15.3.2
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 9.0s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+(node:4885) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4886) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4887) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4889) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4888) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4883) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4884) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+   Generating static pages (0/43) ...
+   Generating static pages (10/43) 
+   Generating static pages (21/43) 
+   Generating static pages (32/43) 
+(node:4899) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4898) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ Generating static pages (43/43)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                  Size  First Load JS
+┌ ƒ /                                       265 B         102 kB
+├ ƒ /_not-found                             983 B         103 kB
+├ ƒ /admin/feedback                       3.12 kB         147 kB
+├ ƒ /api/agent/content                      265 B         102 kB
+├ ƒ /api/agent/context                      265 B         102 kB
+├ ƒ /api/assets/compositions                265 B         102 kB
+├ ƒ /api/assets/discovery                   265 B         102 kB
+├ ƒ /api/assets/registry/widgets            265 B         102 kB
+├ ƒ /api/auth/callback                      265 B         102 kB
+├ ƒ /api/auth/set-session                   265 B         102 kB
+├ ƒ /api/content/[tenant_key]               265 B         102 kB
+├ ƒ /api/copilotkit                         265 B         102 kB
+├ ƒ /api/dashboard/[user_id]                265 B         102 kB
+├ ƒ /api/debug/check-progress-schema        265 B         102 kB
+├ ƒ /api/debug/cookies                      265 B         102 kB
+├ ƒ /api/debug/env-check                    265 B         102 kB
+├ ƒ /api/debug/env-simple                   265 B         102 kB
+├ ƒ /api/debug/mockups                    5.81 kB         396 kB
+├ ƒ /api/debug/nav-check                    265 B         102 kB
+├ ƒ /api/debug/nav-raw                      265 B         102 kB
+├ ƒ /api/dev/apply-entitlements             265 B         102 kB
+├ ƒ /api/dev/grant-basic-entitlements       265 B         102 kB
+├ ƒ /api/dev/simple-entitlements            265 B         102 kB
+├ ƒ /api/entitlements/[user_id]             265 B         102 kB
+├ ƒ /api/entitlements/clear-cache           265 B         102 kB
+├ ƒ /api/feedback/mockup                    265 B         102 kB
+├ ƒ /api/files/upload                       265 B         102 kB
+├ ƒ /api/form-templates/[templateId]        265 B         102 kB
+├ ƒ /api/input/universal                    265 B         102 kB
+├ ƒ /api/input/universal/check              265 B         102 kB
+├ ƒ /api/nav/[tenant_key]                   265 B         102 kB
+├ ƒ /api/orgs/[org_id]/entitlements         265 B         102 kB
+├ ƒ /api/provisioning                       450 B         143 kB
+├ ƒ /api/tenant/[tenant_key]                265 B         102 kB
+├ ƒ /api/tenant/[tenant_key]/bundle         265 B         102 kB
+├ ƒ /api/tenant/list                        265 B         102 kB
+├ ƒ /api/test/create-table                  265 B         102 kB
+├ ƒ /api/test/db-check                      265 B         102 kB
+├ ƒ /api/test/db-debug                      265 B         102 kB
+├ ƒ /api/test/schema-check                  265 B         102 kB
+├ ƒ /api/test/table-access                  265 B         102 kB
+├ ƒ /api/test/universal-progress            265 B         102 kB
+├ ƒ /api/test/universal-progress-auth       265 B         102 kB
+├ ƒ /api/tribe/content/[id]                 265 B         102 kB
+├ ƒ /api/universal-progress                 265 B         102 kB
+├ ƒ /api/user/[user_id]/navigation-state    265 B         102 kB
+├ ƒ /api/user/[user_id]/preferences         265 B         102 kB
+├ ƒ /api/user/[user_id]/profile             265 B         102 kB
+├ ƒ /api/user/[user_id]/progress-batch      265 B         102 kB
+├ ƒ /api/user/[user_id]/video-progress      265 B         102 kB
+├ ƒ /api/user/avatar                        265 B         102 kB
+├ ƒ /copilotkit                           8.72 kB         182 kB
+├ ƒ /dashboard                            1.74 kB         144 kB
+├ ƒ /dashboard/marcus                     11.7 kB         342 kB
+├ ƒ /login                                22.3 kB         165 kB
+└ ƒ /test-forms                           1.81 kB         206 kB
++ First Load JS shared by all              102 kB
+  ├ chunks/1776-bb583e61c3da12fa.js       46.6 kB
+  ├ chunks/8da460e4-405fb7d4e2d39023.js   53.2 kB
+  └ other shared chunks (total)           2.38 kB
+
+
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -7,17 +7,9 @@
 
 "use client";
 
-import React from 'react';
+import React, { lazy, Suspense, useMemo } from 'react';
 import { UniversalWidgetSchema } from "../../../../packages/agent-core/types/UniversalWidgetSchema";
-
-// Import widget components directly
-import { LeaderForgeCard } from './LeaderForgeCard';
-import { VideoPlayerModal } from './VideoPlayerModal';
-import StatCard from './StatCard';
-import Leaderboard from './Leaderboard';
-import VideoList from './VideoList';
-import Panel from './Panel';
-import Grid from './Grid';
+import { widgetRegistry } from './index';
 
 interface WidgetDispatcherProps {
   schema: UniversalWidgetSchema;
@@ -28,24 +20,43 @@ interface WidgetDispatcherProps {
 }
 
 /**
- * Available widget types in the system
+ * Widget type mapping for registry lookup
+ */
+const WIDGET_TYPE_MAP: Record<string, string> = {
+  'Card': 'leaderforge-card',
+  'VideoPlayer': 'videoplayer-modal', // Will be dynamically loaded
+  'StatCard': 'statcard',
+  'Leaderboard': 'leaderboard',
+  'VideoList': 'videolist',
+  'Panel': 'panel',
+  'Grid': 'grid'
+};
+
+/**
+ * Available widget types in the system (registry-based)
  */
 export function isWidgetTypeAvailable(type: string): boolean {
-  const availableTypes = [
-    'Card', 'VideoPlayer', 'StatCard', 'Leaderboard',
-    'VideoList', 'Panel', 'Grid'
-  ];
-  return availableTypes.includes(type);
+  const widgetId = WIDGET_TYPE_MAP[type];
+  return widgetId ? !!widgetRegistry.getWidget(widgetId) : false;
 }
 
 /**
- * Universal Widget Dispatcher (ADR-0009)
+ * Dynamic VideoPlayer loader to prevent 400kB hls.js bundle bloat
+ */
+const DynamicVideoPlayerModal = lazy(() =>
+  import('./VideoPlayerModal').then(module => ({
+    default: module.VideoPlayerModal
+  }))
+);
+
+/**
+ * Registry-Based Widget Dispatcher (ADR-0009)
  *
- * Routes Universal Widget Schema to appropriate components.
- * All components now accept UniversalWidgetSchema directly.
+ * Routes Universal Widget Schema to components via WidgetRegistry.
+ * Eliminates hardcoded switch statement and enables true dynamic loading.
  */
 export function WidgetDispatcher({ schema, userId, tenantKey, onAction, onProgressUpdate }: WidgetDispatcherProps) {
-  console.log('[WidgetDispatcher] Dispatching schema:', {
+  console.log('[WidgetDispatcher] Registry-based dispatch:', {
     type: schema.type,
     id: schema.id,
     hasData: !!schema.data,
@@ -53,99 +64,101 @@ export function WidgetDispatcher({ schema, userId, tenantKey, onAction, onProgre
     userId
   });
 
-  // Direct schema routing - no transformation needed
-  switch (schema.type) {
-    case 'Card':
-      return (
-        <LeaderForgeCard
-          schema={schema}
-          userId={userId}
-          onAction={onAction}
-          onProgressUpdate={onProgressUpdate}
-        />
-      );
+  // Get widget ID from type mapping
+  const widgetId = WIDGET_TYPE_MAP[schema.type];
 
-    case 'VideoPlayer':
-      return (
-        <VideoPlayerModal
+  // Special handling for VideoPlayer (dynamic loading for performance)
+  if (schema.type === 'VideoPlayer') {
+    return (
+      <Suspense fallback={
+        <div className="flex items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600">Loading video player...</span>
+        </div>
+      }>
+        <DynamicVideoPlayerModal
           schema={schema}
           userId={userId}
           tenantKey={tenantKey}
           onProgressUpdate={onProgressUpdate}
         />
-      );
+      </Suspense>
+    );
+  }
 
-    case 'StatCard':
-      return (
-        <StatCard
-          schema={schema}
-          userId={userId}
-          onAction={onAction}
-          onProgressUpdate={onProgressUpdate}
-        />
-      );
+  // Registry-based component lookup
+  const registeredWidget = useMemo(() => {
+    if (!widgetId) {
+      console.warn('[WidgetDispatcher] No widget ID mapped for type:', schema.type);
+      return null;
+    }
 
-    case 'Leaderboard':
-      return (
-        <Leaderboard
-          schema={schema}
-          userId={userId}
-          onAction={onAction}
-          onProgressUpdate={onProgressUpdate}
-        />
-      );
+    const widget = widgetRegistry.getWidget(widgetId);
+    if (!widget) {
+      console.warn('[WidgetDispatcher] Widget not found in registry:', widgetId);
+      return null;
+    }
 
-    case 'VideoList':
-      return (
-        <VideoList
-          schema={schema}
-          userId={userId}
-          onAction={onAction}
-          onProgressUpdate={onProgressUpdate}
-        />
-      );
+    return widget;
+  }, [widgetId]);
 
-    case 'Panel':
-      return (
-        <Panel
-          schema={schema}
-          userId={userId}
-          onAction={onAction}
-          onProgressUpdate={onProgressUpdate}
-        />
-      );
+    // Render widget from registry
+  if (registeredWidget) {
+    const WidgetComponent = registeredWidget.component as React.ComponentType<Record<string, unknown>>;
 
-    case 'Grid':
+    // Handle Grid widget special props (legacy compatibility)
+    if (schema.type === 'Grid') {
       const columns = schema.config.layout?.columns || 3;
+      const gridData = schema.data as { items?: unknown[]; availableContent?: unknown[] };
       return (
-        <Grid
+        <WidgetComponent
           type="Grid"
           title={schema.config.title}
           subtitle={schema.config.subtitle}
-          items={(schema.data as any).items || []}
+          items={gridData.items || []}
           columns={[1, 2, 3, 4, 5, 6].includes(columns) ? columns as 1 | 2 | 3 | 4 | 5 | 6 : 3}
-          availableContent={(schema.data as any).availableContent || []}
+          availableContent={gridData.availableContent || []}
           userId={userId}
           onAction={onAction}
           onProgressUpdate={onProgressUpdate}
         />
       );
+    }
 
-    default:
-      console.warn('[WidgetDispatcher] Unknown widget type:', schema.type);
-      return (
-        <div className="p-4 border border-red-200 rounded-lg bg-red-50">
-          <h3 className="text-red-800 font-medium">Unknown Widget Type</h3>
-          <p className="text-red-600 text-sm mt-1">
-            Widget type "{schema.type}" is not supported.
-          </p>
-          <details className="mt-2">
-            <summary className="text-red-600 text-sm cursor-pointer">Debug Info</summary>
-            <pre className="text-xs mt-1 text-red-700 bg-red-100 p-2 rounded overflow-auto">
-              {JSON.stringify(schema, null, 2)}
-            </pre>
-          </details>
-        </div>
-      );
+    // Standard widget rendering
+    return (
+      <WidgetComponent
+        schema={schema}
+        userId={userId}
+        onAction={onAction}
+        onProgressUpdate={onProgressUpdate}
+      />
+    );
   }
+
+  // Unknown widget type error (registry-aware)
+  const availableTypes = Object.keys(WIDGET_TYPE_MAP);
+  console.warn('[WidgetDispatcher] Unknown widget type:', schema.type);
+
+  return (
+    <div className="p-4 border border-red-200 rounded-lg bg-red-50">
+      <h3 className="text-red-800 font-medium">Unknown Widget Type</h3>
+      <p className="text-red-600 text-sm mt-1">
+        Widget type &ldquo;{schema.type}&rdquo; is not registered in the widget registry.
+      </p>
+      <details className="mt-2">
+        <summary className="text-red-600 text-sm cursor-pointer">Available Types</summary>
+        <div className="text-xs mt-1 text-red-700 bg-red-100 p-2 rounded">
+          <p><strong>Available:</strong> {availableTypes.join(', ')}</p>
+          <p><strong>Registered Widgets:</strong> {widgetRegistry.getAllWidgets().map(w => w.metadata.id).join(', ')}</p>
+        </div>
+      </details>
+      <details className="mt-2">
+        <summary className="text-red-600 text-sm cursor-pointer">Debug Info</summary>
+        <pre className="text-xs mt-1 text-red-700 bg-red-100 p-2 rounded overflow-auto">
+          {JSON.stringify(schema, null, 2)}
+        </pre>
+      </details>
+    </div>
+  );
 }

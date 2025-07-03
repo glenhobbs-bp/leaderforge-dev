@@ -164,9 +164,30 @@ widgetRegistry.registerWidget({
   componentPath: './LeaderForgeCard',
 });
 
-// ✅ PERFORMANCE: VideoPlayerModal registration removed to avoid SSR errors and hls.js bundle bloat
-// VideoPlayerModal is loaded dynamically in DynamicTenantPage when needed
-// This prevents the 400kB hls.js library from being included in the main bundle
+// Register VideoPlayerModal with dynamic loading to prevent bundle bloat
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'videoplayer-modal',
+    type: 'Widget',
+    name: 'Video Player Modal',
+    description: 'HLS video player with modal display and progress tracking',
+    version: '1.0.0',
+    category: 'content',
+    capabilities: [
+      WidgetCapabilities.VIDEO_PLAYBACK,
+      WidgetCapabilities.MODAL_DISPLAY,
+      WidgetCapabilities.PROGRESS_TRACKING,
+      'hls-streaming',
+      'fullscreen-support'
+    ],
+    tags: ['video', 'modal', 'hls', 'streaming', 'progress'],
+    author: 'Widget Team',
+    sizeHint: 'fullscreen',
+    themeable: true,
+  },
+  component: null as unknown as React.ComponentType<unknown>, // Loaded dynamically in WidgetDispatcher
+  componentPath: './VideoPlayerModal',
+});
 
 // Export widgets and dispatcher
 export { default as StatCard } from './StatCard';

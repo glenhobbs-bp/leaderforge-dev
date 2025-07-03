@@ -33,7 +33,22 @@ const nextConfig = {
   images: {
     domains: [
       "cdn.tribesocial.io"
-    ]
+    ],
+    unoptimized: false,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.tribesocial.io',
+        pathname: '/videos/**',
+      }
+    ],
+    minimumCacheTTL: 300,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    formats: ['image/webp', 'image/avif'],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    loader: 'default'
   },
 };
 
