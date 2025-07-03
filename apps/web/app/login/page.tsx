@@ -6,7 +6,7 @@
 // Tags: authentication, Supabase Auth UI, login, client component
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSupabase } from '../../components/SupabaseProvider';
@@ -14,9 +14,13 @@ import { useSupabase } from '../../components/SupabaseProvider';
 export default function LoginPage() {
   const { supabase } = useSupabase();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Get the returnTo parameter from URL
+  const returnTo = searchParams.get('returnTo') || '/dashboard';
 
   useEffect(() => {
     let mounted = true;
@@ -43,7 +47,7 @@ export default function LoginPage() {
 
           // Show authenticating spinner for a moment before redirect
           setTimeout(() => {
-            window.location.href = '/dashboard';
+            window.location.href = returnTo;
           }, 500);
         } catch (error) {
           console.error('[login/page] Error syncing tokens:', error);
@@ -59,7 +63,7 @@ export default function LoginPage() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [supabase, router]);
+  }, [supabase, router, returnTo]);
 
   // Show loading state initially to prevent flash of unstyled content
   useEffect(() => {
@@ -126,6 +130,13 @@ export default function LoginPage() {
         <div className="flex flex-col items-center mb-6">
           <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
         </div>
+        {returnTo !== '/dashboard' && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-700">
+              You&apos;ll be redirected to your requested page after login.
+            </p>
+          </div>
+        )}
         {!isAuthLoaded ? (
           <div className="flex flex-col items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-spinner"></div>

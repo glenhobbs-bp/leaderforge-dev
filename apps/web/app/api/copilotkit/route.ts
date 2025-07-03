@@ -22,19 +22,19 @@ async function handleAdminAction(args: {
 
     if (sessionError || !session?.user) {
       return {
-        error: "Unauthorized - Please log in",
-        success: false
+        success: false,
+        message: "You need to be logged in to perform admin actions. Please log in and try again."
       };
     }
 
     // Check admin status
     const isAdmin = session.user.user_metadata?.is_admin === true ||
-                    session.user.raw_user_meta_data?.is_admin === true;
+                    (session.user as { raw_user_meta_data?: { is_admin?: boolean } })?.raw_user_meta_data?.is_admin === true;
 
     if (!isAdmin) {
       return {
-        error: "Forbidden - Admin access required",
-        success: false
+        success: false,
+        message: "You don't have admin permissions. If you should have admin access, please contact your administrator."
       };
     }
 
@@ -52,28 +52,75 @@ async function handleAdminAction(args: {
     // Execute agent
     const response = await agent.processIntent(context);
 
-    // Return the response with schema for CopilotKit to handle
+    // Handle different response types
+    if (response.error) {
+      return {
+        success: false,
+        message: `Error: ${response.error}`
+      };
+    }
+
+    if (response.completed) {
+      return {
+        success: true,
+        message: "✅ Task completed successfully!",
+        completed: true
+      };
+    }
+
+    // If we have a schema (form to fill out), describe it to the user
+    if (response.schema) {
+      const schema = response.schema;
+      let formDescription = "I need some information to complete this task:\n\n";
+
+      // Extract form fields from the schema
+      if (schema.type === 'Form' && schema.data) {
+                const formData = schema.data as { jsonSchema?: { properties?: Record<string, unknown>; required?: string[] } };
+
+        if (formData.jsonSchema?.properties) {
+          const properties = formData.jsonSchema.properties;
+          const required = formData.jsonSchema.required || [];
+
+          for (const [field, config] of Object.entries(properties)) {
+            const fieldConfig = config as { title?: string; description?: string; enum?: string[] };
+            const isRequired = required.includes(field);
+
+            formDescription += `• **${fieldConfig.title || field}**`;
+            if (isRequired) formDescription += " (required)";
+            formDescription += `: ${fieldConfig.description || 'Please provide this information'}\n`;
+
+            if (fieldConfig.enum) {
+              formDescription += `  Options: ${fieldConfig.enum.join(', ')}\n`;
+            }
+          }
+        }
+      }
+
+      return {
+        success: true,
+        message: formDescription + "\nPlease provide the required information to proceed.",
+        needsInput: true,
+        taskId: response.taskId,
+        formSchema: response.schema
+      };
+    }
+
+    // Default response
     return {
       success: true,
-      schema: response.schema,
-      taskId: response.taskId,
-      message: response.error
-        ? `Error: ${response.error}`
-        : response.completed
-          ? 'Task completed successfully!'
-          : 'Please fill out the form below to complete this task.'
+      message: "Processing your request..."
     };
 
   } catch (error) {
     console.error('[CopilotKit] Admin action error:', error);
     return {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      success: false
+      success: false,
+      message: `An error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
   }
 }
 
-// Use OpenAI adapter configured for admin tasks
+// Use OpenAI adapter
 const serviceAdapter = new OpenAIAdapter({
   model: "gpt-4",
 });
@@ -84,9 +131,11 @@ const runtime = new CopilotRuntime({
     {
       name: "performAdminTask",
       description: `Administrative actions for managing the platform. This includes:
-        - Configuring user entitlements (e.g., "configure entitlements for user abc@example.com")
-        - Creating new tenants (e.g., "create a new tenant named CompanyX")
-        - Changing theme colors (e.g., "change the primary color to blue")`,
+        - Configuring user entitlements (e.g., "give user@example.com premium access")
+        - Creating new tenants (e.g., "create a new tenant called Acme Corp")
+        - Changing theme colors (e.g., "change the primary color to #FF6B6B")
+
+        You must be an admin to use these features.`,
       parameters: [
         {
           name: "intent",

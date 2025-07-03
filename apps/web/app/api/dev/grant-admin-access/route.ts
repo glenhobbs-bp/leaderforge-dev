@@ -50,10 +50,12 @@ export async function POST() {
       }, { status: 500 });
     }
 
+    // Important: Return a flag indicating session refresh is needed
     return NextResponse.json({
       success: true,
       message: `Admin access granted to ${userEmail}`,
-      instructions: 'Please log out and log back in for the changes to take effect.',
+      instructions: 'Your session needs to be refreshed for changes to take effect.',
+      requiresSessionRefresh: true,
       user: {
         id: userId,
         email: userEmail,
