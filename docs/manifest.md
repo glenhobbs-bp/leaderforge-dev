@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/1/2025, 6:25:37 AM*
+*Generated on 7/3/2025, 5:49:38 PM*
 
 ## Overview
 
-- **Total Files**: 297
-- **Total Size**: 2.61 MB
+- **Total Files**: 313
+- **Total Size**: 2.73 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 127 files
-- **.md**: 96 files
-- **.tsx**: 45 files
+- **.ts**: 133 files
+- **.md**: 105 files
+- **.tsx**: 46 files
 - **.json**: 17 files
 - **.js**: 10 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 172 files
-- **AI agent**: 146 files
-- **documentation**: 99 files
-- **security**: 70 files
-- **API**: 52 files
-- **Next.js API**: 50 files
-- **React**: 45 files
-- **UI**: 35 files
+- **TypeScript**: 179 files
+- **AI agent**: 159 files
+- **documentation**: 108 files
+- **security**: 79 files
+- **API**: 55 files
+- **Next.js API**: 53 files
+- **React**: 46 files
+- **UI**: 37 files
+- **React hooks**: 34 files
 - **utility**: 34 files
-- **React hooks**: 31 files
 
 ## File Inventory
 
@@ -113,15 +113,6 @@ aka.ms/tsconfig to read more about this file */
 **Modified**: 6/27/2025
 
 
-### `apps/web/app/admin/feedback/page.tsx`
-
-Purpose: Mockup Feedback Admin Dashboard - View and analyze user feedback on mockups
-
-**Complexity**: high • **Size**: 11.2KB
-**Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 6/29/2025
-
-
 ### `apps/web/app/api/agent/content/route.ts`
 
 Agent Content API Route
@@ -196,11 +187,11 @@ File: apps/web/app/api/auth/set-session/route.ts
 
 ### `apps/web/app/api/copilotkit/route.ts`
 
-localhost:8000", // Local LangGraph dev server
+Admin action handler
 
-**Complexity**: low • **Size**: 0.8KB
-**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/27/2025
+**Complexity**: medium • **Size**: 4.0KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/3/2025
 
 
 ### `apps/web/app/api/dashboard/[user_id]/route.ts`
@@ -219,6 +210,15 @@ Try to get a sample record to see what columns exist
 **Complexity**: low • **Size**: 2.0KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
 **Modified**: 6/27/2025
+
+
+### `apps/web/app/api/debug/check-session/route.ts`
+
+File: apps/web/app/api/debug/check-session/route.ts
+
+**Complexity**: low • **Size**: 1.2KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 7/3/2025
 
 
 ### `apps/web/app/api/debug/cookies/route.ts`
@@ -284,13 +284,31 @@ Use service role for admin operations
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/api/dev/check-admin-status/route.ts`
+
+File: apps/web/app/api/dev/check-admin-status/route.ts
+
+**Complexity**: low • **Size**: 2.1KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 7/3/2025
+
+
+### `apps/web/app/api/dev/grant-admin-access/route.ts`
+
+File: apps/web/app/api/dev/grant-admin-access/route.ts
+
+**Complexity**: low • **Size**: 2.2KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 7/3/2025
+
+
 ### `apps/web/app/api/dev/grant-basic-entitlements/route.ts`
 
 Use service role for admin operations
 
 **Complexity**: low • **Size**: 3.2KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/app/api/dev/simple-entitlements/route.ts`
@@ -299,7 +317,7 @@ Use service role for admin operations
 
 **Complexity**: low • **Size**: 2.6KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/app/api/entitlements/[user_id]/route.ts`
@@ -340,11 +358,11 @@ Purpose: File upload API endpoint for schema-driven forms system
 
 ### `apps/web/app/api/form-templates/[templateId]/route.ts`
 
-Purpose: Form templates API endpoint for schema-driven forms
+Purpose: Form templates API endpoint for schema-driven forms - PERFORMANCE OPTIMIZED
 
-**Complexity**: medium • **Size**: 8.0KB
+**Complexity**: medium • **Size**: 4.0KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/30/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/app/api/input/universal/check/route.ts`
@@ -495,9 +513,9 @@ edge.tribesocial.io';
 
 Universal Progress API - Authenticated Endpoint
 
-**Complexity**: medium • **Size**: 6.5KB
+**Complexity**: medium • **Size**: 7.7KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/app/api/user/[user_id]/navigation-state/route.ts`
@@ -551,7 +569,7 @@ Create service role Supabase client for backend operations
 
 **Complexity**: medium • **Size**: 10.0KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/28/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
@@ -565,11 +583,11 @@ Create service role Supabase client for backend operations
 
 ### `apps/web/app/CopilotKitProvider.tsx`
 
-—
+File: apps/web/app/CopilotKitProvider.tsx
 
-**Complexity**: low • **Size**: 0.3KB
-**Tags**: `React`, `TypeScript`, `AI agent`
-**Modified**: 6/27/2025
+**Complexity**: medium • **Size**: 6.2KB
+**Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`, `security`
+**Modified**: 7/3/2025
 
 
 ### `apps/web/app/dashboard/DashboardClient.tsx`
@@ -578,7 +596,7 @@ Type definitions
 
 **Complexity**: medium • **Size**: 2.9KB
 **Tags**: `React`, `TypeScript`, `AI agent`, `security`
-**Modified**: 6/27/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/app/dashboard/marcus/page.tsx`
@@ -587,16 +605,25 @@ Purpose: Marcus Dashboard Page - Composition-driven dashboard using existing wid
 
 **Complexity**: medium • **Size**: 4.8KB
 **Tags**: `React`, `TypeScript`, `React hooks`
-**Modified**: 6/28/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/app/dashboard/page.tsx`
 
 Server-side dashboard page with SSR optimization and entitlement filtering
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 3.6KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.1KB
 **Tags**: `Next.js page`, `SSR`, `entitlements`, `context management`, `performance`, `React`, `TypeScript`, `security`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
+
+
+### `apps/web/app/dev/grant-admin/page.tsx`
+
+File: apps/web/app/dev/grant-admin/page.tsx
+
+**Complexity**: medium • **Size**: 6.1KB
+**Tags**: `React`, `TypeScript`, `React hooks`
+**Modified**: 7/3/2025
 
 
 ### `apps/web/app/hooks/useContentForContext.ts`
@@ -695,7 +722,7 @@ Get initial session server-side for SSR
 
 **Complexity**: low • **Size**: 1.2KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `apps/web/app/lib/agentService.ts`
@@ -936,9 +963,9 @@ Client-side Progress Types
 
 User Progress Service - Client Side
 
-**Complexity**: high • **Size**: 7.3KB
+**Complexity**: high • **Size**: 12.9KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/app/lib/userProgressService.ts`
@@ -972,9 +999,9 @@ User service layer with optimized database operations and caching
 
 Public login page with styled Supabase Auth UI and token synchronization
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.7KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 6.1KB
 **Tags**: `authentication`, `Supabase Auth UI`, `login`, `client component`, `React`, `TypeScript`, `React hooks`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `apps/web/app/page.tsx`
@@ -1002,15 +1029,6 @@ Purpose: Test page for FormWidget component - Video Reflection Worksheet
 **Complexity**: low • **Size**: 1.9KB
 **Tags**: `React`, `TypeScript`
 **Modified**: 6/30/2025
-
-
-### `apps/web/app/test-widgets/page.tsx`
-
-File: apps/web/app/test-widgets/page.tsx
-
-**Complexity**: medium • **Size**: 9.9KB
-**Tags**: `React`, `TypeScript`, `React hooks`
-**Modified**: 6/27/2025
 
 
 ### `apps/web/components.json`
@@ -1053,18 +1071,18 @@ File: apps/web/components/ai/UniversalSchemaRenderer.tsx
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 33.1KB
+**Complexity**: high • **Size**: 39.1KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`, `AI agent`
-**Modified**: 7/1/2025
+**Modified**: 7/3/2025
 
 
 ### `apps/web/components/forms/FormWidget.tsx`
 
 Purpose: Schema-driven form widget using React JSON Schema Form with custom LeaderForge design system styling
 
-**Complexity**: high • **Size**: 25.1KB
+**Complexity**: high • **Size**: 28.2KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/1/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/components/forms/index.ts`
@@ -1098,9 +1116,9 @@ Purpose: Marcus Dashboard Mockup - Agent-native mockup component for UX validati
 
 Start with initialSession to prevent auth flash
 
-**Complexity**: medium • **Size**: 3.3KB
+**Complexity**: medium • **Size**: 3.9KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 6/27/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/ui/ContentPanel.tsx`
@@ -1161,9 +1179,9 @@ Purpose: Mockup Renderer - Dynamically renders JSX mockup components from agent 
 
 Navigation panel for agent-native app, themed via contextConfig
 
-**Owner**: Frontend team • **Complexity**: high • **Size**: 19.3KB
+**Owner**: Frontend team • **Complexity**: high • **Size**: 20.1KB
 **Tags**: `UI`, `navigation`, `context-based`, `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/ui/ProgressBar.tsx`
@@ -1197,9 +1215,9 @@ Three-panel layout component with theme context and collapsible navigation
 
 Fetch user data from API
 
-**Complexity**: high • **Size**: 17.9KB
+**Complexity**: high • **Size**: 18.6KB
 **Tags**: `React`, `TypeScript`, `UI`, `React Query`, `React hooks`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/components/ui/xxxChatPanel.tsx`
@@ -1238,22 +1256,31 @@ File: apps/web/components/widgets/__tests__/WidgetDispatcher.test.tsx
 **Modified**: 6/28/2025
 
 
+### `apps/web/components/widgets/FormWidget.tsx`
+
+File: apps/web/components/widgets/FormWidget.tsx
+
+**Complexity**: medium • **Size**: 5.6KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
+**Modified**: 7/3/2025
+
+
 ### `apps/web/components/widgets/Grid.tsx`
 
 File: apps/web/components/widgets/Grid.tsx
 
 **Complexity**: medium • **Size**: 3.2KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/1/2025
 
 
 ### `apps/web/components/widgets/index.ts`
 
 File: apps/web/components/widgets/index.ts
 
-**Complexity**: medium • **Size**: 5.5KB
+**Complexity**: medium • **Size**: 7.3KB
 **Tags**: `TypeScript`, `UI`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `apps/web/components/widgets/Leaderboard.tsx`
@@ -1269,8 +1296,8 @@ File: apps/web/components/widgets/Leaderboard.tsx
 
 LeaderForgeCard.tsx
 
-**Complexity**: medium • **Size**: 12.0KB
-**Tags**: `React`, `TypeScript`, `UI`, `AI agent`
+**Complexity**: high • **Size**: 13.5KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 7/1/2025
 
 
@@ -1301,6 +1328,15 @@ File: apps/web/components/widgets/StatCard.tsx
 **Modified**: 6/29/2025
 
 
+### `apps/web/components/widgets/TableWidget.tsx`
+
+File: apps/web/components/widgets/TableWidget.tsx
+
+**Complexity**: high • **Size**: 10.3KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
+**Modified**: 7/3/2025
+
+
 ### `apps/web/components/widgets/types.ts`
 
 Local Widget Types
@@ -1323,18 +1359,18 @@ File: apps/web/components/widgets/VideoList.tsx
 
 VideoPlayerModal.tsx
 
-**Complexity**: high • **Size**: 21.9KB
+**Complexity**: high • **Size**: 24.2KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `apps/web/components/widgets/WidgetDispatcher.tsx`
 
 File: apps/web/components/widgets/WidgetDispatcher.tsx
 
-**Complexity**: medium • **Size**: 4.1KB
+**Complexity**: medium • **Size**: 4.5KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `apps/web/hooks/useAvatar.ts`
@@ -1440,9 +1476,9 @@ Routes navigation to mockups when enabled, falls back to agent content
 
 Root of apps/web
 
-**Complexity**: low • **Size**: 1.1KB
+**Complexity**: low • **Size**: 1.6KB
 **Tags**: None
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `apps/web/package-lock.json`
@@ -1459,8 +1495,8 @@ registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz",
 —
 
 **Size**: 1.3KB
-**Tags**: None
-**Modified**: 6/30/2025
+**Tags**: `AI agent`
+**Modified**: 7/3/2025
 
 
 ### `apps/web/postcss.config.js`
@@ -2093,6 +2129,24 @@ ANTI-PATTERN: Hardcoded business logic
 **Modified**: 7/1/2025
 
 
+### `docs/architecture/adr/0020-architectural-remediation-sprint.md`
+
+—
+
+**Size**: 3.5KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/3/2025
+
+
+### `docs/architecture/adr/0021-copilotkit-admin-integration-pattern.md`
+
+—
+
+**Size**: 3.0KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/3/2025
+
+
 ### `docs/architecture/adr/adr-template.md`
 
 —
@@ -2147,6 +2201,15 @@ Examples of base components
 **Modified**: 6/27/2025
 
 
+### `docs/architecture/vision/001-copilotkit-vision.md`
+
+cloud.copilotkit.ai/>
+
+**Size**: 7.0KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/3/2025
+
+
 ### `docs/database/core-schema-current.sql`
 
 —
@@ -2156,13 +2219,22 @@ Examples of base components
 **Modified**: 6/29/2025
 
 
+### `docs/engineering/architectural-validation-analysis.md`
+
+Current: Each new feature compounds performance problems
+
+**Size**: 11.0KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/1/2025
+
+
 ### `docs/engineering/future-enhancements.md`
 
 —
 
-**Size**: 6.3KB
+**Size**: 7.8KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/30/2025
+**Modified**: 7/1/2025
 
 
 ### `docs/engineering/how-to/README.md`
@@ -2219,6 +2291,15 @@ Mock data schema patterns
 **Modified**: 6/27/2025
 
 
+### `docs/engineering/implementation-plans/copilotkit-admin-integration-plan.md`
+
+—
+
+**Size**: 3.2KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/3/2025
+
+
 ### `docs/engineering/implementation-plans/schema-driven-forms-implementation-plan.md`
 
 Form Templates
@@ -2237,6 +2318,15 @@ Form Templates
 **Modified**: 6/29/2025
 
 
+### `docs/engineering/MASTER_WORKPLAN.md`
+
+—
+
+**Size**: 23.6KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/3/2025
+
+
 ### `docs/engineering/performance-analysis-report.md`
 
 —
@@ -2244,6 +2334,15 @@ Form Templates
 **Size**: 11.2KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/27/2025
+
+
+### `docs/engineering/phase-2-performance-baseline.md`
+
+localhost:3000/api/assets/registry/widgets | jq '.meta.total'
+
+**Size**: 4.0KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/3/2025
 
 
 ### `docs/engineering/README.md`
@@ -2304,18 +2403,18 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX val
 
 Local LangGraph dev server",
 
-**Size**: 149.3KB
+**Size**: 151.9KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/30/2025
+**Modified**: 7/1/2025
 
 
 ### `docs/manifest.md`
 
 Local LangGraph dev server
 
-**Size**: 56.7KB
+**Size**: 57.7KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 6/30/2025
+**Modified**: 7/1/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -2334,6 +2433,15 @@ React component example
 **Size**: 28.9KB
 **Tags**: `documentation`
 **Modified**: 6/27/2025
+
+
+### `docs/product-design/Download i49-ui-component-specs.md`
+
+—
+
+**Size**: 1.2KB
+**Tags**: `documentation`
+**Modified**: 7/1/2025
 
 
 ### `docs/product-design/LEADERFORGE_VISION.md`
@@ -2388,6 +2496,24 @@ Links to specific video content
 **Size**: 6.4KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/27/2025
+
+
+### `docs/testing/production-performance-testing-guide.md`
+
+your-production-domain.com
+
+**Size**: 6.4KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/1/2025
+
+
+### `packages/agent-core/agents/AdminAgent.ts`
+
+File: packages/agent-core/agents/AdminAgent.ts
+
+**Complexity**: high • **Size**: 10.9KB
+**Tags**: `TypeScript`, `AI agent`, `security`
+**Modified**: 7/3/2025
 
 
 ### `packages/agent-core/agents/ContentLibraryAgent.ts`
@@ -2448,18 +2574,18 @@ app.posthog.com";
 
 —
 
-**Complexity**: low • **Size**: 0.2KB
+**Complexity**: low • **Size**: 0.3KB
 **Tags**: `TypeScript`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `packages/agent-core/package.json`
 
 —
 
-**Size**: 0.3KB
+**Size**: 0.8KB
 **Tags**: `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/3/2025
 
 
 ### `packages/agent-core/schema/SchemaProcessor.ts`
@@ -2496,6 +2622,15 @@ Tests for Universal Progress Tool
 **Complexity**: high • **Size**: 11.6KB
 **Tags**: `TypeScript`, `test`, `AI agent`
 **Modified**: 6/27/2025
+
+
+### `packages/agent-core/tools/EntitlementTool.ts`
+
+File: packages/agent-core/tools/EntitlementTool.ts
+
+**Complexity**: medium • **Size**: 3.2KB
+**Tags**: `TypeScript`, `AI agent`, `security`
+**Modified**: 7/3/2025
 
 
 ### `packages/agent-core/tools/ToolRegistry.js`
@@ -2547,9 +2682,9 @@ Agent-native, production-ready user progress tool for modular agent orchestratio
 
 Agent-native, production-ready user progress tool for modular agent orchestration.
 
-**Complexity**: high • **Size**: 21.8KB
+**Complexity**: high • **Size**: 23.6KB
 **Tags**: `TypeScript`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/2/2025
 
 
 ### `packages/agent-core/tsconfig.json`
@@ -2559,6 +2694,15 @@ Agent-native, production-ready user progress tool for modular agent orchestratio
 **Size**: 0.3KB
 **Tags**: None
 **Modified**: 6/27/2025
+
+
+### `packages/agent-core/types/AdminUISchema.ts`
+
+File: packages/agent-core/types/AdminUISchema.ts
+
+**Complexity**: high • **Size**: 5.9KB
+**Tags**: `TypeScript`, `AI agent`, `security`
+**Modified**: 7/3/2025
 
 
 ### `packages/agent-core/types/ComponentSchema.js`

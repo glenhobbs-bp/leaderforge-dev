@@ -23,7 +23,11 @@ export class EntitlementTool {
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Supabase configuration is missing');
     }
-    return createClient(supabaseUrl, supabaseServiceKey);
+    return createClient(supabaseUrl, supabaseServiceKey, {
+      db: {
+        schema: 'core'
+      }
+    });
   }
 
   /**
@@ -34,7 +38,7 @@ export class EntitlementTool {
       const supabase = this.getSupabaseClient();
 
       const { data, error } = await supabase
-        .from('core.entitlements')
+        .from('entitlements')
         .select('key, name, description, tenant_key')
         .order('name');
 
@@ -58,7 +62,7 @@ export class EntitlementTool {
       const supabase = this.getSupabaseClient();
 
       const { data, error } = await supabase
-        .from('core.user_entitlements')
+        .from('user_entitlements')
         .select('entitlement_key')
         .eq('user_id', userId);
 
@@ -83,7 +87,7 @@ export class EntitlementTool {
 
       // First, remove all existing entitlements for the user
       const { error: deleteError } = await supabase
-        .from('core.user_entitlements')
+        .from('user_entitlements')
         .delete()
         .eq('user_id', userId);
 
@@ -102,7 +106,7 @@ export class EntitlementTool {
         }));
 
         const { error: insertError } = await supabase
-          .from('core.user_entitlements')
+          .from('user_entitlements')
           .insert(entitlementRecords);
 
         if (insertError) {
@@ -115,6 +119,31 @@ export class EntitlementTool {
     } catch (error) {
       console.error('Failed to update user entitlements:', error);
       return false;
+    }
+  }
+
+  /**
+   * Look up user ID by email address
+   */
+  static async getUserIdByEmail(email: string): Promise<string | null> {
+    try {
+      const supabase = this.getSupabaseClient();
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (error) {
+        console.error('Error looking up user by email:', error);
+        return null;
+      }
+
+      return data?.id || null;
+    } catch (error) {
+      console.error('Failed to look up user by email:', error);
+      return null;
     }
   }
 }

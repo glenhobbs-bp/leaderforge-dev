@@ -119,7 +119,7 @@ const runtime = new CopilotRuntime({
   actions: [
     {
       name: "performAdminTask",
-      description: "Perform administrative tasks",
+      description: "Perform administrative tasks including managing entitlements, creating tenants, and changing themes",
       parameters: [
         {
           name: "intent",
@@ -130,6 +130,140 @@ const runtime = new CopilotRuntime({
       ],
       handler: async ({ intent }) => {
         return handleAdminAction({ intent });
+      },
+    },
+    {
+      name: "getCurrentEntitlements",
+      description: "Get the current entitlements for a specific user by email or user ID",
+      parameters: [
+        {
+          name: "userIdentifier",
+          type: "string",
+          description: "The user's email address or user ID",
+          required: true,
+        },
+      ],
+      handler: async ({ userIdentifier }) => {
+        try {
+          // Get session from cookies
+          const cookieStore = await cookies();
+          const { session, error: sessionError } = await restoreSession(cookieStore);
+
+          if (sessionError || !session?.user) {
+            return {
+              success: false,
+              message: "You need to be logged in to view entitlements."
+            };
+          }
+
+          // Check admin status
+          const isAdmin = session.user.user_metadata?.is_admin === true ||
+                          (session.user as { raw_user_meta_data?: { is_admin?: boolean } })?.raw_user_meta_data?.is_admin === true;
+
+          if (!isAdmin) {
+            return {
+              success: false,
+              message: "You don't have permission to view user entitlements."
+            };
+          }
+
+          const { EntitlementTool } = await import('agent-core/tools/EntitlementTool');
+
+          // Check if userIdentifier is an email or user ID
+          let userId = userIdentifier;
+          if (userIdentifier.includes('@')) {
+            // It's an email, look up the user ID
+            const lookedUpUserId = await EntitlementTool.getUserIdByEmail(userIdentifier);
+            if (!lookedUpUserId) {
+              return {
+                success: false,
+                message: `No user found with email: ${userIdentifier}`
+              };
+            }
+            userId = lookedUpUserId;
+          }
+
+          const entitlements = await EntitlementTool.getUserEntitlements(userId);
+          const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
+
+          // Map entitlement keys to their full details
+          const userEntitlementDetails = entitlements.map(key => {
+            const entitlement = availableEntitlements.find(e => e.key === key);
+            return entitlement ? `${entitlement.name} - ${entitlement.description}` : key;
+          });
+
+          if (userEntitlementDetails.length === 0) {
+            return {
+              success: true,
+              message: `${userId} currently has no entitlements assigned.`
+            };
+          }
+
+          return {
+            success: true,
+            message: `Current entitlements for ${userId}:\n${userEntitlementDetails.join('\n')}`
+          };
+        } catch (error) {
+          console.error('Error fetching entitlements:', error);
+          return {
+            success: false,
+            message: "Failed to fetch entitlements. Please try again."
+          };
+        }
+      },
+    },
+    {
+      name: "listAvailableEntitlements",
+      description: "List all available entitlements that can be assigned to users",
+      handler: async () => {
+        try {
+          // Get session from cookies
+          const cookieStore = await cookies();
+          const { session, error: sessionError } = await restoreSession(cookieStore);
+
+          if (sessionError || !session?.user) {
+            return {
+              success: false,
+              message: "You need to be logged in to view entitlements."
+            };
+          }
+
+          // Check admin status
+          const isAdmin = session.user.user_metadata?.is_admin === true ||
+                          (session.user as { raw_user_meta_data?: { is_admin?: boolean } })?.raw_user_meta_data?.is_admin === true;
+
+          if (!isAdmin) {
+            return {
+              success: false,
+              message: "You don't have permission to view entitlements."
+            };
+          }
+
+          const { EntitlementTool } = await import('agent-core/tools/EntitlementTool');
+          const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
+
+          if (availableEntitlements.length === 0) {
+            return {
+              success: true,
+              message: "No entitlements are currently available in the system."
+            };
+          }
+
+          const entitlementList = availableEntitlements.map(e =>
+            `• ${e.name} (${e.key}) - ${e.description}`
+          ).join('\n');
+
+          return {
+            success: true,
+            message: `Available entitlements:\n${entitlementList}`
+          };
+        } catch (error) {
+          console.error('Error listing entitlements:', error);
+          return {
+            success: false,
+            message: "Failed to list entitlements. Please try again."
+          };
+        }
       },
     },
   ],

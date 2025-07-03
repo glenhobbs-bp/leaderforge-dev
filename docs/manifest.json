@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-07-01T10:25:37.669Z",
+    "generated_at": "2025-07-03T21:49:38.253Z",
     "generator_version": "1.0.0",
-    "total_files": 297,
-    "total_size_bytes": 2733075,
+    "total_files": 313,
+    "total_size_bytes": 2864242,
     "file_types": {
-      ".ts": 127,
+      ".ts": 133,
       ".json": 17,
-      ".tsx": 45,
+      ".tsx": 46,
       ".js": 10,
-      ".md": 96,
+      ".md": 105,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 172,
-      "API": 52,
-      "AI agent": 146,
-      "React": 45,
-      "React hooks": 31,
-      "Next.js API": 50,
-      "security": 70,
+      "TypeScript": 179,
+      "API": 55,
+      "AI agent": 159,
+      "React": 46,
+      "React hooks": 34,
+      "security": 79,
+      "Next.js API": 53,
       "test": 13,
       "API endpoint": 3,
       "navigation state": 2,
@@ -51,7 +51,7 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 35,
+      "UI": 37,
       "navigation": 6,
       "context-based": 1,
       "UI component": 1,
@@ -70,7 +70,7 @@
       "prototyping": 1,
       "routing": 2,
       "exports": 1,
-      "documentation": 99,
+      "documentation": 108,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -215,28 +215,6 @@
       "last_modified": "2025-06-27T21:33:11.932Z",
       "size_bytes": 12404,
       "hash": "2f2b7059"
-    },
-    {
-      "path": "apps/web/app/admin/feedback/page.tsx",
-      "name": "page.tsx",
-      "directory": "apps/web/app/admin/feedback",
-      "extension": ".tsx",
-      "purpose": "Purpose: Mockup Feedback Admin Dashboard - View and analyze user feedback on mockups",
-      "tags": [
-        "React",
-        "TypeScript",
-        "React hooks",
-        "AI agent"
-      ],
-      "dependencies": [
-        "react",
-        "../../../components/SupabaseProvider",
-        "@radix-ui/react-icons"
-      ],
-      "last_modified": "2025-06-29T22:35:01.007Z",
-      "size_bytes": 11445,
-      "hash": "7089fa04",
-      "complexity": "high"
     },
     {
       "path": "apps/web/app/api/agent/content/route.ts",
@@ -415,20 +393,24 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/copilotkit",
       "extension": ".ts",
-      "purpose": "localhost:8000\", // Local LangGraph dev server",
+      "purpose": "Admin action handler",
       "tags": [
         "TypeScript",
         "API",
         "Next.js API",
-        "AI agent"
+        "AI agent",
+        "security"
       ],
       "dependencies": [
-        "next/server"
+        "next/server",
+        "next/headers",
+        "../../lib/supabaseServerClient",
+        "agent-core/agents/AdminAgent"
       ],
-      "last_modified": "2025-06-27T21:33:11.938Z",
-      "size_bytes": 798,
-      "hash": "af1b2088",
-      "complexity": "low"
+      "last_modified": "2025-07-03T21:49:26.483Z",
+      "size_bytes": 4062,
+      "hash": "4df7ff36",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/dashboard/[user_id]/route.ts",
@@ -470,6 +452,27 @@
       "last_modified": "2025-06-27T21:33:11.939Z",
       "size_bytes": 2091,
       "hash": "9b52dd8f",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/check-session/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/check-session",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/debug/check-session/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-07-03T18:22:28.542Z",
+      "size_bytes": 1240,
+      "hash": "c3d5ee0a",
       "complexity": "low"
     },
     {
@@ -612,6 +615,48 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/app/api/dev/check-admin-status/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/check-admin-status",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/dev/check-admin-status/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-07-03T18:00:29.541Z",
+      "size_bytes": 2110,
+      "hash": "ef2542f4",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/dev/grant-admin-access/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/grant-admin-access",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/dev/grant-admin-access/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient",
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-07-03T20:32:40.482Z",
+      "size_bytes": 2265,
+      "hash": "823a5ea4",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/api/dev/grant-basic-entitlements/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/dev/grant-basic-entitlements",
@@ -626,9 +671,9 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-27T21:33:11.940Z",
-      "size_bytes": 3320,
-      "hash": "48ded82a",
+      "last_modified": "2025-07-02T10:43:40.077Z",
+      "size_bytes": 3315,
+      "hash": "f90327d8",
       "complexity": "low"
     },
     {
@@ -646,9 +691,9 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-06-27T21:33:11.941Z",
-      "size_bytes": 2636,
-      "hash": "00501a0a",
+      "last_modified": "2025-07-02T10:50:37.685Z",
+      "size_bytes": 2635,
+      "hash": "235d3598",
       "complexity": "low"
     },
     {
@@ -744,7 +789,7 @@
       "name": "route.ts",
       "directory": "apps/web/app/api/form-templates/[templateId]",
       "extension": ".ts",
-      "purpose": "Purpose: Form templates API endpoint for schema-driven forms",
+      "purpose": "Purpose: Form templates API endpoint for schema-driven forms - PERFORMANCE OPTIMIZED",
       "tags": [
         "TypeScript",
         "API",
@@ -756,9 +801,9 @@
         "next/headers",
         "@/lib/supabaseServerClient"
       ],
-      "last_modified": "2025-06-30T12:59:16.409Z",
-      "size_bytes": 8169,
-      "hash": "ad395245",
+      "last_modified": "2025-07-02T18:43:48.714Z",
+      "size_bytes": 4060,
+      "hash": "a021e157",
       "complexity": "medium"
     },
     {
@@ -1136,9 +1181,9 @@
         "../../lib/supabaseServerClient",
         "../../../../../packages/agent-core/tools/UserProgressTool"
       ],
-      "last_modified": "2025-06-27T21:33:11.952Z",
-      "size_bytes": 6684,
-      "hash": "715acc4d",
+      "last_modified": "2025-07-02T11:15:22.763Z",
+      "size_bytes": 7864,
+      "hash": "50f3921c",
       "complexity": "medium"
     },
     {
@@ -1282,7 +1327,7 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-28T14:27:21.858Z",
+      "last_modified": "2025-07-02T21:09:36.786Z",
       "size_bytes": 10198,
       "hash": "2bd72623",
       "complexity": "medium"
@@ -1316,23 +1361,28 @@
       "name": "CopilotKitProvider.tsx",
       "directory": "apps/web/app",
       "extension": ".tsx",
-      "purpose": "—",
+      "purpose": "File: apps/web/app/CopilotKitProvider.tsx",
       "tags": [
         "React",
         "TypeScript",
-        "AI agent"
+        "React hooks",
+        "AI agent",
+        "security"
       ],
       "dependencies": [
+        "@copilotkit/react-core",
+        "@copilotkit/react-ui",
         "react",
-        "@copilotkit/react-core"
+        "../components/SupabaseProvider",
+        "@copilotkit/react-core",
+        "../components/ai/UniversalSchemaRenderer",
+        "agent-core/types/UniversalWidgetSchema",
+        "next/navigation"
       ],
-      "exports": [
-        "CopilotKitProvider"
-      ],
-      "last_modified": "2025-06-27T21:33:11.933Z",
-      "size_bytes": 302,
-      "hash": "38ac2445",
-      "complexity": "low"
+      "last_modified": "2025-07-03T21:49:26.482Z",
+      "size_bytes": 6394,
+      "hash": "b57ceebf",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/dashboard/DashboardClient.tsx",
@@ -1351,9 +1401,9 @@
         "../../components/SupabaseProvider",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-06-27T21:33:11.963Z",
-      "size_bytes": 2967,
-      "hash": "e521a189",
+      "last_modified": "2025-07-01T18:53:46.053Z",
+      "size_bytes": 2985,
+      "hash": "b367286b",
       "complexity": "medium"
     },
     {
@@ -1372,7 +1422,7 @@
         "../../../components/SupabaseProvider",
         "../../../components/ai/UniversalSchemaRenderer"
       ],
-      "last_modified": "2025-06-28T23:12:05.308Z",
+      "last_modified": "2025-07-01T22:49:34.783Z",
       "size_bytes": 4923,
       "hash": "1f3f3f56",
       "complexity": "medium"
@@ -1402,9 +1452,33 @@
         "../lib/entitlementService",
         "../lib/tenantService"
       ],
-      "last_modified": "2025-06-27T21:33:11.964Z",
-      "size_bytes": 3677,
-      "hash": "6ec3fef3",
+      "last_modified": "2025-07-03T20:56:07.042Z",
+      "size_bytes": 5238,
+      "hash": "7c7e5e90",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/dev/grant-admin/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/dev/grant-admin",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/app/dev/grant-admin/page.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "next/navigation",
+        "../../lib/supabaseClient"
+      ],
+      "exports": [
+        "GrantAdminPage"
+      ],
+      "last_modified": "2025-07-03T20:32:45.247Z",
+      "size_bytes": 6213,
+      "hash": "c479f8f9",
       "complexity": "medium"
     },
     {
@@ -1674,9 +1748,9 @@
       "exports": [
         "metadata"
       ],
-      "last_modified": "2025-06-27T21:33:11.992Z",
-      "size_bytes": 1184,
-      "hash": "d6d38e4c",
+      "last_modified": "2025-07-03T21:32:00.965Z",
+      "size_bytes": 1222,
+      "hash": "1245a02c",
       "complexity": "low"
     },
     {
@@ -1693,9 +1767,9 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-07-01T09:40:20.356Z",
-      "size_bytes": 22301,
-      "hash": "9168bf38",
+      "last_modified": "2025-07-01T21:36:53.621Z",
+      "size_bytes": 22299,
+      "hash": "7036d466",
       "complexity": "high"
     },
     {
@@ -2217,9 +2291,9 @@
         "utility",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.027Z",
-      "size_bytes": 7447,
-      "hash": "972bba22",
+      "last_modified": "2025-07-02T10:26:49.844Z",
+      "size_bytes": 13234,
+      "hash": "1d33b17a",
       "complexity": "high"
     },
     {
@@ -2311,9 +2385,9 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-06-27T21:33:12.039Z",
-      "size_bytes": 5877,
-      "hash": "ed489e69",
+      "last_modified": "2025-07-03T20:32:43.124Z",
+      "size_bytes": 6290,
+      "hash": "6b638f59",
       "complexity": "medium"
     },
     {
@@ -2380,29 +2454,6 @@
       "size_bytes": 1924,
       "hash": "b5543f79",
       "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/test-widgets/page.tsx",
-      "name": "page.tsx",
-      "directory": "apps/web/app/test-widgets",
-      "extension": ".tsx",
-      "purpose": "File: apps/web/app/test-widgets/page.tsx",
-      "tags": [
-        "React",
-        "TypeScript",
-        "React hooks"
-      ],
-      "dependencies": [
-        "react",
-        "../../components/widgets"
-      ],
-      "exports": [
-        "TestWidgetsPage"
-      ],
-      "last_modified": "2025-06-27T21:33:12.044Z",
-      "size_bytes": 10173,
-      "hash": "33aea2ef",
-      "complexity": "medium"
     },
     {
       "path": "apps/web/components.json",
@@ -2505,17 +2556,13 @@
         "./ai/UniversalSchemaRenderer",
         "../../../packages/agent-core/types/ComponentSchema",
         "../../../packages/agent-core/types/UniversalWidgetSchema",
-        "./widgets/VideoPlayerModal",
         "./forms/FormWidget",
         "./SupabaseProvider",
-        "react",
-        "../app/hooks/useUserPreferences",
-        "@tanstack/react-query",
-        "../app/lib/types"
+        "react"
       ],
-      "last_modified": "2025-07-01T09:40:53.627Z",
-      "size_bytes": 33907,
-      "hash": "b72b032b",
+      "last_modified": "2025-07-03T10:20:55.926Z",
+      "size_bytes": 40008,
+      "hash": "c6705b96",
       "complexity": "high"
     },
     {
@@ -2535,11 +2582,12 @@
         "react",
         "@rjsf/core",
         "@rjsf/validator-ajv8",
-        "@rjsf/utils"
+        "@rjsf/utils",
+        "lucide-react"
       ],
-      "last_modified": "2025-07-01T09:40:46.585Z",
-      "size_bytes": 25735,
-      "hash": "444ea0ba",
+      "last_modified": "2025-07-02T18:38:42.704Z",
+      "size_bytes": 28911,
+      "hash": "f0224c88",
       "complexity": "high"
     },
     {
@@ -2624,9 +2672,9 @@
       "exports": [
         "SupabaseProvider"
       ],
-      "last_modified": "2025-06-27T21:33:12.053Z",
-      "size_bytes": 3425,
-      "hash": "a89b2dbb",
+      "last_modified": "2025-07-01T20:39:38.031Z",
+      "size_bytes": 3955,
+      "hash": "5092eaec",
       "complexity": "medium"
     },
     {
@@ -2808,9 +2856,9 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-06-27T21:33:12.069Z",
-      "size_bytes": 19804,
-      "hash": "466572e3",
+      "last_modified": "2025-07-01T18:53:35.034Z",
+      "size_bytes": 20582,
+      "hash": "5a4a49a9",
       "complexity": "high"
     },
     {
@@ -2905,9 +2953,9 @@
         "@tanstack/react-query",
         "./NavPanel"
       ],
-      "last_modified": "2025-06-27T21:33:12.077Z",
-      "size_bytes": 18303,
-      "hash": "de1e8ea5",
+      "last_modified": "2025-07-02T12:03:16.523Z",
+      "size_bytes": 19010,
+      "hash": "734fc938",
       "complexity": "high"
     },
     {
@@ -3002,6 +3050,31 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/components/widgets/FormWidget.tsx",
+      "name": "FormWidget.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/FormWidget.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "@rjsf/core",
+        "@rjsf/validator-ajv8",
+        "../../../../packages/agent-core/types/AdminUISchema",
+        "../../../../packages/agent-core/types/UniversalWidgetSchema"
+      ],
+      "last_modified": "2025-07-03T17:13:00.943Z",
+      "size_bytes": 5779,
+      "hash": "f72a27d9",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/components/widgets/Grid.tsx",
       "name": "Grid.tsx",
       "directory": "apps/web/components/widgets",
@@ -3018,7 +3091,7 @@
         "../ai/UniversalSchemaRenderer",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T21:33:12.084Z",
+      "last_modified": "2025-07-01T23:45:53.679Z",
       "size_bytes": 3302,
       "hash": "fa544818",
       "complexity": "medium"
@@ -3041,14 +3114,12 @@
         "./Panel",
         "./Grid",
         "./LeaderForgeCard",
-        "./VideoPlayerModal"
+        "./FormWidget",
+        "./TableWidget"
       ],
-      "exports": [
-        "widgetRegistry"
-      ],
-      "last_modified": "2025-06-27T21:33:12.098Z",
-      "size_bytes": 5627,
-      "hash": "e949a47c",
+      "last_modified": "2025-07-03T17:13:04.811Z",
+      "size_bytes": 7430,
+      "hash": "458c4a36",
       "complexity": "medium"
     },
     {
@@ -3082,6 +3153,7 @@
         "React",
         "TypeScript",
         "UI",
+        "React hooks",
         "AI agent"
       ],
       "dependencies": [
@@ -3090,10 +3162,10 @@
         "lucide-react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-07-01T09:40:49.296Z",
-      "size_bytes": 12246,
-      "hash": "7452213a",
-      "complexity": "medium"
+      "last_modified": "2025-07-01T20:08:27.816Z",
+      "size_bytes": 13774,
+      "hash": "d979bc68",
+      "complexity": "high"
     },
     {
       "path": "apps/web/components/widgets/List.tsx",
@@ -3162,6 +3234,29 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/components/widgets/TableWidget.tsx",
+      "name": "TableWidget.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/TableWidget.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../../../../packages/agent-core/types/AdminUISchema",
+        "../../../../packages/agent-core/types/UniversalWidgetSchema"
+      ],
+      "last_modified": "2025-07-03T17:13:02.848Z",
+      "size_bytes": 10500,
+      "hash": "24f24c89",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/components/widgets/types.ts",
       "name": "types.ts",
       "directory": "apps/web/components/widgets",
@@ -3213,13 +3308,12 @@
       ],
       "dependencies": [
         "react",
-        "hls.js",
         "../../app/hooks/useUniversalProgress",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-06-27T21:33:12.092Z",
-      "size_bytes": 22377,
-      "hash": "88ce951b",
+      "last_modified": "2025-07-02T10:26:36.280Z",
+      "size_bytes": 24751,
+      "hash": "4d7161f0",
       "complexity": "high"
     },
     {
@@ -3237,17 +3331,11 @@
       "dependencies": [
         "react",
         "../../../../packages/agent-core/types/UniversalWidgetSchema",
-        "./LeaderForgeCard",
-        "./VideoPlayerModal",
-        "./StatCard",
-        "./Leaderboard",
-        "./VideoList",
-        "./Panel",
-        "./Grid"
+        "./index"
       ],
-      "last_modified": "2025-06-27T21:33:12.094Z",
-      "size_bytes": 4246,
-      "hash": "ce70b66a",
+      "last_modified": "2025-07-03T21:32:00.982Z",
+      "size_bytes": 4627,
+      "hash": "8e91c618",
       "complexity": "medium"
     },
     {
@@ -3519,9 +3607,9 @@
       "extension": ".js",
       "purpose": "Root of apps/web",
       "tags": [],
-      "last_modified": "2025-06-27T21:33:12.110Z",
-      "size_bytes": 1090,
-      "hash": "ef5c4975",
+      "last_modified": "2025-07-03T10:53:12.794Z",
+      "size_bytes": 1604,
+      "hash": "e685e4f1",
       "complexity": "low"
     },
     {
@@ -3543,10 +3631,12 @@
       "directory": "apps/web",
       "extension": ".json",
       "purpose": "—",
-      "tags": [],
-      "last_modified": "2025-06-30T12:50:44.381Z",
-      "size_bytes": 1296,
-      "hash": "4f475628"
+      "tags": [
+        "AI agent"
+      ],
+      "last_modified": "2025-07-03T17:44:48.792Z",
+      "size_bytes": 1329,
+      "hash": "e1c17139"
     },
     {
       "path": "apps/web/postcss.config.js",
@@ -4537,6 +4627,35 @@
       "hash": "bef08633"
     },
     {
+      "path": "docs/architecture/adr/0020-architectural-remediation-sprint.md",
+      "name": "0020-architectural-remediation-sprint.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-03T09:59:53.670Z",
+      "size_bytes": 3580,
+      "hash": "e1c529d1"
+    },
+    {
+      "path": "docs/architecture/adr/0021-copilotkit-admin-integration-pattern.md",
+      "name": "0021-copilotkit-admin-integration-pattern.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-03T17:06:02.027Z",
+      "size_bytes": 3054,
+      "hash": "09068cb1"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -4621,6 +4740,20 @@
       "hash": "972cd2ec"
     },
     {
+      "path": "docs/architecture/vision/001-copilotkit-vision.md",
+      "name": "001-copilotkit-vision.md",
+      "directory": "docs/architecture/vision",
+      "extension": ".md",
+      "purpose": "cloud.copilotkit.ai/>",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-03T16:27:12.175Z",
+      "size_bytes": 7209,
+      "hash": "7d055ec7"
+    },
+    {
       "path": "docs/database/core-schema-current.sql",
       "name": "core-schema-current.sql",
       "directory": "docs/database",
@@ -4636,6 +4769,21 @@
       "hash": "956b0c65"
     },
     {
+      "path": "docs/engineering/architectural-validation-analysis.md",
+      "name": "architectural-validation-analysis.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "Current: Each new feature compounds performance problems",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-01T14:25:45.808Z",
+      "size_bytes": 11246,
+      "hash": "37502dc5"
+    },
+    {
       "path": "docs/engineering/future-enhancements.md",
       "name": "future-enhancements.md",
       "directory": "docs/engineering",
@@ -4646,9 +4794,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-30T12:05:32.964Z",
-      "size_bytes": 6482,
-      "hash": "2fad87a5"
+      "last_modified": "2025-07-01T12:31:57.855Z",
+      "size_bytes": 8033,
+      "hash": "666a7553"
     },
     {
       "path": "docs/engineering/how-to/README.md",
@@ -4737,6 +4885,21 @@
       "hash": "7520263c"
     },
     {
+      "path": "docs/engineering/implementation-plans/copilotkit-admin-integration-plan.md",
+      "name": "copilotkit-admin-integration-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-03T17:03:25.801Z",
+      "size_bytes": 3246,
+      "hash": "669d4148"
+    },
+    {
       "path": "docs/engineering/implementation-plans/schema-driven-forms-implementation-plan.md",
       "name": "schema-driven-forms-implementation-plan.md",
       "directory": "docs/engineering/implementation-plans",
@@ -4766,6 +4929,21 @@
       "hash": "e2fb46d8"
     },
     {
+      "path": "docs/engineering/MASTER_WORKPLAN.md",
+      "name": "MASTER_WORKPLAN.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-03T10:53:02.803Z",
+      "size_bytes": 24157,
+      "hash": "9b616128"
+    },
+    {
       "path": "docs/engineering/performance-analysis-report.md",
       "name": "performance-analysis-report.md",
       "directory": "docs/engineering",
@@ -4778,6 +4956,20 @@
       "last_modified": "2025-06-27T21:33:12.252Z",
       "size_bytes": 11499,
       "hash": "b6fe5928"
+    },
+    {
+      "path": "docs/engineering/phase-2-performance-baseline.md",
+      "name": "phase-2-performance-baseline.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "localhost:3000/api/assets/registry/widgets | jq '.meta.total'",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-03T10:53:38.523Z",
+      "size_bytes": 4054,
+      "hash": "4a2c332b"
     },
     {
       "path": "docs/engineering/README.md",
@@ -4879,9 +5071,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-30T12:20:41.901Z",
-      "size_bytes": 152903,
-      "hash": "510ce301"
+      "last_modified": "2025-07-01T10:25:37.676Z",
+      "size_bytes": 155560,
+      "hash": "93d3a3b1"
     },
     {
       "path": "docs/manifest.md",
@@ -4894,9 +5086,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-06-30T12:20:41.928Z",
-      "size_bytes": 58041,
-      "hash": "39a8b54c"
+      "last_modified": "2025-07-01T10:25:37.703Z",
+      "size_bytes": 59130,
+      "hash": "f82d9032"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -4924,6 +5116,19 @@
       "last_modified": "2025-06-27T21:33:12.257Z",
       "size_bytes": 29556,
       "hash": "2a51764e"
+    },
+    {
+      "path": "docs/product-design/Download i49-ui-component-specs.md",
+      "name": "Download i49-ui-component-specs.md",
+      "directory": "docs/product-design",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-01T15:48:47.781Z",
+      "size_bytes": 1216,
+      "hash": "1cb4868c"
     },
     {
       "path": "docs/product-design/LEADERFORGE_VISION.md",
@@ -5008,6 +5213,39 @@
       "last_modified": "2025-06-27T21:33:12.233Z",
       "size_bytes": 6514,
       "hash": "4e1e780f"
+    },
+    {
+      "path": "docs/testing/production-performance-testing-guide.md",
+      "name": "production-performance-testing-guide.md",
+      "directory": "docs/testing",
+      "extension": ".md",
+      "purpose": "your-production-domain.com",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-02T00:00:59.449Z",
+      "size_bytes": 6556,
+      "hash": "dff0fa11"
+    },
+    {
+      "path": "packages/agent-core/agents/AdminAgent.ts",
+      "name": "AdminAgent.ts",
+      "directory": "packages/agent-core/agents",
+      "extension": ".ts",
+      "purpose": "File: packages/agent-core/agents/AdminAgent.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "../types/AdminUISchema"
+      ],
+      "last_modified": "2025-07-03T21:32:00.970Z",
+      "size_bytes": 11122,
+      "hash": "de760b87",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/agents/ContentLibraryAgent.ts",
@@ -5132,9 +5370,9 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.267Z",
-      "size_bytes": 205,
-      "hash": "cdc9a327",
+      "last_modified": "2025-07-03T17:13:10.546Z",
+      "size_bytes": 281,
+      "hash": "814cf9f0",
       "complexity": "low"
     },
     {
@@ -5146,9 +5384,9 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.267Z",
-      "size_bytes": 262,
-      "hash": "16e21e5f"
+      "last_modified": "2025-07-03T21:29:03.270Z",
+      "size_bytes": 782,
+      "hash": "d2ff0fe5"
     },
     {
       "path": "packages/agent-core/schema/SchemaProcessor.ts",
@@ -5227,6 +5465,25 @@
       "size_bytes": 11859,
       "hash": "4fb402dc",
       "complexity": "high"
+    },
+    {
+      "path": "packages/agent-core/tools/EntitlementTool.ts",
+      "name": "EntitlementTool.ts",
+      "directory": "packages/agent-core/tools",
+      "extension": ".ts",
+      "purpose": "File: packages/agent-core/tools/EntitlementTool.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-07-03T21:45:18.900Z",
+      "size_bytes": 3325,
+      "hash": "b9bf1e85",
+      "complexity": "medium"
     },
     {
       "path": "packages/agent-core/tools/ToolRegistry.js",
@@ -5332,9 +5589,9 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.268Z",
-      "size_bytes": 22366,
-      "hash": "2a6d5df3",
+      "last_modified": "2025-07-02T10:26:43.184Z",
+      "size_bytes": 24201,
+      "hash": "92be280a",
       "complexity": "high"
     },
     {
@@ -5347,6 +5604,25 @@
       "last_modified": "2025-06-27T21:33:12.270Z",
       "size_bytes": 328,
       "hash": "120170f3"
+    },
+    {
+      "path": "packages/agent-core/types/AdminUISchema.ts",
+      "name": "AdminUISchema.ts",
+      "directory": "packages/agent-core/types",
+      "extension": ".ts",
+      "purpose": "File: packages/agent-core/types/AdminUISchema.ts",
+      "tags": [
+        "TypeScript",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "./UniversalWidgetSchema"
+      ],
+      "last_modified": "2025-07-03T17:12:58.350Z",
+      "size_bytes": 6024,
+      "hash": "3d2cc725",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/types/ComponentSchema.js",
