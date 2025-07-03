@@ -11,17 +11,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import { UniversalSchemaRenderer } from '../../components/ai/UniversalSchemaRenderer';
-import { useCopilotAction, useCopilotReadable } from '@copilotkit/react-core';
+import { useCopilotReadable, useCopilotAction } from '@copilotkit/react-core';
 import { CopilotChat } from '@copilotkit/react-ui';
 import type { AdminUISchema } from 'agent-core/types/AdminUISchema';
-
-interface AdminResponse {
-  schema: AdminUISchema;
-  taskId: string;
-  nextStep?: string;
-  completed?: boolean;
-  error?: string;
-}
 
 export default function AdminPage() {
   const router = useRouter();
@@ -35,6 +27,9 @@ export default function AdminPage() {
     async function checkAdminStatus() {
       const { data: { user } } = await supabase.auth.getUser();
 
+      console.log('[Admin Page] Current user:', user);
+      console.log('[Admin Page] User metadata:', user?.user_metadata);
+
       if (!user) {
         router.push('/login');
         return;
@@ -44,6 +39,8 @@ export default function AdminPage() {
       // Supabase stores custom metadata in user_metadata during auth
       const metadata = user.user_metadata || {};
       const isAdminUser = metadata.is_admin === true;
+
+      console.log('[Admin Page] Is admin?', isAdminUser);
 
       if (!isAdminUser) {
         console.log('User is not admin, redirecting to dashboard');
@@ -72,61 +69,33 @@ export default function AdminPage() {
     }
   });
 
-  // Register admin action with CopilotKit
+  // Handle schema updates from the admin agent
   useCopilotAction({
-    name: 'performAdminTask',
-    description: 'Perform an administrative task like configuring entitlements, creating tenants, or changing themes',
+    name: "updateAdminUI",
+    description: "Update the admin UI with a new schema",
     parameters: [
       {
-        name: 'intent',
-        type: 'string',
-        description: 'What the admin wants to do',
-        required: true
+        name: "schema",
+        type: "object",
+        description: "The UI schema to render",
+        required: true,
       },
       {
-        name: 'formData',
-        type: 'object',
-        description: 'Form submission data if following up on a form',
-        required: false
+        name: "error",
+        type: "string",
+        description: "Error message if any",
+        required: false,
       }
     ],
-    handler: async ({ intent, formData }) => {
-      try {
-        setError(null);
-
-        const response = await fetch('/api/agent/admin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            intent,
-            state: formData
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Request failed: ${response.statusText}`);
-        }
-
-        const data: AdminResponse = await response.json();
-
-        if (data.error) {
-          setError(data.error);
-          return `Error: ${data.error}`;
-        }
-
-        setCurrentSchema(data.schema);
-
-        return data.completed
-          ? 'Task completed successfully!'
-          : 'I\'ve prepared a form for you to complete this task.';
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
-        setError(message);
-        return `Error: ${message}`;
+    handler: async ({ schema, error: errorMsg }) => {
+      if (errorMsg) {
+        setError(errorMsg);
+        return;
       }
-    }
+
+      setError(null);
+      setCurrentSchema(schema as AdminUISchema);
+    },
   });
 
   if (loading) {

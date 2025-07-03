@@ -51,7 +51,18 @@ async function handleAdminAction(args: {
 
     // Execute agent
     const response = await agent.processIntent(context);
-    return response;
+
+    // Return the response with schema for CopilotKit to handle
+    return {
+      success: true,
+      schema: response.schema,
+      taskId: response.taskId,
+      message: response.error
+        ? `Error: ${response.error}`
+        : response.completed
+          ? 'Task completed successfully!'
+          : 'Please fill out the form below to complete this task.'
+    };
 
   } catch (error) {
     console.error('[CopilotKit] Admin action error:', error);
