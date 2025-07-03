@@ -6,7 +6,6 @@
  */
 
 import { AdminUISchema } from '../types/AdminUISchema';
-import { ToolRegistry } from '../tools/ToolRegistry';
 
 export interface AdminAgentContext {
   userId: string;
@@ -30,10 +29,8 @@ export interface AdminAgentResponse {
  * Works with CopilotKit to handle admin intents
  */
 export class AdminAgent {
-  private toolRegistry: ToolRegistry;
-
   constructor() {
-    this.toolRegistry = new ToolRegistry();
+    // Tool integration will be added when tools are implemented
   }
 
   /**
@@ -126,18 +123,9 @@ export class AdminAgent {
     const taskId = `entitlements-${Date.now()}`;
     const targetUserId = action.params.userId as string || '';
 
-    // Get current entitlements from tool
-    const entitlementTool = this.toolRegistry.getTool('EntitlementTool');
+    // TODO: Get current entitlements from tool when implemented
+    // For now, use empty array
     let currentEntitlements: string[] = [];
-
-    if (entitlementTool && targetUserId) {
-      try {
-        const result = await entitlementTool.execute('getEntitlements', { userId: targetUserId });
-        currentEntitlements = result.entitlements || [];
-      } catch (error) {
-        console.error('Failed to fetch entitlements:', error);
-      }
-    }
 
     const schema: AdminUISchema = {
       type: 'Form',

@@ -7,8 +7,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { restoreSession } from '../../../../lib/supabaseServerClient';
-import { AdminAgent, AdminAgentContext } from '../../../../packages/agent-core';
+import { restoreSession } from '../../../lib/supabaseServerClient';
+import { AdminAgent } from 'agent-core/agents/AdminAgent';
+import type { AdminAgentContext } from 'agent-core/agents/AdminAgent';
 
 /**
  * POST /api/agent/admin

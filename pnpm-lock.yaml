@@ -163,6 +163,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.80.6
         version: 5.81.2(react@19.1.0)
+      agent-core:
+        specifier: workspace:*
+        version: link:../../packages/agent-core
       class-validator:
         specifier: ^0.14.2
         version: 0.14.2

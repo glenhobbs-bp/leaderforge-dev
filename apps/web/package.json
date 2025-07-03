@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "agent-core": "workspace:*",
     "@copilotkit/react-core": "^1.8.13",
     "@copilotkit/react-textarea": "latest",
     "@copilotkit/react-ui": "^1.8.13",
