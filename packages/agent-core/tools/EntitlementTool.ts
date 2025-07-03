@@ -34,7 +34,7 @@ export class EntitlementTool {
       const supabase = this.getSupabaseClient();
 
       const { data, error } = await supabase
-        .from('entitlements')
+        .from('core.entitlements')
         .select('key, name, description, tenant_key')
         .order('name');
 
@@ -58,7 +58,7 @@ export class EntitlementTool {
       const supabase = this.getSupabaseClient();
 
       const { data, error } = await supabase
-        .from('user_entitlements')
+        .from('core.user_entitlements')
         .select('entitlement_key')
         .eq('user_id', userId);
 
@@ -83,7 +83,7 @@ export class EntitlementTool {
 
       // First, remove all existing entitlements for the user
       const { error: deleteError } = await supabase
-        .from('user_entitlements')
+        .from('core.user_entitlements')
         .delete()
         .eq('user_id', userId);
 
@@ -102,7 +102,7 @@ export class EntitlementTool {
         }));
 
         const { error: insertError } = await supabase
-          .from('user_entitlements')
+          .from('core.user_entitlements')
           .insert(entitlementRecords);
 
         if (insertError) {

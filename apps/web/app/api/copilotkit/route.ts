@@ -35,7 +35,7 @@ async function handleAdminAction(args: {
     if (!isAdmin) {
       return {
         success: false,
-        message: "You don't have permission to perform admin actions. Please contact your administrator."
+        message: "You don't have permission to perform admin actions."
       };
     }
 
@@ -57,21 +57,15 @@ async function handleAdminAction(args: {
           return {
             success: true,
             message: `Successfully updated entitlements for ${userId}. The user now has ${entitlements.length} entitlement(s).`,
-            refreshDashboard: true
+            shouldRefreshDashboard: true
           };
         } else {
           return {
             success: false,
-            message: "Failed to update entitlements. Please check the logs and try again."
+            message: "Failed to update entitlements. Please check the logs for details."
           };
         }
       }
-
-      // Handle other form submissions...
-      return {
-        success: false,
-        message: "Unknown form submission type"
-      };
     }
 
     // Create AdminAgent context
@@ -82,38 +76,50 @@ async function handleAdminAction(args: {
       isAdmin: true,
       intent: args.intent,
       currentStep: args.currentStep,
-      state: (args.state || {}) as Record<string, unknown>,
+      state: args.state as Record<string, unknown>,
     };
 
     // Process the intent
     const result = await agent.processIntent(agentContext);
 
-    return result;
+    if (result.error) {
+      return {
+        success: false,
+        message: result.error
+      };
+    }
+
+    // If we have a schema, we need to render it
+    if (result.schema) {
+      return {
+        success: true,
+        needsRender: true,
+        schema: result.schema,
+        taskId: result.taskId || `task-${Date.now()}`
+      };
+    }
+
+    // Otherwise, return a success message
+    return {
+      success: true,
+      message: "Action completed successfully"
+    };
   } catch (error) {
-    console.error('[CopilotKit API] Error:', error);
+    console.error('Admin action error:', error);
     return {
       success: false,
-      message: "An error occurred while processing your request. Please try again."
+      message: "An error occurred while processing your request."
     };
   }
 }
 
-// Use OpenAI adapter
-const serviceAdapter = new OpenAIAdapter({
-  model: "gpt-4",
-});
+const serviceAdapter = new OpenAIAdapter({ model: "gpt-4o" });
 
-// Create runtime and register the admin action
 const runtime = new CopilotRuntime({
   actions: [
     {
       name: "performAdminTask",
-      description: `Administrative actions for managing the platform. This includes:
-        - Configuring user entitlements (e.g., "give user@example.com premium access")
-        - Creating new tenants (e.g., "create a new tenant called Acme Corp")
-        - Changing theme colors (e.g., "change the primary color to #FF6B6B")
-
-        You must be an admin to use these features.`,
+      description: "Perform administrative tasks",
       parameters: [
         {
           name: "intent",
@@ -121,26 +127,10 @@ const runtime = new CopilotRuntime({
           description: "The admin task to perform",
           required: true,
         },
-        {
-          name: "currentStep",
-          type: "string",
-          description: "Current step in multi-step workflows",
-          required: false,
-        },
-        {
-          name: "state",
-          type: "object",
-          description: "Current state of the workflow",
-          required: false,
-        },
-        {
-          name: "formData",
-          type: "object",
-          description: "Form data submitted by the user",
-          required: false,
-        },
       ],
-      handler: handleAdminAction,
+      handler: async ({ intent }) => {
+        return handleAdminAction({ intent });
+      },
     },
   ],
 });
