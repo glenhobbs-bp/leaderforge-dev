@@ -8,17 +8,18 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  productionBrowserSourceMaps: false,
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      "@": path.resolve(__dirname),                        // Root of apps/web
-      "@app": path.resolve(__dirname, "app"),              // For @app/page.tsx, etc.
-      "@lib": path.resolve(__dirname, "lib"),              // For @lib/loadContextConfig
-      "@components": path.resolve(__dirname, "components") // For @components/ui/...
+      "@": path.resolve(__dirname),
+      "@app": path.resolve(__dirname, "app"),
+      "@lib": path.resolve(__dirname, "lib"),
+      "@components": path.resolve(__dirname, "components")
     };
-
-    // Temporarily remove complex bundle splitting to fix vendors.js syntax error
-    // TODO: Re-enable optimized splitting once syntax error is resolved
 
     return config;
   },
