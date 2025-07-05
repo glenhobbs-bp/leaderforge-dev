@@ -178,10 +178,10 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
 
   if (loading) {
     return (
-      <div className="p-4 border rounded-lg bg-gray-50">
-        <div className="flex items-center justify-center">
+      <div className="entitlement-form-container p-4 border rounded-lg bg-gray-50">
+        <div className="loading-container flex items-center justify-center">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-gray-600">Loading entitlements...</span>
+          <span className="loading-text ml-2">Loading entitlements...</span>
         </div>
       </div>
     );
