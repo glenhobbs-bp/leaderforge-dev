@@ -151,6 +151,7 @@
   width: fit-content !important;
   float: right !important;
   clear: both !important;
+  margin-bottom: 12px !important;
 }
 
 /* Message Text Styling - More refined typography */
@@ -280,23 +281,51 @@
    COPILOTKIT BUTTON STYLING
    ======================================== */
 
+/* Main bubble button - smaller and cleaner */
 .copilotKitButton {
-  background: #3b82f6 !important;
+  width: 48px !important;
+  height: 48px !important;
   border: none !important;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15) !important;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
   border-radius: 50% !important;
-  width: 56px !important;
-  height: 56px !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  transition: all 0.2s ease !important;
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 1000 !important;
 }
 
 .copilotKitButton:hover {
-  background: #2563eb !important;
   transform: scale(1.05) !important;
+  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.25) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%) !important;
 }
 
-.copilotKitButtonIcon {
-  color: white !important;
+/* Hide default icon and prepare for custom icon */
+.copilotKitButton svg {
+  display: none !important;
+}
+
+/* Custom LeaderForge icon via CSS */
+.copilotKitButton::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  background-image: url('/logos/leaderforge-icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Remove any additional borders or outlines */
+.copilotKitButton:focus,
+.copilotKitButton:active {
+  outline: none !important;
+  border: none !important;
 }
 
 /* ========================================
@@ -344,7 +373,7 @@
   font-size: 13px;
   line-height: 1.5;
   color: #374151;
-  margin-top: 16px !important;
+  margin-top: 0px !important;
   margin-bottom: 16px !important;
 }
 
