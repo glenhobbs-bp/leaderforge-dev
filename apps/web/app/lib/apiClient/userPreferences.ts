@@ -13,9 +13,9 @@ import type { User } from '../types';
  * @throws Error if the API call fails.
  */
 export async function fetchUserPreferences(userId: string): Promise<User['preferences'] | undefined> {
-  // 5-second timeout to prevent hangs while allowing reasonable API response time
+  // 20-second timeout to accommodate slower API responses while still preventing infinite hangs
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
 
   try {
     const res = await fetch(`/api/user/${userId}/preferences?t=${Date.now()}`, {
