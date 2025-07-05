@@ -105,6 +105,13 @@
 .copilotKitMessages {
   background: white !important;
   padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.copilotKitMessages > * {
+  width: 100% !important;
 }
 
 .copilotKitMessage {
@@ -118,6 +125,11 @@
   border: 1px solid #e2e8f0 !important;
   border-radius: 8px !important;
   padding: 12px !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  max-width: 85% !important;
+  float: left !important;
+  clear: both !important;
 }
 
 /* User Messages - Refined LeaderForge brand styling */
@@ -336,10 +348,10 @@
 
 /* Form headings - more refined */
 .entitlement-form-container h3 {
-  font-size: 16px !important;
+  font-size: 14px !important;
   font-weight: 600 !important;
   color: #1e293b !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
   letter-spacing: -0.025em !important;
 }
 
@@ -449,26 +461,37 @@
   background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
   color: white !important;
   border: none !important;
-  border-radius: 6px !important;
-  padding: 8px 16px !important;
-  font-size: 13px !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
-  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.15) !important;
   width: 100% !important;
   text-align: center !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
 }
 
 .entitlement-form-container .entitlement-submit-button:hover {
   background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3) !important;
-  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25) !important;
+  transform: translateY(-0.5px) !important;
 }
 
 .entitlement-form-container .entitlement-submit-button:active {
   transform: translateY(0) !important;
-  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.15) !important;
+}
+
+.entitlement-form-container .entitlement-submit-button:disabled {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
 }
 
 /* Larger scroll container for entitlements list */
@@ -479,4 +502,39 @@
   border-radius: 6px !important;
   padding: 12px !important;
   background: #fafafa !important;
+}
+
+/* ========================================
+   FIX USER MESSAGE ALIGNMENT
+   ======================================== */
+
+/* Force user messages to right side */
+.copilotKitMessages .copilotKitUserMessage {
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  display: block !important;
+  width: fit-content !important;
+  max-width: 85% !important;
+  float: right !important;
+  clear: both !important;
+}
+
+/* Ensure message container allows right alignment */
+.copilotKitMessages {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.copilotKitMessages > * {
+  width: 100% !important;
+}
+
+/* Assistant messages stay left */
+.copilotKitAssistantMessage {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  max-width: 85% !important;
+  float: left !important;
+  clear: both !important;
 }

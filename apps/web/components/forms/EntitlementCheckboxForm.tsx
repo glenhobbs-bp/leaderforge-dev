@@ -24,6 +24,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { Save, Loader2 } from 'lucide-react';
 
 // Debounce hook to prevent excessive API calls during streaming
 function useDebounce<T>(value: T, delay: number): T {
@@ -215,12 +216,12 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
         >
           {loading ? (
             <>
-              <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+              <Loader2 className="h-3 w-3 animate-spin" />
               Updating...
             </>
           ) : (
             <>
-              <span>💾</span>
+              <Save className="h-3 w-3" />
               Save Changes
             </>
           )}
