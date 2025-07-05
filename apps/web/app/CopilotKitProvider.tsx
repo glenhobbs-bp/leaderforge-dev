@@ -97,7 +97,7 @@ export function CopilotKitProvider({
     if (isReady && !loading) {
       console.log('[CopilotKitProvider] Sending user properties:', userProperties);
     }
-  }, [isReady, loading, userId, adminLevel, userName, session]);
+  }, [isReady, loading, userProperties]);
 
   // Only render CopilotKit after ready and session is stable
   if (!isReady || loading) {
@@ -112,12 +112,18 @@ export function CopilotKitProvider({
     >
       {children}
       <EntitlementActions />
-      <CopilotPopup
-        instructions="You are a helpful assistant for LeaderForge, an AI-powered leadership development platform. Help users navigate the platform, understand content, and achieve their leadership goals."
+            <CopilotPopup
+        instructions={`You are a helpful assistant for LeaderForge, an AI-powered leadership development platform.
+
+You are helping ${userName} (${userEmail}) who has ${adminLevel} access level in the ${userProperties.tenantKey} organization.
+
+Help users navigate the platform, understand content, manage entitlements, and achieve their leadership goals. You have access to admin functions for managing user entitlements.`}
         labels={{
           title: "LeaderForge Assistant",
-          initial: "Hi! I'm your LeaderForge assistant. How can I help you today?",
+          initial: `Hi ${userName}! I'm your LeaderForge assistant. How can I help you today?`,
         }}
+        defaultOpen={false}
+        clickOutsideToClose={true}
       />
     </CopilotKit>
   );

@@ -271,16 +271,23 @@ export const POST = async (req: NextRequest) => {
     let userContext = null;
     if (parsedBody?.variables?.properties) {
       try {
-        const properties = JSON.parse(parsedBody.variables.properties);
+        // Properties might be already parsed or a string
+        const properties = typeof parsedBody.variables.properties === 'string'
+          ? JSON.parse(parsedBody.variables.properties)
+          : parsedBody.variables.properties;
+
         userContext = {
           userId: properties.userId,
           isAuthenticated: properties.isAuthenticated,
           adminLevel: properties.adminLevel,
-          userName: properties.userName
+          userName: properties.userName,
+          userEmail: properties.userEmail,
+          tenantKey: properties.tenantKey
         };
         console.log('[CopilotKit API] User context from properties:', userContext);
-      } catch {
-        console.log('[CopilotKit API] Failed to parse properties');
+      } catch (error) {
+        console.log('[CopilotKit API] Failed to parse properties:', error);
+        console.log('[CopilotKit API] Properties value:', parsedBody.variables.properties);
       }
     } else {
       console.log('[CopilotKit API] No properties found in request');

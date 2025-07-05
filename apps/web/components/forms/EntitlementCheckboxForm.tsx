@@ -23,7 +23,24 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+
+// Debounce hook to prevent excessive API calls during streaming
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      window.clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 interface Entitlement {
   id: string;
@@ -37,35 +54,46 @@ interface EntitlementCheckboxFormProps {
 }
 
 export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxFormProps) {
+  // Debounce userIdentifier to prevent API calls on partial values during streaming
+  const debouncedUserIdentifier = useDebounce(userIdentifier, 500);
+
   const [entitlements, setEntitlements] = useState<Entitlement[]>([]);
   const [currentEntitlements, setCurrentEntitlements] = useState<string[]>([]);
   const [selectedEntitlements, setSelectedEntitlements] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Memoize whether the userIdentifier is valid to prevent unnecessary re-renders
+  // Enhanced validation for complete email addresses
   const isValidUserIdentifier = useMemo(() => {
-    const result = userIdentifier &&
-           userIdentifier.length >= 25 && // Require much longer length to avoid partial emails
-           userIdentifier.includes('@') &&
-           userIdentifier.includes('.'); // Require both @ and . for valid email
+    if (!debouncedUserIdentifier) return false;
 
-    return result;
-  }, [userIdentifier]);
+    // Must be a complete email format: user@domain.tld
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidEmail = emailRegex.test(debouncedUserIdentifier);
+
+    // Additional length check to ensure it's not a partial email
+    const isCompleteLength = debouncedUserIdentifier.length >= 10; // Minimum realistic email length
+
+    console.log(`[EntitlementCheckboxForm] Validating "${debouncedUserIdentifier}": email=${isValidEmail}, length=${isCompleteLength}`);
+
+    return isValidEmail && isCompleteLength;
+  }, [debouncedUserIdentifier]);
 
   // Load entitlements and current user entitlements
   useEffect(() => {
     // Skip if userIdentifier is invalid
     if (!isValidUserIdentifier) {
-      console.log(`[EntitlementCheckboxForm] Invalid userIdentifier: "${userIdentifier}"`);
+      if (debouncedUserIdentifier) {
+        console.log(`[EntitlementCheckboxForm] Invalid userIdentifier: "${debouncedUserIdentifier}"`);
+      }
       setLoading(false);
-      setError('Invalid user identifier');
+      setError(debouncedUserIdentifier ? 'Invalid user identifier - must be a complete email address' : null);
       return;
     }
 
     const loadEntitlements = async () => {
       try {
-        console.log(`[EntitlementCheckboxForm] Loading entitlements for: "${userIdentifier}"`);
+        console.log(`[EntitlementCheckboxForm] Loading entitlements for: "${debouncedUserIdentifier}"`);
         setLoading(true);
         setError(null);
 
@@ -75,7 +103,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userIdentifier }),
+          body: JSON.stringify({ userIdentifier: debouncedUserIdentifier }),
         });
 
         if (!response.ok) {
@@ -96,7 +124,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
     };
 
     loadEntitlements();
-  }, [userIdentifier, isValidUserIdentifier]);
+  }, [debouncedUserIdentifier, isValidUserIdentifier]);
 
   // Handle checkbox changes
   const handleCheckboxChange = (entitlementId: string, checked: boolean) => {
@@ -112,7 +140,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
   // Handle form submission
   const handleSubmit = async () => {
     try {
-      console.log(`[EntitlementCheckboxForm] Updating entitlements for ${userIdentifier}`);
+      console.log(`[EntitlementCheckboxForm] Updating entitlements for ${debouncedUserIdentifier}`);
       setLoading(true);
 
       const response = await fetch('/api/admin/entitlements/update', {
@@ -121,7 +149,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userIdentifier,
+          userIdentifier: debouncedUserIdentifier,
           entitlements: selectedEntitlements,
         }),
       });
@@ -136,7 +164,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
       setCurrentEntitlements(selectedEntitlements);
 
       // Show success message
-      alert(`Successfully updated entitlements for ${userIdentifier}`);
+      alert(`Successfully updated entitlements for ${debouncedUserIdentifier}`);
       console.log(`[EntitlementCheckboxForm] Successfully updated entitlements`);
 
     } catch (err) {
@@ -171,7 +199,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm max-w-2xl">
       <h3 className="text-lg font-semibold mb-4 text-gray-900">
-        Configure Entitlements for {userIdentifier}
+        Configure Entitlements for {debouncedUserIdentifier}
       </h3>
 
       {/* Combined selection counter + submit button */}

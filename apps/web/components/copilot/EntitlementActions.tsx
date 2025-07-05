@@ -21,29 +21,27 @@ export function EntitlementActions() {
     if (!userIdentifier || (!userIdentifier.includes('@') && !userIdentifier.includes('-'))) {
       // Try to get current user email from context, fallback to known email
       userIdentifier = 'glen@brilliantperspectives.com';
-      console.log('[EntitlementActions] Using default userIdentifier for entitlement management');
     }
 
     return <MemoizedEntitlementCheckboxForm userIdentifier={userIdentifier} />;
   }, []);
 
-  // Single CopilotKit action with Generative UI for interactive entitlement management
+  // Register the CopilotKit action
   useCopilotAction({
-    name: "manageEntitlements",
-    description: "Show and manage user entitlements with interactive checkboxes. If no specific user is mentioned, defaults to the current user.",
+    name: "manageUserEntitlements",
+    description: "Show and manage user entitlements and permissions",
     parameters: [
       {
         name: "userIdentifier",
         type: "string",
-        description: "The user's email address or user ID. Use full email address like 'glen@brilliantperspectives.com', not just first name.",
+        description: "Email address or user identifier to manage entitlements for",
         required: false,
       },
     ],
     render: renderEntitlementForm,
-  }, [renderEntitlementForm]); // Add dependency array
+  });
 
-  // This component doesn't render anything visible - it just provides the CopilotKit actions
-  return null;
+  return null; // This component only registers the action
 }
 
 // Memoized version to prevent unnecessary re-renders
