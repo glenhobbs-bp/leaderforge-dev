@@ -12,7 +12,6 @@ import { useCopilotAction } from "@copilotkit/react-core";
 import { EntitlementCheckboxForm } from '../forms/EntitlementCheckboxForm';
 
 export function EntitlementActions() {
-
   // Memoized render function to prevent infinite re-renders
   const renderEntitlementForm = React.useCallback(({ args }: { args: { userIdentifier?: string } }) => {
     // Default to current user's email if no userIdentifier provided or if it's just a first name
@@ -22,6 +21,7 @@ export function EntitlementActions() {
     if (!userIdentifier || (!userIdentifier.includes('@') && !userIdentifier.includes('-'))) {
       // Try to get current user email from context, fallback to known email
       userIdentifier = 'glen@brilliantperspectives.com';
+      console.log('[EntitlementActions] Using default userIdentifier for entitlement management');
     }
 
     return <MemoizedEntitlementCheckboxForm userIdentifier={userIdentifier} />;

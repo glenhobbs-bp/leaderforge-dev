@@ -45,17 +45,19 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
 
   // Memoize whether the userIdentifier is valid to prevent unnecessary re-renders
   const isValidUserIdentifier = useMemo(() => {
-    return userIdentifier &&
+    const result = userIdentifier &&
            userIdentifier.length >= 25 && // Require much longer length to avoid partial emails
            userIdentifier.includes('@') &&
            userIdentifier.includes('.'); // Require both @ and . for valid email
+
+    return result;
   }, [userIdentifier]);
 
   // Load entitlements and current user entitlements
   useEffect(() => {
     // Skip if userIdentifier is invalid
     if (!isValidUserIdentifier) {
-      console.log(`[EntitlementCheckboxForm] Skipping load for invalid userIdentifier: "${userIdentifier}" (length: ${userIdentifier?.length || 0})`);
+      console.log(`[EntitlementCheckboxForm] Invalid userIdentifier: "${userIdentifier}"`);
       setLoading(false);
       setError('Invalid user identifier');
       return;
@@ -77,7 +79,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
         });
 
         if (!response.ok) {
-          throw new Error('Failed to load entitlements');
+          throw new Error(`Failed to load entitlements: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -110,6 +112,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
   // Handle form submission
   const handleSubmit = async () => {
     try {
+      console.log(`[EntitlementCheckboxForm] Updating entitlements for ${userIdentifier}`);
       setLoading(true);
 
       const response = await fetch('/api/admin/entitlements/update', {
@@ -124,18 +127,20 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update entitlements');
+        throw new Error(`Failed to update entitlements: ${response.status} ${response.statusText}`);
       }
 
-            await response.json();
+      await response.json();
 
       // Update current entitlements to reflect changes
       setCurrentEntitlements(selectedEntitlements);
 
       // Show success message
       alert(`Successfully updated entitlements for ${userIdentifier}`);
+      console.log(`[EntitlementCheckboxForm] Successfully updated entitlements`);
 
     } catch (err) {
+      console.error(`[EntitlementCheckboxForm] Error updating entitlements:`, err);
       setError(err instanceof Error ? err.message : 'Failed to update entitlements');
     } finally {
       setLoading(false);
@@ -163,15 +168,13 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
     );
   }
 
-  console.log(`[EntitlementCheckboxForm] Rendering form with ${entitlements.length} entitlements, ${selectedEntitlements.length} selected`);
-
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm max-w-2xl">
       <h3 className="text-lg font-semibold mb-4 text-gray-900">
         Configure Entitlements for {userIdentifier}
       </h3>
 
-                  {/* Combined selection counter + submit button */}
+      {/* Combined selection counter + submit button */}
       <div className="mb-3">
         <div className="bg-blue-50 p-3 rounded border">
           <div className="text-sm text-gray-700 font-medium text-center mb-2">

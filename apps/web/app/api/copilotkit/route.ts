@@ -29,8 +29,8 @@ import {
 } from "@copilotkit/runtime";
 import { cookies } from 'next/headers';
 import { restoreSession } from '../../lib/supabaseServerClient';
-  import { AdminAgent, AdminAgentContext } from 'agent-core/agents/AdminAgent';
-  import { EntitlementTool } from 'agent-core/tools/EntitlementTool';
+import { AdminAgent, AdminAgentContext } from 'agent-core/agents/AdminAgent';
+import { EntitlementTool } from 'agent-core/tools/EntitlementTool';
 
 // Admin action handler
 async function handleAdminAction(args: {
@@ -235,57 +235,60 @@ const runtime = new CopilotRuntime({
 });
 
 export const POST = async (req: NextRequest) => {
-  // Extract context from CopilotKit properties if available
-  let userContext: {
-    userId?: string;
-    isAuthenticated?: boolean;
-    adminLevel?: string;
-    sessionState?: string;
-    userEmail?: string;
-    userName?: string;
-  } | null = null;
-
   try {
-    const body = await req.text();
-    const requestData = JSON.parse(body);
+    console.log('[CopilotKit API] POST request received');
 
-    // CopilotKit might send properties in variables or other locations
-    const possibleProperties = requestData.properties ||
-                              requestData.variables?.properties ||
-                              requestData.variables?.input?.properties ||
-                              null;
+    // Parse the request to understand its structure
+    const requestBody = await req.text();
+    console.log('[CopilotKit API] Raw request body length:', requestBody.length);
 
-    // Only log full request data if properties are missing (for debugging)
-    if (!possibleProperties) {
-      console.log('[CopilotKit API] No properties found, request structure:', {
-        requestKeys: Object.keys(requestData || {}),
-        hasVariables: !!requestData.variables,
-        variablesKeys: requestData.variables ? Object.keys(requestData.variables) : null
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(requestBody);
+      console.log('[CopilotKit API] Request structure:', {
+        requestKeys: Object.keys(parsedBody),
+        hasVariables: !!parsedBody.variables,
+        variablesKeys: parsedBody.variables ? Object.keys(parsedBody.variables) : []
       });
+    } catch {
+      console.log('[CopilotKit API] Failed to parse request body as JSON');
     }
 
-    // Log summary of request structure
-    console.log('[CopilotKit API] Request summary:', {
-      hasProperties: !!possibleProperties,
-      operationType: requestData.operationName || 'unknown'
-    });
+    // Determine the type of operation
+    let operationType = 'unknown';
+    let hasProperties = false;
 
-    // Extract user context from CopilotKit properties
-    if (possibleProperties) {
-      userContext = possibleProperties;
-      console.log('[CopilotKit API] User context from properties:', {
-        userId: userContext.userId,
-        isAuthenticated: userContext.isAuthenticated,
-        adminLevel: userContext.adminLevel,
-        userName: userContext.userName
-      });
+    if (parsedBody?.query?.includes('availableAgents')) {
+      operationType = 'availableAgents';
+    } else if (parsedBody?.query?.includes('generateCopilotResponse')) {
+      operationType = 'generateCopilotResponse';
+      hasProperties = !!(parsedBody?.variables?.properties);
+    }
+
+    console.log('[CopilotKit API] Request summary:', { hasProperties, operationType });
+
+    // Extract user context from properties if available
+    let userContext = null;
+    if (parsedBody?.variables?.properties) {
+      try {
+        const properties = JSON.parse(parsedBody.variables.properties);
+        userContext = {
+          userId: properties.userId,
+          isAuthenticated: properties.isAuthenticated,
+          adminLevel: properties.adminLevel,
+          userName: properties.userName
+        };
+        console.log('[CopilotKit API] User context from properties:', userContext);
+      } catch {
+        console.log('[CopilotKit API] Failed to parse properties');
+      }
     } else {
       console.log('[CopilotKit API] No properties found in request');
     }
 
-    // Also get session from cookies as fallback
+    // Get session for additional context
     const cookieStore = await cookies();
-    const { session } = await restoreSession(cookieStore);
+    const { session, error: sessionError } = await restoreSession(cookieStore);
 
     if (session?.user) {
       console.log('[CopilotKit API] Session context:', {
@@ -293,32 +296,33 @@ export const POST = async (req: NextRequest) => {
         email: session.user.email,
         isAuthenticated: true
       });
+    } else {
+      console.log('[CopilotKit API] No valid session found:', sessionError);
     }
 
-    // Reconstruct the request with the body for CopilotKit
-    const newReq = new NextRequest(req.url, {
+    // Create new request with the original body
+    const newReq = new Request(req.url, {
       method: req.method,
       headers: req.headers,
-      body: body,
+      body: requestBody,
     });
 
+    console.log('[CopilotKit API] Processing request with existing runtime and serviceAdapter');
     const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
       runtime,
       serviceAdapter,
-      endpoint: newReq.nextUrl.pathname,
+      endpoint: "/api/copilotkit",
     });
 
-    return handleRequest(newReq);
+    const response = await handleRequest(newReq);
+    console.log('[CopilotKit API] Response generated, status:', response.status);
+    return response;
+
   } catch (error) {
     console.error('[CopilotKit API] Error processing request:', error);
-
-    // Fallback to original handling
-    const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
-      runtime,
-      serviceAdapter,
-      endpoint: req.nextUrl.pathname,
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
     });
-
-    return handleRequest(req);
   }
 };
