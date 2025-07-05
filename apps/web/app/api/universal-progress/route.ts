@@ -170,10 +170,13 @@ export async function POST(request: NextRequest) {
           metadata: e.metadata
         })));
 
-        // ✅ CRITICAL FIX: Round all progress values before processing
-        const processedEvents = events.map((event: { value: number; [key: string]: unknown }) => ({
+        // ✅ CRITICAL FIX: Ensure each event has required fields including tenantKey and userId
+        const processedEvents = events.map((event: { value: number; tenantKey?: string; userId?: string; [key: string]: unknown }) => ({
           ...event,
-          value: Math.round(event.value) // Ensure all values are integers
+          value: Math.round(event.value), // Ensure all values are integers
+          userId: event.userId || effectiveUserId, // Ensure userId is present
+          tenantKey: event.tenantKey || tenantKey, // Use event's tenantKey or fallback to request tenantKey
+          timestamp: event.timestamp || new Date().toISOString() // Ensure timestamp is present
         }));
 
         const result = await userProgressTool.batchTrackProgress(processedEvents);

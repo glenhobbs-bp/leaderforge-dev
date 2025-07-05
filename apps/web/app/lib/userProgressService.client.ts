@@ -22,14 +22,14 @@ interface PendingEvent extends ProgressEvent {
 
 /**
  * Batched Progress Service - Optimizes performance by batching progress events
- * Accumulates events for 2-3 seconds then sends in batch to reduce API overhead
+ * Accumulates events for 20-30 seconds then sends in batch to reduce API overhead
  * Fixed memory leak issues with proper timer cleanup
  */
 class BatchedProgressService {
   private static instance: BatchedProgressService;
   private pendingEvents: PendingEvent[] = [];
   private batchTimer: number | null = null;
-  private readonly batchDelayMs = 2500; // 2.5 second batching window
+  private readonly batchDelayMs = 25000; // 25 second batching window (allows multiple 5s video updates)
   private readonly maxBatchSize = 50; // Maximum events per batch
   private isDestroyed = false; // Track destruction state
   private cleanupFunction?: () => void; // Store cleanup function
@@ -156,15 +156,21 @@ class BatchedProgressService {
       throw new Error('Service is destroyed');
     }
 
-    // ✅ FIX: Use ProgressEvent fields directly without mapping
+    // ✅ FIX: Include all required fields from ProgressEvent, especially tenantKey and userId
     const mappedEvents = events.map(event => ({
       contentId: event.contentId,
       progressType: event.progressType,
       value: event.value,
-      metadata: event.metadata
+      metadata: event.metadata,
+      userId: event.userId, // ✅ CRITICAL: Include userId in each event
+      tenantKey: event.tenantKey, // ✅ CRITICAL: Include tenantKey in each event
+      timestamp: event.timestamp
     }));
 
     console.log('[BatchedProgressService] Sending batch events:', mappedEvents);
+
+    // ✅ FIX: Extract common tenantKey from first event for API route fallback
+    const commonTenantKey = events.length > 0 ? events[0].tenantKey : undefined;
 
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
@@ -175,6 +181,7 @@ class BatchedProgressService {
       body: JSON.stringify({
         action: 'batchTrackProgress', // ✅ FIX: Add required action parameter
         events: mappedEvents,
+        tenantKey: commonTenantKey, // ✅ FIX: Include tenantKey at request level for API route
         batch: true
       })
     });
