@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generated_at": "2025-07-05T02:09:59.707Z",
+    "generated_at": "2025-07-05T02:20:25.293Z",
     "generator_version": "1.0.0",
     "total_files": 322,
-    "total_size_bytes": 3089309,
+    "total_size_bytes": 3089472,
     "file_types": {
       ".ts": 135,
       ".json": 18,
@@ -18,7 +18,7 @@
       "AI agent": 164,
       "React": 46,
       "React hooks": 34,
-      "security": 87,
+      "security": 86,
       "Next.js API": 55,
       "test": 13,
       "API endpoint": 3,
@@ -360,7 +360,7 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-07-04T14:59:47.244Z",
+      "last_modified": "2025-07-05T02:15:52.048Z",
       "size_bytes": 2123,
       "hash": "1713aba4",
       "complexity": "low"
@@ -408,7 +408,7 @@
         "agent-core/agents/AdminAgent",
         "agent-core/tools/EntitlementTool"
       ],
-      "last_modified": "2025-07-04T14:59:46.530Z",
+      "last_modified": "2025-07-05T02:15:52.048Z",
       "size_bytes": 10661,
       "hash": "e97db640",
       "complexity": "high"
@@ -471,7 +471,7 @@
         "next/headers",
         "../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-07-03T18:22:28.542Z",
+      "last_modified": "2025-07-05T02:15:52.048Z",
       "size_bytes": 1240,
       "hash": "c3d5ee0a",
       "complexity": "low"
@@ -630,7 +630,7 @@
         "next/server",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-03T18:00:29.541Z",
+      "last_modified": "2025-07-05T02:15:52.049Z",
       "size_bytes": 2110,
       "hash": "ef2542f4",
       "complexity": "low"
@@ -651,7 +651,7 @@
         "next/server",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-04T09:56:51.786Z",
+      "last_modified": "2025-07-05T02:15:52.049Z",
       "size_bytes": 2835,
       "hash": "d411aae2",
       "complexity": "low"
@@ -673,7 +673,7 @@
         "../../../lib/supabaseServerClient",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-03T20:32:40.482Z",
+      "last_modified": "2025-07-05T02:15:52.049Z",
       "size_bytes": 2265,
       "hash": "823a5ea4",
       "complexity": "low"
@@ -735,7 +735,7 @@
         "next/server",
         "agent-core/tools/EntitlementTool"
       ],
-      "last_modified": "2025-07-04T09:56:53.956Z",
+      "last_modified": "2025-07-05T02:15:52.050Z",
       "size_bytes": 1583,
       "hash": "d9964af7",
       "complexity": "low"
@@ -911,7 +911,7 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-07-04T17:21:45.206Z",
+      "last_modified": "2025-07-05T02:15:52.050Z",
       "size_bytes": 4007,
       "hash": "ec7512c8",
       "complexity": "medium"
@@ -1251,7 +1251,7 @@
         "next/headers",
         "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-07-05T01:35:15.906Z",
+      "last_modified": "2025-07-05T02:15:52.050Z",
       "size_bytes": 4323,
       "hash": "12594c9f",
       "complexity": "medium"
@@ -1277,7 +1277,7 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-07-05T01:47:30.470Z",
+      "last_modified": "2025-07-05T02:15:52.051Z",
       "size_bytes": 7362,
       "hash": "b0d6c043",
       "complexity": "medium"
@@ -1303,7 +1303,7 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-07-04T16:01:57.003Z",
+      "last_modified": "2025-07-05T02:15:52.051Z",
       "size_bytes": 5381,
       "hash": "eae29f6b",
       "complexity": "medium"
@@ -1423,7 +1423,7 @@
         "agent-core/types/UniversalWidgetSchema",
         "next/navigation"
       ],
-      "last_modified": "2025-07-03T21:49:26.482Z",
+      "last_modified": "2025-07-05T02:15:52.047Z",
       "size_bytes": 6394,
       "hash": "b57ceebf",
       "complexity": "medium"
@@ -1520,7 +1520,7 @@
       "exports": [
         "GrantAdminPage"
       ],
-      "last_modified": "2025-07-03T20:32:45.247Z",
+      "last_modified": "2025-07-05T02:15:52.052Z",
       "size_bytes": 6213,
       "hash": "c479f8f9",
       "complexity": "medium"
@@ -1738,7 +1738,7 @@
       "exports": [
         "useUserPreferences"
       ],
-      "last_modified": "2025-07-04T17:13:26.905Z",
+      "last_modified": "2025-07-05T02:15:52.052Z",
       "size_bytes": 2792,
       "hash": "a80ffc41",
       "complexity": "low"
@@ -1792,7 +1792,7 @@
       "exports": [
         "metadata"
       ],
-      "last_modified": "2025-07-03T21:32:00.965Z",
+      "last_modified": "2025-07-05T02:15:52.052Z",
       "size_bytes": 1222,
       "hash": "1245a02c",
       "complexity": "low"
@@ -1811,7 +1811,7 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-07-04T14:59:47.459Z",
+      "last_modified": "2025-07-05T02:15:52.053Z",
       "size_bytes": 21882,
       "hash": "de9b1103",
       "complexity": "high"
@@ -1959,7 +1959,7 @@
       "dependencies": [
         "../types"
       ],
-      "last_modified": "2025-07-05T01:50:17.305Z",
+      "last_modified": "2025-07-05T02:15:52.055Z",
       "size_bytes": 4188,
       "hash": "e4ab07f2",
       "complexity": "medium"
@@ -1985,7 +1985,7 @@
       "exports": [
         "authService"
       ],
-      "last_modified": "2025-07-04T14:59:47.376Z",
+      "last_modified": "2025-07-05T02:15:52.055Z",
       "size_bytes": 2336,
       "hash": "68be773c",
       "complexity": "low"
@@ -2082,7 +2082,7 @@
       "exports": [
         "entitlementService"
       ],
-      "last_modified": "2025-07-04T17:21:12.648Z",
+      "last_modified": "2025-07-05T02:15:52.056Z",
       "size_bytes": 7214,
       "hash": "a846134f",
       "complexity": "medium"
@@ -2262,7 +2262,7 @@
       "exports": [
         "createSupabaseServerClient"
       ],
-      "last_modified": "2025-07-04T14:59:47.151Z",
+      "last_modified": "2025-07-05T02:15:52.057Z",
       "size_bytes": 4628,
       "hash": "54ef447e",
       "complexity": "medium"
@@ -2429,7 +2429,7 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-07-03T20:32:43.124Z",
+      "last_modified": "2025-07-05T02:15:52.057Z",
       "size_bytes": 6290,
       "hash": "6b638f59",
       "complexity": "medium"
@@ -2602,7 +2602,7 @@
         "./forms/FormWidget",
         "./SupabaseProvider"
       ],
-      "last_modified": "2025-07-05T01:55:27.149Z",
+      "last_modified": "2025-07-05T02:15:52.058Z",
       "size_bytes": 43487,
       "hash": "3eb8836f",
       "complexity": "high"
@@ -2714,7 +2714,7 @@
       "exports": [
         "SupabaseProvider"
       ],
-      "last_modified": "2025-07-04T23:17:51.548Z",
+      "last_modified": "2025-07-05T02:15:52.058Z",
       "size_bytes": 3970,
       "hash": "62066b03",
       "complexity": "medium"
@@ -2898,7 +2898,7 @@
       "exports": [
         "forceAvatarRefresh"
       ],
-      "last_modified": "2025-07-05T01:44:23.151Z",
+      "last_modified": "2025-07-05T02:15:52.058Z",
       "size_bytes": 20374,
       "hash": "ed4454f5",
       "complexity": "high"
@@ -2995,7 +2995,7 @@
         "@tanstack/react-query",
         "./NavPanel"
       ],
-      "last_modified": "2025-07-04T17:16:46.573Z",
+      "last_modified": "2025-07-05T02:15:52.059Z",
       "size_bytes": 19347,
       "hash": "8cdd14b7",
       "complexity": "high"
@@ -3111,7 +3111,7 @@
         "../../../../packages/agent-core/types/AdminUISchema",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-07-03T17:13:00.943Z",
+      "last_modified": "2025-07-05T02:15:52.059Z",
       "size_bytes": 5779,
       "hash": "f72a27d9",
       "complexity": "medium"
@@ -3159,7 +3159,7 @@
         "./FormWidget",
         "./TableWidget"
       ],
-      "last_modified": "2025-07-03T17:13:04.811Z",
+      "last_modified": "2025-07-05T02:15:52.060Z",
       "size_bytes": 7430,
       "hash": "458c4a36",
       "complexity": "medium"
@@ -3293,7 +3293,7 @@
         "../../../../packages/agent-core/types/AdminUISchema",
         "../../../../packages/agent-core/types/UniversalWidgetSchema"
       ],
-      "last_modified": "2025-07-03T17:13:02.848Z",
+      "last_modified": "2025-07-05T02:15:52.059Z",
       "size_bytes": 10500,
       "hash": "24f24c89",
       "complexity": "high"
@@ -3375,7 +3375,7 @@
         "../../../../packages/agent-core/types/UniversalWidgetSchema",
         "./index"
       ],
-      "last_modified": "2025-07-03T21:32:00.982Z",
+      "last_modified": "2025-07-05T02:15:52.059Z",
       "size_bytes": 4627,
       "hash": "8e91c618",
       "complexity": "medium"
@@ -3501,7 +3501,7 @@
         "../components/ui/NavPanel",
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-07-04T16:45:14.543Z",
+      "last_modified": "2025-07-05T02:15:52.060Z",
       "size_bytes": 6626,
       "hash": "0117f52f",
       "complexity": "medium"
@@ -3525,7 +3525,7 @@
       "dependencies": [
         "swr"
       ],
-      "last_modified": "2025-07-04T17:20:26.562Z",
+      "last_modified": "2025-07-05T02:15:52.060Z",
       "size_bytes": 1906,
       "hash": "daa8ea0e",
       "complexity": "low"
@@ -3635,7 +3635,7 @@
       "tags": [
         "TypeScript"
       ],
-      "last_modified": "2025-07-04T14:23:59.124Z",
+      "last_modified": "2025-07-05T02:15:52.060Z",
       "size_bytes": 201,
       "hash": "9269d492",
       "complexity": "low"
@@ -3647,7 +3647,7 @@
       "extension": ".js",
       "purpose": "✅ FIX: Disable source maps in development to prevent 404 errors",
       "tags": [],
-      "last_modified": "2025-07-04T23:32:54.407Z",
+      "last_modified": "2025-07-05T02:15:52.061Z",
       "size_bytes": 1794,
       "hash": "6995f3b1",
       "complexity": "low"
@@ -3661,7 +3661,7 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-07-04T14:24:02.290Z",
+      "last_modified": "2025-07-05T02:15:52.062Z",
       "size_bytes": 553134,
       "hash": "bdcf0f7e"
     },
@@ -3674,7 +3674,7 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-07-04T14:59:46.228Z",
+      "last_modified": "2025-07-05T02:15:52.062Z",
       "size_bytes": 1329,
       "hash": "246105f2"
     },
@@ -3697,7 +3697,7 @@
       "extension": ".json",
       "purpose": "—",
       "tags": [],
-      "last_modified": "2025-07-04T17:26:59.010Z",
+      "last_modified": "2025-07-05T02:15:52.063Z",
       "size_bytes": 105,
       "hash": "55222935"
     },
@@ -4800,7 +4800,7 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-07-03T16:27:12.175Z",
+      "last_modified": "2025-07-05T02:15:52.063Z",
       "size_bytes": 7209,
       "hash": "7d055ec7"
     },
@@ -5122,9 +5122,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-04T14:27:25.974Z",
-      "size_bytes": 166329,
-      "hash": "20b34446"
+      "last_modified": "2025-07-05T02:15:52.063Z",
+      "size_bytes": 167909,
+      "hash": "c667c032"
     },
     {
       "path": "docs/manifest.md",
@@ -5137,9 +5137,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-04T14:27:26.003Z",
-      "size_bytes": 63271,
-      "hash": "5f118186"
+      "last_modified": "2025-07-05T02:15:52.064Z",
+      "size_bytes": 63912,
+      "hash": "d98baac1"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -5235,7 +5235,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-04T11:56:42.405Z",
+      "last_modified": "2025-07-05T02:15:52.064Z",
       "size_bytes": 63029,
       "hash": "fa2f072a"
     },
@@ -5250,7 +5250,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-04T11:56:42.464Z",
+      "last_modified": "2025-07-05T02:15:52.064Z",
       "size_bytes": 60276,
       "hash": "31c26d07"
     },
@@ -5265,7 +5265,7 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-04T11:56:42.468Z",
+      "last_modified": "2025-07-05T02:15:52.065Z",
       "size_bytes": 39174,
       "hash": "05e3756c"
     },
@@ -5301,15 +5301,14 @@
       "name": "QA-0001-navigation-state-restoration-audit.md",
       "directory": "docs/quality-assurance/audits",
       "extension": ".md",
-      "purpose": "Request sent with correct context:",
+      "purpose": "—",
       "tags": [
         "documentation",
-        "AI agent",
-        "security"
+        "AI agent"
       ],
-      "last_modified": "2025-07-05T02:08:31.881Z",
-      "size_bytes": 6918,
-      "hash": "ca5d8bf2"
+      "last_modified": "2025-07-05T02:20:11.242Z",
+      "size_bytes": 4860,
+      "hash": "7fde8ad5"
     },
     {
       "path": "docs/quality-assurance/README.md",
@@ -5320,7 +5319,7 @@
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-07-05T02:09:11.376Z",
+      "last_modified": "2025-07-05T02:15:52.065Z",
       "size_bytes": 5796,
       "hash": "5d974dfc"
     },
@@ -5334,7 +5333,7 @@
         "documentation",
         "security"
       ],
-      "last_modified": "2025-07-05T02:09:51.608Z",
+      "last_modified": "2025-07-05T02:15:52.065Z",
       "size_bytes": 4377,
       "hash": "5027f64b"
     },
@@ -5380,7 +5379,7 @@
       "dependencies": [
         "../types/AdminUISchema"
       ],
-      "last_modified": "2025-07-04T14:59:47.012Z",
+      "last_modified": "2025-07-05T02:15:52.066Z",
       "size_bytes": 15627,
       "hash": "160318a9",
       "complexity": "high"
@@ -5508,7 +5507,7 @@
         "TypeScript",
         "AI agent"
       ],
-      "last_modified": "2025-07-03T17:13:10.546Z",
+      "last_modified": "2025-07-05T02:15:52.066Z",
       "size_bytes": 281,
       "hash": "814cf9f0",
       "complexity": "low"
@@ -5522,7 +5521,7 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-07-03T21:29:03.270Z",
+      "last_modified": "2025-07-05T02:15:52.066Z",
       "size_bytes": 782,
       "hash": "d2ff0fe5"
     },
@@ -5618,7 +5617,7 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-04T14:59:46.854Z",
+      "last_modified": "2025-07-05T02:15:52.067Z",
       "size_bytes": 3970,
       "hash": "559d957a",
       "complexity": "medium"
@@ -5757,7 +5756,7 @@
       "dependencies": [
         "./UniversalWidgetSchema"
       ],
-      "last_modified": "2025-07-03T17:12:58.350Z",
+      "last_modified": "2025-07-05T02:15:52.067Z",
       "size_bytes": 6024,
       "hash": "3d2cc725",
       "complexity": "high"

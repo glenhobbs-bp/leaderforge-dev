@@ -23,6 +23,7 @@ interface PendingEvent extends ProgressEvent {
 /**
  * Batched Progress Service - Optimizes performance by batching progress events
  * Accumulates events for 2-3 seconds then sends in batch to reduce API overhead
+ * Fixed memory leak issues with proper timer cleanup
  */
 class BatchedProgressService {
   private static instance: BatchedProgressService;
@@ -30,8 +31,20 @@ class BatchedProgressService {
   private batchTimer: number | null = null;
   private readonly batchDelayMs = 2500; // 2.5 second batching window
   private readonly maxBatchSize = 50; // Maximum events per batch
+  private isDestroyed = false; // Track destruction state
+  private cleanupFunction?: () => void; // Store cleanup function
 
-  private constructor() {}
+  private constructor() {
+    // ✅ FIX: Add cleanup on page unload to prevent memory leaks
+    if (typeof window !== 'undefined') {
+      this.cleanupFunction = () => {
+        this.destroy();
+      };
+
+      window.addEventListener('beforeunload', this.cleanupFunction);
+      window.addEventListener('pagehide', this.cleanupFunction);
+    }
+  }
 
   static getInstance(): BatchedProgressService {
     if (!BatchedProgressService.instance) {
@@ -41,9 +54,40 @@ class BatchedProgressService {
   }
 
   /**
+   * Destroy the service and clean up all timers
+   */
+  destroy(): void {
+    if (this.isDestroyed) return;
+
+    this.isDestroyed = true;
+
+    // Clear timer
+    if (this.batchTimer) {
+      window.clearTimeout(this.batchTimer);
+      this.batchTimer = null;
+    }
+
+    // Reject all pending events
+    this.pendingEvents.forEach(event => {
+      event._reject(new Error('Service destroyed'));
+    });
+    this.pendingEvents = [];
+
+    // Remove event listeners
+    if (typeof window !== 'undefined' && this.cleanupFunction) {
+      window.removeEventListener('beforeunload', this.cleanupFunction);
+      window.removeEventListener('pagehide', this.cleanupFunction);
+    }
+  }
+
+  /**
    * Add a progress event to the batch queue
    */
   addEvent(event: ProgressEvent): Promise<UserProgress> {
+    if (this.isDestroyed) {
+      return Promise.reject(new Error('Service is destroyed'));
+    }
+
     return new Promise((resolve, reject) => {
       // Add event with promise resolvers
       const eventWithPromise: PendingEvent = {
@@ -68,7 +112,7 @@ class BatchedProgressService {
    * Force immediate flush of pending events
    */
   async flushBatch(): Promise<void> {
-    if (this.pendingEvents.length === 0) return;
+    if (this.pendingEvents.length === 0 || this.isDestroyed) return;
 
     // Clear timer
     if (this.batchTimer) {
@@ -104,49 +148,50 @@ class BatchedProgressService {
     }
   }
 
+  /**
+   * Batch track progress directly via API call
+   */
   private async batchTrackProgressDirect(events: ProgressEvent[]): Promise<UserProgress[]> {
-    // ✅ DEBUG: Log exactly what we're sending to the server
-    console.log('[BatchedProgressService] Sending batch events:', events.map(e => ({
-      contentId: e.contentId,
-      progressType: e.progressType,
-      metadata: e.metadata,
-      value: e.value,
-      timestamp: e.timestamp
-    })));
-
-    // ✅ DEBUG: Show raw JSON being sent to server
-    console.log('[BatchedProgressService] Raw JSON payload:', JSON.stringify({
-      action: 'batchTrackProgress',
-      events
-    }, null, 2));
+    if (this.isDestroyed) {
+      throw new Error('Service is destroyed');
+    }
 
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // ✅ CRITICAL FIX: Include cookies for authentication
+      credentials: 'include',
       body: JSON.stringify({
-        action: 'batchTrackProgress',
-        events
+        events,
+        batch: true
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to batch track progress: ${response.statusText}`);
+      throw new Error(`Progress API error: ${response.status}`);
     }
 
     const result = await response.json();
-    return result.data;
+    return Array.isArray(result) ? result : [result];
   }
 
-    private resetBatchTimer(): void {
+  /**
+   * Reset the batch timer with proper cleanup
+   */
+  private resetBatchTimer(): void {
+    if (this.isDestroyed) return;
+
+    // Clear existing timer
     if (this.batchTimer) {
       window.clearTimeout(this.batchTimer);
     }
 
+    // Set new timer
     this.batchTimer = window.setTimeout(() => {
-      this.flushBatch();
+      if (!this.isDestroyed) {
+        this.flushBatch();
+      }
     }, this.batchDelayMs);
   }
 

@@ -36,20 +36,33 @@ export function useNavigation(tenantKey: string, userId?: string) {
 
       // 5-second timeout to prevent 1+ minute hangs
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      let timeoutId: number | undefined;
+
+      // ✅ FIX: Ensure timeout is always cleared
+      const cleanup = () => {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId);
+          timeoutId = undefined;
+        }
+      };
+
+      timeoutId = window.setTimeout(() => {
+        cleanup();
+        controller.abort();
+      }, 5000);
 
       try {
         const response = await fetch(`/api/user/${userId}/profile`, {
           credentials: 'include',
           signal: controller.signal
         });
-        clearTimeout(timeoutId);
+        cleanup(); // Clear timeout on success
 
         if (!response.ok) return null;
         const result = await response.json();
         return result.user;
       } catch (error) {
-        clearTimeout(timeoutId);
+        cleanup(); // Clear timeout on error
         console.warn('[useNavigation] Profile fetch failed:', error);
         return null; // Graceful degradation
       }

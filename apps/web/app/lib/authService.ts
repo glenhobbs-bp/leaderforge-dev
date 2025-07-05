@@ -5,24 +5,43 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 
+interface TimeoutPromise extends Promise<never> {
+  cleanup?: () => void;
+}
+
 export const authService = {
   /**
    * Signs out user and clears session
    * Extracted from NavPanel to follow separation of concerns
+   * Fixed memory leak issues with proper timeout cleanup
    */
   async signOut(supabase: SupabaseClient): Promise<void> {
     try {
-      // Create timeout promises for all operations
-      const timeout = (ms: number) => new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), ms)
-      );
+      // ✅ FIX: Create timeout promises with proper cleanup
+      const createTimeoutPromise = (ms: number): TimeoutPromise => {
+        let timeoutId: number;
+        const promise = new Promise<never>((_, reject) => {
+          timeoutId = window.setTimeout(() => reject(new Error('Timeout')), ms);
+        }) as TimeoutPromise;
+
+        // Add cleanup method to the promise
+        promise.cleanup = () => {
+          if (timeoutId) {
+            window.clearTimeout(timeoutId);
+          }
+        };
+
+        return promise;
+      };
 
       // Sign out from Supabase with 2-second timeout
       try {
+        const timeoutPromise = createTimeoutPromise(2000);
         await Promise.race([
           supabase.auth.signOut(),
-          timeout(2000)
+          timeoutPromise
         ]);
+        timeoutPromise.cleanup?.();
       } catch (error) {
         console.warn('[authService] Supabase signOut timeout/error:', error);
         // Continue with logout even if Supabase fails
@@ -30,14 +49,16 @@ export const authService = {
 
       // Clear server-side session with 1-second timeout
       try {
+        const timeoutPromise = createTimeoutPromise(1000);
         await Promise.race([
           fetch('/api/auth/set-session', {
             method: 'POST',
             body: JSON.stringify({ session: null }),
             headers: { 'Content-Type': 'application/json' },
           }),
-          timeout(1000)
+          timeoutPromise
         ]);
+        timeoutPromise.cleanup?.();
       } catch (error) {
         console.warn('[authService] Set-session timeout/error:', error);
         // Continue with logout even if server call fails

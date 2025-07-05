@@ -5,23 +5,36 @@
 
 import useSWR from 'swr';
 
-// Fetch function with credentials and timeout
+// Fetch function with credentials and timeout - Fixed memory leak issues
 const fetchWithCredentials = (url: string) => {
   // 15-second timeout to accommodate slow entitlement queries
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  let timeoutId: number | undefined;
+
+  // ✅ FIX: Ensure timeout is always cleared
+  const cleanup = () => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+      timeoutId = undefined;
+    }
+  };
+
+  timeoutId = window.setTimeout(() => {
+    cleanup();
+    controller.abort();
+  }, 15000);
 
   return fetch(url, {
     credentials: 'include',
     signal: controller.signal
   }).then((res) => {
-    window.clearTimeout(timeoutId);
+    cleanup(); // Clear timeout on success
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     return res.json();
   }).catch((error) => {
-    window.clearTimeout(timeoutId);
+    cleanup(); // Clear timeout on error
     if (error.name === 'AbortError') {
       console.warn('[useNavOptions] Navigation API request timed out');
       throw new Error('Navigation request timeout');

@@ -2,10 +2,12 @@
   "name": "web",
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS='--no-deprecation' next dev",
     "build": "next build",
     "turbo:build": "cd ../.. && npm run build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "agent-core": "workspace:*",

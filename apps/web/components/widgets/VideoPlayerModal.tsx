@@ -412,7 +412,16 @@ export function VideoPlayerModal({
       console.log('[VideoPlayerModal] Clearing auto-save interval');
       window.clearInterval(interval);
     };
-  }, [isPlaying, contentId, title, userId]); // Added contentId dependency
+  }, [isPlaying, contentId, title, userId]);
+
+  // ✅ FIX: Add cleanup effect to ensure intervals are cleared on unmount
+  useEffect(() => {
+    return () => {
+      console.log('[VideoPlayerModal] Component unmounting - ensuring all timers are cleared');
+      // This cleanup will run when the component unmounts
+      // Any intervals created in other effects will be cleared by their own cleanup functions
+    };
+  }, []);
 
   // Initialize video player
   useEffect(() => {

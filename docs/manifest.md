@@ -1,6 +1,6 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/4/2025, 10:09:59 PM*
+*Generated on 7/4/2025, 10:20:25 PM*
 
 ## Overview
 
@@ -22,7 +22,7 @@
 - **TypeScript**: 181 files
 - **AI agent**: 164 files
 - **documentation**: 114 files
-- **security**: 87 files
+- **security**: 86 files
 - **API**: 57 files
 - **Next.js API**: 55 files
 - **React**: 46 files
@@ -218,7 +218,7 @@ File: apps/web/app/api/debug/check-session/route.ts
 
 **Complexity**: low • **Size**: 1.2KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/debug/cookies/route.ts`
@@ -290,7 +290,7 @@ File: apps/web/app/api/dev/check-admin-status/route.ts
 
 **Complexity**: low • **Size**: 2.1KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/dev/fix-entitlement-permissions/route.ts`
@@ -308,7 +308,7 @@ File: apps/web/app/api/dev/grant-admin-access/route.ts
 
 **Complexity**: low • **Size**: 2.2KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/dev/grant-basic-entitlements/route.ts`
@@ -605,7 +605,7 @@ File: apps/web/app/CopilotKitProvider.tsx
 
 **Complexity**: medium • **Size**: 6.2KB
 **Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/dashboard/DashboardClient.tsx`
@@ -641,7 +641,7 @@ File: apps/web/app/dev/grant-admin/page.tsx
 
 **Complexity**: medium • **Size**: 6.1KB
 **Tags**: `React`, `TypeScript`, `React hooks`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/hooks/useContentForContext.ts`
@@ -740,7 +740,7 @@ Get initial session server-side for SSR
 
 **Complexity**: low • **Size**: 1.2KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/lib/agentService.ts`
@@ -1019,7 +1019,7 @@ Public login page with styled Supabase Auth UI and token synchronization
 
 **Owner**: Frontend team • **Complexity**: medium • **Size**: 6.1KB
 **Tags**: `authentication`, `Supabase Auth UI`, `login`, `client component`, `React`, `TypeScript`, `React hooks`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/page.tsx`
@@ -1280,7 +1280,7 @@ File: apps/web/components/widgets/FormWidget.tsx
 
 **Complexity**: medium • **Size**: 5.6KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/components/widgets/Grid.tsx`
@@ -1298,7 +1298,7 @@ File: apps/web/components/widgets/index.ts
 
 **Complexity**: medium • **Size**: 7.3KB
 **Tags**: `TypeScript`, `UI`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/components/widgets/Leaderboard.tsx`
@@ -1352,7 +1352,7 @@ File: apps/web/components/widgets/TableWidget.tsx
 
 **Complexity**: high • **Size**: 10.3KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/components/widgets/types.ts`
@@ -1388,7 +1388,7 @@ File: apps/web/components/widgets/WidgetDispatcher.tsx
 
 **Complexity**: medium • **Size**: 4.5KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/hooks/useAvatar.ts`
@@ -2234,7 +2234,7 @@ cloud.copilotkit.ai/>
 
 **Size**: 7.0KB
 **Tags**: `documentation`, `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `docs/database/core-schema-current.sql`
@@ -2430,7 +2430,7 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX val
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 162.4KB
+**Size**: 164.0KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/4/2025
 
@@ -2439,7 +2439,7 @@ docs.copilotkit.ai/guides/frontend-actions",
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 61.8KB
+**Size**: 62.4KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/4/2025
 
@@ -2545,10 +2545,10 @@ Links to specific video content
 
 ### `docs/quality-assurance/audits/QA-0001-navigation-state-restoration-audit.md`
 
-Request sent with correct context:
+—
 
-**Size**: 6.8KB
-**Tags**: `documentation`, `AI agent`, `security`
+**Size**: 4.7KB
+**Tags**: `documentation`, `AI agent`
 **Modified**: 7/4/2025
 
 
@@ -2657,7 +2657,7 @@ app.posthog.com";
 
 **Complexity**: low • **Size**: 0.3KB
 **Tags**: `TypeScript`, `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `packages/agent-core/package.json`
@@ -2666,7 +2666,7 @@ app.posthog.com";
 
 **Size**: 0.8KB
 **Tags**: `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `packages/agent-core/schema/SchemaProcessor.ts`
@@ -2783,7 +2783,7 @@ File: packages/agent-core/types/AdminUISchema.ts
 
 **Complexity**: high • **Size**: 5.9KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `packages/agent-core/types/ComponentSchema.js`
