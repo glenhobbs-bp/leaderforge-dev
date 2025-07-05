@@ -42,47 +42,54 @@
 }
 
 .copilotkit-sidebar-header h2 {
-  font-family: var(--ck-font-family);
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--ck-text-primary);
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 1rem; /* 16px - more refined */
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
   letter-spacing: -0.025em;
 }
 
-/* Message styling */
+/* Message styling - Refined Typography */
 .copilotkit-message {
   padding: 0.75rem 1rem !important;
-  font-family: var(--ck-font-family);
-  font-size: 0.8125rem !important;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 0.875rem !important; /* 14px - body-small */
   line-height: 1.5;
+  font-weight: 400;
 }
 
 .copilotkit-message-user {
-  background: var(--ck-bg-secondary) !important;
-  border-radius: var(--ck-radius-lg);
-  margin: 0.375rem 0.75rem 0.375rem 1.5rem;
-  box-shadow: var(--ck-shadow-sm);
-  padding: 0.625rem 0.875rem !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.95) 100%) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 0.75rem; /* 12px - more refined */
+  margin: 0.5rem 1rem 0.5rem 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+  padding: 0.75rem 1rem !important;
 }
 
 .copilotkit-message-assistant {
-  background: transparent !important;
-  margin: 0.375rem 1.5rem 0.375rem 0.75rem;
-  padding: 0.625rem 0.875rem !important;
+  background: rgba(255,255,255,0.02) !important;
+  margin: 0.5rem 2rem 0.5rem 1rem;
+  padding: 0.75rem 1rem !important;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-/* Form rendering within chat */
+/* Form rendering within chat - Sophisticated Glassmorphism */
 .copilotkit-message form {
-  background: rgba(255,255,255,0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: var(--ck-radius-lg);
-  padding: 1rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 1rem; /* 16px - more refined */
+  padding: 1.5rem;
   box-shadow:
-    0 4px 16px rgba(0,0,0,0.06),
-    0 2px 8px rgba(0,0,0,0.04),
-    inset 0 1px 0 rgba(255,255,255,0.4);
+    0 8px 32px rgba(0,0,0,0.08),
+    0 4px 16px rgba(0,0,0,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  margin: 0.75rem 0;
 }
 
 /* Input field styling */
@@ -171,10 +178,12 @@
 }
 
 .copilotkit-message .rjsf legend {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ck-text-primary);
-  margin-bottom: 1rem;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 1.125rem; /* 18px - body-large */
+  font-weight: 500;
+  color: var(--text-primary, #1e293b);
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.025em;
 }
 
 .copilotkit-message .rjsf .form-group {
@@ -183,9 +192,10 @@
 
 .copilotkit-message .rjsf label {
   display: block;
-  font-size: 0.875rem;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 0.875rem; /* 14px - body-small */
   font-weight: 500;
-  color: var(--ck-text-primary);
+  color: var(--text-primary, #1e293b);
   margin-bottom: 0.5rem;
 }
 
@@ -193,11 +203,12 @@
 .copilotkit-message .rjsf input[type="email"],
 .copilotkit-message .rjsf select {
   width: 100%;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  color: var(--ck-text-primary);
-  background: var(--ck-bg-primary);
-  border: 1px solid var(--ck-border-color);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 0.875rem; /* 14px - body-small */
+  color: var(--text-primary, #1e293b);
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(226,232,240,0.8);
   border-radius: var(--ck-radius-lg);
   transition: all 0.2s ease-in-out;
 }
@@ -212,42 +223,45 @@
 
 /* Checkbox styling */
 .copilotkit-message .rjsf .checkbox input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: 0.5rem;
-  accent-color: var(--ck-primary-color);
+  width: 1.125rem; /* 18px - slightly more refined */
+  height: 1.125rem;
+  margin-right: 0.75rem;
+  accent-color: var(--primary, #1e40af);
+  border-radius: 0.25rem; /* 4px - rounded corners */
 }
 
 .copilotkit-message .rjsf .checkbox label {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   cursor: pointer;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 0.875rem; /* 14px - body-small */
+  font-weight: 400;
+  color: var(--text-primary, #1e293b);
+  line-height: 1.5;
 }
 
-/* Submit button styling */
+/* Submit button styling - Refined Design */
 .copilotkit-message .rjsf button[type="submit"] {
-  background: linear-gradient(135deg, var(--ck-primary-color) 0%, var(--ck-primary-hover) 100%);
+  background: var(--primary, #1e40af);
   color: white;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 9999px;
-  padding: 0.75rem 2rem;
-  font-size: 0.875rem;
+  border: none;
+  border-radius: 0.75rem; /* 12px - more refined than pill */
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 0.875rem; /* 14px - body-small */
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 4px 16px rgba(0,0,0,0.1),
-    0 2px 8px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15), 0 2px 4px rgba(30, 64, 175, 0.1);
+  letter-spacing: -0.025em;
 }
 
 .copilotkit-message .rjsf button[type="submit"]:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow:
-    0 8px 24px rgba(0,0,0,0.15),
-    0 4px 12px rgba(0,0,0,0.1),
-    inset 0 1px 0 rgba(255,255,255,0.3);
+  background: var(--primary-hover, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.2), 0 4px 8px rgba(30, 64, 175, 0.15);
 }
 
 /* Error message styling */
