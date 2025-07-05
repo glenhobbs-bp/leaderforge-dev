@@ -6,6 +6,7 @@ import { Camera, User, Edit3 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { forceAvatarRefresh } from './NavPanel';
 
+
 interface UserData {
   id: string;
   email: string;
@@ -83,9 +84,9 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
 
   const queryClient = useQueryClient();
 
-  // Fetch user data
+  // ✅ FIX: Use a separate query key for modal to avoid conflicts with main preferences hook
   const { data, isLoading, error } = useQuery({
-    queryKey: ['user', userId],
+    queryKey: ['user-profile-modal', userId],
     queryFn: () => fetchUserData(userId),
     enabled: !!userId && isOpen,
   });
@@ -101,7 +102,9 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
   const updateMutation = useMutation({
     mutationFn: (data: Partial<UserData & UserPreferences>) => updateUserData(userId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user', userId] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile-modal', userId] });
+      // Also invalidate the main user preferences cache to keep them in sync
+      queryClient.invalidateQueries({ queryKey: ['user-preferences', userId] });
       setIsEditing(false);
     },
     onError: (error) => {
@@ -146,7 +149,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
       queryClient.refetchQueries({ queryKey: ['avatar'] });
 
       // Update the user query cache to reflect the new avatar filename
-      queryClient.setQueryData(['user', userId], (oldData: { user: UserData; preferences: UserPreferences } | undefined) => {
+      queryClient.setQueryData(['user-profile-modal', userId], (oldData: { user: UserData; preferences: UserPreferences } | undefined) => {
         if (oldData && data.fileName) {
           return {
             ...oldData,
@@ -250,7 +253,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
   }
 
   if (!data || !data.user) {
-    console.warn('User data not available yet');
+    // User data not loaded yet - return null to prevent rendering
     return null;
   }
 
@@ -330,7 +333,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
 
                   input.onchange = (event) => {
                     console.log('[Avatar Upload] File selected via programmatic input');
-                    handleAvatarUpload(event as any);
+                    handleAvatarUpload(event as unknown as React.ChangeEvent<HTMLInputElement>);
                     document.body.removeChild(input);
                   };
 

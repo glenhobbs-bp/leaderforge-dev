@@ -19,38 +19,74 @@ export async function GET(
   try {
     const { user_id } = await params;
 
-        // SSR-first authentication with robust session restoration
+    // Fast path: Check for session existence without expensive restoration
     const cookieStore = await cookies();
-    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
+    const projectRef = 'pcjaagjqydyqfsthsmac';
+    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
 
-    if (sessionError || !session || session.user.id !== user_id) {
+    // If no tokens, immediately fail with 401
+    if (!accessToken || !refreshToken) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Not authenticated' },
         { status: 401 }
       );
     }
 
-    // Get user data with authenticated context (respects RLS)
-    const { data: user, error: userError } = await supabase
-      .schema('core')
-      .from('users')
-      .select('*')
-      .eq('id', user_id)
-      .single();
+    // Wrap session restoration in a shorter timeout to prevent hanging
+    const authPromise = (async () => {
+      const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    if (userError) {
-      console.error('[API] Error fetching user preferences:', userError);
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      );
-    }
+      if (sessionError || !session || session.user.id !== user_id) {
+        throw new Error('Authentication failed');
+      }
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+      return { supabase };
+    })();
+
+    // 2-second timeout for auth operations
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Authentication timeout')), 2000)
+    );
+
+    const { supabase } = await Promise.race([authPromise, timeoutPromise]);
+
+    // Wrap database operations in timeout to prevent hanging
+    const dbPromise = (async () => {
+      const { data: user, error: userError } = await supabase
+        .schema('core')
+        .from('users')
+        .select('*')
+        .eq('id', user_id)
+        .single();
+
+      if (userError) {
+        console.error('[API] Error fetching user preferences:', userError);
+        throw new Error('Failed to fetch user data');
+      }
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      return user;
+    })();
+
+    // 3-second timeout for database operations
+    const dbTimeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Database timeout')), 3000)
+    );
+
+    const user = await Promise.race([dbPromise, dbTimeoutPromise]);
 
     // Return both user profile and preferences
+    console.log('[API] 📊 User preferences fetched:', {
+      userId: user.id,
+      preferences: user.preferences,
+      navigationState: user.preferences?.navigationState,
+      timestamp: new Date().toISOString()
+    });
+
     const response = NextResponse.json({
       user: {
         id: user.id,
@@ -63,14 +99,28 @@ export async function GET(
       preferences: user.preferences || {}
     });
 
-    // Add caching headers for performance (30 seconds cache to avoid navigation state staleness)
-    response.headers.set('Cache-Control', 'public, max-age=30, s-maxage=30');
-    response.headers.set('CDN-Cache-Control', 'public, max-age=30');
-    response.headers.set('Vercel-CDN-Cache-Control', 'public, max-age=30');
+    // ✅ FIX: Disable caching to ensure navigation state changes are immediately visible
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('CDN-Cache-Control', 'no-cache');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-cache');
 
     return response;
   } catch (error) {
-    console.error('[GET /api/user/preferences] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    // Return appropriate error codes based on error type
+    if (errorMessage.includes('timeout') || errorMessage.includes('Authentication')) {
+      return NextResponse.json(
+        { error: 'Authentication timeout' },
+        { status: 401 }
+      );
+    }
+
+    if (errorMessage.includes('User not found')) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    console.error('[GET /api/user/preferences] Error:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to fetch user data' },
       { status: 500 }

@@ -13,22 +13,59 @@ import type { User } from '../types';
  * @throws Error if the API call fails.
  */
 export async function fetchUserPreferences(userId: string): Promise<User['preferences'] | undefined> {
-  const res = await fetch(`/api/user/${userId}/preferences`, {
-    credentials: 'include',
-    // Add cache headers for browser-level caching
-    headers: {
-      'Cache-Control': 'max-age=300', // 5 minutes browser cache
+  // 5-second timeout to prevent hangs while allowing reasonable API response time
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    const res = await fetch(`/api/user/${userId}/preferences?t=${Date.now()}`, {
+      credentials: 'include',
+      signal: controller.signal,
+      // ✅ FIX: Force fresh data by disabling cache
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Accept': 'application/json',
+      },
+      // Add keepalive for better connection reuse
+      keepalive: true,
+    });
+
+    window.clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ error: 'Network error' }));
+      console.error('[apiClient] Error:', error);
+      throw new Error(error.error || 'Failed to fetch user preferences');
     }
-  });
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: 'Network error' }));
-    console.error('[apiClient] Error:', error);
-    throw new Error(error.error || 'Failed to fetch user preferences');
+    const data = await res.json();
+
+    // 🔍 DEBUG: Log the actual API response structure
+    console.log('[apiClient] 🔍 Raw API response:', data);
+    console.log('[apiClient] 🔍 Response type:', typeof data);
+    console.log('[apiClient] 🔍 Has preferences key:', 'preferences' in data);
+    console.log('[apiClient] 🔍 Preferences value:', data?.preferences);
+
+    // ✅ FIX: API returns { user: {...}, preferences: {...} } structure
+    // Extract just the preferences part that the hook expects
+    if (data && typeof data === 'object' && 'preferences' in data) {
+      console.log('[apiClient] ✅ Extracting preferences from API response:', data.preferences);
+      return data.preferences as User['preferences'];
+    }
+
+    // Fallback: if data structure is unexpected, return empty preferences
+    console.warn('[apiClient] ❌ Unexpected data structure from preferences API:', data);
+    return {};
+  } catch (error) {
+    window.clearTimeout(timeoutId);
+    if ((error as Error).name === 'AbortError') {
+      console.warn('[apiClient] User preferences request timed out, using fallback');
+      return undefined; // Graceful degradation
+    }
+    throw error;
   }
-
-  const data = await res.json();
-  return data as User['preferences'];
 }
 
 /**
@@ -59,7 +96,16 @@ export async function updateUserPreferences(
   }
 
   const data = await res.json();
-  return data as User['preferences'];
+
+  // ✅ FIX: API returns { user: {...}, preferences: {...} } structure
+  // Extract just the preferences part that the hook expects
+  if (data && typeof data === 'object' && 'preferences' in data) {
+    return data.preferences as User['preferences'];
+  }
+
+  // Fallback: if data structure is unexpected, return empty preferences
+  console.warn('[apiClient] Unexpected data structure from preferences update API:', data);
+  return {};
 }
 
 // TODO: Add test coverage for this API client.

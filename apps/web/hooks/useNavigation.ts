@@ -28,25 +28,45 @@ interface NavigationSection {
 export function useNavigation(tenantKey: string, userId?: string) {
   const { navOptions, loading, error } = useNavOptions(tenantKey);
 
-  // Fetch user data for personalized greeting (with optimized caching)
+  // Fetch user data for personalized greeting (with aggressive timeout)
   const { data: userData } = useQuery({
     queryKey: ['user-navigation-data', userId],
     queryFn: async () => {
       if (!userId) return null;
-      const response = await fetch(`/api/user/${userId}/profile`, {
-        credentials: 'include'
-      });
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.user;
+
+      // 5-second timeout to prevent 1+ minute hangs
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      try {
+        const response = await fetch(`/api/user/${userId}/profile`, {
+          credentials: 'include',
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) return null;
+        const result = await response.json();
+        return result.user;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.warn('[useNavigation] Profile fetch failed:', error);
+        return null; // Graceful degradation
+      }
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1
+    staleTime: 10 * 60 * 1000, // 10 minutes - longer cache
+    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
+    retry: false, // Don't retry on timeout to prevent cascading delays
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
   });
 
   const navSchema: NavPanelSchema | null = useMemo(() => {
     if (!navOptions || !Array.isArray(navOptions)) return null;
+
+    // Early return if no navigation options to process
+    if (navOptions.length === 0) return null;
 
     // Group nav options by section and collect section orders
     const sectionMap = new Map<string, NavOption[]>();
@@ -102,15 +122,8 @@ export function useNavigation(tenantKey: string, userId?: string) {
         // nav_key is for human readability and debugging only
         const itemId = option.id; // Always use database UUID
 
-        // Debug: Log ID mapping for troubleshooting
-        if (process.env.NODE_ENV === 'development') {
-          console.log('[useNavigation] ID mapping:', {
-            label: option.label,
-            nav_key: option.nav_key,
-            database_id: option.id,
-            final_id: itemId
-          });
-        }
+        // Debug: Log ID mapping for troubleshooting (only once per component mount)
+        // Removed excessive logging that was causing performance issues
 
         return {
           id: itemId, // Always use database UUID for navigation selection
@@ -159,7 +172,7 @@ export function useNavigation(tenantKey: string, userId?: string) {
         }
       }
     };
-  }, [navOptions, userData]);
+  }, [navOptions, userData?.first_name]); // Only depend on specific userData fields
 
   return {
     navSchema,

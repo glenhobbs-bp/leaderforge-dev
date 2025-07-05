@@ -1,17 +1,17 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/3/2025, 7:35:53 PM*
+*Generated on 7/4/2025, 10:27:25 AM*
 
 ## Overview
 
-- **Total Files**: 313
-- **Total Size**: 2.75 MB
+- **Total Files**: 318
+- **Total Size**: 2.92 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 133 files
-- **.md**: 105 files
+- **.ts**: 135 files
+- **.md**: 108 files
 - **.tsx**: 46 files
 - **.json**: 17 files
 - **.js**: 10 files
@@ -19,12 +19,12 @@
 
 ## Most Common Tags
 
-- **TypeScript**: 179 files
-- **AI agent**: 159 files
-- **documentation**: 108 files
-- **security**: 79 files
-- **API**: 55 files
-- **Next.js API**: 53 files
+- **TypeScript**: 181 files
+- **AI agent**: 163 files
+- **documentation**: 111 files
+- **security**: 84 files
+- **API**: 57 files
+- **Next.js API**: 55 files
 - **React**: 46 files
 - **UI**: 37 files
 - **React hooks**: 34 files
@@ -189,9 +189,9 @@ File: apps/web/app/api/auth/set-session/route.ts
 
 Admin action handler
 
-**Complexity**: medium • **Size**: 8.9KB
+**Complexity**: high • **Size**: 10.4KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/dashboard/[user_id]/route.ts`
@@ -293,6 +293,15 @@ File: apps/web/app/api/dev/check-admin-status/route.ts
 **Modified**: 7/3/2025
 
 
+### `apps/web/app/api/dev/fix-entitlement-permissions/route.ts`
+
+File: apps/web/app/api/dev/fix-entitlement-permissions/route.ts
+
+**Complexity**: low • **Size**: 2.8KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `security`
+**Modified**: 7/4/2025
+
+
 ### `apps/web/app/api/dev/grant-admin-access/route.ts`
 
 File: apps/web/app/api/dev/grant-admin-access/route.ts
@@ -318,6 +327,15 @@ Use service role for admin operations
 **Complexity**: low • **Size**: 2.6KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
 **Modified**: 7/2/2025
+
+
+### `apps/web/app/api/dev/test-entitlements/route.ts`
+
+File: apps/web/app/api/dev/test-entitlements/route.ts
+
+**Complexity**: low • **Size**: 1.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/entitlements/[user_id]/route.ts`
@@ -387,9 +405,9 @@ Purpose: Universal Input API - Handles all user input submissions in unified sys
 
 API route to return entitlement-filtered nav options for a given tenant. SSR/session safe, Next.js 15+ compatible.
 
-**Complexity**: medium • **Size**: 4.5KB
+**Complexity**: medium • **Size**: 3.5KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `security`
-**Modified**: 6/27/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/orgs/[org_id]/entitlements/route.ts`
@@ -729,9 +747,9 @@ Get initial session server-side for SSR
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: high • **Size**: 21.8KB
+**Complexity**: high • **Size**: 21.6KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 7/1/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -1469,7 +1487,7 @@ Routes navigation to mockups when enabled, falls back to agent content
 
 **Complexity**: low • **Size**: 0.2KB
 **Tags**: `TypeScript`
-**Modified**: 5/27/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/next.config.js`
@@ -1485,9 +1503,9 @@ Root of apps/web
 
 registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz",
 
-**Size**: 539.7KB
+**Size**: 540.2KB
 **Tags**: `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/package.json`
@@ -1496,7 +1514,7 @@ registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz",
 
 **Size**: 1.3KB
 **Tags**: `AI agent`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/postcss.config.js`
@@ -2403,18 +2421,18 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX val
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 159.9KB
+**Size**: 162.4KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `docs/manifest.md`
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 60.8KB
+**Size**: 61.8KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -2471,6 +2489,33 @@ React component example
 **Modified**: 6/27/2025
 
 
+### `docs/product-management/prds/powerprompts_prd.md`
+
+70% to creator, 30% to platform
+
+**Size**: 61.6KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/4/2025
+
+
+### `docs/product-management/prds/prompt_contexts_prd.md`
+
+days
+
+**Size**: 58.9KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/4/2025
+
+
+### `docs/product-management/prds/prompt_library_prd.md`
+
+Check plan entitlements
+
+**Size**: 38.3KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/4/2025
+
+
 ### `docs/product-management/prds/user-input-response-system.md`
 
 Links to specific video content
@@ -2511,9 +2556,9 @@ your-production-domain.com
 
 File: packages/agent-core/agents/AdminAgent.ts
 
-**Complexity**: high • **Size**: 10.9KB
+**Complexity**: high • **Size**: 15.3KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `packages/agent-core/agents/ContentLibraryAgent.ts`
@@ -2628,9 +2673,9 @@ Tests for Universal Progress Tool
 
 File: packages/agent-core/tools/EntitlementTool.ts
 
-**Complexity**: medium • **Size**: 4.0KB
+**Complexity**: medium • **Size**: 3.9KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/4/2025
 
 
 ### `packages/agent-core/tools/ToolRegistry.js`

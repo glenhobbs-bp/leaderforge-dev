@@ -5,7 +5,7 @@
 // Owner: Frontend team
 // Tags: UI, navigation, context-based, React
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import ContextSelector from "./ContextSelector";
 import { useSupabase } from '../SupabaseProvider';
@@ -91,13 +91,12 @@ export default function NavPanel({
   userId,
   selectedNavOptionId,
 }: NavPanelProps) {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[NavPanel] RENDER - Database-driven with tenantKey:', tenantKey);
-  }
+  // Removed excessive debug logging that was causing performance issues and render loops
 
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [hasUserInteracted, setHasUserInteracted] = useState(false); // Track user interaction
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const hasRestoredNav = useRef(false); // Prevent multiple restoration calls
   const { supabase } = useSupabase();
 
   // Database-driven navigation using the tenant key
@@ -139,18 +138,12 @@ export default function NavPanel({
     };
   }, [userId]);
 
-
-
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] navSchema changed:', navSchema);
-    }
+    // Removed excessive debug logging that was causing performance issues
   }, [navSchema]);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] selectedTenantKey changed:', selectedTenantKey);
-    }
+    // Removed excessive debug logging that was causing performance issues
     // Reset user interaction flag when tenant changes to allow restoration
     setHasUserInteracted(false);
     setSelectedNav(null); // Clear selection for new tenant
@@ -158,40 +151,43 @@ export default function NavPanel({
 
   // Initialize selected nav from persisted state only on first load and if user hasn't interacted
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] Navigation state restoration check:', {
-        lastNavOptionId,
-        selectedNav,
+    // Prevent multiple restoration calls
+    if (hasRestoredNav.current) return;
+
+    // Prioritize prop value over persisted state
+    const navToRestore = selectedNavOptionId || lastNavOptionId;
+
+    console.log('[NavPanel] 🔍 Navigation restoration debug:', {
+      selectedNavOptionId,
+      lastNavOptionId,
+      navToRestore,
+      selectedNav,
+      hasUserInteracted,
+      hasRestoredNav: hasRestoredNav.current,
+      tenantKey,
+      shouldRestore: navToRestore && !selectedNav && !hasUserInteracted
+    });
+
+    if (navToRestore && !selectedNav && !hasUserInteracted) {
+      console.log('[NavPanel] ✅ RESTORING navigation state:', navToRestore);
+      setSelectedNav(navToRestore);
+      hasRestoredNav.current = true; // Mark as restored
+    } else {
+      console.log('[NavPanel] ❌ Navigation restoration skipped:', {
+        hasNavToRestore: !!navToRestore,
+        hasSelectedNav: !!selectedNav,
         hasUserInteracted,
-        tenantKey: tenantKey,
-        shouldRestore: lastNavOptionId && !selectedNav && !hasUserInteracted
+        reason: !navToRestore ? 'no nav to restore' :
+                selectedNav ? 'already has selection' :
+                hasUserInteracted ? 'user has interacted' : 'unknown'
       });
     }
+  }, [lastNavOptionId, selectedNavOptionId, hasUserInteracted, tenantKey]); // Track user interaction to prevent override
 
-    if (lastNavOptionId && !selectedNav && !hasUserInteracted) {
-      setSelectedNav(lastNavOptionId);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Restored navigation state:', lastNavOptionId);
-      }
-    }
-  }, [lastNavOptionId, hasUserInteracted, tenantKey]); // Track user interaction to prevent override
-
-  // Update selected nav when selectedNavOptionId prop changes (from parent component)
+  // Reset restoration flag when tenant changes
   useEffect(() => {
-    if (selectedNavOptionId && selectedNavOptionId !== selectedNav) {
-      setSelectedNav(selectedNavOptionId);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Updated selected nav from prop:', selectedNavOptionId);
-      }
-    }
-  }, [selectedNavOptionId, selectedNav]);
-
-  // Debug modal state changes
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] Profile modal state changed:', isProfileModalOpen);
-    }
-  }, [isProfileModalOpen]);
+    hasRestoredNav.current = false;
+  }, [tenantKey]);
 
   const handleNavClick = (navOptionId: string) => {
     if (process.env.NODE_ENV === 'development') {
@@ -300,15 +296,7 @@ export default function NavPanel({
   );
 
   // Debug: Log navigation items and current selection
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[NavPanel] Rendering navigation items:', {
-      tenantKey: tenantKey,
-      selectedNav,
-      lastNavOptionId,
-      allItems: mainSections.flatMap(s => s.items.map(i => ({ id: i.id, label: i.label }))),
-      sectionsCount: mainSections.length
-    });
-  }
+  // Removed excessive debug logging that was causing performance issues during render loops
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] my-4">

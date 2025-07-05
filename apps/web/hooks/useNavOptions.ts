@@ -5,14 +5,30 @@
 
 import useSWR from 'swr';
 
-// Fetch function with credentials
-const fetchWithCredentials = (url: string) =>
-  fetch(url, { credentials: 'include' }).then((res) => {
+// Fetch function with credentials and timeout
+const fetchWithCredentials = (url: string) => {
+  // 15-second timeout to accommodate slow entitlement queries
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+  return fetch(url, {
+    credentials: 'include',
+    signal: controller.signal
+  }).then((res) => {
+    window.clearTimeout(timeoutId);
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     return res.json();
+  }).catch((error) => {
+    window.clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      console.warn('[useNavOptions] Navigation API request timed out');
+      throw new Error('Navigation request timeout');
+    }
+    throw error;
   });
+};
 
 export function useNavOptions(tenantKey: string, initialData?: unknown) {
   const shouldFetch = !!tenantKey;

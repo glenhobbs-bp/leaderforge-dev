@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-07-03T23:35:53.990Z",
+    "generated_at": "2025-07-04T14:27:25.967Z",
     "generator_version": "1.0.0",
-    "total_files": 313,
-    "total_size_bytes": 2881441,
+    "total_files": 318,
+    "total_size_bytes": 3057116,
     "file_types": {
-      ".ts": 133,
+      ".ts": 135,
       ".json": 17,
       ".tsx": 46,
       ".js": 10,
-      ".md": 105,
+      ".md": 108,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 179,
-      "API": 55,
-      "AI agent": 159,
+      "TypeScript": 181,
+      "API": 57,
+      "AI agent": 163,
       "React": 46,
       "React hooks": 34,
-      "security": 79,
-      "Next.js API": 53,
+      "security": 84,
+      "Next.js API": 55,
       "test": 13,
       "API endpoint": 3,
       "navigation state": 2,
@@ -70,7 +70,7 @@
       "prototyping": 1,
       "routing": 2,
       "exports": 1,
-      "documentation": 108,
+      "documentation": 111,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -405,12 +405,13 @@
         "next/server",
         "next/headers",
         "../../lib/supabaseServerClient",
-        "agent-core/agents/AdminAgent"
+        "agent-core/agents/AdminAgent",
+        "agent-core/tools/EntitlementTool"
       ],
-      "last_modified": "2025-07-03T23:35:43.833Z",
-      "size_bytes": 9161,
-      "hash": "8cf61b69",
-      "complexity": "medium"
+      "last_modified": "2025-07-04T14:21:39.226Z",
+      "size_bytes": 10661,
+      "hash": "e97db640",
+      "complexity": "high"
     },
     {
       "path": "apps/web/app/api/dashboard/[user_id]/route.ts",
@@ -635,6 +636,27 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/api/dev/fix-entitlement-permissions/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/fix-entitlement-permissions",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/dev/fix-entitlement-permissions/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "@supabase/supabase-js"
+      ],
+      "last_modified": "2025-07-04T09:56:51.786Z",
+      "size_bytes": 2835,
+      "hash": "d411aae2",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/api/dev/grant-admin-access/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/dev/grant-admin-access",
@@ -694,6 +716,28 @@
       "last_modified": "2025-07-02T10:50:37.685Z",
       "size_bytes": 2635,
       "hash": "235d3598",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/dev/test-entitlements/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/dev/test-entitlements",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/dev/test-entitlements/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "agent-core/tools/EntitlementTool"
+      ],
+      "last_modified": "2025-07-04T09:56:53.956Z",
+      "size_bytes": 1583,
+      "hash": "d9964af7",
       "complexity": "low"
     },
     {
@@ -867,9 +911,9 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-06-27T21:33:11.943Z",
-      "size_bytes": 4580,
-      "hash": "1e08699e",
+      "last_modified": "2025-07-04T14:27:17.176Z",
+      "size_bytes": 3625,
+      "hash": "72686dfb",
       "complexity": "medium"
     },
     {
@@ -1767,9 +1811,9 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-07-01T21:36:53.621Z",
-      "size_bytes": 22299,
-      "hash": "7036d466",
+      "last_modified": "2025-07-04T14:22:52.999Z",
+      "size_bytes": 22164,
+      "hash": "49aae387",
       "complexity": "high"
     },
     {
@@ -3595,9 +3639,9 @@
       "tags": [
         "TypeScript"
       ],
-      "last_modified": "2025-05-27T21:40:57.456Z",
-      "size_bytes": 211,
-      "hash": "f2b3bca0",
+      "last_modified": "2025-07-04T14:23:59.124Z",
+      "size_bytes": 201,
+      "hash": "9269d492",
       "complexity": "low"
     },
     {
@@ -3621,9 +3665,9 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.113Z",
-      "size_bytes": 552674,
-      "hash": "58f9103b"
+      "last_modified": "2025-07-04T14:24:02.290Z",
+      "size_bytes": 553134,
+      "hash": "bdcf0f7e"
     },
     {
       "path": "apps/web/package.json",
@@ -3634,9 +3678,9 @@
       "tags": [
         "AI agent"
       ],
-      "last_modified": "2025-07-03T17:44:48.792Z",
+      "last_modified": "2025-07-04T14:20:10.828Z",
       "size_bytes": 1329,
-      "hash": "e1c17139"
+      "hash": "246105f2"
     },
     {
       "path": "apps/web/postcss.config.js",
@@ -5071,9 +5115,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-03T22:45:18.353Z",
-      "size_bytes": 163767,
-      "hash": "97ed8bec"
+      "last_modified": "2025-07-04T13:54:43.596Z",
+      "size_bytes": 166285,
+      "hash": "1262e391"
     },
     {
       "path": "docs/manifest.md",
@@ -5086,9 +5130,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-03T22:45:18.472Z",
-      "size_bytes": 62265,
-      "hash": "c65fa3a9"
+      "last_modified": "2025-07-04T13:54:43.619Z",
+      "size_bytes": 63273,
+      "hash": "1c9fddff"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -5174,6 +5218,51 @@
       "hash": "4db59066"
     },
     {
+      "path": "docs/product-management/prds/powerprompts_prd.md",
+      "name": "powerprompts_prd.md",
+      "directory": "docs/product-management/prds",
+      "extension": ".md",
+      "purpose": "70% to creator, 30% to platform",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-04T11:56:42.405Z",
+      "size_bytes": 63029,
+      "hash": "fa2f072a"
+    },
+    {
+      "path": "docs/product-management/prds/prompt_contexts_prd.md",
+      "name": "prompt_contexts_prd.md",
+      "directory": "docs/product-management/prds",
+      "extension": ".md",
+      "purpose": "days",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-04T11:56:42.464Z",
+      "size_bytes": 60276,
+      "hash": "31c26d07"
+    },
+    {
+      "path": "docs/product-management/prds/prompt_library_prd.md",
+      "name": "prompt_library_prd.md",
+      "directory": "docs/product-management/prds",
+      "extension": ".md",
+      "purpose": "Check plan entitlements",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-04T11:56:42.468Z",
+      "size_bytes": 39174,
+      "hash": "05e3756c"
+    },
+    {
       "path": "docs/product-management/prds/user-input-response-system.md",
       "name": "user-input-response-system.md",
       "directory": "docs/product-management/prds",
@@ -5242,9 +5331,9 @@
       "dependencies": [
         "../types/AdminUISchema"
       ],
-      "last_modified": "2025-07-03T23:35:43.833Z",
-      "size_bytes": 11149,
-      "hash": "58bed063",
+      "last_modified": "2025-07-04T14:22:30.285Z",
+      "size_bytes": 15627,
+      "hash": "160318a9",
       "complexity": "high"
     },
     {
@@ -5480,9 +5569,9 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-03T23:34:55.056Z",
-      "size_bytes": 4056,
-      "hash": "14d05082",
+      "last_modified": "2025-07-04T14:22:07.206Z",
+      "size_bytes": 3970,
+      "hash": "559d957a",
       "complexity": "medium"
     },
     {

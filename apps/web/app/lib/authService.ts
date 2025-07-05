@@ -12,21 +12,43 @@ export const authService = {
    */
   async signOut(supabase: SupabaseClient): Promise<void> {
     try {
-      // Sign out from Supabase
-      await supabase.auth.signOut();
+      // Create timeout promises for all operations
+      const timeout = (ms: number) => new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), ms)
+      );
 
-      // Clear server-side session
-      await fetch('/api/auth/set-session', {
-        method: 'POST',
-        body: JSON.stringify({ session: null }),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      // Sign out from Supabase with 2-second timeout
+      try {
+        await Promise.race([
+          supabase.auth.signOut(),
+          timeout(2000)
+        ]);
+      } catch (error) {
+        console.warn('[authService] Supabase signOut timeout/error:', error);
+        // Continue with logout even if Supabase fails
+      }
 
-      // Redirect to home/login
+      // Clear server-side session with 1-second timeout
+      try {
+        await Promise.race([
+          fetch('/api/auth/set-session', {
+            method: 'POST',
+            body: JSON.stringify({ session: null }),
+            headers: { 'Content-Type': 'application/json' },
+          }),
+          timeout(1000)
+        ]);
+      } catch (error) {
+        console.warn('[authService] Set-session timeout/error:', error);
+        // Continue with logout even if server call fails
+      }
+
+      // Redirect immediately - don't wait for server calls
       window.location.href = '/';
     } catch (error) {
       console.error('[authService] Sign out error:', error);
-      throw error;
+      // Force redirect even on error to ensure user can log out
+      window.location.href = '/';
     }
   },
 

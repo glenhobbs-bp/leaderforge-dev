@@ -34,10 +34,6 @@ export async function POST(req: Request) {
       ? body.refresh_token[0]
       : body.refresh_token;
 
-    console.log('[set-session] ✅ Preparing to set cookies...');
-    console.log('[set-session] typeof access_token:', typeof access_token, '| Value:', access_token);
-    console.log('[set-session] typeof refresh_token:', typeof refresh_token, '| Value:', refresh_token);
-
     const response = NextResponse.json({ success: true });
 
     // Add CORS headers to response
@@ -53,7 +49,6 @@ export async function POST(req: Request) {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7,
       });
-      console.log('[set-session] ✅ Access token cookie set');
     }
 
     if (refresh_token) {
@@ -64,7 +59,6 @@ export async function POST(req: Request) {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 30,
       });
-      console.log('[set-session] ✅ Refresh token cookie set');
     }
 
     return response;

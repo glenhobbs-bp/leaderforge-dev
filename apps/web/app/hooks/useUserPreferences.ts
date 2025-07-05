@@ -15,7 +15,11 @@ import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/us
 export function useUserPreferences(userId: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['user-preferences', userId],
-    queryFn: () => fetchUserPreferences(userId),
+    queryFn: async () => {
+      const result = await fetchUserPreferences(userId);
+      // ✅ FIX: Ensure we never return undefined - React Query expects a value
+      return result ?? {};
+    },
     enabled: options?.enabled ?? !!userId,
     // Reduce stale time to prevent navigation state staleness
     staleTime: 30 * 1000, // 30 seconds (matches API cache)
@@ -32,6 +36,8 @@ export function useUserPreferences(userId: string, options?: { enabled?: boolean
     refetchOnReconnect: false, // Don't refetch on reconnect
     networkMode: 'offlineFirst', // Support offline-first
     throwOnError: false, // Don't throw errors, handle them gracefully
+    // ✅ FIX: Provide default data to prevent undefined state
+    placeholderData: {},
     meta: {
       errorMessage: 'Failed to load user preferences'
     }

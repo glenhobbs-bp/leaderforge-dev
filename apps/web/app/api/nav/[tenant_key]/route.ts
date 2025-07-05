@@ -28,32 +28,20 @@ export async function GET(req: NextRequest, context: { params: { tenant_key: str
     const cookieStore = await cookies();
     const supabase = createSupabaseServerClient(cookieStore);
 
-    // Debug: Log authentication attempt
-    console.log(`[API/nav/${tenant_key}] Starting authentication check...`);
-
     // Simplified auth: try to get session directly first
     const { data: { session } } = await supabase.auth.getSession();
-    console.log(`[API/nav/${tenant_key}] Initial session check:`, session ? 'Found' : 'None');
 
     // If no session, try manual hydration once
     if (!session?.user?.id) {
-      console.log(`[API/nav/${tenant_key}] No initial session, attempting manual hydration...`);
       const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
       const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
       const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
-
-      console.log(`[API/nav/${tenant_key}] Cookie tokens found:`, {
-        hasAccessToken: !!accessToken,
-        hasRefreshToken: !!refreshToken,
-        projectRef
-      });
 
       if (accessToken && refreshToken) {
         await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
         });
-        console.log(`[API/nav/${tenant_key}] Session restoration attempted`);
       }
     }
 
@@ -61,14 +49,7 @@ export async function GET(req: NextRequest, context: { params: { tenant_key: str
     const { data: { session: finalSession } } = await supabase.auth.getSession();
     const userId = finalSession?.user?.id;
 
-    console.log(`[API/nav/${tenant_key}] Final auth result:`, {
-      hasSession: !!finalSession,
-      userId: userId || 'None',
-      tenant: tenant_key
-    });
-
     if (!userId) {
-      console.log(`[API/nav/${tenant_key}] Authentication failed - returning 401`);
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
@@ -86,16 +67,23 @@ export async function GET(req: NextRequest, context: { params: { tenant_key: str
       });
     }
 
-    // Get nav options from database
-    const navOptions: NavOption[] = await navService.getNavOptions(supabase, tenant_key, userId);
+    // Get nav options from database with timeout protection
+    const navOptions: NavOption[] = await Promise.race([
+      navService.getNavOptions(supabase, tenant_key, userId),
+      new Promise<NavOption[]>((_, reject) =>
+        setTimeout(() => reject(new Error('Navigation query timeout')), 10000)
+      )
+    ]).catch(error => {
+      console.warn(`[API] Navigation query failed for ${tenant_key}:`, error.message);
+      // Return empty array as fallback to prevent complete failure
+      return [];
+    });
 
     // Cache the result
     navCache.set(cacheKey, { data: navOptions, timestamp: Date.now(), userId });
 
     const endTime = Date.now();
     const duration = endTime - startTime;
-
-    console.log(`[API] GET /api/nav/${tenant_key} completed in ${duration}ms for user ${userId} - ${navOptions.length} options returned`);
 
     return NextResponse.json(navOptions, {
       status: 200,

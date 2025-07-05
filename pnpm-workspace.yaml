@@ -1,5 +1,5 @@
 packages:
   - apps/web  # Only include web app since API routes moved to web
   - packages/*
-  - 'agent'
+  # - 'agent'  # ✅ DISABLED: Agent server runs on Render, not locally
 

@@ -130,10 +130,26 @@ export class AdminAgent {
     action: { params: Record<string, unknown> }
   ): Promise<AdminAgentResponse> {
     const taskId = `entitlements-${Date.now()}`;
-    const targetUserId = action.params.userId as string || '';
+    let targetUserId = action.params.userId as string || '';
 
     // Import the EntitlementTool
     const { EntitlementTool } = await import('../tools/EntitlementTool');
+
+    // If targetUserId looks like an email, convert it to UUID
+    if (targetUserId && targetUserId.includes('@')) {
+      const lookedUpUserId = await EntitlementTool.getUserIdByEmail(targetUserId);
+      if (!lookedUpUserId) {
+        return {
+          taskId,
+          schema: this.createErrorSchema(
+            'User Not Found',
+            `No user found with email: ${targetUserId}`
+          ),
+          error: 'User not found'
+        };
+      }
+      targetUserId = lookedUpUserId;
+    }
 
     // Fetch real entitlements from the database
     const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
@@ -212,6 +228,9 @@ export class AdminAgent {
       isCurrentlyAssigned: currentEntitlements.includes(e.id)
     }));
 
+    // Keep the original identifier for display purposes
+    const displayUserId = action.params.userId as string || targetUserId;
+
     const schema: AdminUISchema = {
       type: 'Form',
       id: `entitlements-modify-${taskId}`,
@@ -221,13 +240,19 @@ export class AdminAgent {
         formData: {
           jsonSchema: {
             type: 'object',
-            title: `Entitlements for ${targetUserId}`,
+            title: `Entitlements for ${displayUserId}`,
             description: `Current entitlements are pre-selected. Check/uncheck to modify.`,
             properties: {
               userId: {
                 type: 'string',
                 title: 'User',
-                default: targetUserId,
+                default: targetUserId, // Use UUID for backend operations
+                readOnly: true
+              },
+              displayUserId: {
+                type: 'string',
+                title: 'User Identifier',
+                default: displayUserId, // Show original email/ID to user
                 readOnly: true
               },
               currentEntitlements: {
@@ -259,6 +284,9 @@ export class AdminAgent {
           },
           uiSchema: {
             userId: {
+              'ui:widget': 'hidden'
+            },
+            displayUserId: {
               'ui:widget': 'text',
               'ui:readonly': true,
               'ui:description': 'User being modified'
@@ -275,7 +303,8 @@ export class AdminAgent {
             }
           },
           initialValues: {
-            userId: targetUserId,
+            userId: targetUserId, // UUID for backend
+            displayUserId: displayUserId, // Email/original for display
             currentEntitlements: currentEntitlements,
             newEntitlements: currentEntitlements
           }
@@ -283,7 +312,7 @@ export class AdminAgent {
       },
       config: {
         title: 'Modify User Entitlements',
-        subtitle: `Step 2: Update entitlements for ${targetUserId}`,
+        subtitle: `Step 2: Update entitlements for ${displayUserId}`,
         formConfig: {
           submitButton: {
             text: 'Update Entitlements',

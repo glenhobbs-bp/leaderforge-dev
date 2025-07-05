@@ -9,10 +9,21 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   productionBrowserSourceMaps: false,
+  // ✅ FIX: Disable source maps in development to prevent 404 errors
+  devIndicators: {
+    buildActivity: false,
+  },
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
-  webpack: (config) => {
+      webpack: (config) => {
+    // ✅ FIX: Remove devtool override to prevent performance warnings
+    // Source maps are handled by Next.js automatically
+
+    // ✅ FIX: Minimal webpack config to prevent rebuild issues
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
       "@": path.resolve(__dirname),

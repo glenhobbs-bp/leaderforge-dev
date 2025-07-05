@@ -28,85 +28,90 @@ export default function SupabaseProvider({
 
   // Start with initialSession to prevent auth flash
   const [session, setSession] = useState<Session | null>(initialSession);
-  const [loading, setLoading] = useState(!!initialSession); // If we have initial session, we're still loading
+  const [loading, setLoading] = useState(false); // ✅ FIX: Start with false, only set true during actual auth operations
 
   const hasRestoredSession = useRef(false);
   const mounted = useRef(true);
+  const processingAuth = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
 
     const restoreSession = async () => {
-      if (hasRestoredSession.current) return;
-      if (!initialSession) {
-        setLoading(false);
+      if (hasRestoredSession.current || processingAuth.current) return;
+
+      // ✅ FIX: If we have initialSession, use it directly without setSession call
+      if (initialSession) {
+        console.log('[SupabaseProvider] Using initial session directly');
+        hasRestoredSession.current = true;
         return;
       }
 
-      console.log('[SupabaseProvider] Restoring initial session');
+      // Only try to get session if we don't have one
+      if (!session) {
+        setLoading(true);
+        processingAuth.current = true;
 
-      try {
-        const { data, error } = await supabase.auth.setSession({
-          access_token: initialSession.access_token,
-          refresh_token: initialSession.refresh_token,
-        });
+        try {
+          const { data: { session: currentSession } } = await supabase.auth.getSession();
 
-        if (error) {
-          console.error('[SupabaseProvider] Session restoration failed:', error);
+          if (isMounted) {
+            setSession(currentSession);
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('[SupabaseProvider] Session check error:', error);
           if (isMounted) {
             setSession(null);
             setLoading(false);
           }
-        } else if (isMounted) {
-          console.log('[SupabaseProvider] Session restored successfully');
-          setSession(data.session);
-          setLoading(false);
         }
-      } catch (error) {
-        console.error('[SupabaseProvider] Session restoration error:', error);
-        if (isMounted) {
-          setSession(null);
-          setLoading(false);
-        }
+
+        processingAuth.current = false;
       }
 
       hasRestoredSession.current = true;
     };
 
-    // Auth state change listener
+    // Auth state change listener with better event handling
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      if (!isMounted || processingAuth.current) return;
+
       console.log('[SupabaseProvider] Auth state changed:', event, newSession?.user?.id);
 
-      if (!isMounted) return;
+      // ✅ FIX: Handle auth events more precisely
+      switch (event) {
+        case 'INITIAL_SESSION':
+          // Only process if we don't already have a session
+          if (!session && newSession) {
+            setSession(newSession);
+          }
+          break;
 
-      // Prevent auth loops - only update session for genuine auth events
-      if (event === 'SIGNED_OUT') {
-        console.log('[SupabaseProvider] User signed out, clearing session');
-        setSession(null);
-        setLoading(false);
-        return;
-      }
+        case 'SIGNED_IN':
+          setSession(newSession);
+          setLoading(false);
+          break;
 
-      if (event === 'SIGNED_IN' && newSession) {
-        console.log('[SupabaseProvider] User signed in, updating session');
-        setSession(newSession);
-        setLoading(false);
-        return;
-      }
+        case 'SIGNED_OUT':
+          setSession(null);
+          setLoading(false);
+          break;
 
-      if (event === 'TOKEN_REFRESHED' && newSession) {
-        console.log('[SupabaseProvider] Token refreshed, updating session');
-        setSession(newSession);
-        setLoading(false);
-        return;
-      }
+        case 'TOKEN_REFRESHED':
+          if (newSession) {
+            setSession(newSession);
+          }
+          break;
 
-      // For other events, only update if we've completed initial restoration
-      if (hasRestoredSession.current) {
-        setSession(newSession);
-        setLoading(false);
+        default:
+          // For other events, only update if session changed
+          if (newSession?.user?.id !== session?.user?.id) {
+            setSession(newSession);
+          }
+          break;
       }
     });
 

@@ -21,17 +21,17 @@ export const entitlementService = {
     }
 
     try {
-      const { data, error } = await supabase
+      // ✅ PERFORMANCE FIX: Use simpler query without expensive JOIN
+      // First get user entitlement IDs only (much faster)
+      const { data: userEntData, error: userEntError } = await supabase
         .schema('core')
         .from('user_entitlements')
-        .select(`
-          *,
-          entitlement:entitlements (*)
-        `)
+        .select('entitlement_id, granted_at, expires_at')
         .eq('user_id', userId)
         .is('revoked_at', null);
 
-      if (error) {
+      if (userEntError) {
+        console.warn('[entitlementService] Error fetching user entitlements:', userEntError);
         // Return empty array for permission errors, but cache it to avoid repeated calls
         const emptyResult: Entitlement[] = [];
         entitlementCache.set(cacheKey, {
@@ -41,7 +41,49 @@ export const entitlementService = {
         return emptyResult;
       }
 
-      const entitlements = (data || []) as Entitlement[];
+      // If no entitlements, return empty array
+      if (!userEntData || userEntData.length === 0) {
+        const emptyResult: Entitlement[] = [];
+        entitlementCache.set(cacheKey, {
+          data: emptyResult,
+          timestamp: Date.now()
+        });
+        return emptyResult;
+      }
+
+      // ✅ PERFORMANCE FIX: Get entitlement details in a separate, simpler query
+      const entitlementIds = userEntData.map(ue => ue.entitlement_id);
+      const { data: entitlementData, error: entitlementError } = await supabase
+        .schema('core')
+        .from('entitlements')
+        .select('*')
+        .in('id', entitlementIds);
+
+      if (entitlementError) {
+        console.warn('[entitlementService] Error fetching entitlement details:', entitlementError);
+                 // Fallback: return user entitlements without full details
+         const fallbackResult = userEntData.map(ue => ({
+           id: ue.entitlement_id, // Add required id field
+           ...ue,
+           entitlement: { id: ue.entitlement_id, name: ue.entitlement_id }
+         })) as Entitlement[];
+
+        entitlementCache.set(cacheKey, {
+          data: fallbackResult,
+          timestamp: Date.now()
+        });
+        return fallbackResult;
+      }
+
+             // ✅ PERFORMANCE FIX: Combine the results manually (faster than JOIN)
+       const entitlements = userEntData.map(ue => {
+         const entitlementDetail = entitlementData?.find(e => e.id === ue.entitlement_id);
+         return {
+           id: ue.entitlement_id, // Add required id field
+           ...ue,
+           entitlement: entitlementDetail || { id: ue.entitlement_id, name: ue.entitlement_id }
+         };
+       }) as Entitlement[];
 
       // Cache the result in persistent cache
       entitlementCache.set(cacheKey, {

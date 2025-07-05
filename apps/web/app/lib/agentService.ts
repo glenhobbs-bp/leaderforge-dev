@@ -83,7 +83,7 @@ export class AgentService {
       throw new Error(`Agent ${agentId} not found`);
     }
 
-    console.log(`[AgentService] Invoking ${agent.type} agent: ${agent.name}`);
+    // Agent invocation
 
     switch (agent.type) {
       case 'langgraph':
@@ -131,7 +131,7 @@ export class AgentService {
         return content;
       }
 
-      console.log(`[AgentService] Batch fetching progress and worksheet completions for ${contentIds.length} content items:`, contentIds);
+      // Batch fetching progress and worksheet completions
 
       // Step 2: Fetch progress and worksheet data in parallel using content_id
       let progressMap: Record<string, any> = {};
@@ -160,7 +160,7 @@ export class AgentService {
 
         // Process video progress data
         if (progressResult.error) {
-          console.warn(`[AgentService] Progress query failed:`, progressResult.error);
+          // Progress query failed
         } else if (progressResult.data) {
           progressResult.data.forEach((item) => {
             progressMap[item.content_id] = {
@@ -172,7 +172,7 @@ export class AgentService {
               lastUpdated: item.last_viewed_at
             };
           });
-          console.log(`[AgentService] Successfully fetched progress for ${progressResult.data?.length || 0} items`);
+          // Successfully fetched progress data
         }
 
         // Process worksheet completion data
@@ -184,11 +184,7 @@ export class AgentService {
             const videoIdFromData = item.input_data?.video_id;
             const videoIdFromContext = item.source_context?.match(/video-reflection:([^:]+)/)?.[1];
 
-            console.log(`[AgentService] Found worksheet submission:`, {
-              videoIdFromData,
-              videoIdFromContext,
-              source_context: item.source_context
-            });
+            // Found worksheet submission
           });
 
           // Collect all completed content_ids

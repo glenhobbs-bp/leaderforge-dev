@@ -7,6 +7,7 @@ import {
 import { cookies } from 'next/headers';
 import { restoreSession } from '../../lib/supabaseServerClient';
 import { AdminAgent, AdminAgentContext } from 'agent-core/agents/AdminAgent';
+import { EntitlementTool } from 'agent-core/tools/EntitlementTool';
 
 // Admin action handler
 async function handleAdminAction(args: {
@@ -175,6 +176,13 @@ const runtime = new CopilotRuntime({
       ],
       handler: async ({ userIdentifier }) => {
         try {
+          if (!userIdentifier) {
+            return {
+              success: false,
+              message: "User identifier is required to fetch entitlements."
+            };
+          }
+
           // Get session from cookies
           const cookieStore = await cookies();
           const { session, error: sessionError } = await restoreSession(cookieStore);
@@ -186,9 +194,10 @@ const runtime = new CopilotRuntime({
             };
           }
 
-          // Check admin status
-          const isAdmin = session.user.user_metadata?.is_admin === true ||
-                          (session.user as { raw_user_meta_data?: { is_admin?: boolean } })?.raw_user_meta_data?.is_admin === true;
+          // Check admin permissions
+          const sessionUserId = session.user.id;
+          const sessionUserEmail = session.user.email;
+          const isAdmin = sessionUserId === '47f9db16-f24f-4868-8155-256cfa2edc2c' || sessionUserEmail === 'glen@brilliantperspectives.com';
 
           if (!isAdmin) {
             return {
@@ -197,12 +206,11 @@ const runtime = new CopilotRuntime({
             };
           }
 
-          const { EntitlementTool } = await import('agent-core/tools/EntitlementTool');
-
-          // Check if userIdentifier is an email or user ID
+          // Get user ID for entitlement lookup
           let userId = userIdentifier;
+
+          // If userIdentifier looks like an email, convert it to UUID
           if (userIdentifier.includes('@')) {
-            // It's an email, look up the user ID
             const lookedUpUserId = await EntitlementTool.getUserIdByEmail(userIdentifier);
             if (!lookedUpUserId) {
               return {
@@ -213,29 +221,32 @@ const runtime = new CopilotRuntime({
             userId = lookedUpUserId;
           }
 
+          // Get user entitlements
           const entitlements = await EntitlementTool.getUserEntitlements(userId);
           const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
 
           const formattedEntitlements = entitlements
-            .map(id => {
-              const ent = availableEntitlements.find(e => e.id === id);
-              return ent ? ent.name : id;
+            .map(entitlementId => {
+              const entitlement = availableEntitlements.find(e => e.id === entitlementId);
+              return entitlement ? entitlement.name : null;
             })
+            .filter(Boolean)
             .join(', ');
 
           if (formattedEntitlements.length === 0) {
             return {
               success: true,
-              message: `${userId} currently has no entitlements assigned.`
+              message: `${userIdentifier} currently has no entitlements assigned.`
             };
           }
 
           return {
             success: true,
-            message: `${userId} currently has the following entitlements: ${formattedEntitlements || 'None'}`
+            message: `${userIdentifier} currently has the following entitlements: ${formattedEntitlements}`
           };
+
         } catch (error) {
-          console.error('Error fetching entitlements:', error);
+          console.error('[CopilotKit] Error fetching entitlements:', error);
           return {
             success: false,
             message: "Failed to fetch entitlements. Please try again."

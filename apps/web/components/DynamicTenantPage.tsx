@@ -1,7 +1,7 @@
 "use client";
 // File: apps/web/components/DynamicTenantPage.tsx
 // Purpose: Agent-native 3-panel layout. Pure renderer - displays only what agents return.
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback, Suspense, lazy } from "react";
 import ThreePanelLayout from "./ui/ThreePanelLayout";
 import NavPanel from "./ui/NavPanel";
 import { UniversalSchemaRenderer } from "./ai/UniversalSchemaRenderer";
@@ -11,7 +11,6 @@ import { UniversalWidgetSchema } from "../../../packages/agent-core/types/Univer
 // import { VideoPlayerModal } from "./widgets/VideoPlayerModal"; // ❌ Removed static import
 import { FormWidget } from "./forms/FormWidget";
 import { useSupabase } from './SupabaseProvider';
-import React, { Suspense, lazy } from "react";
 
 // Dynamic VideoPlayerModal loader to prevent bundle bloat
 const DynamicVideoPlayerModal = lazy(() =>
@@ -20,7 +19,7 @@ const DynamicVideoPlayerModal = lazy(() =>
   }))
 );
 import { useUserPreferences } from '../app/hooks/useUserPreferences';
-import { useQueryClient } from '@tanstack/react-query';
+// Removed queryClient import - no longer needed after fixing render loop
 import type { UserPreferences } from '../app/lib/types';
 
 // Diagnostic: Track module load
@@ -60,18 +59,18 @@ type DynamicTenantPageProps = {
 };
 
 export default function DynamicTenantPage(props: DynamicTenantPageProps) {
-  console.log('[DynamicTenantPage] RENDER - Database-driven', props);
+  // Reduced debug logging to prevent console spam during render loops
+  // console.log('[DynamicTenantPage] RENDER - Database-driven', props);
 
   // Auth context
   const { session, loading: authLoading } = useSupabase();
 
-  // React Query client for cache invalidation
-  const queryClient = useQueryClient();
+  // React Query client removed - was causing render loops via cache invalidation
 
   // Core state
   const hasMounted = useRef(false);
   const hasNavigationRestored = useRef(false);
-  const [hasRestoredContext, setHasRestoredContext] = useState(false);
+  const [hasRestoredTenant, setHasRestoredTenant] = useState(false);
   const [shouldFetchUserPrefs, setShouldFetchUserPrefs] = useState(false);
 
   // Video modal state
@@ -92,102 +91,141 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'leaderforge'
   );
   const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // ✅ FIX: Start with false, set true only during actual loading
   const [contentLoading, setContentLoading] = useState(false); // New loading state for content
   const [error, setError] = useState<string | null>(null);
   const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
 
   // Only fetch user preferences when explicitly needed
-  const { data: userPrefs, error: userPrefsError } = useUserPreferences(
+  const { data: userPrefs, error: userPrefsError, refetch: refetchUserPrefs, isLoading: userPrefsLoading } = useUserPreferences(
     session?.user?.id || '',
     { enabled: shouldFetchUserPrefs && !!session?.user?.id }
   );
 
   // Trigger user preferences fetch on initial mount when session is available
   useEffect(() => {
-    if (session?.user?.id && !shouldFetchUserPrefs && !hasRestoredContext) {
+    if (session?.user?.id && !shouldFetchUserPrefs && !hasRestoredTenant) {
       console.log('[DynamicTenantPage] Triggering initial user preferences fetch for session:', session.user.id);
       setShouldFetchUserPrefs(true);
     }
-  }, [session?.user?.id, shouldFetchUserPrefs, hasRestoredContext]);
+  }, [session?.user?.id, shouldFetchUserPrefs, hasRestoredTenant]);
 
   // Handle user preferences errors gracefully
   useEffect(() => {
     if (userPrefsError) {
       console.warn('[DynamicTenantPage] User preferences failed to load:', userPrefsError);
       // Don't block the app, just mark restoration as complete to proceed
-      if (!hasRestoredContext) {
-        setHasRestoredContext(true);
+      if (!hasRestoredTenant) {
+        setHasRestoredTenant(true);
       }
     }
-  }, [userPrefsError, hasRestoredContext]);
+  }, [userPrefsError, hasRestoredTenant]);
 
   // Context restoration effect - restore last visited context
   useEffect(() => {
     // If user preferences failed to load, proceed without restoration
     if (userPrefsError) {
-      if (!hasRestoredContext) {
+      if (!hasRestoredTenant) {
         console.log('[DynamicTenantPage] Skipping tenant restoration due to user preferences error');
-        setHasRestoredContext(true);
+        setHasRestoredTenant(true);
       }
       return;
     }
 
-    if (!session?.user?.id || !userPrefs || hasRestoredContext) return;
+    // ✅ FIX: Wait for user preferences to finish loading before trying to restore
+    // Check if userPrefs is empty object (placeholder data) or actually has content
+    const hasRealUserPrefs = userPrefs && Object.keys(userPrefs).length > 0;
 
-    const preferences = userPrefs.preferences as UserPreferences;
+    if (!session?.user?.id || !hasRealUserPrefs || hasRestoredTenant || userPrefsLoading) {
+      if (userPrefsLoading) {
+        console.log('[DynamicTenantPage] ⏳ Waiting for user preferences to load...');
+      }
+      if (!hasRealUserPrefs && userPrefs) {
+        console.log('[DynamicTenantPage] ⏳ User preferences is empty placeholder, waiting for real data...');
+      }
+      return;
+    }
+
+    // ✅ FIX: Add detailed debugging for user preferences structure
+    console.log('[DynamicTenantPage] 🔍 DEBUG: Full userPrefs data:', userPrefs);
+    console.log('[DynamicTenantPage] 🔍 DEBUG: User prefs loading state:', { userPrefsLoading, userPrefsError, hasUserPrefs: !!userPrefs });
+
+    // ✅ FIX: userPrefs IS the preferences object (API client extracts it)
+    const preferences = userPrefs as UserPreferences;
     const navigationState = preferences?.navigationState;
     const lastTenant = navigationState?.lastTenant;
+
+    console.log('[DynamicTenantPage] 🔍 DEBUG: Navigation state details:', {
+      preferences,
+      navigationState,
+      lastTenant,
+      lastNavOption: navigationState?.lastNavOption,
+      lastUpdated: navigationState?.lastUpdated
+    });
 
     console.log('[DynamicTenantPage] Tenant restoration:', {
       lastTenant,
       currentTenant,
-      hasRestoredContext
+      hasRestoredTenant
     });
 
     // ✅ FIXED: Only restore tenant if it's actually different AND not already set
     // Prevent infinite loops when tenant is already correct
-    if (lastTenant && lastTenant !== currentTenant && hasRestoredContext === false) {
+    if (lastTenant && lastTenant !== currentTenant && hasRestoredTenant === false) {
       console.log('[DynamicTenantPage] Restoring last tenant:', lastTenant);
       setCurrentTenant(lastTenant);
     } else {
       console.log('[DynamicTenantPage] Tenant restoration skipped:', {
         hasLastTenant: !!lastTenant,
         tenantsDifferent: lastTenant !== currentTenant,
-        contextNotRestored: hasRestoredContext === false,
+        contextNotRestored: hasRestoredTenant === false,
         reason: !lastTenant ? 'no saved tenant' :
                 lastTenant === currentTenant ? 'tenant already correct' : 'context already restored'
       });
     }
 
-    setHasRestoredContext(true);
-  }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
+    setHasRestoredTenant(true);
+  }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredTenant, currentTenant, userPrefsLoading]);
 
-  // Navigation option restoration effect - runs after context is restored
+  // Navigation option restoration effect - runs ONLY ONCE after context is restored
   useEffect(() => {
+    // ✅ CRITICAL FIX: Early exit if already restored to prevent infinite loops
+    if (hasNavigationRestored.current) {
+      return;
+    }
+
     console.log('[DynamicTenantPage] 🔄 Navigation restoration effect triggered:', {
       hasSession: !!session?.user?.id,
       hasUserPrefs: !!userPrefs,
       hasUserPrefsError: !!userPrefsError,
-      hasRestoredContext,
-      currentTenant
+      hasRestoredTenant,
+      currentTenant,
+      userPrefsLoading
     });
 
     // If user preferences failed to load, skip navigation restoration
     if (userPrefsError) {
       console.log('[DynamicTenantPage] Skipping navigation restoration due to user preferences error');
+      hasNavigationRestored.current = true; // Mark as attempted to prevent retry loops
       return;
     }
 
-    if (!session?.user?.id || !userPrefs || !hasRestoredContext) return;
+    // ✅ FIX: Wait for user preferences to finish loading before trying to restore navigation
+    // Check if userPrefs is empty object (placeholder data) or actually has content
+    const hasRealUserPrefs = userPrefs && Object.keys(userPrefs).length > 0;
 
-    // ✅ FIXED: Only restore navigation once per component mount, not on every dependency change
-    if (hasNavigationRestored.current) {
-      console.log('[DynamicTenantPage] ⏭️ Navigation already restored, skipping');
+    if (!session?.user?.id || !hasRealUserPrefs || !hasRestoredTenant || userPrefsLoading) {
+      if (userPrefsLoading) {
+        console.log('[DynamicTenantPage] ⏳ Waiting for user preferences to load for navigation restoration...');
+      }
+      if (!hasRealUserPrefs && userPrefs) {
+        console.log('[DynamicTenantPage] ⏳ User preferences is empty placeholder for navigation, waiting for real data...');
+      }
       return;
     }
 
-    const preferences = userPrefs.preferences as UserPreferences;
+    // ✅ FIX: userPrefs IS the preferences object (API client extracts it)
+    const preferences = userPrefs as UserPreferences;
     const navigationState = preferences?.navigationState;
     const lastTenant = navigationState?.lastTenant;
     const lastNavOption = navigationState?.lastNavOption;
@@ -197,7 +235,11 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       lastTenant,
       lastNavOption,
       currentTenant,
-      shouldRestore: lastNavOption && lastTenant === currentTenant
+      shouldRestore: lastNavOption && lastTenant === currentTenant,
+      // ✅ DEBUG: Add more detailed debugging
+      userPrefsStructure: userPrefs,
+      preferencesIsUserPrefs: preferences === userPrefs,
+      navigationStateRaw: navigationState
     });
 
     // Only restore navigation option if we're in the correct tenant and have a saved option
@@ -208,6 +250,8 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         currentTenant,
         timestamp: navigationState?.lastUpdated
       });
+
+      console.log('[DynamicTenantPage] 🔧 Setting selectedNavOptionId to:', lastNavOption);
       setSelectedNavOptionId(lastNavOption);
       hasNavigationRestored.current = true; // Mark as restored
 
@@ -217,15 +261,15 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         loadContentForNavOption(lastNavOption, false); // Don't update selection since it's already set
       }, 200); // Small delay to ensure context is fully set
     } else {
-      console.log('[DynamicTenantPage] ❌ NOT restoring navigation state:', {
+      console.log('[DynamicTenantPage] 📋 No navigation state to restore:', {
         hasLastNavOption: !!lastNavOption,
-        lastTenant,
+        lastTenant: lastTenant || 'none',
         currentTenant,
-        tenantMatch: lastTenant === currentTenant
+        reason: !lastNavOption ? 'no saved navigation' : 'tenant mismatch'
       });
       hasNavigationRestored.current = true; // Mark as attempted even if no restoration
     }
-  }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredContext, currentTenant]);
+  }, [session?.user?.id, userPrefs, userPrefsError, hasRestoredTenant, currentTenant, userPrefsLoading]);
 
   // Debug session state
   useEffect(() => {
@@ -246,6 +290,14 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       }
     }
   }, []);
+
+  // ✅ FIX: Initialize loading state properly
+  useEffect(() => {
+    if (session && !authLoading && hasRestoredTenant) {
+      // All initialization complete, ensure loading is false
+      setLoading(false);
+    }
+  }, [session, authLoading, hasRestoredTenant]);
 
   // 🤖 AGENT-NATIVE: Handle ComponentSchema from agent - MUST be at top level before any returns
   // Memoize content to prevent object recreation causing video re-mounting
@@ -345,12 +397,8 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
   // Memoize content component to prevent video re-mounting - MUST be at top level before any returns
   const contentComponent = useMemo(() => {
-    console.log('[DynamicTenantPage] contentComponent memo triggered:', {
-      contentLoading,
-      schemaType,
-      content,
-      hasComponent: content && typeof content === 'object' && 'component' in content
-    });
+    // Reduced debug logging to prevent console spam during render loops
+    // console.log('[DynamicTenantPage] contentComponent memo triggered:', { contentLoading, schemaType, content, hasComponent: content && typeof content === 'object' && 'component' in content });
 
     if (contentLoading) {
       return createLoadingContent();
@@ -559,7 +607,13 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     // Show loading state while fetching content
     setContentLoading(true);
 
+    // 20-second timeout for agent content API (LangGraph needs 8-13 seconds)
+    const controller = new AbortController();
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     try {
+      timeoutId = setTimeout(() => controller.abort(), 20000);
+
       // Call the agent content API
       const response = await fetch('/api/agent/content', {
         method: 'POST',
@@ -567,6 +621,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
+        signal: controller.signal,
         body: JSON.stringify({
           userId: session.user.id,
           tenantKey: currentTenant,
@@ -576,6 +631,8 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           }
         })
       });
+
+      window.clearTimeout(timeoutId);
 
       if (!response.ok) {
         let errorData: { message?: string; error?: string };
@@ -644,32 +701,37 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         });
       }
 
-    // Persist navigation state to database (always persist when content loads successfully)
-    if (session?.user?.id) {
-      try {
-        await fetch(`/api/user/${session.user.id}/navigation-state`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tenantKey: currentTenant,
-            navOptionId: navId
-          })
-        });
-        console.log('[DynamicTenantPage] ✅ Navigation state persisted:', { tenantKey: currentTenant, navOptionId: navId });
+    // ✅ FIX: Navigation state is already persisted by NavPanel via useNavigationState hook
+    // Remove duplicate navigation state saving to prevent race conditions
+    console.log('[DynamicTenantPage] ✅ Content loaded successfully for navigation option:', navId);
 
-        // Invalidate user preferences cache to ensure fresh data on next load
-        queryClient.invalidateQueries({ queryKey: ['user-preferences', session.user.id] });
-        console.log('[DynamicTenantPage] 🔄 User preferences cache invalidated');
-      } catch (error) {
-        console.warn('[DynamicTenantPage] ⚠️ Failed to persist navigation state:', error);
-      }
-    }
+    // Refetch user preferences after a delay to ensure any navigation state changes are reflected
+    setTimeout(async () => {
+      console.log('[DynamicTenantPage] 🔄 Refetching user preferences after content load...');
+      await refetchUserPrefs();
+      console.log('[DynamicTenantPage] ✅ User preferences refetched successfully');
+    }, 500); // Shorter delay since we're not waiting for our own DB write
 
   } catch (error) {
+      window.clearTimeout(timeoutId);
       console.error('[DynamicTenantPage] Network error calling agent:', error);
 
       // Clear loading state
       setContentLoading(false);
+
+      // Handle timeout specifically
+      if ((error as Error).name === 'AbortError') {
+        setAgentSchema({
+          type: 'error',
+          content: {
+            type: 'error',
+            title: 'Request Timeout',
+            description: 'The content request took too long. Please try again.',
+            action: 'Retry'
+          }
+        });
+        return;
+      }
 
       // Show network error state
       setAgentSchema({
@@ -691,8 +753,8 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     await loadContentForNavOption(navId, false); // Don't update selection again
   };
 
-  // Show loading state while waiting for auth or schema
-  if (!session || loading) {
+  // Show loading state while waiting for auth or initialization
+  if (!session || authLoading || (!hasRestoredTenant && !userPrefsError)) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
@@ -780,6 +842,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
     // Create nav component using database-driven approach
     const NavComponent = ({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
+      console.log('[DynamicTenantPage] 🔧 NavComponent rendering with selectedNavOptionId:', selectedNavOptionId);
       return (
         <NavPanel
           tenantKey={currentTenant}
@@ -985,3 +1048,5 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     </div>
   );
 }
+
+// Removed React.memo as it was causing excessive re-renders

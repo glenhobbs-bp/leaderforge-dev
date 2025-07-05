@@ -20,6 +20,7 @@ export interface Entitlement {
 }
 
 export class EntitlementTool {
+
   private static getSupabaseClient() {
     if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Supabase configuration is missing');
@@ -69,13 +70,13 @@ export class EntitlementTool {
         .is('revoked_at', null);
 
       if (error) {
-        console.error('Error fetching user entitlements:', error);
-        return [];
+        throw error;
       }
 
-      return data?.map(ue => ue.entitlement_id) || [];
+      const entitlementIds = data?.map(row => row.entitlement_id) || [];
+      return entitlementIds;
     } catch (error) {
-      console.error('Failed to fetch user entitlements:', error);
+      console.error('Error fetching user entitlements:', error);
       return [];
     }
   }
@@ -139,13 +140,12 @@ export class EntitlementTool {
         .single();
 
       if (error) {
-        console.error('Error looking up user by email:', error);
-        return null;
+        throw error;
       }
 
       return data?.id || null;
     } catch (error) {
-      console.error('Failed to look up user by email:', error);
+      console.error('Error fetching user by email:', error);
       return null;
     }
   }
