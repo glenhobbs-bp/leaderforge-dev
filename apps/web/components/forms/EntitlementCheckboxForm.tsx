@@ -3,6 +3,22 @@
  * Purpose: Interactive checkbox form for managing user entitlements in CopilotKit
  * Owner: Engineering Team
  * Tags: #copilotkit #forms #entitlements #admin
+ *
+ * CRITICAL DISTINCTION: Two Types of Entitlements
+ *
+ * 1. ADMIN PERMISSIONS (Authorization)
+ *    - Question: "Can the current user manage entitlements?"
+ *    - Examples: is_super_admin, platform_admin, tenant_admin
+ *    - Purpose: Controls WHO can access this form
+ *    - Checked in: /api/admin/entitlements/list endpoint before returning data
+ *
+ * 2. TARGET USER ENTITLEMENTS (Business Logic)
+ *    - Question: "What entitlements does the target user have?"
+ *    - Examples: leaderforge-premium, basic-access, content-library-access
+ *    - Purpose: The checkboxes shown in this form, what gets granted/revoked
+ *    - Displayed as: availableEntitlements (all possible) vs currentEntitlements (user has)
+ *
+ * This form displays #2 (target user entitlements) after #1 (admin permissions) are verified by the API.
  */
 
 "use client";

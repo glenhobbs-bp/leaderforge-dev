@@ -1,8 +1,24 @@
 /**
  * File: packages/agent-core/tools/EntitlementTool.ts
- * Purpose: Tool for fetching and managing entitlements from the database
+ * Purpose: Tool for managing user entitlements (business logic)
  * Owner: Engineering Team
- * Tags: #tools #entitlements #database
+ * Tags: #tools #entitlements #business-logic
+ *
+ * CRITICAL DISTINCTION: Two Types of Entitlements
+ *
+ * 1. ADMIN PERMISSIONS (Authorization) - NOT handled by this tool
+ *    - Question: "Can the current user manage entitlements?"
+ *    - Examples: is_super_admin, platform_admin, tenant_admin
+ *    - Purpose: Controls WHO can access entitlement management features
+ *    - Handled in: API routes via getAdminLevel() checks
+ *
+ * 2. TARGET USER ENTITLEMENTS (Business Logic) - THIS is what this tool manages
+ *    - Question: "What entitlements does the target user have?"
+ *    - Examples: leaderforge-premium, basic-access, content-library-access
+ *    - Purpose: The actual business entitlements being granted/revoked
+ *    - Methods: getUserEntitlements(), updateUserEntitlements(), getAvailableEntitlements()
+ *
+ * This tool assumes authorization has already been checked by the caller!
  */
 
 import { createClient } from '@supabase/supabase-js';

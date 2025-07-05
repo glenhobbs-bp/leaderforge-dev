@@ -1,3 +1,26 @@
+/**
+ * File: apps/web/app/api/copilotkit/route.ts
+ * Purpose: CopilotKit API endpoint for admin actions
+ * Owner: Engineering Team
+ * Tags: #copilotkit #api #admin
+ *
+ * CRITICAL DISTINCTION: Two Types of Entitlements
+ *
+ * 1. ADMIN PERMISSIONS (Authorization)
+ *    - Question: "Can the current user manage entitlements?"
+ *    - Examples: is_super_admin, platform_admin, tenant_admin
+ *    - Purpose: Controls WHO can access entitlement management features
+ *    - Checked via: getAdminLevel() function
+ *
+ * 2. TARGET USER ENTITLEMENTS (Business Logic)
+ *    - Question: "What entitlements does the target user have?"
+ *    - Examples: leaderforge-premium, basic-access, content-library-access
+ *    - Purpose: The actual business entitlements being granted/revoked
+ *    - Managed via: EntitlementTool.getUserEntitlements()
+ *
+ * NEVER conflate these two concepts!
+ */
+
 import { NextRequest } from "next/server";
 import {
   CopilotRuntime,
@@ -203,241 +226,9 @@ const runtime = new CopilotRuntime({
           required: true,
         },
       ],
-            handler: async ({ intent }) => {
+      handler: async ({ intent }) => {
         console.log('[CopilotKit API] performAdminTask called with intent:', intent);
         return handleAdminAction({ intent });
-      },
-    },
-
-
-    {
-      name: "modifyUserEntitlements",
-      description: "Add or remove specific entitlements for a user",
-      parameters: [
-        {
-          name: "userIdentifier",
-          type: "string",
-          description: "The user's email address or user ID",
-          required: true,
-        },
-        {
-          name: "action",
-          type: "string",
-          description: "The action to perform: 'add', 'remove', or 'set'",
-          required: true,
-        },
-        {
-          name: "entitlements",
-          type: "string",
-          description: "Comma-separated list of entitlement IDs or names",
-          required: true,
-        },
-      ],
-      handler: async ({ userIdentifier, action, entitlements }) => {
-        try {
-          // Get session from cookies
-          const cookieStore = await cookies();
-          const { session, error: sessionError } = await restoreSession(cookieStore);
-
-          if (sessionError || !session?.user) {
-            return {
-              success: false,
-              message: "You need to be logged in to modify entitlements."
-            };
-          }
-
-          // Check admin permissions
-          const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } }) => {
-            const metadata = user.user_metadata || {};
-            const rawMetadata = user.raw_user_meta_data || {};
-
-            if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
-              return 'i49_super_admin';
-            }
-
-            if (metadata.is_admin === true || rawMetadata.is_admin === true) {
-              return 'platform_admin';
-            }
-
-            if (metadata.tenant_admin || rawMetadata.tenant_admin) {
-              return 'tenant_admin';
-            }
-
-            if (metadata.account_admin || rawMetadata.account_admin) {
-              return 'account_admin';
-            }
-
-            return 'none';
-          };
-
-          const adminLevel = getAdminLevel(session.user);
-          const isAdmin = adminLevel !== 'none';
-
-          if (!isAdmin) {
-            return {
-              success: false,
-              message: "You don't have permission to modify entitlements."
-            };
-          }
-
-          // Get user ID
-          let userId = userIdentifier;
-          if (userIdentifier.includes('@')) {
-            const lookedUpUserId = await EntitlementTool.getUserIdByEmail(userIdentifier);
-            if (!lookedUpUserId) {
-              return {
-                success: false,
-                message: `No user found with email: ${userIdentifier}`
-              };
-            }
-            userId = lookedUpUserId;
-          }
-
-          // Parse entitlements
-          const entitlementList = entitlements.split(',').map(e => e.trim());
-          const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
-          const currentEntitlements = await EntitlementTool.getUserEntitlements(userId);
-
-          // Resolve entitlement names to IDs
-          const resolvedEntitlements = entitlementList.map(entitlement => {
-            // Try to find by ID first
-            let found = availableEntitlements.find(e => e.id === entitlement);
-            if (!found) {
-              // Try to find by display name
-              found = availableEntitlements.find(e =>
-                e.display_name.toLowerCase().includes(entitlement.toLowerCase()) ||
-                e.name.toLowerCase().includes(entitlement.toLowerCase())
-              );
-            }
-            return found ? found.id : null;
-          }).filter(Boolean);
-
-          if (resolvedEntitlements.length === 0) {
-            return {
-              success: false,
-              message: `No matching entitlements found for: ${entitlements}. Please check the entitlement names and try again.`
-            };
-          }
-
-          // Perform the action
-          let newEntitlements = [...currentEntitlements];
-
-          if (action === 'add') {
-            resolvedEntitlements.forEach(entitlement => {
-              if (!newEntitlements.includes(entitlement)) {
-                newEntitlements.push(entitlement);
-              }
-            });
-          } else if (action === 'remove') {
-            newEntitlements = newEntitlements.filter(e => !resolvedEntitlements.includes(e));
-          } else if (action === 'set') {
-            newEntitlements = resolvedEntitlements;
-          }
-
-          // Update entitlements
-          const success = await EntitlementTool.updateUserEntitlements(userId, newEntitlements);
-
-          if (success) {
-            const updatedEntitlementNames = newEntitlements.map(id => {
-              const entitlement = availableEntitlements.find(e => e.id === id);
-              return entitlement ? entitlement.display_name : id;
-            });
-
-            return {
-              success: true,
-              message: `Successfully updated entitlements for ${userIdentifier}. They now have ${newEntitlements.length} entitlement(s): ${updatedEntitlementNames.join(', ')}`
-            };
-          } else {
-            return {
-              success: false,
-              message: `Failed to update entitlements for ${userIdentifier}. Please try again.`
-            };
-          }
-
-        } catch (error) {
-          console.error('[CopilotKit] Error modifying entitlements:', error);
-          return {
-            success: false,
-            message: "Failed to modify entitlements. Please try again."
-          };
-        }
-      },
-    },
-    {
-      name: "listAvailableEntitlements",
-      description: "List all available entitlements that can be assigned to users",
-      handler: async () => {
-        try {
-          // Get session from cookies
-          const cookieStore = await cookies();
-          const { session, error: sessionError } = await restoreSession(cookieStore);
-
-          if (sessionError || !session?.user) {
-            return {
-              success: false,
-              message: "You need to be logged in to view entitlements."
-            };
-          }
-
-          // Check admin status
-          const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } }) => {
-            const metadata = user.user_metadata || {};
-            const rawMetadata = user.raw_user_meta_data || {};
-
-            if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
-              return 'i49_super_admin';
-            }
-
-            if (metadata.is_admin === true || rawMetadata.is_admin === true) {
-              return 'platform_admin';
-            }
-
-            if (metadata.tenant_admin || rawMetadata.tenant_admin) {
-              return 'tenant_admin';
-            }
-
-            if (metadata.account_admin || rawMetadata.account_admin) {
-              return 'account_admin';
-            }
-
-            return 'none';
-          };
-
-          const adminLevel = getAdminLevel(session.user);
-          const isAdmin = adminLevel !== 'none';
-
-          if (!isAdmin) {
-            return {
-              success: false,
-              message: "You don't have permission to view entitlements."
-            };
-          }
-
-          const { EntitlementTool } = await import('agent-core/tools/EntitlementTool');
-          const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
-
-          if (availableEntitlements.length === 0) {
-            return {
-              success: false,
-              message: `No entitlements are currently defined in the system. To create entitlements, you'll need to add them to the core.entitlements table in the database. Would you like me to help you understand what entitlements should be created?`
-            };
-          }
-
-          const entitlementList = availableEntitlements
-            .map(e => `- ${e.display_name} (${e.tenant_key}): ${e.description || 'No description'}`)
-            .join('\n');
-
-          return {
-            success: true,
-            message: `Here are all available entitlements in the system:\n\n${entitlementList}\n\nTo assign entitlements to a user, please let me know which ones you'd like to grant.`
-          };
-        } catch (error) {
-          console.error('Error listing entitlements:', error);
-          return {
-            success: false,
-            message: "Failed to list entitlements. Please try again."
-          };
-        }
       },
     },
   ],
