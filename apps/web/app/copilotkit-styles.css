@@ -344,11 +344,13 @@
   font-size: 13px;
   line-height: 1.5;
   color: #374151;
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
 }
 
 /* Form headings - more refined */
 .entitlement-form-container h3 {
-  font-size: 14px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
   color: #1e293b !important;
   margin-bottom: 12px !important;
@@ -537,4 +539,9 @@
   max-width: 85% !important;
   float: left !important;
   clear: both !important;
+}
+
+/* Add spacing after user messages */
+.copilotKitUserMessage {
+  margin-bottom: 16px !important;
 }
