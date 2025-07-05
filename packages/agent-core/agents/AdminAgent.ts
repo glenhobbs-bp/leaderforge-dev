@@ -11,6 +11,7 @@ export interface AdminAgentContext {
   userId: string;
   tenantKey: string;
   isAdmin: boolean;
+  adminLevel?: string; // 'i49_super_admin', 'platform_admin', 'tenant_admin', 'account_admin', 'none'
   intent: string;
   currentStep?: string;
   state?: Record<string, unknown>;
@@ -267,14 +268,12 @@ export class AdminAgent {
               },
               newEntitlements: {
                 type: 'array',
-                title: 'Select Entitlements',
-                description: 'Check the entitlements this user should have. Currently assigned entitlements are pre-selected.',
+                title: 'Available Entitlements',
+                description: 'Check the entitlements this user should have. Currently assigned entitlements are already checked.',
                 items: {
                   type: 'string',
                   enum: entitlementOptions.map(e => e.value),
-                  enumNames: entitlementOptions.map(e =>
-                    `${e.label}${e.isCurrentlyAssigned ? ' ✓ (currently assigned)' : ''} - ${e.description}`
-                  )
+                  enumNames: entitlementOptions.map(e => `${e.label} - ${e.description}`)
                 },
                 default: currentEntitlements,
                 uniqueItems: true
@@ -297,9 +296,10 @@ export class AdminAgent {
             newEntitlements: {
               'ui:widget': 'checkboxes',
               'ui:options': {
-                inline: false
+                inline: false,
+                enumDisabled: false
               },
-              'ui:help': 'Changes will be applied when you submit this form'
+              'ui:help': 'Check/uncheck entitlements to modify user access. Changes will be applied when you submit this form.'
             }
           },
           initialValues: {

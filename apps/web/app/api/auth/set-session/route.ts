@@ -41,6 +41,29 @@ export async function POST(req: Request) {
       response.headers.set(key, value);
     });
 
+    // Handle logout - clear cookies when session is null
+    if (body.session === null) {
+      response.cookies.set(accessTokenCookie, '', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 0, // Expire immediately
+      });
+
+      response.cookies.set(refreshTokenCookie, '', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 0, // Expire immediately
+      });
+
+      console.log('[set-session] ✅ Cleared auth cookies for logout');
+      return response;
+    }
+
+    // Handle login - set cookies
     if (access_token) {
       response.cookies.set(accessTokenCookie, access_token, {
         path: '/',

@@ -6,8 +6,8 @@ import {
 } from "@copilotkit/runtime";
 import { cookies } from 'next/headers';
 import { restoreSession } from '../../lib/supabaseServerClient';
-import { AdminAgent, AdminAgentContext } from 'agent-core/agents/AdminAgent';
-import { EntitlementTool } from 'agent-core/tools/EntitlementTool';
+  import { AdminAgent, AdminAgentContext } from 'agent-core/agents/AdminAgent';
+  import { EntitlementTool } from 'agent-core/tools/EntitlementTool';
 
 // Admin action handler
 async function handleAdminAction(args: {
@@ -30,8 +30,31 @@ async function handleAdminAction(args: {
     }
 
     // Check admin status
-    const isAdmin = session.user.user_metadata?.is_admin === true ||
-                    (session.user as { raw_user_meta_data?: { is_admin?: boolean } })?.raw_user_meta_data?.is_admin === true;
+    const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } }) => {
+      const metadata = user.user_metadata || {};
+      const rawMetadata = user.raw_user_meta_data || {};
+
+      if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
+        return 'i49_super_admin';
+      }
+
+      if (metadata.is_admin === true || rawMetadata.is_admin === true) {
+        return 'platform_admin';
+      }
+
+      if (metadata.tenant_admin || rawMetadata.tenant_admin) {
+        return 'tenant_admin';
+      }
+
+      if (metadata.account_admin || rawMetadata.account_admin) {
+        return 'account_admin';
+      }
+
+      return 'none';
+    };
+
+    const adminLevel = getAdminLevel(session.user);
+    const isAdmin = adminLevel !== 'none';
 
     if (!isAdmin) {
       return {
@@ -52,6 +75,7 @@ async function handleAdminAction(args: {
           userId: session.user.id,
           tenantKey: 'leaderforge',
           isAdmin: true,
+          adminLevel: adminLevel,
           intent: `configure entitlements for ${formData.userId}`,
           currentStep: 'show-modification-form',
           state: { targetUserId: formData.userId },
@@ -60,9 +84,19 @@ async function handleAdminAction(args: {
         const agentResult = await agent.processIntent(agentContext);
 
         if (agentResult.schema) {
+          // For CopilotKit, we need to return a simple text response instead of complex schemas
+          // Get the entitlements data and format it as a selectable list
+          const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
+          const currentEntitlements = await EntitlementTool.getUserEntitlements(formData.userId);
+
+          const entitlementList = availableEntitlements.map(entitlement => {
+            const isAssigned = currentEntitlements.includes(entitlement.id);
+            return `${isAssigned ? '✅' : '☐'} ${entitlement.display_name} (${entitlement.id})`;
+          }).join('\n');
+
           return {
-            needsRender: true,
-            schema: agentResult.schema,
+            success: true,
+            message: `Here are all available entitlements for ${formData.userId}:\n\n${entitlementList}\n\nTo modify entitlements, please tell me which ones to add or remove. For example: "Add leaderforge-premium and remove basic-access" or "Give them all admin entitlements".`,
             taskId: agentResult.taskId
           };
         }
@@ -99,7 +133,8 @@ async function handleAdminAction(args: {
     const agentContext: AdminAgentContext = {
       userId: session.user.id,
       tenantKey: 'leaderforge',
-      isAdmin: true,
+      isAdmin: isAdmin,
+      adminLevel: adminLevel,
       intent: args.intent,
       currentStep: args.currentStep,
       state: args.state as Record<string, unknown> || {},
@@ -116,6 +151,15 @@ async function handleAdminAction(args: {
       }
 
       if (agentResult.schema) {
+        // For entitlement configuration, return a user-friendly message instead of complex schema
+        if (args.intent.toLowerCase().includes('entitlement')) {
+          return {
+            success: true,
+            message: "I can help you configure user entitlements. Please provide the user's email address or user ID, and I'll show you their current entitlements and available options.",
+            taskId: agentResult.taskId
+          };
+        }
+
         return {
           needsRender: true,
           schema: agentResult.schema,
@@ -159,13 +203,16 @@ const runtime = new CopilotRuntime({
           required: true,
         },
       ],
-      handler: async ({ intent }) => {
+            handler: async ({ intent }) => {
+        console.log('[CopilotKit API] performAdminTask called with intent:', intent);
         return handleAdminAction({ intent });
       },
     },
+
+
     {
-      name: "getCurrentEntitlements",
-      description: "Get the current entitlements for a specific user by email or user ID",
+      name: "modifyUserEntitlements",
+      description: "Add or remove specific entitlements for a user",
       parameters: [
         {
           name: "userIdentifier",
@@ -173,16 +220,21 @@ const runtime = new CopilotRuntime({
           description: "The user's email address or user ID",
           required: true,
         },
+        {
+          name: "action",
+          type: "string",
+          description: "The action to perform: 'add', 'remove', or 'set'",
+          required: true,
+        },
+        {
+          name: "entitlements",
+          type: "string",
+          description: "Comma-separated list of entitlement IDs or names",
+          required: true,
+        },
       ],
-      handler: async ({ userIdentifier }) => {
+      handler: async ({ userIdentifier, action, entitlements }) => {
         try {
-          if (!userIdentifier) {
-            return {
-              success: false,
-              message: "User identifier is required to fetch entitlements."
-            };
-          }
-
           // Get session from cookies
           const cookieStore = await cookies();
           const { session, error: sessionError } = await restoreSession(cookieStore);
@@ -190,26 +242,46 @@ const runtime = new CopilotRuntime({
           if (sessionError || !session?.user) {
             return {
               success: false,
-              message: "You need to be logged in to view entitlements."
+              message: "You need to be logged in to modify entitlements."
             };
           }
 
           // Check admin permissions
-          const sessionUserId = session.user.id;
-          const sessionUserEmail = session.user.email;
-          const isAdmin = sessionUserId === '47f9db16-f24f-4868-8155-256cfa2edc2c' || sessionUserEmail === 'glen@brilliantperspectives.com';
+          const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } }) => {
+            const metadata = user.user_metadata || {};
+            const rawMetadata = user.raw_user_meta_data || {};
+
+            if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
+              return 'i49_super_admin';
+            }
+
+            if (metadata.is_admin === true || rawMetadata.is_admin === true) {
+              return 'platform_admin';
+            }
+
+            if (metadata.tenant_admin || rawMetadata.tenant_admin) {
+              return 'tenant_admin';
+            }
+
+            if (metadata.account_admin || rawMetadata.account_admin) {
+              return 'account_admin';
+            }
+
+            return 'none';
+          };
+
+          const adminLevel = getAdminLevel(session.user);
+          const isAdmin = adminLevel !== 'none';
 
           if (!isAdmin) {
             return {
               success: false,
-              message: "You don't have permission to view user entitlements."
+              message: "You don't have permission to modify entitlements."
             };
           }
 
-          // Get user ID for entitlement lookup
+          // Get user ID
           let userId = userIdentifier;
-
-          // If userIdentifier looks like an email, convert it to UUID
           if (userIdentifier.includes('@')) {
             const lookedUpUserId = await EntitlementTool.getUserIdByEmail(userIdentifier);
             if (!lookedUpUserId) {
@@ -221,35 +293,72 @@ const runtime = new CopilotRuntime({
             userId = lookedUpUserId;
           }
 
-          // Get user entitlements
-          const entitlements = await EntitlementTool.getUserEntitlements(userId);
+          // Parse entitlements
+          const entitlementList = entitlements.split(',').map(e => e.trim());
           const availableEntitlements = await EntitlementTool.getAvailableEntitlements();
+          const currentEntitlements = await EntitlementTool.getUserEntitlements(userId);
 
-          const formattedEntitlements = entitlements
-            .map(entitlementId => {
-              const entitlement = availableEntitlements.find(e => e.id === entitlementId);
-              return entitlement ? entitlement.name : null;
-            })
-            .filter(Boolean)
-            .join(', ');
+          // Resolve entitlement names to IDs
+          const resolvedEntitlements = entitlementList.map(entitlement => {
+            // Try to find by ID first
+            let found = availableEntitlements.find(e => e.id === entitlement);
+            if (!found) {
+              // Try to find by display name
+              found = availableEntitlements.find(e =>
+                e.display_name.toLowerCase().includes(entitlement.toLowerCase()) ||
+                e.name.toLowerCase().includes(entitlement.toLowerCase())
+              );
+            }
+            return found ? found.id : null;
+          }).filter(Boolean);
 
-          if (formattedEntitlements.length === 0) {
+          if (resolvedEntitlements.length === 0) {
             return {
-              success: true,
-              message: `${userIdentifier} currently has no entitlements assigned.`
+              success: false,
+              message: `No matching entitlements found for: ${entitlements}. Please check the entitlement names and try again.`
             };
           }
 
-          return {
-            success: true,
-            message: `${userIdentifier} currently has the following entitlements: ${formattedEntitlements}`
-          };
+          // Perform the action
+          let newEntitlements = [...currentEntitlements];
+
+          if (action === 'add') {
+            resolvedEntitlements.forEach(entitlement => {
+              if (!newEntitlements.includes(entitlement)) {
+                newEntitlements.push(entitlement);
+              }
+            });
+          } else if (action === 'remove') {
+            newEntitlements = newEntitlements.filter(e => !resolvedEntitlements.includes(e));
+          } else if (action === 'set') {
+            newEntitlements = resolvedEntitlements;
+          }
+
+          // Update entitlements
+          const success = await EntitlementTool.updateUserEntitlements(userId, newEntitlements);
+
+          if (success) {
+            const updatedEntitlementNames = newEntitlements.map(id => {
+              const entitlement = availableEntitlements.find(e => e.id === id);
+              return entitlement ? entitlement.display_name : id;
+            });
+
+            return {
+              success: true,
+              message: `Successfully updated entitlements for ${userIdentifier}. They now have ${newEntitlements.length} entitlement(s): ${updatedEntitlementNames.join(', ')}`
+            };
+          } else {
+            return {
+              success: false,
+              message: `Failed to update entitlements for ${userIdentifier}. Please try again.`
+            };
+          }
 
         } catch (error) {
-          console.error('[CopilotKit] Error fetching entitlements:', error);
+          console.error('[CopilotKit] Error modifying entitlements:', error);
           return {
             success: false,
-            message: "Failed to fetch entitlements. Please try again."
+            message: "Failed to modify entitlements. Please try again."
           };
         }
       },
@@ -271,8 +380,31 @@ const runtime = new CopilotRuntime({
           }
 
           // Check admin status
-          const isAdmin = session.user.user_metadata?.is_admin === true ||
-                          (session.user as { raw_user_meta_data?: { is_admin?: boolean } })?.raw_user_meta_data?.is_admin === true;
+          const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } }) => {
+            const metadata = user.user_metadata || {};
+            const rawMetadata = user.raw_user_meta_data || {};
+
+            if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
+              return 'i49_super_admin';
+            }
+
+            if (metadata.is_admin === true || rawMetadata.is_admin === true) {
+              return 'platform_admin';
+            }
+
+            if (metadata.tenant_admin || rawMetadata.tenant_admin) {
+              return 'tenant_admin';
+            }
+
+            if (metadata.account_admin || rawMetadata.account_admin) {
+              return 'account_admin';
+            }
+
+            return 'none';
+          };
+
+          const adminLevel = getAdminLevel(session.user);
+          const isAdmin = adminLevel !== 'none';
 
           if (!isAdmin) {
             return {
@@ -312,11 +444,90 @@ const runtime = new CopilotRuntime({
 });
 
 export const POST = async (req: NextRequest) => {
-  const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
-    runtime,
-    serviceAdapter,
-    endpoint: req.nextUrl.pathname,
-  });
+  // Extract context from CopilotKit properties if available
+  let userContext: {
+    userId?: string;
+    isAuthenticated?: boolean;
+    adminLevel?: string;
+    sessionState?: string;
+    userEmail?: string;
+    userName?: string;
+  } | null = null;
 
-  return handleRequest(req);
+  try {
+    const body = await req.text();
+    const requestData = JSON.parse(body);
+
+    // CopilotKit might send properties in variables or other locations
+    const possibleProperties = requestData.properties ||
+                              requestData.variables?.properties ||
+                              requestData.variables?.input?.properties ||
+                              null;
+
+    // Only log full request data if properties are missing (for debugging)
+    if (!possibleProperties) {
+      console.log('[CopilotKit API] No properties found, request structure:', {
+        requestKeys: Object.keys(requestData || {}),
+        hasVariables: !!requestData.variables,
+        variablesKeys: requestData.variables ? Object.keys(requestData.variables) : null
+      });
+    }
+
+    // Log summary of request structure
+    console.log('[CopilotKit API] Request summary:', {
+      hasProperties: !!possibleProperties,
+      operationType: requestData.operationName || 'unknown'
+    });
+
+    // Extract user context from CopilotKit properties
+    if (possibleProperties) {
+      userContext = possibleProperties;
+      console.log('[CopilotKit API] User context from properties:', {
+        userId: userContext.userId,
+        isAuthenticated: userContext.isAuthenticated,
+        adminLevel: userContext.adminLevel,
+        userName: userContext.userName
+      });
+    } else {
+      console.log('[CopilotKit API] No properties found in request');
+    }
+
+    // Also get session from cookies as fallback
+    const cookieStore = await cookies();
+    const { session } = await restoreSession(cookieStore);
+
+    if (session?.user) {
+      console.log('[CopilotKit API] Session context:', {
+        userId: session.user.id,
+        email: session.user.email,
+        isAuthenticated: true
+      });
+    }
+
+    // Reconstruct the request with the body for CopilotKit
+    const newReq = new NextRequest(req.url, {
+      method: req.method,
+      headers: req.headers,
+      body: body,
+    });
+
+    const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
+      runtime,
+      serviceAdapter,
+      endpoint: newReq.nextUrl.pathname,
+    });
+
+    return handleRequest(newReq);
+  } catch (error) {
+    console.error('[CopilotKit API] Error processing request:', error);
+
+    // Fallback to original handling
+    const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
+      runtime,
+      serviceAdapter,
+      endpoint: req.nextUrl.pathname,
+    });
+
+    return handleRequest(req);
+  }
 };

@@ -28,6 +28,8 @@ export default function LoginPage() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[login/page] Auth state change:', event, !!session);
+
       if (event === 'SIGNED_IN' && session) {
         setIsAuthenticating(true);
         try {
@@ -45,10 +47,9 @@ export default function LoginPage() {
             throw new Error(`Cookie sync failed: ${response.statusText}`);
           }
 
-          // Show authenticating spinner for a moment before redirect
-          setTimeout(() => {
-            window.location.href = returnTo;
-          }, 500);
+          // Redirect immediately after cookie sync
+          console.log('[login/page] Redirecting to:', returnTo);
+          window.location.href = returnTo;
         } catch (error) {
           console.error('[login/page] Error syncing tokens:', error);
           if (mounted) {
@@ -56,6 +57,10 @@ export default function LoginPage() {
             setIsAuthenticating(false);
           }
         }
+      } else if (event === 'SIGNED_OUT') {
+        // Reset states when signed out
+        setIsAuthenticating(false);
+        setError(null);
       }
     });
 

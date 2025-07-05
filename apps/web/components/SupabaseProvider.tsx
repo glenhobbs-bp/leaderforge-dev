@@ -28,76 +28,66 @@ export default function SupabaseProvider({
 
   // Start with initialSession to prevent auth flash
   const [session, setSession] = useState<Session | null>(initialSession);
-  const [loading, setLoading] = useState(false); // ✅ FIX: Start with false, only set true during actual auth operations
+  const [loading, setLoading] = useState(false);
 
-  const hasRestoredSession = useRef(false);
-  const mounted = useRef(true);
-  const processingAuth = useRef(false);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    const restoreSession = async () => {
-      if (hasRestoredSession.current || processingAuth.current) return;
+    // If we have an initialSession, mark as initialized
+    if (initialSession) {
+      console.log('[SupabaseProvider] Using initial session directly');
+      hasInitialized.current = true;
+    } else {
+      // If no initialSession but auth cookies might exist, try to restore session
+      console.log('[SupabaseProvider] No initial session, attempting client-side session restoration');
+      setLoading(true);
 
-      // ✅ FIX: If we have initialSession, use it directly without setSession call
-      if (initialSession) {
-        console.log('[SupabaseProvider] Using initial session directly');
-        hasRestoredSession.current = true;
-        return;
-      }
-
-      // Only try to get session if we don't have one
-      if (!session) {
-        setLoading(true);
-        processingAuth.current = true;
-
-        try {
-          const { data: { session: currentSession } } = await supabase.auth.getSession();
-
-          if (isMounted) {
-            setSession(currentSession);
-            setLoading(false);
+      // Try to get session from client-side storage
+      supabase.auth.getSession().then(({ data: { session: clientSession }, error }) => {
+        if (isMounted) {
+          if (clientSession && !error) {
+            console.log('[SupabaseProvider] Client-side session found:', clientSession.user.id);
+            setSession(clientSession);
+          } else {
+            console.log('[SupabaseProvider] No client-side session found');
           }
-        } catch (error) {
-          console.error('[SupabaseProvider] Session check error:', error);
-          if (isMounted) {
-            setSession(null);
-            setLoading(false);
-          }
+          setLoading(false);
+          hasInitialized.current = true;
         }
+      });
+    }
 
-        processingAuth.current = false;
-      }
-
-      hasRestoredSession.current = true;
-    };
-
-    // Auth state change listener with better event handling
+    // Auth state change listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      if (!isMounted || processingAuth.current) return;
+      if (!isMounted) return;
 
-      console.log('[SupabaseProvider] Auth state changed:', event, newSession?.user?.id);
+      console.log('[SupabaseProvider] Auth state changed:', event, newSession?.user?.id || 'undefined');
 
-      // ✅ FIX: Handle auth events more precisely
+      // Handle auth events
       switch (event) {
         case 'INITIAL_SESSION':
-          // Only process if we don't already have a session
-          if (!session && newSession) {
+          // Only process INITIAL_SESSION if we don't have a server-side session
+          if (!hasInitialized.current) {
             setSession(newSession);
+            setLoading(false);
+            hasInitialized.current = true;
           }
           break;
 
         case 'SIGNED_IN':
           setSession(newSession);
           setLoading(false);
+          hasInitialized.current = true;
           break;
 
         case 'SIGNED_OUT':
           setSession(null);
           setLoading(false);
+          hasInitialized.current = true;
           break;
 
         case 'TOKEN_REFRESHED':
@@ -107,7 +97,7 @@ export default function SupabaseProvider({
           break;
 
         default:
-          // For other events, only update if session changed
+          // For other events, only update if session actually changed
           if (newSession?.user?.id !== session?.user?.id) {
             setSession(newSession);
           }
@@ -115,20 +105,11 @@ export default function SupabaseProvider({
       }
     });
 
-    // Restore session on mount
-    restoreSession();
-
     return () => {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, []); // Remove initialSession from dependencies to prevent re-runs
-
-  useEffect(() => {
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
+  }, [initialSession, supabase.auth]);
 
   return (
     <Context.Provider value={{ supabase, session, loading }}>

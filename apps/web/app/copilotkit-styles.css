@@ -637,285 +637,361 @@
   box-shadow: var(--ck-shadow-sm);
 }
 
-/* CopilotKit Modal/Popup Customization - Inherits from Platform Theme */
-.copilotkit-custom-popup {
-  --ck-font-family: var(--font-primary, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  --ck-bg-primary: var(--background, #ffffff);
-  --ck-bg-secondary: var(--surface, #f8fafc);
-  --ck-border-color: var(--border, #e2e8f0);
-  --ck-text-primary: var(--text-primary, #1e293b);
-  --ck-text-secondary: var(--text-secondary, #64748b);
-  --ck-primary-color: var(--primary, #1e40af);
-  --ck-primary-hover: var(--primary-hover, #1d4ed8);
-  --ck-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --ck-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --ck-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --ck-radius-sm: 0.375rem;
-  --ck-radius-md: 0.5rem;
-  --ck-radius-lg: 0.75rem;
-  --ck-radius-xl: 1rem;
-}
+/* CopilotKit Popup Modal Customization - LeaderForge Design System */
 
-/* Modal container */
-.copilotkit-popup-container {
-  font-family: var(--ck-font-family) !important;
+/* Force CopilotKit styles to load */
+.copilotkit-custom-popup,
+[data-copilotkit],
+.copilotkit-popup,
+div[class*="copilot"] {
+  z-index: 9999 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 /* Modal backdrop */
-.copilotkit-backdrop {
+.copilotkit-popup-backdrop,
+[data-copilotkit-popup-backdrop] {
   background: rgba(0, 0, 0, 0.5) !important;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  z-index: 9998 !important;
 }
 
-/* Modal window */
-.copilotkit-modal {
-  background: var(--ck-bg-primary) !important;
-  border-radius: var(--ck-radius-xl) !important;
-  box-shadow: var(--ck-shadow-lg) !important;
-  border: 1px solid var(--ck-border-color) !important;
-  max-width: 480px !important;
-  width: 90vw !important;
+/* Modal container */
+.copilotkit-popup-container,
+[data-copilotkit-popup-container] {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 480px !important;
+  max-width: 90vw !important;
+  max-height: 80vh !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  z-index: 9999 !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 /* Modal header */
-.copilotkit-header {
-  background: var(--ck-bg-primary) !important;
-  border-bottom: 1px solid var(--ck-border-color) !important;
-  padding: 1.25rem !important;
+.copilotkit-popup-header,
+[data-copilotkit-popup-header] {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+  color: white !important;
+  padding: 20px !important;
+  border-radius: 16px 16px 0 0 !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.3) !important;
 }
 
-.copilotkit-title {
-  font-size: 1.125rem !important;
+.copilotkit-popup-title,
+[data-copilotkit-popup-title] {
+  font-size: 18px !important;
   font-weight: 600 !important;
-  color: var(--ck-text-primary) !important;
-  letter-spacing: -0.025em;
+  color: white !important;
+  margin: 0 !important;
+  letter-spacing: -0.025em !important;
 }
 
 /* Close button */
-.copilotkit-close-button {
-  color: var(--ck-text-secondary) !important;
-  transition: all 0.15s ease !important;
-}
-
-.copilotkit-close-button:hover {
-  color: var(--ck-text-primary) !important;
-  background: var(--ck-bg-secondary) !important;
-}
-
-/* Chat area */
-.copilotkit-messages {
-  background: var(--ck-bg-primary) !important;
-  padding: 1rem !important;
-  max-height: 60vh !important;
-  overflow-y: auto !important;
-}
-
-/* Message styling */
-.copilotkit-message {
-  padding: 0.75rem 1rem !important;
-  font-family: var(--ck-font-family);
-  font-size: 0.875rem !important;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-}
-
-.copilotkit-message-user {
-  background: var(--ck-bg-secondary) !important;
-  border-radius: var(--ck-radius-lg) !important;
-  margin: 0.5rem 0 0.5rem 2rem !important;
-  box-shadow: var(--ck-shadow-sm) !important;
-  border: 1px solid var(--ck-border-color) !important;
-}
-
-.copilotkit-message-assistant {
+.copilotkit-popup-close,
+[data-copilotkit-popup-close] {
   background: transparent !important;
-  margin: 0.5rem 2rem 0.5rem 0 !important;
+  border: none !important;
+  color: white !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  padding: 8px !important;
+  position: absolute !important;
+  right: 16px !important;
+  top: 16px !important;
+  transition: color 0.2s ease-in-out !important;
+  z-index: 10000 !important;
 }
 
-/* Form rendering within chat */
-.copilotkit-form-container {
-  background: var(--ck-bg-primary);
-  border: 1px solid var(--ck-border-color);
-  border-radius: var(--ck-radius-lg);
-  padding: 1.25rem;
-  margin: 0.5rem 0;
-  box-shadow: var(--ck-shadow-sm);
+.copilotkit-popup-close:hover,
+[data-copilotkit-popup-close]:hover {
+  color: rgba(255, 255, 255, 0.8) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 4px !important;
 }
 
-.copilotkit-form-container form {
-  font-family: var(--ck-font-family);
+/* Messages container */
+.copilotkit-popup-messages,
+[data-copilotkit-popup-messages] {
+  padding: 16px !important;
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  background: transparent !important;
 }
 
-/* Input area */
-.copilotkit-input-container {
-  border-top: 1px solid var(--ck-border-color) !important;
-  padding: 1rem !important;
-  background: var(--ck-bg-primary) !important;
+/* Individual messages */
+.copilotkit-popup-message,
+[data-copilotkit-popup-message] {
+  margin-bottom: 16px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #1e293b !important; /* Dark text for readability */
 }
 
-.copilotkit-input {
-  background: var(--ck-bg-secondary) !important;
-  border: 1px solid var(--ck-border-color) !important;
-  border-radius: var(--ck-radius-lg) !important;
-  padding: 0.75rem 1rem !important;
-  font-size: 0.875rem !important;
-  font-family: var(--ck-font-family) !important;
-  color: var(--ck-text-primary) !important;
-  transition: all 0.15s ease !important;
+/* User messages */
+.copilotkit-popup-message.user,
+[data-copilotkit-popup-message="user"] {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  border-radius: 18px 18px 4px 18px !important;
+  margin-left: 20% !important;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.2) !important;
 }
 
-.copilotkit-input:focus {
+/* Assistant messages */
+.copilotkit-popup-message.assistant,
+[data-copilotkit-popup-message="assistant"] {
+  background: rgba(248, 250, 252, 0.8) !important;
+  color: #1e293b !important; /* Dark text for readability */
+  padding: 12px 16px !important;
+  border-radius: 18px 18px 18px 4px !important;
+  margin-right: 20% !important;
+  border: 1px solid rgba(226, 232, 240, 0.5) !important;
+}
+
+/* Input container */
+.copilotkit-popup-input-container,
+[data-copilotkit-popup-input] {
+  padding: 16px 20px 20px 20px !important;
+  border-top: 1px solid rgba(226, 232, 240, 0.3) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-radius: 0 0 16px 16px !important;
+}
+
+/* Input field */
+.copilotkit-popup-input input,
+.copilotkit-popup-input textarea,
+[data-copilotkit-popup-input] input,
+[data-copilotkit-popup-input] textarea {
+  background: rgba(248, 250, 252, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 12px !important;
+  color: #1e293b !important; /* Dark text for readability */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px !important;
+  padding: 12px 16px !important;
+  width: 100% !important;
+  transition: all 0.2s ease-in-out !important;
   outline: none !important;
-  border-color: var(--ck-primary-color) !important;
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1) !important;
 }
 
-.copilotkit-input::placeholder {
-  color: var(--ck-text-secondary) !important;
-  opacity: 0.7 !important;
+.copilotkit-popup-input input:focus,
+.copilotkit-popup-input textarea:focus,
+[data-copilotkit-popup-input] input:focus,
+[data-copilotkit-popup-input] textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.copilotkit-popup-input input::placeholder,
+.copilotkit-popup-input textarea::placeholder,
+[data-copilotkit-popup-input] input::placeholder,
+[data-copilotkit-popup-input] textarea::placeholder {
+  color: #64748b !important;
 }
 
 /* Send button */
-.copilotkit-send-button {
-  background: var(--ck-primary-color) !important;
+.copilotkit-popup-send-button,
+[data-copilotkit-popup-send] {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
   color: white !important;
-  border-radius: var(--ck-radius-md) !important;
-  padding: 0.5rem 1rem !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  transition: all 0.15s ease !important;
   border: none !important;
-}
-
-.copilotkit-send-button:hover:not(:disabled) {
-  background: var(--ck-primary-hover) !important;
-  transform: translateY(-1px);
-  box-shadow: var(--ck-shadow-sm) !important;
-}
-
-.copilotkit-send-button:disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-/* Loading states */
-.copilotkit-loading {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  color: var(--ck-text-secondary);
-  font-size: 0.875rem;
-}
-
-.copilotkit-loading-spinner {
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid var(--ck-border-color);
-  border-top-color: var(--ck-primary-color);
-  border-radius: 50%;
-  animation: copilotkit-spin 0.6s linear infinite;
-}
-
-@keyframes copilotkit-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Scrollbar styling */
-.copilotkit-messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-.copilotkit-messages::-webkit-scrollbar-track {
-  background: var(--ck-bg-secondary);
-  border-radius: 3px;
-}
-
-.copilotkit-messages::-webkit-scrollbar-thumb {
-  background: var(--ck-border-color);
-  border-radius: 3px;
-}
-
-.copilotkit-messages::-webkit-scrollbar-thumb:hover {
-  background: var(--ck-text-secondary);
-}
-
-/* Form elements within CopilotKit */
-.copilotkit-form-container input,
-.copilotkit-form-container select,
-.copilotkit-form-container textarea {
-  font-family: var(--ck-font-family) !important;
-  font-size: 0.875rem !important;
-  border-color: var(--ck-border-color) !important;
-  transition: all 0.15s ease !important;
-}
-
-.copilotkit-form-container input:focus,
-.copilotkit-form-container select:focus,
-.copilotkit-form-container textarea:focus {
-  border-color: var(--ck-primary-color) !important;
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1) !important;
-}
-
-/* Button styling within forms */
-.copilotkit-form-container button[type="submit"] {
-  background: var(--ck-primary-color) !important;
-  color: white !important;
-  border-radius: var(--ck-radius-md) !important;
-  padding: 0.625rem 1.25rem !important;
-  font-size: 0.875rem !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px !important;
   font-weight: 500 !important;
-  transition: all 0.15s ease !important;
-  margin-top: 1rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out !important;
+  margin-left: 8px !important;
 }
 
-.copilotkit-form-container button[type="submit"]:hover {
-  background: var(--ck-primary-hover) !important;
-  transform: translateY(-1px);
-  box-shadow: var(--ck-shadow-sm) !important;
+.copilotkit-popup-send-button:hover,
+[data-copilotkit-popup-send]:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3) !important;
 }
 
-/* Animations */
-.copilotkit-modal {
-  animation: copilotkit-fade-in 0.2s ease-out;
-}
-
-@keyframes copilotkit-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Toggle button (when popup is closed) */
-.copilotkit-toggle-button {
+/* Toggle button (floating bubble) - More aggressive targeting */
+.copilotkit-popup-toggle,
+[data-copilotkit-popup-toggle],
+button[data-copilotkit],
+div[class*="copilot"] button,
+.copilotkit-custom-popup button {
   position: fixed !important;
   bottom: 1.5rem !important;
   right: 1.5rem !important;
-  width: 3.5rem !important;
-  height: 3.5rem !important;
-  background: var(--ck-primary-color) !important;
+  width: 60px !important;
+  height: 60px !important;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
   color: white !important;
+  border: none !important;
   border-radius: 50% !important;
-  box-shadow: var(--ck-shadow-lg) !important;
+  box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3) !important;
+  cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  transition: all 0.2s ease !important;
-  border: none !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-size: 24px !important;
   z-index: 9999 !important;
 }
 
-.copilotkit-toggle-button:hover {
-  background: var(--ck-primary-hover) !important;
-  transform: scale(1.1);
+.copilotkit-popup-toggle:hover,
+[data-copilotkit-popup-toggle]:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 12px 30px rgba(30, 64, 175, 0.4) !important;
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
 }
 
-.copilotkit-toggle-button svg {
-  width: 1.5rem !important;
-  height: 1.5rem !important;
+/* Form elements in popup */
+.copilotkit-popup-form-container,
+[data-copilotkit-popup-form] {
+  background: rgba(248, 250, 252, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.5) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  margin: 8px 0 !important;
+}
+
+.copilotkit-popup-form-container input,
+.copilotkit-popup-form-container select,
+.copilotkit-popup-form-container textarea,
+[data-copilotkit-popup-form] input,
+[data-copilotkit-popup-form] select,
+[data-copilotkit-popup-form] textarea {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 8px !important;
+  color: #1e293b !important; /* Dark text for readability */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px !important;
+  padding: 8px 12px !important;
+  margin: 4px 0 !important;
+}
+
+.copilotkit-popup-form-container label,
+[data-copilotkit-popup-form] label {
+  color: #374151 !important; /* Dark text for readability */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  margin-bottom: 4px !important;
+  display: block !important;
+}
+
+/* Checkboxes */
+.copilotkit-popup-form-container input[type="checkbox"],
+[data-copilotkit-popup-form] input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  margin-right: 8px !important;
+  accent-color: #3b82f6 !important;
+}
+
+/* Buttons in forms */
+.copilotkit-popup-form-container button,
+[data-copilotkit-popup-form] button {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 20px !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out !important;
+  margin: 8px 4px 0 0 !important;
+}
+
+.copilotkit-popup-form-container button:hover,
+[data-copilotkit-popup-form] button:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3) !important;
+}
+
+/* Loading states */
+.copilotkit-popup-loading,
+[data-copilotkit-popup-loading] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px !important;
+  color: #64748b !important;
+}
+
+/* Scrollbar styling */
+.copilotkit-popup-messages::-webkit-scrollbar,
+[data-copilotkit-popup-messages]::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.copilotkit-popup-messages::-webkit-scrollbar-track,
+[data-copilotkit-popup-messages]::-webkit-scrollbar-track {
+  background: rgba(248, 250, 252, 0.5) !important;
+  border-radius: 3px !important;
+}
+
+.copilotkit-popup-messages::-webkit-scrollbar-thumb,
+[data-copilotkit-popup-messages]::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3) !important;
+  border-radius: 3px !important;
+}
+
+.copilotkit-popup-messages::-webkit-scrollbar-thumb:hover,
+[data-copilotkit-popup-messages]::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5) !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .copilotkit-popup-container,
+  [data-copilotkit-popup-container] {
+    width: 95vw !important;
+    max-height: 85vh !important;
+  }
+
+  .copilotkit-popup-toggle,
+  [data-copilotkit-popup-toggle] {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    width: 56px !important;
+    height: 56px !important;
+  }
+}
+
+/* Ensure text is dark on light backgrounds for readability */
+.copilotkit-popup-container *,
+[data-copilotkit-popup-container] * {
+  color: #1e293b !important;
+}
+
+/* Override for specific elements that should be white */
+.copilotkit-popup-header *,
+[data-copilotkit-popup-header] *,
+.copilotkit-popup-message.user *,
+[data-copilotkit-popup-message="user"] *,
+.copilotkit-popup-toggle *,
+[data-copilotkit-popup-toggle] *,
+.copilotkit-popup-send-button *,
+[data-copilotkit-popup-send] *,
+.copilotkit-popup-form-container button *,
+[data-copilotkit-popup-form] button * {
+  color: white !important;
 }

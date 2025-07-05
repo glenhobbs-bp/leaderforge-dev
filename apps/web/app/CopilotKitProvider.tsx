@@ -9,195 +9,116 @@
 
 import { CopilotKit } from "@copilotkit/react-core";
 import { CopilotPopup } from "@copilotkit/react-ui";
-import "@copilotkit/react-ui/styles.css";
-import { useEffect, useState } from "react";
-import { useSupabase } from "../components/SupabaseProvider";
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
-import { UniversalSchemaRenderer } from "../components/ai/UniversalSchemaRenderer";
-import type { UniversalWidgetSchema } from "agent-core/types/UniversalWidgetSchema";
-import { useRouter, usePathname } from "next/navigation";
-
-// Admin actions component that renders forms using CopilotKit's Generative UI
-function AdminActions() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [dashboardData, setDashboardData] = useState<{ lastRefresh?: string } | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  // Make current page context readable by the copilot
-  useCopilotReadable({
-    description: "Current page and navigation context",
-    value: {
-      currentPage: pathname,
-      isOnDashboard: pathname === '/dashboard',
-      isDashboardAvailable: dashboardData !== null
-    }
-  });
-
-  // Make dashboard data readable if available
-  if (dashboardData) {
-    useCopilotReadable({
-      description: "Dashboard data and statistics",
-      value: dashboardData
-    });
-  }
-
-  useCopilotAction({
-    name: "performAdminTask",
-    description: `Administrative actions for managing the platform. This includes:
-      - Configuring user entitlements (e.g., "give user@example.com premium access")
-      - Creating new tenants (e.g., "create a new tenant called Acme Corp")
-      - Changing theme colors (e.g., "change the primary color to #FF6B6B")`,
-    parameters: [
-      {
-        name: "intent",
-        type: "string",
-        description: "The admin task to perform",
-        required: true,
-      }
-    ],
-    render: (props) => {
-      // Extract status and result from props
-      const { status, args, result } = props;
-
-      // This render function is called by CopilotKit to display the form
-      if (result?.schema && result.needsRender) {
-        const schema = result.schema as UniversalWidgetSchema;
-
-        // Handle form submission
-        const handleAction = async (action: { action: string; data?: unknown }) => {
-          if (action.action === 'submit' && result?.taskId) {
-            // Re-execute the action with the form data
-            // In CopilotKit, we need to trigger a new message/action rather than calling handler directly
-            // The form submission will be handled by sending a new message to the chat
-            window.dispatchEvent(new CustomEvent('copilotkit:submit-form', {
-              detail: {
-                intent: args.intent,
-                formData: action.data,
-                taskId: result.taskId
-              }
-            }));
-          }
-        };
-
-        return (
-          <div className="copilotkit-form-container">
-            <UniversalSchemaRenderer
-              schema={schema}
-              onAction={handleAction}
-            />
-          </div>
-        );
-      }
-
-      // During processing, show loading state
-      if (status === "executing" || isProcessing) {
-        return (
-          <div className="flex items-center space-x-2 p-4">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-            <span className="text-sm text-muted-foreground">Processing your request...</span>
-          </div>
-        );
-      }
-
-      return null;
-    },
-    handler: async ({ intent }) => {
-      setIsProcessing(true);
-      try {
-        const response = await fetch("/api/copilotkit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            action: "admin",
-            intent,
-          }),
-        });
-
-        const data = await response.json();
-
-        // If we get a refresh instruction, refresh the dashboard
-        if (data.message?.includes("dashboard") && data.message?.includes("refresh")) {
-          setDashboardData({ lastRefresh: new Date().toISOString() });
-
-          // If we're on the dashboard, trigger a page refresh
-          if (pathname === '/dashboard') {
-            router.refresh();
-          }
-        }
-
-        return data;
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-  });
-
-  // Navigation action
-  useCopilotAction({
-    name: "navigateToPage",
-    description: "Navigate to different pages in the application (dashboard, settings, etc.)",
-    parameters: [
-      {
-        name: "page",
-        type: "string",
-        description: "The page to navigate to",
-        required: true,
-      }
-    ],
-    handler: async ({ page }) => {
-      const pageMap: Record<string, string> = {
-        'dashboard': '/dashboard',
-        'home': '/',
-        'settings': '/settings',
-        'admin': '/admin'
-      };
-
-      const route = pageMap[page.toLowerCase()] || `/${page}`;
-      router.push(route);
-
-      return { success: true, message: `Navigating to ${page}...` };
-    },
-  });
-
-  return null;
-}
+import { useSupabase } from '../components/SupabaseProvider';
+import { useEffect, useState } from 'react';
+import { EntitlementActions } from '../components/copilot/EntitlementActions';
 
 export function CopilotKitProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { session } = useSupabase();
-  const [showCopilot, setShowCopilot] = useState(false);
+  const { session, loading } = useSupabase();
+  const [isReady, setIsReady] = useState(false);
 
+  // Simple readiness check - wait for session to stabilize
   useEffect(() => {
-    // Only show CopilotKit after authentication
-    if (session?.user) {
-      setShowCopilot(true);
-    } else {
-      setShowCopilot(false);
+    // Small delay to ensure session is fully loaded
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
+  }, []);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[CopilotKitProvider] State:', {
+      loading,
+      hasSession: !!session,
+      userId: session?.user?.id,
+      isReady,
+      shouldRender: isReady && !loading,
+      sessionUser: session?.user ? {
+        id: session.user.id,
+        email: session.user.email
+      } : null
+    });
+  }, [session, loading, isReady]);
+
+  // Determine user context with proper admin level detection (matching API route logic)
+  const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } } | null) => {
+    if (!user) return 'none';
+
+    const metadata = user.user_metadata || {};
+    const rawMetadata = user.raw_user_meta_data || {};
+
+    if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
+      return 'i49_super_admin';
     }
-  }, [session]);
+
+    if (metadata.is_admin === true || rawMetadata.is_admin === true) {
+      return 'platform_admin';
+    }
+
+    if (metadata.tenant_admin || rawMetadata.tenant_admin) {
+      return 'tenant_admin';
+    }
+
+    if (metadata.account_admin || rawMetadata.account_admin) {
+      return 'account_admin';
+    }
+
+    return 'none';
+  };
+
+  const userId = session?.user?.id || 'anonymous';
+  const adminLevel = getAdminLevel(session?.user);
+  const userName = session?.user?.user_metadata?.full_name ||
+                   session?.user?.user_metadata?.name ||
+                   session?.user?.email?.split('@')[0] ||
+                   'User';
+  const userEmail = session?.user?.email || '';
+
+  const userProperties = {
+    userId,
+    adminLevel,
+    userName,
+    userEmail,
+    isAuthenticated: !!session,
+    isAdmin: adminLevel !== 'none',
+    tenantKey: 'leaderforge', // Add tenant context
+  };
+
+  // Log the properties being sent
+  useEffect(() => {
+    if (isReady && !loading) {
+      console.log('[CopilotKitProvider] Sending user properties:', userProperties);
+    }
+  }, [isReady, loading, userId, adminLevel, userName, session]);
+
+  // Only render CopilotKit after ready and session is stable
+  if (!isReady || loading) {
+    return <>{children}</>;
+  }
 
   return (
-    <CopilotKit runtimeUrl="/api/copilotkit">
+    <CopilotKit
+      runtimeUrl="/api/copilotkit"
+      properties={userProperties}
+      key={`copilot-${userId}`} // Force re-render when user changes
+    >
       {children}
-      {showCopilot && (
-        <>
-          <AdminActions />
-          <CopilotPopup
-            labels={{
-              title: "LeaderForge Assistant",
-              initial: "Hi! I'm your LeaderForge assistant. I can help you manage users, configure settings, and navigate the platform. What would you like to do today?",
-              placeholder: "Ask me to configure entitlements, create tenants, or navigate...",
-            }}
-            defaultOpen={false}
-            clickOutsideToClose={true}
-            className="copilotkit-custom-popup"
-          />
-        </>
-      )}
+      <EntitlementActions />
+      <CopilotPopup
+        instructions="You are a helpful assistant for LeaderForge, an AI-powered leadership development platform. Help users navigate the platform, understand content, and achieve their leadership goals."
+        labels={{
+          title: "LeaderForge Assistant",
+          initial: "Hi! I'm your LeaderForge assistant. How can I help you today?",
+        }}
+      />
     </CopilotKit>
   );
 }

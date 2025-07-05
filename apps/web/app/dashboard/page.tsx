@@ -5,9 +5,36 @@
 import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import DashboardClient from './DashboardClient';
+import { Suspense } from 'react';
+import DynamicTenantPage from '../../components/DynamicTenantPage';
 import { entitlementService } from '../lib/entitlementService';
 import { tenantService } from '../lib/tenantService';
+import type { TenantConfig } from '../lib/types';
+
+// Enhanced loading component - standardized to match login modal
+function DashboardLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+        <div className="flex flex-col items-center mb-6">
+          <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
+        </div>
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner mb-4"></div>
+          <p className="text-sm font-medium text-gray-800 mb-2">Loading Dashboard</p>
+          <p className="text-xs text-gray-600 text-center">
+            Setting up your personalized experience...
+          </p>
+          <div className="mt-4 flex space-x-1">
+            <div className="w-2 h-2 bg-primary-dot rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-secondary-dot rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-2 h-2 bg-accent-dot rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -19,36 +46,56 @@ export default async function DashboardPage() {
 
   const supabase = createSupabaseServerClient(cookieStore);
 
+  let finalSession = null;
+
   if (accessToken && refreshToken) {
-    await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
+    try {
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+
+      if (error) {
+        console.warn('[dashboard/page] setSession error:', error);
+      } else if (data.session) {
+        console.log('[dashboard/page] Session restored successfully');
+        // Use the session from setSession directly
+        finalSession = data.session;
+      }
+    } catch (error) {
+      console.warn('[dashboard/page] Session restoration failed:', error);
+    }
   } else {
     console.warn('[dashboard/page] Missing access or refresh token in cookies');
   }
 
-  const {
-    data: { session },
-    error: sessionError
-  } = await supabase.auth.getSession();
+  // Only get session if we haven't already restored it
+  if (!finalSession) {
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabase.auth.getSession();
 
-  let finalSession = session;
+    finalSession = session;
+
+    if (sessionError) {
+      console.warn('[dashboard/page] getSession error:', sessionError);
+    }
+  }
 
   // Add more detailed session validation
-  if (!session?.user) {
+  if (!finalSession?.user) {
     console.warn('[dashboard/page] No user found in session, redirecting to login');
     console.warn('[dashboard/page] Debug info:', {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!refreshToken,
-      sessionExists: !!session,
-      userExists: !!session?.user,
-      sessionError: sessionError?.message
+      sessionExists: !!finalSession,
+      userExists: !!finalSession?.user
     });
 
-    // If we have tokens but no session, try to refresh
-    if (accessToken && refreshToken && sessionError) {
-      console.warn('[dashboard/page] Session error with valid tokens, attempting refresh');
+    // If we have tokens but no session, try to refresh (even without explicit error)
+    if (accessToken && refreshToken) {
+      console.warn('[dashboard/page] Have tokens but no session, attempting refresh');
       try {
         const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession({
           refresh_token: refreshToken,
@@ -77,10 +124,10 @@ export default async function DashboardPage() {
   }
 
   // --- SSR: Fetch entitled context list ---
-  let initialTenants = [];
+  let initialTenants: TenantConfig[] = [];
   let initialTenantConfig = null;
   let initialNavOptions = null;
-  let defaultTenantKey = 'leaderforge'; // Default fallback
+  let defaultTenantKey = 'leaderforge';
 
   try {
     let allContexts = await tenantService.getAllTenantConfigs(supabase);
@@ -121,14 +168,15 @@ export default async function DashboardPage() {
     initialTenants = [];
   }
 
-  // Pass all SSR data to client for hydration
+  // Directly render DynamicTenantPage with Suspense - no redundant wrapper
   return (
-    <DashboardClient
-      initialSession={finalSession}
-      initialTenants={initialTenants}
-      initialTenantConfig={initialTenantConfig}
-      initialNavOptions={initialNavOptions}
-      defaultTenantKey={defaultTenantKey}
-    />
+    <Suspense fallback={<DashboardLoader />}>
+      <DynamicTenantPage
+        initialTenants={initialTenants}
+        initialTenantConfig={initialTenantConfig}
+        initialNavOptions={initialNavOptions}
+        defaultTenantKey={defaultTenantKey}
+      />
+    </Suspense>
   );
 }

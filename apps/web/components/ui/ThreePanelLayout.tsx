@@ -7,7 +7,6 @@
 
 import React, { ReactElement, useState } from "react";
 import { ThemeProvider } from "./ThemeContext";
-import AIExperience from "../ai/AIExperience";
 
 interface ContextConfig {
   theme: {
@@ -73,7 +72,6 @@ export default function ThreePanelLayout({
           )}
         </div>
       </div>
-      <AIExperience />
     </ThemeProvider>
   );
 }

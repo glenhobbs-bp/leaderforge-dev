@@ -133,16 +133,20 @@ export class EntitlementTool {
     try {
       const supabase = this.getSupabaseClient();
 
+      console.log(`[EntitlementTool] Looking up user by email: ${email}`);
+
       const { data, error } = await supabase
-        .from('users')
+        .from('users')  // ✅ Schema already set in client config
         .select('id')
         .eq('email', email)
         .single();
 
       if (error) {
+        console.error('Error fetching user by email:', error);
         throw error;
       }
 
+      console.log(`[EntitlementTool] Found user ID: ${data?.id}`);
       return data?.id || null;
     } catch (error) {
       console.error('Error fetching user by email:', error);

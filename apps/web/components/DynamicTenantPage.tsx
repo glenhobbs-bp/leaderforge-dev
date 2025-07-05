@@ -19,8 +19,7 @@ const DynamicVideoPlayerModal = lazy(() =>
   }))
 );
 import { useUserPreferences } from '../app/hooks/useUserPreferences';
-// Removed queryClient import - no longer needed after fixing render loop
-import type { UserPreferences } from '../app/lib/types';
+import type { UserPreferences, TenantConfig } from '../app/lib/types';
 
 // Diagnostic: Track module load
 console.log('[DynamicTenantPage] Module loaded - Database-driven mode');
@@ -40,19 +39,8 @@ interface AgentSchema {
 }
 
 type DynamicTenantPageProps = {
-  // Props for tenant management
-  initialTenants?: Array<{
-    tenant_key: string;
-    display_name: string;
-    theme?: unknown;
-    i18n?: unknown;
-    logo_url?: string;
-    nav_options?: unknown;
-    settings?: unknown;
-    created_at?: string;
-    updated_at?: string;
-    subtitle?: string;
-  }>;
+  // Props for tenant management - using correct TenantConfig type
+  initialTenants?: TenantConfig[];
   initialTenantConfig?: unknown;
   initialNavOptions?: unknown;
   defaultTenantKey?: string;
@@ -67,9 +55,10 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
   // React Query client removed - was causing render loops via cache invalidation
 
-  // Core state
+  // Core state - prevent multiple mounts
   const hasMounted = useRef(false);
   const hasNavigationRestored = useRef(false);
+  const hasTriggeredUserPrefsFetch = useRef(false);
   const [hasRestoredTenant, setHasRestoredTenant] = useState(false);
   const [shouldFetchUserPrefs, setShouldFetchUserPrefs] = useState(false);
 
@@ -104,11 +93,12 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
   // Trigger user preferences fetch on initial mount when session is available
   useEffect(() => {
-    if (session?.user?.id && !shouldFetchUserPrefs && !hasRestoredTenant) {
+    if (session?.user?.id && !hasTriggeredUserPrefsFetch.current && !shouldFetchUserPrefs && hasMounted.current) {
       console.log('[DynamicTenantPage] Triggering initial user preferences fetch for session:', session.user.id);
+      hasTriggeredUserPrefsFetch.current = true;
       setShouldFetchUserPrefs(true);
     }
-  }, [session?.user?.id, shouldFetchUserPrefs, hasRestoredTenant]);
+  }, [session?.user?.id]); // ✅ FIX: Simplified dependencies and require mounted state
 
   // Handle user preferences errors gracefully
   useEffect(() => {
@@ -190,7 +180,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   // Navigation option restoration effect - runs ONLY ONCE after context is restored
   useEffect(() => {
     // ✅ CRITICAL FIX: Early exit if already restored to prevent infinite loops
-    if (hasNavigationRestored.current) {
+    if (hasNavigationRestored.current || !hasMounted.current) {
       return;
     }
 
@@ -290,6 +280,8 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       }
     }
   }, []);
+
+
 
   // ✅ FIX: Initialize loading state properly
   useEffect(() => {
@@ -848,8 +840,8 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           tenantKey={currentTenant}
           contextOptions={props.initialTenants?.map(ctx => ({
             id: ctx.tenant_key,
-            title: ctx.display_name,
-            subtitle: ctx.subtitle || 'AI-Powered Experience',
+            title: ctx.name || ctx.tenant_key,
+            subtitle: (ctx.description as string) || 'AI-Powered Experience',
             icon: 'star'
           })) || []}
           selectedTenantKey={currentTenant}
