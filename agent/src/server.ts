@@ -52,19 +52,25 @@ const server = createServer(async (req, res) => {
         console.log('[Agent Server] Received request:', {
           threadId,
           input: {
-            context: input.context,
-            messages: input.messages?.length || 0
+            // Debug: Show what we're actually receiving
+            userId: input.userId,
+            tenantKey: input.tenantKey,
+            navOptionId: input.navOptionId,
+            messages: input.messages?.length || 0,
+            hasContext: !!input.context
           }
         });
 
-        // Run the graph
+        // 🚨 CRITICAL FIX: Read user context from correct location
+        // Web app sends userId, tenantKey, navOptionId at root level of input
+        // NOT in input.context - that was the bug!
         const result = await graph.invoke({
-          userId: input.context?.userId || 'test-user',
-          tenantKey: input.context?.tenantKey || 'leaderforge',
-          navOptionId: input.context?.navOptionId || 'test-nav',
+          userId: input.userId || 'unknown-user',
+          tenantKey: input.tenantKey || 'unknown-tenant',
+          navOptionId: input.navOptionId || 'unknown-nav',
           contentList: [],
           progressMap: {},
-          agentConfig: {},
+          agentConfig: input.agentConfig || {},
           agentParameters: {},
           schema: {},
           messages: input.messages || []
