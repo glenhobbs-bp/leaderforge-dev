@@ -13,7 +13,7 @@ import { UserProgressTool, SupabaseUserProgressRepository } from '../../../../..
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { action, userId, contentId, contextKey, progressData, watchTime, position, duration, score, totalQuestions, answeredQuestions, scrollPosition, highlights, event, contentIds, events } = body;
+    const { action, userId, contentId, tenantKey, progressData, watchTime, position, duration, score, totalQuestions, answeredQuestions, scrollPosition, highlights, event, contentIds, events } = body;
 
     // Get user session for authentication (using same method as agent/content route)
     const cookieStore = await nextCookies();
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       effectiveUserId,
       action,
       contentId: contentId || 'N/A',
-      contextKey: contextKey || 'N/A'
+      tenantKey: tenantKey || 'N/A'
     });
 
     // Create UserProgressTool with the authenticated SSR client (like rest of platform)
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         const result = await userProgressTool.trackVideoProgress(
           effectiveUserId,
           contentId,
-          contextKey,
+          tenantKey,
           watchTimeInt,
           positionInt,
           durationInt
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         const result = await userProgressTool.trackQuizCompletion(
           effectiveUserId,
           contentId,
-          contextKey,
+          tenantKey,
           score,
           totalQuestions,
           answeredQuestions
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         const result = await userProgressTool.trackReadingProgress(
           effectiveUserId,
           contentId,
-          contextKey,
+          tenantKey,
           scrollPosition,
           highlights
         );
@@ -131,33 +131,33 @@ export async function POST(request: NextRequest) {
       }
 
       case 'getProgress': {
-        const result = await userProgressTool.getProgress(effectiveUserId, contentId, contextKey);
+        const result = await userProgressTool.getProgress(effectiveUserId, contentId, tenantKey);
         return NextResponse.json({ success: true, data: result });
       }
 
       case 'setProgress': {
-        const result = await userProgressTool.setProgress(effectiveUserId, contentId, contextKey, progressData);
+        const result = await userProgressTool.setProgress(effectiveUserId, contentId, tenantKey, progressData);
         return NextResponse.json({ success: true, data: result });
       }
 
       case 'listProgress':
       case 'getProgressForContentIds': {
-        const result = await userProgressTool.listProgressForContentIds(effectiveUserId, contentIds || [], contextKey);
+        const result = await userProgressTool.listProgressForContentIds(effectiveUserId, contentIds || [], tenantKey);
         return NextResponse.json({ success: true, data: result });
       }
 
       case 'getProgressSummary': {
-        const result = await userProgressTool.getProgressSummary(effectiveUserId, contextKey);
+        const result = await userProgressTool.getProgressSummary(effectiveUserId, tenantKey);
         return NextResponse.json({ success: true, data: result });
       }
 
       case 'getCompletionStats': {
-        const result = await userProgressTool.getCompletionStats(effectiveUserId, contextKey);
+        const result = await userProgressTool.getCompletionStats(effectiveUserId, tenantKey);
         return NextResponse.json({ success: true, data: result });
       }
 
       case 'checkMilestones': {
-        const result = await userProgressTool.checkMilestones(effectiveUserId, contextKey);
+        const result = await userProgressTool.checkMilestones(effectiveUserId, tenantKey);
         return NextResponse.json({ success: true, data: result });
       }
 

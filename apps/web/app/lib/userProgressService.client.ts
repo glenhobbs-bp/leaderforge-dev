@@ -156,6 +156,16 @@ class BatchedProgressService {
       throw new Error('Service is destroyed');
     }
 
+    // ✅ FIX: Use ProgressEvent fields directly without mapping
+    const mappedEvents = events.map(event => ({
+      contentId: event.contentId,
+      progressType: event.progressType,
+      value: event.value,
+      metadata: event.metadata
+    }));
+
+    console.log('[BatchedProgressService] Sending batch events:', mappedEvents);
+
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
       headers: {
@@ -163,17 +173,20 @@ class BatchedProgressService {
       },
       credentials: 'include',
       body: JSON.stringify({
-        events,
+        action: 'batchTrackProgress', // ✅ FIX: Add required action parameter
+        events: mappedEvents,
         batch: true
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Progress API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('[BatchedProgressService] API error:', errorText);
+      throw new Error(`Progress API error: ${response.status} - ${errorText}`);
     }
 
     const result = await response.json();
-    return Array.isArray(result) ? result : [result];
+    return Array.isArray(result.data) ? result.data : [result.data];
   }
 
   /**
@@ -201,7 +214,7 @@ class BatchedProgressService {
   async trackVideoProgress(
     userId: string,
     contentId: string,
-    contextKey: string,
+    tenantKey: string,
     watchTime: number,
     position: number,
     duration?: number
@@ -224,7 +237,7 @@ class BatchedProgressService {
     const event: ProgressEvent = {
       userId,
       contentId,
-      tenantKey: contextKey,
+      tenantKey,
       progressType: 'video',
       value: progressValue,
       metadata: {
@@ -244,7 +257,7 @@ class BatchedProgressService {
   static async trackQuizCompletion(
     userId: string,
     contentId: string,
-    contextKey: string,
+    tenantKey: string,
     score: number,
     totalQuestions: number,
     answeredQuestions: number
@@ -259,7 +272,7 @@ class BatchedProgressService {
         action: 'trackQuizCompletion',
         userId,
         contentId,
-        contextKey,
+        tenantKey,
         score,
         totalQuestions,
         answeredQuestions
@@ -280,7 +293,7 @@ class BatchedProgressService {
   static async trackReadingProgress(
     userId: string,
     contentId: string,
-    contextKey: string,
+    tenantKey: string,
     scrollPosition: number,
     highlights?: number
   ): Promise<UserProgress> {
@@ -294,7 +307,7 @@ class BatchedProgressService {
         action: 'trackReadingProgress',
         userId,
         contentId,
-        contextKey,
+        tenantKey,
         scrollPosition,
         highlights
       })
@@ -338,7 +351,7 @@ class BatchedProgressService {
   static async getProgress(
     userId: string,
     contentId: string,
-    contextKey: string
+    tenantKey: string
   ): Promise<UserProgress | null> {
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
@@ -350,7 +363,7 @@ class BatchedProgressService {
         action: 'getProgress',
         userId,
         contentId,
-        contextKey
+        tenantKey
       })
     });
 
@@ -368,7 +381,7 @@ class BatchedProgressService {
   static async getProgressForContentIds(
     userId: string,
     contentIds: string[],
-    contextKey: string
+    tenantKey: string
   ): Promise<Record<string, UserProgress>> {
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
@@ -380,7 +393,7 @@ class BatchedProgressService {
         action: 'getProgressForContentIds',
         userId,
         contentIds,
-        contextKey
+        tenantKey
       })
     });
 
@@ -397,7 +410,7 @@ class BatchedProgressService {
    */
   static async getProgressSummary(
     userId: string,
-    contextKey: string
+    tenantKey: string
   ): Promise<ProgressSummary> {
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
@@ -408,7 +421,7 @@ class BatchedProgressService {
       body: JSON.stringify({
         action: 'getProgressSummary',
         userId,
-        contextKey
+        tenantKey
       })
     });
 
@@ -425,7 +438,7 @@ class BatchedProgressService {
    */
   static async getCompletionStats(
     userId: string,
-    contextKey: string
+    tenantKey: string
   ): Promise<CompletionStats> {
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
@@ -436,7 +449,7 @@ class BatchedProgressService {
       body: JSON.stringify({
         action: 'getCompletionStats',
         userId,
-        contextKey
+        tenantKey
       })
     });
 
@@ -453,7 +466,7 @@ class BatchedProgressService {
    */
   static async checkMilestones(
     userId: string,
-    contextKey: string
+    tenantKey: string
   ): Promise<Milestone[]> {
     const response = await fetch('/api/universal-progress', {
       method: 'POST',
@@ -464,7 +477,7 @@ class BatchedProgressService {
       body: JSON.stringify({
         action: 'checkMilestones',
         userId,
-        contextKey
+        tenantKey
       })
     });
 
@@ -514,14 +527,14 @@ export class ClientUserProgressService {
   static async trackVideoProgress(
     userId: string,
     contentId: string,
-    contextKey: string,
+    tenantKey: string,
     watchTime: number,
     position: number,
     duration?: number
   ): Promise<UserProgress> {
     // Use batched service for video progress (most frequent calls)
     return BatchedProgressService.getInstance().trackVideoProgress(
-      userId, contentId, contextKey, watchTime, position, duration
+      userId, contentId, tenantKey, watchTime, position, duration
     );
   }
 
