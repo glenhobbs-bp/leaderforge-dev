@@ -211,7 +211,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="btn-design-system btn-success w-full"
+          className="entitlement-submit-button"
         >
           {loading ? (
             <>
@@ -227,7 +227,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
         </button>
       </div>
 
-      <div className="space-y-3 max-h-48 overflow-y-auto border border-gray-200 p-2 rounded">
+      <div className="entitlements-scroll-container space-y-3">
         {entitlements.map((entitlement) => {
           const isSelected = selectedEntitlements.includes(entitlement.id);
           const wasOriginallySelected = currentEntitlements.includes(entitlement.id);
