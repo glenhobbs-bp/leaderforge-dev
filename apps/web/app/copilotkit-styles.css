@@ -112,6 +112,7 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
+/* Assistant Messages - Refined and elegant */
 .copilotKitAssistantMessage {
   background: #f8fafc !important;
   border: 1px solid #e2e8f0 !important;
@@ -119,10 +120,124 @@
   padding: 12px !important;
 }
 
+/* User Messages - Refined LeaderForge brand styling */
+.copilotKitUserMessage {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  max-width: 85% !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.15) !important;
+  display: block !important;
+  text-align: left !important;
+  width: fit-content !important;
+  float: right !important;
+  clear: both !important;
+}
+
+/* Message Text Styling - More refined typography */
 .copilotKitMarkdownElement {
   color: #1e293b !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
   line-height: 1.5 !important;
+  font-weight: 400 !important;
+}
+
+/* User message text styling */
+.copilotKitUserMessage .copilotKitMarkdownElement,
+.copilotKitUserMessage p,
+.copilotKitUserMessage {
+  color: white !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  font-weight: 400 !important;
+  margin: 0 !important;
+}
+
+/* Assistant message text styling */
+.copilotKitAssistantMessage .copilotKitMarkdownElement,
+.copilotKitAssistantMessage p {
+  color: #374151 !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  font-weight: 400 !important;
+  margin: 0 !important;
+}
+
+/* Message typography hierarchy */
+.copilotKitMessage h1,
+.copilotKitMessage h2,
+.copilotKitMessage h3 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  margin: 8px 0 4px 0 !important;
+  line-height: 1.3 !important;
+}
+
+.copilotKitMessage ul,
+.copilotKitMessage ol {
+  font-size: 13px !important;
+  margin: 8px 0 !important;
+  padding-left: 16px !important;
+}
+
+.copilotKitMessage li {
+  margin-bottom: 2px !important;
+  line-height: 1.4 !important;
+}
+
+/* Code blocks - refined styling */
+.copilotKitMessage code {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+  font-size: 12px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace !important;
+  color: #475569 !important;
+}
+
+.copilotKitMessage pre {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  padding: 12px !important;
+  font-size: 12px !important;
+  overflow-x: auto !important;
+  margin: 8px 0 !important;
+}
+
+/* Message container refinements */
+.copilotKitMessagesContainer {
+  max-height: 400px !important;
+  overflow-y: auto !important;
+  padding: 8px !important;
+}
+
+/* Scroll styling for messages */
+.copilotKitMessagesContainer::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.copilotKitMessagesContainer::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 2px !important;
+}
+
+.copilotKitMessagesContainer::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 2px !important;
+}
+
+.copilotKitMessagesContainer::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
 }
 
 /* ========================================
@@ -205,4 +320,126 @@
 /* Hide Help and Debug buttons - keep only close button */
 .copilotKitHeaderControls button:not(.copilotKitHeaderCloseButton) {
   display: none !important;
+}
+
+/* ========================================
+   FORM STYLING - ENTITLEMENT MANAGEMENT
+   ======================================== */
+
+/* Refined form container */
+.entitlement-form-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+/* Form headings - more refined */
+.entitlement-form-container h3 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  margin-bottom: 16px !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* Form text refinements */
+.entitlement-form-container .text-sm {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.entitlement-form-container .text-xs {
+  font-size: 11px !important;
+  line-height: 1.3 !important;
+  color: #6b7280 !important;
+}
+
+/* Design System Button Styling */
+.btn-design-system {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  min-height: 36px;
+}
+
+.btn-design-system:focus-visible {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}
+
+.btn-design-system:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Success button variant */
+.btn-success {
+  background-color: #22c55e;
+  border-color: #22c55e;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #16a34a;
+  border-color: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Form selection counter styling */
+.selection-counter {
+  background: #f0f9ff !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #1e40af !important;
+  text-align: center !important;
+  margin-bottom: 8px !important;
+}
+
+/* Checkbox refinements */
+.entitlement-form-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  accent-color: #1e40af;
+}
+
+/* Label styling refinements */
+.entitlement-form-container label {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #374151;
+}
+
+.entitlement-form-container .font-medium {
+  font-weight: 500 !important;
+  color: #1e293b !important;
+}
+
+/* Status badges */
+.status-badge {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  letter-spacing: 0.025em !important;
 }

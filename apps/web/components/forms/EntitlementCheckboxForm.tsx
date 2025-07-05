@@ -197,35 +197,34 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
   }
 
   return (
-    <div className="p-4 border rounded-lg bg-white shadow-sm max-w-2xl">
+    <div className="entitlement-form-container p-4 border rounded-lg bg-white shadow-sm max-w-2xl">
       <h3 className="text-lg font-semibold mb-4 text-gray-900">
         Configure Entitlements for {debouncedUserIdentifier}
       </h3>
 
-      {/* Combined selection counter + submit button */}
+      {/* Refined selection counter + submit button */}
       <div className="mb-3">
-        <div className="bg-blue-50 p-3 rounded border">
-          <div className="text-sm text-gray-700 font-medium text-center mb-2">
-            {selectedEntitlements.length} of {entitlements.length} entitlements selected
-          </div>
-
-          <div
-            onClick={handleSubmit}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-            className="w-full px-4 py-2 font-bold rounded transition-colors cursor-pointer bg-green-600 hover:bg-green-700 text-white"
-            style={{
-              minHeight: '40px',
-              fontSize: '14px',
-              textAlign: 'center',
-              lineHeight: '40px',
-              opacity: loading ? '0.5' : '1'
-            }}
-          >
-            {loading ? '⏳ Updating...' : '💾 Save Changes'}
-          </div>
+        <div className="selection-counter">
+          {selectedEntitlements.length} of {entitlements.length} entitlements selected
         </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="btn-design-system btn-success w-full"
+        >
+          {loading ? (
+            <>
+              <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+              Updating...
+            </>
+          ) : (
+            <>
+              <span>💾</span>
+              Save Changes
+            </>
+          )}
+        </button>
       </div>
 
       <div className="space-y-3 max-h-48 overflow-y-auto border border-gray-200 p-2 rounded">
@@ -249,7 +248,7 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
                 <div className="font-medium text-gray-900">
                   {entitlement.display_name}
                   {wasOriginallySelected && (
-                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+                    <span className="status-badge ml-2 bg-green-100 text-green-700">
                       Currently Assigned
                     </span>
                   )}
@@ -266,9 +265,9 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
         })}
       </div>
 
-      {/* Debug info */}
+      {/* Debug info - refined */}
       <div className="mt-2 text-xs text-gray-500">
-        Debug: {entitlements.length} total, {selectedEntitlements.length} selected, loading: {loading.toString()}
+        {entitlements.length} total • {selectedEntitlements.length} selected
       </div>
     </div>
   );
