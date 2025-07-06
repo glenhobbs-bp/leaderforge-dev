@@ -8,7 +8,8 @@
 
 import React, { useState } from 'react';
 import { Search, X, Edit2, Plus, Lock, MessageSquare } from 'lucide-react';
-import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotReadable, useCopilotChat } from "@copilotkit/react-core";
+import { Role, TextMessage } from "@copilotkit/runtime-client-gql";
 
 interface Prompt {
   id: string;
@@ -206,6 +207,9 @@ export default function PromptLibraryMockup() {
     isLocked: false
   });
 
+  // CopilotKit chat hook for programmatic message sending
+  const { appendMessage } = useCopilotChat();
+
   // Make prompt library available to CopilotKit AI context
   useCopilotReadable({
     description: "Complete prompt library with all available templates",
@@ -291,12 +295,12 @@ export default function PromptLibraryMockup() {
     },
   });
 
-      const handleUsePrompt = (prompt: Prompt) => {
+        const handleUsePrompt = (prompt: Prompt) => {
     // SEAMLESS COPILOTKIT INTEGRATION:
-    // Using useCopilotReadable to make the selected prompt immediately
-    // available to the AI context - no alerts or manual steps needed!
+    // Using useCopilotChat to programmatically send the prompt as a user message
+    // This creates the exact experience: click "Use Now" → chat opens → prompt is sent
 
-    // 1. Set the pending prompt - this immediately makes it available to the AI
+    // 1. Set the pending prompt for additional context
     setPendingPrompt(prompt);
 
     // 2. Open the CopilotKit chat modal
@@ -304,10 +308,18 @@ export default function PromptLibraryMockup() {
     if (copilotButton instanceof HTMLElement) {
       copilotButton.click();
 
-      // 3. Clear the pending prompt after a short delay to keep context clean
+      // 3. After a brief delay, automatically send the prompt as a user message
       setTimeout(() => {
+        const userMessage = new TextMessage({
+          content: `I want to use this prompt template: "${prompt.title}"\n\n${prompt.samplePrompt}\n\nPlease help me customize and use this prompt effectively.`,
+          role: Role.User,
+        });
+
+        appendMessage(userMessage);
+
+        // Clear the pending prompt after sending
         setPendingPrompt(null);
-      }, 30000); // Clear after 30 seconds if not used
+      }, 500); // Small delay to ensure modal is fully open
     }
   };
 
