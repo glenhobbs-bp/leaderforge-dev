@@ -83,8 +83,8 @@ export async function GET(
       return { supabase };
     })();
 
-    // More aggressive timeout for production (1 second instead of 2)
-    const authTimeout = isDev ? 2000 : 1000;
+    // Fixed timeout values - give Vercel more time for network latency and cold starts
+    const authTimeout = isDev ? 2000 : 3000; // 3 seconds for production auth
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Authentication timeout')), authTimeout)
     );
@@ -124,8 +124,8 @@ export async function GET(
       return user;
     })();
 
-    // More aggressive timeout for production (2 seconds instead of 3)
-    const dbTimeout = isDev ? 3000 : 2000;
+    // Fixed timeout values - give Vercel more time for database operations
+    const dbTimeout = isDev ? 3000 : 5000; // 5 seconds for production DB operations
     const dbTimeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Database timeout')), dbTimeout)
     );
