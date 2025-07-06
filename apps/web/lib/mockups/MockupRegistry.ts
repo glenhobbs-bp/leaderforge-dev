@@ -10,6 +10,7 @@ import MarcusDashboard from '../../components/mockups/MarcusDashboardMockup';
 import TeamLeaderDashboard from '../../components/mockups/TeamLeaderDashboardMockup';
 import ExecutiveDashboard from '../../components/mockups/ExecutiveDashboardMockup';
 import PromptLibraryMockup from '../../components/mockups/PromptLibraryMockup';
+import BackgroundAgentsMockup from '../../components/mockups/BackgroundAgentsMockup';
 
 // Mockup registry interface
 export interface MockupConfig {
@@ -60,6 +61,15 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     description: 'Searchable repository of proven AI prompts for business scenarios',
     featureFlag: 'ENABLE_PROMPT_LIBRARY_MOCKUP',
     entitlementName: 'prompt-library-mockup',
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
+  },
+
+  // Background Agents - AI Operating System
+  '8c9029a8-f0d6-4522-8f10-b1107c84b594': {
+    component: BackgroundAgentsMockup,
+    name: 'Background Agents',
+    description: 'AI agents working behind the scenes to monitor, analyze, and alert',
+    featureFlag: 'ENABLE_BACKGROUND_AGENTS_MOCKUP',
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
   },
 };
