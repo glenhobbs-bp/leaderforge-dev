@@ -8,7 +8,7 @@
 
 import React, { useState } from 'react';
 import { Search, X, Edit2, Plus, Lock, MessageSquare } from 'lucide-react';
-import { useCopilotAction } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 
 interface Prompt {
   id: string;
@@ -194,6 +194,7 @@ export default function PromptLibraryMockup() {
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [showManageModal, setShowManageModal] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | null>(null);
+  const [pendingPrompt, setPendingPrompt] = useState<Prompt | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -205,91 +206,108 @@ export default function PromptLibraryMockup() {
     isLocked: false
   });
 
-    // CopilotKit action for using prompts
+  // Make prompt library available to CopilotKit AI context
+  useCopilotReadable({
+    description: "Complete prompt library with all available templates",
+    value: mockPrompts,
+  });
+
+  // Make the pending (selected) prompt available when user clicks "Use Now"
+  useCopilotReadable({
+    description: "Currently selected prompt template that the user wants to use immediately",
+    value: pendingPrompt,
+    available: pendingPrompt ? 'enabled' : 'disabled',
+  });
+
+  // CopilotKit action for using prompts - Enhanced with template matching
   useCopilotAction({
     name: "usePromptLibraryTemplate",
-    description: "Use a prompt template from the library with user guidance",
+    description: "Help users find and use prompt templates from the library. Automatically detects when users mention prompt names or want to use templates.",
     parameters: [
-      {
-        name: "promptContent",
-        type: "string",
-        description: "The prompt content to use as a starting point",
-        required: true,
-      },
       {
         name: "promptTitle",
         type: "string",
-        description: "The title of the prompt being used",
-        required: true,
+        description: "The title or name of the prompt template the user wants to use",
+        required: false,
       },
       {
-        name: "userInstructions",
+        name: "userRequest",
         type: "string",
-        description: "Additional instructions from the user on how to customize or use this prompt",
+        description: "The user's specific request about what they want to do with the prompt",
         required: false,
       },
     ],
-    handler: async ({ promptContent, promptTitle, userInstructions }) => {
-      let response = `I've loaded the "${promptTitle}" prompt template for you:\n\n---\n${promptContent}\n---\n\n`;
+        handler: async ({ promptTitle, userRequest }) => {
+      // The AI now has direct access to:
+      // 1. The complete prompt library via useCopilotReadable
+      // 2. Any pending/selected prompt when "Use Now" is clicked
+      //
+      // Note: The AI can access these automatically through the readable context.
+      // We just need to provide helpful responses based on user input.
 
-      if (userInstructions) {
-        response += `Based on your instructions: "${userInstructions}"\n\n`;
+      // Try to find matching prompt from our library
+      const matchingPrompt = mockPrompts.find(prompt =>
+        promptTitle && prompt.title.toLowerCase().includes(promptTitle.toLowerCase())
+      );
+
+      if (matchingPrompt) {
+        let response = `🎯 Perfect! I found the "${matchingPrompt.title}" template for you.\n\n`;
+        response += `**Template Content:**\n${matchingPrompt.samplePrompt}\n\n`;
+        response += `**Description:** ${matchingPrompt.description}\n\n`;
+
+        if (matchingPrompt.howToUse.length > 0) {
+          response += `**How to use it:**\n${matchingPrompt.howToUse.map(tip => `• ${tip}`).join('\n')}\n\n`;
+        }
+
+        if (userRequest) {
+          response += `Based on your request: "${userRequest}"\n\n`;
+        }
+
+        response += `**Next steps:**\n`;
+        response += `• Copy the template above and modify it for your needs\n`;
+        response += `• Ask me to customize specific parts\n`;
+        response += `• Tell me about your specific use case for personalized suggestions\n`;
+        response += `• Ask questions about any part you'd like clarified`;
+
+        return response;
+      } else {
+        let response = `I'd be happy to help you with prompt templates! `;
+
+        if (promptTitle) {
+          response += `I couldn't find an exact match for "${promptTitle}", but here are some available templates:\n\n`;
+        } else {
+          response += `Here are the available prompt templates in our library:\n\n`;
+        }
+
+        const availablePrompts = mockPrompts.slice(0, 5); // Show top 5
+        availablePrompts.forEach(prompt => {
+          response += `**${prompt.title}** (${prompt.category})\n`;
+          response += `${prompt.description}\n\n`;
+        });
+
+        response += `Which template interests you? Just mention the name and I'll help you use it!`;
+        return response;
       }
-
-      response += "How would you like me to help you customize or use this prompt? I can:\n";
-      response += "• Customize it for your specific needs\n";
-      response += "• Explain how to use it effectively\n";
-      response += "• Suggest improvements or variations\n";
-      response += "• Help you fill in any placeholders";
-
-      return response;
     },
   });
 
-    const handleUsePrompt = (prompt: Prompt) => {
-    // Find the CopilotKit chat button and click it to open the modal
+      const handleUsePrompt = (prompt: Prompt) => {
+    // SEAMLESS COPILOTKIT INTEGRATION:
+    // Using useCopilotReadable to make the selected prompt immediately
+    // available to the AI context - no alerts or manual steps needed!
+
+    // 1. Set the pending prompt - this immediately makes it available to the AI
+    setPendingPrompt(prompt);
+
+    // 2. Open the CopilotKit chat modal
     const copilotButton = document.querySelector('.copilotKitButton');
     if (copilotButton instanceof HTMLElement) {
       copilotButton.click();
 
-      // After a short delay, populate the input and automatically send the message
+      // 3. Clear the pending prompt after a short delay to keep context clean
       setTimeout(() => {
-        const message = `I want to use this prompt template: "${prompt.title}"\n\n${prompt.samplePrompt}\n\nPlease help me customize and use this prompt effectively.`;
-
-        // Find the input field and populate it
-        const inputField = document.querySelector('.copilotKitInput') as HTMLTextAreaElement;
-        if (inputField) {
-          inputField.value = message;
-
-          // Trigger input event to update CopilotKit's internal state
-          const inputEvent = new Event('input', { bubbles: true });
-          inputField.dispatchEvent(inputEvent);
-
-          // After a brief moment to let the state update, find and click the send button
-          setTimeout(() => {
-            // Look for the send button (it might have different selectors)
-            const sendButton = document.querySelector('[type="submit"]') ||
-                             document.querySelector('button[aria-label*="send"]') ||
-                             document.querySelector('button[title*="send"]') ||
-                             document.querySelector('.copilotKitInputContainer button') ||
-                             inputField.parentElement?.querySelector('button');
-
-            if (sendButton instanceof HTMLElement) {
-              sendButton.click();
-            } else {
-              // Fallback: trigger Enter key press on the input field
-              const enterEvent = new KeyboardEvent('keydown', {
-                key: 'Enter',
-                code: 'Enter',
-                keyCode: 13,
-                which: 13,
-                bubbles: true
-              });
-              inputField.dispatchEvent(enterEvent);
-            }
-          }, 100);
-        }
-      }, 500);
+        setPendingPrompt(null);
+      }, 30000); // Clear after 30 seconds if not used
     }
   };
 
