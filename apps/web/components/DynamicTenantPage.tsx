@@ -754,6 +754,13 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     }
   }, [authLoading, session]);
 
+  // SYNC authentication check - redirect immediately if no session
+  if (!authLoading && !session) {
+    console.log('[DynamicTenantPage] No session - redirecting to login synchronously');
+    window.location.href = '/login';
+    return null; // Prevent any rendering
+  }
+
   // Show loading state while waiting for auth or initialization
   if (authLoading || (!hasRestoredTenant && !userPrefsError && session)) {
     return (
