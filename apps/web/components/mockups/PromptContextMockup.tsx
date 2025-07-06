@@ -7,7 +7,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Settings, Share2, Eye, Edit2, TestTube, CheckCircle2, Users, Building, Globe } from 'lucide-react';
+import { Plus, Settings, Share2, Eye, Edit2, TestTube, CheckCircle2, Users, Building, Globe, X } from 'lucide-react';
 
 interface PromptContext {
   id: string;
@@ -170,7 +170,16 @@ export default function PromptContextMockup() {
 
           {showResponse && (
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-sm font-medium text-blue-900 mb-2">AI Response Preview:</h3>
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="text-sm font-medium text-blue-900">AI Response Preview:</h3>
+                <button
+                  onClick={() => setShowResponse(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Close preview"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
               <p className="text-xs text-blue-800 leading-relaxed">
                 Based on your Kingdom leadership approach and thin slicing preference, I recommend first seeking to understand what this team member needs to flourish. Use the opposite spirit principle - respond with encouragement where they expect correction. Break the conversation into smaller, manageable pieces rather than addressing everything at once.
               </p>
