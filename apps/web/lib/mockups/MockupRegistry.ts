@@ -11,6 +11,7 @@ import TeamLeaderDashboard from '../../components/mockups/TeamLeaderDashboardMoc
 import ExecutiveDashboard from '../../components/mockups/ExecutiveDashboardMockup';
 import PromptLibraryMockup from '../../components/mockups/PromptLibraryMockup';
 import BackgroundAgentsMockup from '../../components/mockups/BackgroundAgentsMockup';
+import PowerPromptsMockup from '../../components/mockups/PowerPromptsMockup';
 
 // Mockup registry interface
 export interface MockupConfig {
@@ -70,6 +71,15 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     name: 'Background Agents',
     description: 'AI agents working behind the scenes to monitor, analyze, and alert',
     featureFlag: 'ENABLE_BACKGROUND_AGENTS_MOCKUP',
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
+  },
+
+  // PowerPrompts - AI Operating System
+  'd9e41e48-3191-42b1-9d39-69b397014ee4': {
+    component: PowerPromptsMockup,
+    name: 'PowerPrompts',
+    description: 'AI-driven sequences that proactively guide your development with personalized prompts and challenges',
+    featureFlag: 'ENABLE_POWERPROMPTS_MOCKUP',
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
   },
 };
