@@ -13,11 +13,31 @@ import type { User } from '../types';
  * @throws Error if the API call fails.
  */
 export async function fetchUserPreferences(userId: string): Promise<User['preferences'] | undefined> {
-  // 20-second timeout to accommodate slower API responses while still preventing infinite hangs
+  const startTime = Date.now();
+  const isDev = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' ||
+     window.location.search.includes('debug=true') ||
+     process.env.NODE_ENV === 'development');
+
+  if (isDev) {
+    console.log('[USER PREFS CLIENT] 🚀 Starting fetch for user:', userId);
+  }
+
+  // More aggressive timeout for production (10 seconds instead of 20)
+  const timeout = isDev ? 20000 : 10000;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 20000);
+  const timeoutId = setTimeout(() => {
+    if (isDev) {
+      console.log('[USER PREFS CLIENT] ⏰ Request timeout after', timeout + 'ms');
+    }
+    controller.abort();
+  }, timeout);
 
   try {
+    if (isDev) {
+      console.log('[USER PREFS CLIENT] 📡 Making API request...');
+    }
+
     const res = await fetch(`/api/user/${userId}/preferences?t=${Date.now()}`, {
       credentials: 'include',
       signal: controller.signal,
@@ -34,6 +54,14 @@ export async function fetchUserPreferences(userId: string): Promise<User['prefer
 
     window.clearTimeout(timeoutId);
 
+    if (isDev) {
+      console.log('[USER PREFS CLIENT] 📡 API response received:', {
+        status: res.status,
+        ok: res.ok,
+        time: `${Date.now() - startTime}ms`
+      });
+    }
+
     if (!res.ok) {
       const error = await res.json().catch(() => ({ error: 'Network error' }));
       console.error('[apiClient] Error:', error);
@@ -42,16 +70,20 @@ export async function fetchUserPreferences(userId: string): Promise<User['prefer
 
     const data = await res.json();
 
-    // 🔍 DEBUG: Log the actual API response structure
-    console.log('[apiClient] 🔍 Raw API response:', data);
-    console.log('[apiClient] 🔍 Response type:', typeof data);
-    console.log('[apiClient] 🔍 Has preferences key:', 'preferences' in data);
-    console.log('[apiClient] 🔍 Preferences value:', data?.preferences);
+    if (isDev) {
+      // 🔍 DEBUG: Log the actual API response structure
+      console.log('[apiClient] 🔍 Raw API response:', data);
+      console.log('[apiClient] 🔍 Response type:', typeof data);
+      console.log('[apiClient] 🔍 Has preferences key:', 'preferences' in data);
+      console.log('[apiClient] 🔍 Preferences value:', data?.preferences);
+    }
 
     // ✅ FIX: API returns { user: {...}, preferences: {...} } structure
     // Extract just the preferences part that the hook expects
     if (data && typeof data === 'object' && 'preferences' in data) {
-      console.log('[apiClient] ✅ Extracting preferences from API response:', data.preferences);
+      if (isDev) {
+        console.log('[apiClient] ✅ Extracting preferences from API response:', data.preferences);
+      }
       return data.preferences as User['preferences'];
     }
 
@@ -60,10 +92,21 @@ export async function fetchUserPreferences(userId: string): Promise<User['prefer
     return {};
   } catch (error) {
     window.clearTimeout(timeoutId);
+    const totalTime = Date.now() - startTime;
+
     if ((error as Error).name === 'AbortError') {
-      console.warn('[apiClient] User preferences request timed out, using fallback');
+      if (isDev) {
+        console.warn('[USER PREFS CLIENT] ⏰ Request timed out after', `${totalTime}ms, using fallback`);
+      } else {
+        console.warn('[apiClient] User preferences request timed out, using fallback');
+      }
       return undefined; // Graceful degradation
     }
+
+    if (isDev) {
+      console.error('[USER PREFS CLIENT] ❌ Error after', `${totalTime}ms:`, error);
+    }
+
     throw error;
   }
 }

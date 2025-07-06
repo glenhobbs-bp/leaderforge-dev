@@ -16,8 +16,24 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ user_id: string }> }
 ) {
+  const startTime = Date.now();
+  const isDev = process.env.NODE_ENV === 'development' || process.env.FORCE_DEV === 'true';
+
+  // Enhanced logging for production debugging
+  if (isDev) {
+    console.log('[PREFERENCES API] 🚀 Starting preferences fetch for user:', {
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV,
+      forceDev: process.env.FORCE_DEV
+    });
+  }
+
   try {
     const { user_id } = await params;
+
+    if (isDev) {
+      console.log('[PREFERENCES API] 📋 User ID:', user_id);
+    }
 
     // Fast path: Check for session existence without expensive restoration
     const cookieStore = await cookies();
@@ -25,8 +41,18 @@ export async function GET(
     const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
     const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
 
+    if (isDev) {
+      console.log('[PREFERENCES API] 🍪 Tokens check:', {
+        hasAccessToken: !!accessToken,
+        hasRefreshToken: !!refreshToken
+      });
+    }
+
     // If no tokens, immediately fail with 401
     if (!accessToken || !refreshToken) {
+      if (isDev) {
+        console.log('[PREFERENCES API] ❌ No tokens found, returning 401');
+      }
       return NextResponse.json(
         { error: 'Not authenticated' },
         { status: 401 }
@@ -35,7 +61,20 @@ export async function GET(
 
     // Wrap session restoration in a shorter timeout to prevent hanging
     const authPromise = (async () => {
+      if (isDev) {
+        console.log('[PREFERENCES API] 🔐 Starting session restoration...');
+      }
+
       const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
+
+      if (isDev) {
+        console.log('[PREFERENCES API] 🔐 Session restoration result:', {
+          hasSession: !!session,
+          sessionUserId: session?.user?.id,
+          targetUserId: user_id,
+          error: sessionError?.message
+        });
+      }
 
       if (sessionError || !session || session.user.id !== user_id) {
         throw new Error('Authentication failed');
@@ -44,12 +83,17 @@ export async function GET(
       return { supabase };
     })();
 
-    // 2-second timeout for auth operations
+    // More aggressive timeout for production (1 second instead of 2)
+    const authTimeout = isDev ? 2000 : 1000;
     const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Authentication timeout')), 2000)
+      setTimeout(() => reject(new Error('Authentication timeout')), authTimeout)
     );
 
     const { supabase } = await Promise.race([authPromise, timeoutPromise]);
+
+    if (isDev) {
+      console.log('[PREFERENCES API] ✅ Authentication successful, querying database...');
+    }
 
     // Wrap database operations in timeout to prevent hanging
     const dbPromise = (async () => {
@@ -59,6 +103,14 @@ export async function GET(
         .select('*')
         .eq('id', user_id)
         .single();
+
+      if (isDev) {
+        console.log('[PREFERENCES API] 📊 Database query result:', {
+          hasUser: !!user,
+          hasPreferences: !!user?.preferences,
+          error: userError?.message
+        });
+      }
 
       if (userError) {
         console.error('[API] Error fetching user preferences:', userError);
@@ -72,20 +124,26 @@ export async function GET(
       return user;
     })();
 
-    // 3-second timeout for database operations
+    // More aggressive timeout for production (2 seconds instead of 3)
+    const dbTimeout = isDev ? 3000 : 2000;
     const dbTimeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Database timeout')), 3000)
+      setTimeout(() => reject(new Error('Database timeout')), dbTimeout)
     );
 
     const user = await Promise.race([dbPromise, dbTimeoutPromise]);
 
+    const totalTime = Date.now() - startTime;
+
     // Return both user profile and preferences
-    console.log('[API] 📊 User preferences fetched:', {
-      userId: user.id,
-      preferences: user.preferences,
-      navigationState: user.preferences?.navigationState,
-      timestamp: new Date().toISOString()
-    });
+    if (isDev) {
+      console.log('[API] 📊 User preferences fetched successfully:', {
+        userId: user.id,
+        preferences: user.preferences,
+        navigationState: user.preferences?.navigationState,
+        totalTime: `${totalTime}ms`,
+        timestamp: new Date().toISOString()
+      });
+    }
 
     const response = NextResponse.json({
       user: {
@@ -106,7 +164,12 @@ export async function GET(
 
     return response;
   } catch (error) {
+    const totalTime = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    if (isDev) {
+      console.error('[PREFERENCES API] ❌ Error after', `${totalTime}ms:`, errorMessage);
+    }
 
     // Return appropriate error codes based on error type
     if (errorMessage.includes('timeout') || errorMessage.includes('Authentication')) {

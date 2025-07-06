@@ -1,4 +1,7 @@
 {
   "buildCommand": "cd ../.. && turbo build --filter=web",
-  "installCommand": "cd ../.. && pnpm install"
+  "installCommand": "cd ../.. && pnpm install",
+  "env": {
+    "FORCE_DEV": "true"
+  }
 }

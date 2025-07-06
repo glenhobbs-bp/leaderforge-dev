@@ -18,7 +18,30 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react'],
+    serverComponentsExternalPackages: ['@supabase/supabase-js']
   },
+  // Enable development features when NODE_ENV is development
+  ...(process.env.NODE_ENV === 'development' && {
+    logging: {
+      fetches: {
+        fullUrl: true,
+      },
+    },
+    // Enable source maps in development builds
+    productionBrowserSourceMaps: true,
+    // Disable minification for better debugging
+    swcMinify: false,
+  }),
+  // Force development mode if VERCEL_ENV is preview and FORCE_DEV is set
+  ...(process.env.VERCEL_ENV === 'preview' && process.env.FORCE_DEV === 'true' && {
+    logging: {
+      fetches: {
+        fullUrl: true,
+      },
+    },
+    productionBrowserSourceMaps: true,
+    swcMinify: false,
+  }),
       webpack: (config) => {
     // ✅ FIX: Remove devtool override to prevent performance warnings
     // Source maps are handled by Next.js automatically
