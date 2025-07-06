@@ -58,7 +58,11 @@ export default async function RootLayout({
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    initialSession = session;
+    // Only set initialSession if we have a valid session
+    // Don't set it to null - let client-side handle null/undefined sessions
+    if (session) {
+      initialSession = session;
+    }
   }
 
   return (

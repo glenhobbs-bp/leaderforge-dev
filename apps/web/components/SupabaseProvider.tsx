@@ -35,12 +35,12 @@ export default function SupabaseProvider({
   useEffect(() => {
     let isMounted = true;
 
-    // If we have an initialSession, mark as initialized
-    if (initialSession) {
+    // If we have a valid initialSession, mark as initialized
+    if (initialSession?.user?.id) {
       console.log('[SupabaseProvider] Using initial session directly');
       hasInitialized.current = true;
     } else {
-      // If no initialSession but auth cookies might exist, try to restore session
+      // If no valid initialSession, try to restore session client-side
       console.log('[SupabaseProvider] No initial session, attempting client-side session restoration');
       setLoading(true);
 

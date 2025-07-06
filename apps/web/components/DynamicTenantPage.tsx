@@ -745,8 +745,17 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     await loadContentForNavOption(navId, false); // Don't update selection again
   };
 
+  // Authentication guard - redirect to login if no session and auth loading is complete
+  useEffect(() => {
+    if (!authLoading && !session) {
+      console.log('[DynamicTenantPage] No session found, redirecting to login');
+      window.location.href = '/login';
+      return;
+    }
+  }, [authLoading, session]);
+
   // Show loading state while waiting for auth or initialization
-  if (!session || authLoading || (!hasRestoredTenant && !userPrefsError)) {
+  if (authLoading || (!hasRestoredTenant && !userPrefsError && session)) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
@@ -756,10 +765,10 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           <div className="flex flex-col items-center justify-center py-8">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner mb-4"></div>
             <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-              {!session ? 'Authenticating...' : 'Loading Experience'}
+              {authLoading ? 'Authenticating...' : 'Loading Experience'}
             </p>
             <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-              {!session ? 'Verifying your credentials...' : 'Setting up your personalized experience...'}
+              {authLoading ? 'Verifying your credentials...' : 'Setting up your personalized experience...'}
             </p>
                           <div className="mt-4 flex space-x-1">
                 <div className="w-2 h-2 bg-primary-dot rounded-full animate-pulse"></div>
