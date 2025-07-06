@@ -577,17 +577,17 @@
 
 /* Loading state styling */
 .entitlement-form-container .loading-text {
-  font-size: 14px !important;
+  font-size: 13px !important;
   color: #6b7280 !important;
   font-weight: 400 !important;
 }
 
 /* Loading container styling */
 .entitlement-form-container .loading-container {
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
 .entitlement-form-container .loading-container span {
-  font-size: 14px !important;
+  font-size: 13px !important;
   color: #6b7280 !important;
 }

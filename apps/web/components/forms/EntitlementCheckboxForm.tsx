@@ -164,8 +164,6 @@ export function EntitlementCheckboxForm({ userIdentifier }: EntitlementCheckboxF
       // Update current entitlements to reflect changes
       setCurrentEntitlements(selectedEntitlements);
 
-      // Show success message
-      alert(`Successfully updated entitlements for ${debouncedUserIdentifier}`);
       console.log(`[EntitlementCheckboxForm] Successfully updated entitlements`);
 
     } catch (err) {
