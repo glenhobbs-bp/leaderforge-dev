@@ -126,28 +126,26 @@ export default function PromptContextMockup() {
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Prompt Context Management
-            </h1>
-            <p className="text-sm text-gray-600">
-              Configure how AI understands and responds to you across all LeaderForge interactions
-            </p>
-          </div>
-          <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors">
-            <Plus className="w-4 h-4" />
-            New Context
-          </button>
+      {/* Header Section - Match Prompt Library pattern */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            Prompt Context Management
+          </h1>
+          <p className="text-sm text-gray-600">
+            Configure how AI understands and responds to you across all LeaderForge interactions
+          </p>
         </div>
+        <button className="flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition-colors">
+          <Plus className="w-4 h-4" />
+          New Context
+        </button>
       </div>
 
-      {/* Test Section */}
-      <div className="card-glass p-6 mb-8">
+      {/* Test Section - Combined Glassmorphism Card like Prompt Library */}
+      <div className="card-glass-subtle p-4 mb-6">
         <div className="flex items-center gap-2 mb-4">
-          <TestTube className="w-5 h-5 text-green-600" />
+          <TestTube className="w-4 h-4 text-green-600" />
           <h2 className="text-lg font-medium text-glass-primary">Test Your Contexts</h2>
         </div>
 
@@ -158,21 +156,22 @@ export default function PromptContextMockup() {
               value={testPrompt}
               onChange={(e) => setTestPrompt(e.target.value)}
               placeholder="Enter a question to test how your contexts affect AI responses..."
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             />
           </div>
 
           <button
             onClick={handleTestResponse}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md hover:scale-105"
           >
+            <TestTube className="w-3 h-3" />
             Test Response
           </button>
 
           {showResponse && (
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="font-medium text-blue-900 mb-2">AI Response Preview:</h3>
-              <p className="text-sm text-blue-800 leading-relaxed">
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="text-sm font-medium text-blue-900 mb-2">AI Response Preview:</h3>
+              <p className="text-xs text-blue-800 leading-relaxed">
                 Based on your Kingdom leadership approach and thin slicing preference, I recommend first seeking to understand what this team member needs to flourish. Use the opposite spirit principle - respond with encouragement where they expect correction. Break the conversation into smaller, manageable pieces rather than addressing everything at once.
               </p>
               <div className="mt-3 flex items-center gap-2 text-xs text-blue-600">
@@ -184,14 +183,14 @@ export default function PromptContextMockup() {
         </div>
       </div>
 
-      {/* Context Cards Grid */}
-      <div className="space-y-4">
+      {/* Context Cards Grid - Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {contexts.map((context) => (
-          <div key={context.id} className="card-glass p-6">
+          <div key={context.id} className="card-glass-subtle p-4 hover:card-glass-interactive">
             <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4 flex-1">
+              <div className="flex items-start gap-3 flex-1">
                 {/* Context Icon & Toggle */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <div className={`${getContextTypeColor(context.type)}`}>
                     {getContextIcon(context.type)}
                   </div>
@@ -202,14 +201,14 @@ export default function PromptContextMockup() {
                       onChange={() => handleToggleContext(context.id)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-600"></div>
                   </label>
                 </div>
 
                 {/* Context Info */}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-medium text-glass-primary">{context.name}</h3>
+                    <h3 className="text-sm font-medium text-glass-primary">{context.name}</h3>
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       context.type === 'personal' ? 'bg-blue-100 text-blue-700' :
                       context.type === 'team' ? 'bg-green-100 text-green-700' :
@@ -220,11 +219,11 @@ export default function PromptContextMockup() {
                     </span>
                   </div>
 
-                  <p className="text-sm text-glass-muted mb-3 leading-relaxed">
+                  <p className="text-xs text-glass-muted mb-2 leading-relaxed line-clamp-2">
                     {context.description}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs text-glass-muted">
+                  <div className="flex items-center gap-3 text-xs text-glass-muted">
                     <span>Updated {context.lastUpdated}</span>
                     <span>•</span>
                     <span>Used {context.usage} times</span>
@@ -232,32 +231,32 @@ export default function PromptContextMockup() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 ml-4">
+              {/* Action Buttons - Smaller */}
+              <div className="flex items-center gap-1 ml-2">
                 {context.canEdit && (
-                  <button className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <Edit2 className="w-4 h-4" />
+                  <button className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                    <Edit2 className="w-3 h-3" />
                   </button>
                 )}
 
                 {context.canShare && (
-                  <button className="p-2 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
-                    <Share2 className="w-4 h-4" />
+                  <button className="p-1 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors">
+                    <Share2 className="w-3 h-3" />
                   </button>
                 )}
 
-                <button className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
-                  <Eye className="w-4 h-4" />
+                <button className="p-1 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors">
+                  <Eye className="w-3 h-3" />
                 </button>
 
                 {context.lastUpdated === 'Licensed' && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                  <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
                     Licensed
                   </span>
                 )}
 
                 {!context.canEdit && context.lastUpdated !== 'Licensed' && (
-                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                  <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
                     View Only
                   </span>
                 )}
@@ -267,11 +266,11 @@ export default function PromptContextMockup() {
         ))}
       </div>
 
-      {/* Context Hierarchy Info */}
-      <div className="mt-8 card-glass-subtle p-4">
-        <div className="flex items-center gap-2 mb-3">
+      {/* Context Hierarchy Info - Smaller and more compact */}
+      <div className="mt-6 card-glass-subtle p-3">
+        <div className="flex items-center gap-2 mb-2">
           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span className="text-sm font-medium text-glass-primary">Context Inheritance</span>
+          <span className="text-xs font-medium text-glass-primary">Context Inheritance</span>
         </div>
         <p className="text-xs text-glass-muted leading-relaxed">
           Contexts are applied hierarchically: Personal → Team → Organization → External.
