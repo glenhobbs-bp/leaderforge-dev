@@ -7,6 +7,8 @@ import { ComponentType } from 'react';
 
 // Import mockup components
 import MarcusDashboard from '../../components/mockups/MarcusDashboardMockup';
+import TeamLeaderDashboard from '../../components/mockups/TeamLeaderDashboardMockup';
+import ExecutiveDashboard from '../../components/mockups/ExecutiveDashboardMockup';
 
 // Mockup registry interface
 export interface MockupConfig {
@@ -30,14 +32,25 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true', // Environment variable control
   },
 
-  // Future mockups will be added here:
-  // 'another-nav-uuid': {
-  //   component: TeamLeaderMockup,
-  //   name: 'Team Leader Dashboard',
-  //   description: 'Team leader experience mockup',
-  //   featureFlag: 'ENABLE_TEAM_LEADER_MOCKUP',
-  //   enabledUsers: ['user-id-1', 'user-id-2'],
-  // },
+  // Team Leader Dashboard - Stakeholder Review
+  '8e36b3b6-9c8b-46d7-93f7-8ac41cfd9086': {
+    component: TeamLeaderDashboard,
+    name: 'Team Leader Dashboard',
+    description: 'Team leader perspective mockup for stakeholder review',
+    featureFlag: 'ENABLE_TEAM_LEADER_MOCKUP',
+    entitlementName: 'team-leader-mockup',
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
+  },
+
+  // Executive Dashboard - Stakeholder Review
+  'bd9b0a73-e281-46a0-84c1-2d532c3ab7fb': {
+    component: ExecutiveDashboard,
+    name: 'Executive Dashboard',
+    description: 'Executive/organizational perspective mockup for stakeholder review',
+    featureFlag: 'ENABLE_EXECUTIVE_MOCKUP',
+    entitlementName: 'executive-mockup',
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
+  },
 };
 
 // Feature flag checker
