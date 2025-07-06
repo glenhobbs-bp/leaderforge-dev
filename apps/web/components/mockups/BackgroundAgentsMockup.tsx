@@ -86,11 +86,31 @@ export default function BackgroundAgentsMockup() {
   ]);
 
   // Make background agents data available to CopilotKit AI context
+  // Filter out React elements (icons) to avoid circular reference issues
+  const serializableActiveAgents = activeAgents.map(agent => ({
+    id: agent.id,
+    name: agent.name,
+    description: agent.description,
+    isActive: agent.isActive,
+    price: agent.price,
+    isFeatured: agent.isFeatured,
+    type: agent.type
+  }));
+  const serializableAvailableAgents = availableAgents.map(agent => ({
+    id: agent.id,
+    name: agent.name,
+    description: agent.description,
+    isActive: agent.isActive,
+    price: agent.price,
+    isFeatured: agent.isFeatured,
+    type: agent.type
+  }));
+
   useCopilotReadable({
     description: "Background agents system with active and available agents",
     value: {
-      activeAgents,
-      availableAgents,
+      activeAgents: serializableActiveAgents,
+      availableAgents: serializableAvailableAgents,
       totalActiveAgents: activeAgents.filter(a => a.isActive).length,
       availableAgentsCount: availableAgents.length
     }
