@@ -102,6 +102,13 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     hasError: !!userPrefsError
   });
 
+  // Mark component as mounted on initial render
+  useEffect(() => {
+    console.log('[DynamicTenantPage] 🎯 Component mounting...');
+    hasMounted.current = true;
+    console.log('[DynamicTenantPage] ✅ Component mounted, hasMounted set to true');
+  }, []);
+
   // Trigger user preferences fetch on initial mount when session is available
   useEffect(() => {
     console.log('[DynamicTenantPage] 🔍 USER PREFS TRIGGER DEBUG:', {
@@ -118,7 +125,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       hasTriggeredUserPrefsFetch.current = true;
       setShouldFetchUserPrefs(true);
     }
-  }, [session?.user?.id]); // ✅ FIX: Simplified dependencies and require mounted state
+  }, [session?.user?.id, shouldFetchUserPrefs]); // ✅ FIX: Added shouldFetchUserPrefs dependency
 
   // Handle user preferences errors gracefully
   useEffect(() => {
