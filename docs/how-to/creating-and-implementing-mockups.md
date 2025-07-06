@@ -4,6 +4,48 @@
 
 This guide walks you through creating and implementing mockups using LeaderForge's **Agent-Native Mockup Composition System** (ADR-0014). This system enables rapid prototyping of UI mockups through the existing agent architecture, using JSX components with entitlement-based access control.
 
+## ⚠️ CRITICAL: Follow Working Patterns Exactly
+
+**Before doing anything else, understand these EXACT patterns that work in production:**
+
+### **✅ Working Agent Config Pattern**
+```json
+{
+  "component": "YourMockupName",
+  "features": ["list", "of", "features"]
+}
+```
+
+### **❌ WRONG Agent Config (Causes "Feature Coming Soon")**
+```json
+{
+  "mockup_component": "YourMockupName",  // ❌ Wrong key
+  "features": ["list", "of", "features"]
+}
+```
+
+### **✅ Working Mockup Examples to Copy From**
+```sql
+-- Check existing working mockups and copy their exact pattern:
+SELECT
+  a.name as agent_name,
+  a.config as agent_config,
+  no.label as nav_label,
+  no.required_entitlements,
+  no.section
+FROM core.agents a
+JOIN core.nav_options no ON a.id = no.agent_id
+WHERE a.type = 'mockup'
+  AND no.nav_key IN ('prompt-library', 'dashboard', 'lfdashboard')
+ORDER BY no.label;
+```
+
+### **🔑 Key Pattern Rules**
+1. **Agent Config**: Always use `"component": "ComponentName"` (not `mockup_component`)
+2. **Entitlements**: Most mockups work WITHOUT entitlements - only add if needed
+3. **Navigation**: UPDATE existing nav entries, don't create duplicates
+4. **Component Name**: Must match exactly (case-sensitive)
+
 ## 🚀 Quick Start (5 Minutes)
 
 ### **Step 1: Create Your Mockup Component**
@@ -145,6 +187,434 @@ git push origin main
 
 # Mockup is live immediately via agent-native system!
 # No registry updates or backend changes needed
+```
+
+## 🔧 Using Supabase MCP Tools (Alternative Method)
+
+If you have access to Supabase MCP tools, you can set up mockups more efficiently:
+
+### **🚨 BEFORE YOU START: Check Working Patterns**
+```typescript
+// ALWAYS start by checking existing working mockups
+const workingMockups = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: `SELECT
+    a.name as agent_name,
+    a.config as agent_config,
+    no.label as nav_label,
+    no.nav_key,
+    no.required_entitlements,
+    no.section
+  FROM core.agents a
+  JOIN core.nav_options no ON a.id = no.agent_id
+  WHERE a.type = 'mockup'
+    AND no.nav_key IN ('prompt-library', 'dashboard', 'lfdashboard')
+  ORDER BY no.label;`
+});
+
+// Copy the EXACT pattern from working mockups
+// Key observations:
+// - Agent config uses "component" key (not "mockup_component")
+// - Most mockups have empty required_entitlements array
+// - Navigation sections vary by feature type
+```
+
+### **Step 1: Create Mockup Agent**
+```typescript
+// Use MCP tools instead of direct SQL
+mcp_supabase_apply_migration({
+  project_id: "your-project-id",
+  name: "setup_your_mockup_agent",
+  query: `INSERT INTO core.agents (
+    name,
+    display_name,
+    type,
+    description,
+    prompt,
+    model,
+    config,
+    enabled
+  ) VALUES (
+    'your_mockup_name',
+    'Your Mockup Display Name',
+    'mockup',
+    'Description of your mockup functionality',
+    'Prompt for the agent describing what it should display',
+    'claude-3-sonnet-20241022',
+    '{"component": "YourMockupComponent"}',
+    true
+  );`
+});
+```
+
+### **🚨 CRITICAL: Agent Config Key**
+**MUST use `"component"` key, NOT `"mockup_component"`**
+- ✅ CORRECT: `'{"component": "YourMockupComponent"}'`
+- ❌ WRONG: `'{"mockup_component": "YourMockupComponent"}'`
+
+### **Step 2: Create Entitlement (OPTIONAL - Usually Not Needed)**
+```typescript
+// 🚨 IMPORTANT: Most mockups work WITHOUT entitlements!
+// Only create entitlements if you need restricted access
+
+// Check working patterns first:
+// - Prompt Library: No entitlements (empty array)
+// - Executive Dashboard: No entitlements (empty array)
+// - My Dashboard: Has entitlements (special case)
+
+// Create entitlement ONLY if you need restricted access:
+mcp_supabase_apply_migration({
+  project_id: "your-project-id",
+  name: "setup_your_mockup_entitlement",
+  query: `INSERT INTO core.entitlements (
+    name,
+    display_name,
+    description,
+    features,
+    active,
+    tenant_key
+  ) VALUES (
+    'your-mockup-entitlement',
+    'Your Mockup Access',
+    'Access to your mockup for testing',
+    '{"mockup_access": true}',
+    true,
+    'leaderforge'
+  );`
+});
+```
+
+### **🔑 When to Use Entitlements vs Not**
+```typescript
+// ✅ NO ENTITLEMENTS (Most common pattern):
+// - General mockups for all users
+// - Feature previews
+// - UI/UX testing mockups
+// Example: Prompt Library, Executive Dashboard
+
+// ❌ ENTITLEMENTS NEEDED (Rare cases):
+// - User-specific mockups (e.g., personal dashboards)
+// - Role-specific features
+// - Beta testing with limited access
+// Example: My Dashboard (requires user-dashboard-mockup)
+```
+
+### **Step 3: Wire Up Navigation (New vs Existing)**
+
+**For NEW navigation options:**
+```typescript
+// Get agent ID first
+const agentResult = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: "SELECT id FROM core.agents WHERE name = 'your_mockup_name';"
+});
+
+// Create new navigation option
+mcp_supabase_apply_migration({
+  project_id: "your-project-id",
+  name: "create_new_nav_option",
+  query: `INSERT INTO core.nav_options (
+    label,
+    icon,
+    description,
+    nav_key,
+    agent_id,
+    required_entitlements,
+    section,
+    tenant_key
+  ) VALUES (
+    'Your Feature Name',
+    'IconName',
+    'Description of your feature',
+    'your-feature-key',
+    'AGENT_ID_FROM_STEP_1',
+    ARRAY['your-mockup-entitlement'],
+    'Your Section',
+    'leaderforge'
+  );`
+});
+```
+
+**For EXISTING navigation options (Common Issue):**
+```typescript
+// 🚨 COMMON ISSUE: Existing nav shows "Feature Coming Soon"
+// This happens when agent_id is NULL
+
+// Check existing navigation
+const navCheck = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: `SELECT id, label, nav_key, agent_id
+          FROM core.nav_options
+          WHERE label ILIKE '%your feature%';`
+});
+
+// Update existing navigation to use your mockup agent
+mcp_supabase_apply_migration({
+  project_id: "your-project-id",
+  name: "wire_existing_nav_to_mockup",
+  query: `UPDATE core.nav_options
+          SET
+            agent_id = 'AGENT_ID_FROM_STEP_1',
+            required_entitlements = ARRAY['your-mockup-entitlement'],
+            description = 'Updated description',
+            agent_prompt = 'Display your mockup interface'
+          WHERE nav_key = 'existing-nav-key';`
+});
+```
+
+### **Step 4: Grant User Access**
+```typescript
+// Get entitlement and user IDs
+const entitlementId = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: "SELECT id FROM core.entitlements WHERE name = 'your-mockup-entitlement';"
+});
+
+const users = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: "SELECT id, email FROM core.users WHERE email IN ('user1@domain.com', 'user2@domain.com');"
+});
+
+// Grant access to users
+mcp_supabase_apply_migration({
+  project_id: "your-project-id",
+  name: "grant_mockup_access",
+  query: `INSERT INTO core.user_entitlements (
+    user_id,
+    entitlement_id,
+    granted_by,
+    grant_reason,
+    tenant_key
+  ) VALUES
+    ('USER_ID_1', 'ENTITLEMENT_ID', 'ADMIN_USER_ID', 'Mockup testing access', 'leaderforge'),
+    ('USER_ID_2', 'ENTITLEMENT_ID', 'ADMIN_USER_ID', 'Mockup testing access', 'leaderforge');`
+});
+```
+
+### **Step 5: Verification**
+```typescript
+// Verify complete setup
+const verification = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: `SELECT
+    'Nav Option' as component,
+    no.label,
+    no.nav_key,
+    CASE WHEN no.agent_id IS NOT NULL THEN 'Connected' ELSE 'Missing' END as status
+  FROM core.nav_options no
+  WHERE no.nav_key = 'your-nav-key'
+
+  UNION ALL
+
+  SELECT
+    'Agent' as component,
+    a.display_name as label,
+    a.name as nav_key,
+    CASE WHEN a.enabled THEN 'Enabled' ELSE 'Disabled' END as status
+  FROM core.agents a
+  WHERE a.name = 'your_mockup_name';`
+});
+```
+
+### **🔍 Final Validation Checklist**
+```typescript
+// Run this comprehensive check to catch common issues:
+const fullValidation = await mcp_supabase_execute_sql({
+  project_id: "your-project-id",
+  query: `
+  -- Check 1: Agent has correct config key
+  SELECT
+    'Agent Config Check' as check_type,
+    a.name,
+    CASE
+      WHEN a.config::text LIKE '%"component":%' THEN '✅ Correct'
+      WHEN a.config::text LIKE '%"mockup_component":%' THEN '❌ Wrong key'
+      ELSE '⚠️ No component key'
+    END as status,
+    a.config
+  FROM core.agents a
+  WHERE a.name = 'your_mockup_name'
+
+  UNION ALL
+
+  -- Check 2: Navigation has agent assigned
+  SELECT
+    'Navigation Check' as check_type,
+    no.label as name,
+    CASE
+      WHEN no.agent_id IS NOT NULL THEN '✅ Agent assigned'
+      ELSE '❌ No agent (will show Feature Coming Soon)'
+    END as status,
+    no.agent_id::text as config
+  FROM core.nav_options no
+  WHERE no.nav_key = 'your-nav-key'
+
+  UNION ALL
+
+  -- Check 3: Compare with working patterns
+  SELECT
+    'Pattern Check' as check_type,
+    'Working mockups' as name,
+    COUNT(*)::text || ' working mockups found' as status,
+    'Use these as reference' as config
+  FROM core.nav_options no
+  JOIN core.agents a ON no.agent_id = a.id
+  WHERE a.type = 'mockup'
+    AND no.nav_key IN ('prompt-library', 'dashboard', 'lfdashboard');
+  `
+});
+
+// If any checks show ❌ or ⚠️, fix them before testing!
+```
+
+## 🔍 Troubleshooting "Feature Coming Soon"
+
+### **Root Cause Analysis: Common Issues**
+
+**Issue #1: NULL Agent ID (Most Common)**
+```sql
+-- Check navigation options without agents
+SELECT id, label, nav_key, agent_id, section
+FROM core.nav_options
+WHERE agent_id IS NULL
+AND tenant_key = 'leaderforge'
+ORDER BY section, label;
+```
+
+**Issue #2: Wrong Agent Config Key**
+```sql
+-- Check for wrong config key (this causes "Feature Coming Soon")
+SELECT name, config
+FROM core.agents
+WHERE type = 'mockup'
+AND config::text LIKE '%mockup_component%';  -- ❌ Wrong key
+```
+
+**Issue #3: Unnecessary Entitlements**
+```sql
+-- Check if mockup requires entitlements (most don't need them)
+SELECT no.label, no.required_entitlements, a.name as agent_name
+FROM core.nav_options no
+JOIN core.agents a ON no.agent_id = a.id
+WHERE a.type = 'mockup'
+AND array_length(no.required_entitlements, 1) > 0;
+```
+
+### **Quick Fixes**
+
+**Fix #1: Assign Agent to Navigation**
+```sql
+UPDATE core.nav_options
+SET agent_id = (SELECT id FROM core.agents WHERE name = 'your_mockup_agent_name')
+WHERE nav_key = 'problematic-nav-key';
+```
+
+**Fix #2: Correct Agent Config**
+```sql
+-- Fix wrong config key
+UPDATE core.agents
+SET config = '{"component": "YourMockupComponent"}'::jsonb
+WHERE name = 'your_mockup_agent_name';
+```
+
+**Fix #3: Remove Unnecessary Entitlements**
+```sql
+-- Remove entitlement requirements (follow working patterns)
+UPDATE core.nav_options
+SET required_entitlements = ARRAY[]::text[]
+WHERE nav_key = 'your-nav-key';
+```
+
+### **Verification Checklist**
+```sql
+-- 1. Agent exists and is enabled
+SELECT name, type, enabled FROM core.agents WHERE name = 'your_mockup_name';
+
+-- 2. Navigation has agent assigned
+SELECT label, nav_key, agent_id FROM core.nav_options WHERE nav_key = 'your-key';
+
+-- 3. User has required entitlements
+SELECT u.email, e.name as entitlement
+FROM core.user_entitlements ue
+JOIN core.users u ON ue.user_id = u.id
+JOIN core.entitlements e ON ue.entitlement_id = e.id
+WHERE u.email = 'your-email@domain.com';
+
+-- 4. Complete flow verification
+SELECT
+  no.label as nav_label,
+  no.nav_key,
+  a.name as agent_name,
+  a.type as agent_type,
+  a.enabled as agent_enabled,
+  no.required_entitlements
+FROM core.nav_options no
+LEFT JOIN core.agents a ON no.agent_id = a.id
+WHERE no.nav_key = 'your-nav-key';
+```
+
+### **Debug Navigation Flow**
+```javascript
+// Browser console debugging:
+// 1. Check if navigation option loads
+[DynamicTenantPage] Found navigation option: {label: "...", agentId: "..."}
+
+// 2. Check agent invocation
+[AgentService] Invoking agent: your_mockup_name
+
+// 3. Check component loading
+[MockupRenderer] Loading YourMockupComponent...
+
+// 4. Look for errors
+[ERROR] Failed to load mockup component: YourMockupComponent
+```
+
+### **Real-World Example: Prompt Contexts Fix**
+```typescript
+// Problem: "Prompt Contexts" showed "Feature Coming Soon"
+// Cause: Multiple issues found during troubleshooting
+
+// Issue #1: agent_id was NULL in nav_options
+// Issue #2: Wrong agent config key ("mockup_component" instead of "component")
+// Issue #3: Unnecessary entitlement requirements
+
+// Solution using Supabase MCP:
+// 1. Created mockup agent (INITIAL - HAD WRONG CONFIG)
+mcp_supabase_apply_migration({
+  name: "setup_prompt_context_mockup_agent",
+  query: `INSERT INTO core.agents (name, type, config)
+          VALUES ('prompt_context_management_mockup', 'mockup',
+          '{"mockup_component": "PromptContextMockup"}');`  // ❌ Wrong key
+});
+
+// 2. Updated existing navigation (ALSO HAD ISSUES)
+mcp_supabase_apply_migration({
+  name: "wire_prompt_contexts_to_mockup",
+  query: `UPDATE core.nav_options
+          SET agent_id = (SELECT id FROM core.agents WHERE name = 'prompt_context_management_mockup'),
+              required_entitlements = ARRAY['prompt-context-management-mockup']  // ❌ Unnecessary
+          WHERE nav_key = 'prompt-contexts';`
+});
+
+// 3. REQUIRED FIXES after "Feature Coming Soon" persisted:
+// Fix #1: Correct agent config key
+mcp_supabase_apply_migration({
+  name: "fix_prompt_context_agent_config",
+  query: `UPDATE core.agents
+          SET config = '{"component": "PromptContextMockup"}'::jsonb  // ✅ Correct key
+          WHERE name = 'prompt_context_management_mockup';`
+});
+
+// Fix #2: Remove unnecessary entitlements (follow working patterns)
+mcp_supabase_apply_migration({
+  name: "remove_prompt_context_entitlement_requirement",
+  query: `UPDATE core.nav_options
+          SET required_entitlements = ARRAY[]::text[]  // ✅ No entitlements needed
+          WHERE nav_key = 'prompt-contexts';`
+});
+
+// Result: Navigation now shows mockup instead of "Feature Coming Soon"
+// Lesson: Always copy exact patterns from working mockups first!
 ```
 
 ## 📋 Detailed Implementation Guide
@@ -939,6 +1409,40 @@ If you have existing mockups in the old MockupRegistry system:
 The new system provides better scalability, easier access management, and consistent architecture with the rest of the platform.
 
 ---
+
+## 🎯 Key Takeaways (Avoid Common Issues)
+
+### **⚠️ CRITICAL REMINDERS**
+1. **Agent Config**: Always use `"component": "Name"` (not `"mockup_component"`)
+2. **Check Working Patterns**: Copy exact patterns from existing working mockups
+3. **Entitlements**: Most mockups work WITHOUT entitlements
+4. **Update vs Create**: Update existing navigation, don't create duplicates
+5. **Test Early**: Run validation checks before testing
+
+### **🔧 Debug Command (Save This)**
+```sql
+-- Run this whenever you have "Feature Coming Soon" issues:
+SELECT
+  'Issue Check' as check_type,
+  no.label,
+  no.nav_key,
+  CASE
+    WHEN no.agent_id IS NULL THEN '❌ No agent assigned'
+    WHEN a.config::text LIKE '%"mockup_component":%' THEN '❌ Wrong config key'
+    WHEN array_length(no.required_entitlements, 1) > 0 THEN '⚠️ Has entitlements (check if needed)'
+    ELSE '✅ Looks good'
+  END as status
+FROM core.nav_options no
+LEFT JOIN core.agents a ON no.agent_id = a.id
+WHERE no.nav_key = 'your-problematic-nav-key';
+```
+
+### **🚀 Success Formula**
+1. **Check working patterns** → Copy exact config structure
+2. **Create agent** → Use `"component": "Name"` key
+3. **Update navigation** → Assign agent_id, usually no entitlements
+4. **Validate** → Run comprehensive checks
+5. **Test** → Navigate to feature, confirm mockup loads
 
 **The mockup system enables rapid user experience validation without architectural investment - perfect for iterating toward requirements and eventual implementation!**
 
