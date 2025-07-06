@@ -1,33 +1,33 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/4/2025, 10:20:25 PM*
+*Generated on 7/6/2025, 2:19:44 PM*
 
 ## Overview
 
-- **Total Files**: 322
-- **Total Size**: 2.95 MB
+- **Total Files**: 331
+- **Total Size**: 2.56 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 135 files
-- **.md**: 111 files
-- **.tsx**: 46 files
+- **.ts**: 137 files
+- **.md**: 115 files
+- **.tsx**: 49 files
 - **.json**: 18 files
 - **.js**: 10 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 181 files
+- **TypeScript**: 186 files
 - **AI agent**: 164 files
-- **documentation**: 114 files
-- **security**: 86 files
-- **API**: 57 files
-- **Next.js API**: 55 files
-- **React**: 46 files
-- **UI**: 37 files
-- **React hooks**: 34 files
+- **documentation**: 119 files
+- **security**: 90 files
+- **API**: 59 files
+- **Next.js API**: 57 files
+- **React**: 49 files
+- **UI**: 40 files
+- **React hooks**: 37 files
 - **utility**: 34 files
 
 ## File Inventory
@@ -113,6 +113,24 @@ aka.ms/tsconfig to read more about this file */
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/api/admin/entitlements/list/route.ts`
+
+File: apps/web/app/api/admin/entitlements/list/route.ts
+
+**Complexity**: medium • **Size**: 5.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/5/2025
+
+
+### `apps/web/app/api/admin/entitlements/update/route.ts`
+
+File: apps/web/app/api/admin/entitlements/update/route.ts
+
+**Complexity**: medium • **Size**: 3.7KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/5/2025
+
+
 ### `apps/web/app/api/agent/content/route.ts`
 
 Agent Content API Route
@@ -171,9 +189,9 @@ Handles Supabase auth redirect and sets cookies for SSR session access.
 
 File: apps/web/app/api/auth/set-session/route.ts
 
-**Complexity**: low • **Size**: 2.1KB
+**Complexity**: medium • **Size**: 2.7KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/api/content/[tenant_key]/route.ts`
@@ -187,11 +205,11 @@ File: apps/web/app/api/auth/set-session/route.ts
 
 ### `apps/web/app/api/copilotkit/route.ts`
 
-Admin action handler
+File: apps/web/app/api/copilotkit/route.ts
 
-**Complexity**: high • **Size**: 10.4KB
+**Complexity**: high • **Size**: 11.5KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/api/dashboard/[user_id]/route.ts`
@@ -531,9 +549,9 @@ edge.tribesocial.io';
 
 Universal Progress API - Authenticated Endpoint
 
-**Complexity**: medium • **Size**: 7.7KB
+**Complexity**: medium • **Size**: 8.0KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 7/2/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/api/user/[user_id]/navigation-state/route.ts`
@@ -549,9 +567,9 @@ API endpoint for updating user navigation state with SSR authentication
 
 SSR-compliant user preferences API with proper authentication
 
-**Owner**: Backend team • **Complexity**: medium • **Size**: 7.2KB
+**Owner**: Backend team • **Complexity**: high • **Size**: 9.2KB
 **Tags**: `API`, `user management`, `preferences`, `SSR auth`, `TypeScript`, `Next.js API`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
 
 
 ### `apps/web/app/api/user/[user_id]/profile/route.ts`
@@ -603,18 +621,9 @@ Create service role Supabase client for backend operations
 
 File: apps/web/app/CopilotKitProvider.tsx
 
-**Complexity**: medium • **Size**: 6.2KB
-**Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`, `security`
-**Modified**: 7/4/2025
-
-
-### `apps/web/app/dashboard/DashboardClient.tsx`
-
-Type definitions
-
-**Complexity**: medium • **Size**: 2.9KB
-**Tags**: `React`, `TypeScript`, `AI agent`, `security`
-**Modified**: 7/1/2025
+**Complexity**: medium • **Size**: 4.0KB
+**Tags**: `React`, `TypeScript`, `React hooks`, `security`
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/dashboard/marcus/page.tsx`
@@ -630,9 +639,9 @@ Purpose: Marcus Dashboard Page - Composition-driven dashboard using existing wid
 
 Server-side dashboard page with SSR optimization and entitlement filtering
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.1KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 7.2KB
 **Tags**: `Next.js page`, `SSR`, `entitlements`, `context management`, `performance`, `React`, `TypeScript`, `security`
-**Modified**: 7/3/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/dev/grant-admin/page.tsx`
@@ -720,9 +729,9 @@ React Query hook for fetching user entitlements.
 
 React Query hooks for user preferences with optimized caching
 
-**Owner**: Frontend team • **Complexity**: low • **Size**: 2.7KB
+**Owner**: Frontend team • **Complexity**: low • **Size**: 3.4KB
 **Tags**: `React hooks`, `React Query`, `user preferences`, `caching`, `cross-invalidation`, `TypeScript`, `hooks`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
 
 
 ### `apps/web/app/hooks/useVideoProgress.ts`
@@ -736,11 +745,11 @@ React hook for video progress tracking with optimistic updates
 
 ### `apps/web/app/layout.tsx`
 
-Get initial session server-side for SSR
+Get initial session server-side for SSR using the same restoration logic
 
-**Complexity**: low • **Size**: 1.2KB
+**Complexity**: low • **Size**: 2.4KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
 
 
 ### `apps/web/app/lib/agentService.ts`
@@ -819,16 +828,16 @@ Performs a provisioning action via the API.
 
 API client for user preferences with caching and error handling
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 4.1KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 5.2KB
 **Tags**: `API client`, `user preferences`, `caching`, `error handling`, `TypeScript`, `utility`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/lib/authService.ts`
 
 Authentication service layer - extracted from UI components
 
-**Owner**: Backend team • **Complexity**: low • **Size**: 2.3KB
+**Owner**: Backend team • **Complexity**: low • **Size**: 2.9KB
 **Tags**: `authentication`, `Supabase`, `service layer`, `session management`, `TypeScript`, `utility`
 **Modified**: 7/4/2025
 
@@ -981,9 +990,9 @@ Client-side Progress Types
 
 User Progress Service - Client Side
 
-**Complexity**: high • **Size**: 12.9KB
+**Complexity**: high • **Size**: 15.0KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 7/2/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/app/lib/userProgressService.ts`
@@ -1017,18 +1026,18 @@ User service layer with optimized database operations and caching
 
 Public login page with styled Supabase Auth UI and token synchronization
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 6.1KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 6.4KB
 **Tags**: `authentication`, `Supabase Auth UI`, `login`, `client component`, `React`, `TypeScript`, `React hooks`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/page.tsx`
 
 SSR Root page that redirects based on session status
 
-**Complexity**: low • **Size**: 0.5KB
+**Complexity**: low • **Size**: 1.6KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 6/27/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/app/QueryClientProvider.tsx`
@@ -1058,24 +1067,6 @@ ui.shadcn.com/schema.json",
 **Modified**: 6/27/2025
 
 
-### `apps/web/components/ai/AIExperience.tsx`
-
-Only render CopilotKit on client side to avoid hydration mismatch
-
-**Complexity**: low • **Size**: 0.7KB
-**Tags**: `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 6/27/2025
-
-
-### `apps/web/components/ai/ClientRoot.tsx`
-
-—
-
-**Complexity**: low • **Size**: 0.5KB
-**Tags**: `React`, `TypeScript`, `UI`
-**Modified**: 6/27/2025
-
-
 ### `apps/web/components/ai/UniversalSchemaRenderer.tsx`
 
 File: apps/web/components/ai/UniversalSchemaRenderer.tsx
@@ -1085,13 +1076,31 @@ File: apps/web/components/ai/UniversalSchemaRenderer.tsx
 **Modified**: 6/27/2025
 
 
+### `apps/web/components/copilot/EntitlementActions.tsx`
+
+File: apps/web/components/copilot/EntitlementActions.tsx
+
+**Complexity**: low • **Size**: 1.7KB
+**Tags**: `React`, `TypeScript`, `UI`, `security`
+**Modified**: 7/5/2025
+
+
 ### `apps/web/components/DynamicTenantPage.tsx`
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 42.5KB
+**Complexity**: high • **Size**: 44.8KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
+
+
+### `apps/web/components/forms/EntitlementCheckboxForm.tsx`
+
+File: apps/web/components/forms/EntitlementCheckboxForm.tsx
+
+**Complexity**: medium • **Size**: 9.3KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `security`
+**Modified**: 7/5/2025
 
 
 ### `apps/web/components/forms/FormWidget.tsx`
@@ -1121,22 +1130,49 @@ Purpose: Video Worksheet Form - Captures video reflection worksheet responses fo
 **Modified**: 6/30/2025
 
 
+### `apps/web/components/mockups/ExecutiveDashboardMockup.tsx`
+
+Purpose: Executive Dashboard Mockup - Agent-native mockup component for stakeholder review
+
+**Complexity**: medium • **Size**: 6.7KB
+**Tags**: `React`, `TypeScript`, `UI`
+**Modified**: 7/6/2025
+
+
 ### `apps/web/components/mockups/MarcusDashboardMockup.tsx`
 
 Purpose: Marcus Dashboard Mockup - Agent-native mockup component for UX validation
 
-**Complexity**: high • **Size**: 27.1KB
+**Complexity**: high • **Size**: 67.0KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/1/2025
+**Modified**: 7/6/2025
+
+
+### `apps/web/components/mockups/PromptLibraryMockup.tsx`
+
+Purpose: Mockup component for Prompt Library interface showing searchable prompt collection
+
+**Complexity**: high • **Size**: 12.4KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`
+**Modified**: 7/6/2025
+
+
+### `apps/web/components/mockups/TeamLeaderDashboardMockup.tsx`
+
+Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for stakeholder review
+
+**Complexity**: high • **Size**: 11.8KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`
+**Modified**: 7/6/2025
 
 
 ### `apps/web/components/SupabaseProvider.tsx`
 
 Start with initialSession to prevent auth flash
 
-**Complexity**: medium • **Size**: 3.9KB
+**Complexity**: medium • **Size**: 3.6KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
 
 
 ### `apps/web/components/ui/ContentPanel.tsx`
@@ -1226,7 +1262,7 @@ Three-panel layout component with theme context and collapsible navigation
 
 **Owner**: Frontend team • **Complexity**: low • **Size**: 2.4KB
 **Tags**: `UI`, `layout`, `theme`, `React`, `client component`, `TypeScript`, `React hooks`
-**Modified**: 6/27/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/components/ui/UserProfileModal.tsx`
@@ -1377,9 +1413,9 @@ File: apps/web/components/widgets/VideoList.tsx
 
 VideoPlayerModal.tsx
 
-**Complexity**: high • **Size**: 24.2KB
+**Complexity**: high • **Size**: 24.5KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/2/2025
+**Modified**: 7/4/2025
 
 
 ### `apps/web/components/widgets/WidgetDispatcher.tsx`
@@ -1431,7 +1467,7 @@ React Query hook for fetching optimized dashboard data from agent/context API
 
 Database-driven navigation hook that transforms NavOption[] to NavPanelSchema
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 6.5KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 6.8KB
 **Tags**: `React hooks`, `navigation`, `database-driven`, `entitlements`, `React Query`, `TypeScript`, `hooks`, `AI agent`, `security`
 **Modified**: 7/4/2025
 
@@ -1440,7 +1476,7 @@ Database-driven navigation hook that transforms NavOption[] to NavPanelSchema
 
 React hook for fetching navigation options from the database
 
-**Owner**: Frontend team • **Complexity**: low • **Size**: 1.9KB
+**Owner**: Frontend team • **Complexity**: low • **Size**: 2.1KB
 **Tags**: `React hooks`, `navigation`, `SWR`, `database`, `TypeScript`, `hooks`, `security`
 **Modified**: 7/4/2025
 
@@ -1458,9 +1494,9 @@ Entry point for mockup system - exports all mockup functionality
 
 Generalized mockup routing system for rapid prototyping in production context
 
-**Owner**: Product Team • **Complexity**: medium • **Size**: 3.9KB
+**Owner**: Product Team • **Complexity**: medium • **Size**: 5.0KB
 **Tags**: `mockups`, `feature-flags`, `prototyping`, `navigation`, `TypeScript`, `utility`, `security`
-**Modified**: 6/29/2025
+**Modified**: 7/6/2025
 
 
 ### `apps/web/lib/mockups/MockupRouter.tsx`
@@ -1494,25 +1530,16 @@ Routes navigation to mockups when enabled, falls back to agent content
 
 ✅ FIX: Disable source maps in development to prevent 404 errors
 
-**Complexity**: low • **Size**: 1.8KB
+**Complexity**: low • **Size**: 2.4KB
 **Tags**: None
-**Modified**: 7/4/2025
-
-
-### `apps/web/package-lock.json`
-
-registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz",
-
-**Size**: 540.2KB
-**Tags**: `AI agent`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `apps/web/package.json`
 
 —
 
-**Size**: 1.3KB
+**Size**: 1.4KB
 **Tags**: `AI agent`
 **Modified**: 7/4/2025
 
@@ -1560,6 +1587,15 @@ tailwind.config.ts
 **Size**: 0.7KB
 **Tags**: None
 **Modified**: 5/27/2025
+
+
+### `apps/web/vercel.json`
+
+—
+
+**Size**: 0.1KB
+**Tags**: None
+**Modified**: 7/5/2025
 
 
 ### `docs/.legacy/adr-template.md`
@@ -2255,6 +2291,15 @@ Current: Each new feature compounds performance problems
 **Modified**: 7/1/2025
 
 
+### `docs/engineering/CRITICAL-REGRESSIONS.md`
+
+—
+
+**Size**: 4.7KB
+**Tags**: `documentation`, `security`
+**Modified**: 7/6/2025
+
+
 ### `docs/engineering/future-enhancements.md`
 
 —
@@ -2412,9 +2457,18 @@ Register agent with proper typing
 
 Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX validation
 
-**Size**: 28.2KB
+**Size**: 29.4KB
 **Tags**: `documentation`, `React hooks`, `AI agent`, `security`
-**Modified**: 6/29/2025
+**Modified**: 7/6/2025
+
+
+### `docs/LEGACY_TEMP_REF/bold-action-modal.tsx`
+
+First update Firestore
+
+**Complexity**: medium • **Size**: 7.1KB
+**Tags**: `React`, `TypeScript`, `documentation`, `React hooks`
+**Modified**: 7/6/2025
 
 
 ### `docs/legacy-migration-summary.md`
@@ -2430,18 +2484,18 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for UX val
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 164.0KB
+**Size**: 169.4KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
 
 
 ### `docs/manifest.md`
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 62.4KB
+**Size**: 64.6KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/4/2025
+**Modified**: 7/6/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -2543,20 +2597,38 @@ Links to specific video content
 **Modified**: 6/27/2025
 
 
-### `docs/quality-assurance/audits/QA-0001-navigation-state-restoration-audit.md`
-
-—
-
-**Size**: 4.7KB
-**Tags**: `documentation`, `AI agent`
-**Modified**: 7/4/2025
-
-
 ### `docs/quality-assurance/README.md`
 
 —
 
-**Size**: 5.7KB
+**Size**: 6.2KB
+**Tags**: `documentation`
+**Modified**: 7/4/2025
+
+
+### `docs/quality-assurance/resolved/QA-0001-navigation-state-restoration-audit.md`
+
+—
+
+**Size**: 5.0KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/4/2025
+
+
+### `docs/quality-assurance/resolved/QA-0002-memory-leak-fixes-audit.md`
+
+Timer could accumulate without cleanup
+
+**Size**: 7.9KB
+**Tags**: `documentation`
+**Modified**: 7/4/2025
+
+
+### `docs/quality-assurance/resolved/QA-0003-progress-tracking-api-fix-audit.md`
+
+✅ CRITICAL FIX: Ensure each event has required fields including tenantKey and userId
+
+**Size**: 4.5KB
 **Tags**: `documentation`
 **Modified**: 7/4/2025
 
@@ -2579,6 +2651,15 @@ Links to specific video content
 **Modified**: 6/27/2025
 
 
+### `docs/stakeholder-review-mockups.md`
+
+—
+
+**Size**: 6.5KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/6/2025
+
+
 ### `docs/testing/production-performance-testing-guide.md`
 
 your-production-domain.com
@@ -2592,9 +2673,9 @@ your-production-domain.com
 
 File: packages/agent-core/agents/AdminAgent.ts
 
-**Complexity**: high • **Size**: 15.3KB
+**Complexity**: high • **Size**: 15.4KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `packages/agent-core/agents/ContentLibraryAgent.ts`
@@ -2709,9 +2790,9 @@ Tests for Universal Progress Tool
 
 File: packages/agent-core/tools/EntitlementTool.ts
 
-**Complexity**: medium • **Size**: 3.9KB
+**Complexity**: medium • **Size**: 4.9KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/4/2025
+**Modified**: 7/5/2025
 
 
 ### `packages/agent-core/tools/ToolRegistry.js`

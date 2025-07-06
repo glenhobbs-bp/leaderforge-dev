@@ -23,37 +23,49 @@ import { LeaderForgeCard } from '../widgets/LeaderForgeCard';
 
 export default function TeamLeaderMockup() {
   return (
-    <div className="p-6">
-      <header className="mb-8">
-        <h1 className="text-2xl font-medium text-gray-900 mb-1">Team Dashboard</h1>
-        <p className="text-sm text-gray-500">Lead your team to success</p>
-      </header>
+    <div className="p-6 min-h-screen bg-gray-50">
+      {/* Header Section - Following Design System */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          Team Dashboard
+        </h1>
+        <p className="text-sm text-gray-600">
+          Lead your team to success
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Use existing widget components for consistency */}
-        <StatCard
-          title="Team Members"
-          value="12"
-          change="+2 this month"
-          trend="up"
-          icon="Users"
-        />
+      {/* Stats Grid - Using Glassmorphism Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="card-glass-subtle p-4">
+          <h3 className="text-lg font-medium text-glass-primary mb-2">Team Members</h3>
+          <div className="text-2xl font-bold text-blue-600">12</div>
+          <p className="text-xs text-glass-muted">+2 this month</p>
+        </div>
 
-        <StatCard
-          title="Active Projects"
-          value="8"
-          change="+1 this week"
-          trend="up"
-          icon="Target"
-        />
+        <div className="card-glass-subtle p-4">
+          <h3 className="text-lg font-medium text-glass-primary mb-2">Active Projects</h3>
+          <div className="text-2xl font-bold text-green-600">8</div>
+          <p className="text-xs text-glass-muted">+1 this week</p>
+        </div>
 
-        <StatCard
-          title="Completion Rate"
-          value="94%"
-          change="+3% this week"
-          trend="up"
-          icon="CheckCircle"
-        />
+        <div className="card-glass-subtle p-4">
+          <h3 className="text-lg font-medium text-glass-primary mb-2">Completion Rate</h3>
+          <div className="text-2xl font-bold text-purple-600">94%</div>
+          <p className="text-xs text-glass-muted">+3% this week</p>
+        </div>
+      </div>
+
+      {/* Team List - Glassmorphism Card */}
+      <div className="card-glass p-6">
+        <h2 className="text-xl font-semibold text-glass-primary mb-4">Team Members</h2>
+        <div className="space-y-3">
+          {['Sarah Johnson', 'Mike Chen', 'Emily Davis'].map((name, index) => (
+            <div key={index} className="flex items-center justify-between p-3 card-glass-subtle rounded-lg">
+              <span className="text-sm font-medium text-glass-primary">{name}</span>
+              <span className="text-xs text-glass-muted">Active</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -183,7 +195,13 @@ Navigate to the page and check console logs:
 
 #### **🎨 CRITICAL: Design System Adherence**
 
-**ALL mockups MUST adhere to the established design system**. This is not optional - mockups that don't follow design system patterns create inconsistent user experiences and misleading feedback.
+**⚠️ ALL mockups MUST adhere to the established design system ⚠️**
+
+This is **NOT OPTIONAL** - mockups that don't follow design system patterns create:
+- ❌ Inconsistent user experiences
+- ❌ Misleading stakeholder feedback
+- ❌ Technical debt when implementing
+- ❌ Brand inconsistency
 
 **Required Design System Elements:**
 - **Typography**: Use established heading sizes (`text-2xl`, `text-xl`, etc.)

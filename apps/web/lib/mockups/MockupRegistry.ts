@@ -9,6 +9,7 @@ import { ComponentType } from 'react';
 import MarcusDashboard from '../../components/mockups/MarcusDashboardMockup';
 import TeamLeaderDashboard from '../../components/mockups/TeamLeaderDashboardMockup';
 import ExecutiveDashboard from '../../components/mockups/ExecutiveDashboardMockup';
+import PromptLibraryMockup from '../../components/mockups/PromptLibraryMockup';
 
 // Mockup registry interface
 export interface MockupConfig {
@@ -49,6 +50,16 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     description: 'Executive/organizational perspective mockup for stakeholder review',
     featureFlag: 'ENABLE_EXECUTIVE_MOCKUP',
     entitlementName: 'executive-mockup',
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
+  },
+
+  // Prompt Library - AI Operating System
+  'fc9861cd-210d-4abe-9d13-76f1a366ef88': {
+    component: PromptLibraryMockup,
+    name: 'Prompt Library',
+    description: 'Searchable repository of proven AI prompts for business scenarios',
+    featureFlag: 'ENABLE_PROMPT_LIBRARY_MOCKUP',
+    entitlementName: 'prompt-library-mockup',
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
   },
 };
