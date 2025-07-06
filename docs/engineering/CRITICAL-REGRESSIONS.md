@@ -76,6 +76,37 @@ This document tracks critical regressions that must be addressed before producti
 
 ---
 
+## P2 - Debug Logging Cleanup Required
+
+**Issue**: Extensive debugging logs added during authentication flow investigation need cleanup.
+
+**Current State**:
+- Multiple components have comprehensive debug logging for authentication troubleshooting
+- Console logs include detailed user preferences flow, mounting sequences, and API calls
+- Debugging was essential for fixing critical mounting issue but creates noise in production
+
+**Files Affected**:
+- `apps/web/components/DynamicTenantPage.tsx` - Extensive component lifecycle logging
+- `apps/web/hooks/useUserPreferences.ts` - API call debugging
+- `apps/web/app/api/user/[user_id]/preferences/route.ts` - Authentication flow logging
+- Various authentication-related components with debug output
+
+**Impact**:
+- Console noise in production environment
+- Potential performance impact from excessive logging
+- User experience may be affected by visible debug output
+
+**Required Cleanup Actions**:
+1. Remove or reduce debug logging in `DynamicTenantPage.tsx`
+2. Clean up API debugging in user preferences endpoints
+3. Remove temporary debugging in authentication hooks
+4. Maintain minimal essential logging for error tracking
+5. Consider implementing conditional debug logging based on environment
+
+**Priority**: P2 - Should be cleaned up after major features/refactors complete
+
+---
+
 ## Documentation Standards
 
 - All regressions must include impact assessment

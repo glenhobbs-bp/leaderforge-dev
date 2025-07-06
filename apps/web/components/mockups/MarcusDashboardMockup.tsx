@@ -24,6 +24,15 @@ interface ToDoEntry {
   rescheduleCount?: number;
 }
 
+interface WorksheetEntry {
+  id: string;
+  title: string;
+  submissionCount: number;
+  lastUpdated: string;
+  status: 'completed' | 'in_progress' | 'reviewed';
+  category: string;
+}
+
 interface ToDoSchema {
   config: {
     title: string;
@@ -435,6 +444,58 @@ const mockVideoData = {
   }
 };
 
+// Mock worksheet data
+const mockWorksheetData: WorksheetEntry[] = [
+  {
+    id: 'w1',
+    title: 'Leadership Style Assessment',
+    submissionCount: 3,
+    lastUpdated: '2025-07-04',
+    status: 'completed',
+    category: 'Self-Assessment'
+  },
+  {
+    id: 'w2',
+    title: 'Team Communication Plan',
+    submissionCount: 1,
+    lastUpdated: '2025-07-02',
+    status: 'reviewed',
+    category: 'Planning'
+  },
+  {
+    id: 'w3',
+    title: 'Conflict Resolution Strategies',
+    submissionCount: 2,
+    lastUpdated: '2025-07-01',
+    status: 'completed',
+    category: 'Skills Development'
+  },
+  {
+    id: 'w4',
+    title: 'Goal Setting Framework',
+    submissionCount: 4,
+    lastUpdated: '2025-06-28',
+    status: 'completed',
+    category: 'Planning'
+  },
+  {
+    id: 'w5',
+    title: 'Feedback Delivery Workshop',
+    submissionCount: 1,
+    lastUpdated: '2025-06-25',
+    status: 'in_progress',
+    category: 'Skills Development'
+  },
+  {
+    id: 'w6',
+    title: 'Personal Development Plan',
+    submissionCount: 2,
+    lastUpdated: '2025-06-20',
+    status: 'reviewed',
+    category: 'Self-Assessment'
+  }
+];
+
 const mockProgressStats = [
   {
     id: '5-minute-checkin',
@@ -684,7 +745,291 @@ const mockActivityData = {
   }
 };
 
+function MyWorksheets({ worksheets }: { worksheets: WorksheetEntry[] }) {
+  const [sortBy, setSortBy] = useState<'date' | 'status' | 'category' | 'submissions'>('date');
+  const [filterBy, setFilterBy] = useState<'all' | 'completed' | 'in_progress' | 'reviewed' | 'Self-Assessment' | 'Planning' | 'Skills Development'>('all');
 
+  const getStatusColor = (status: WorksheetEntry['status']) => {
+    switch (status) {
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'in_progress':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'reviewed':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusIcon = (status: WorksheetEntry['status']) => {
+    switch (status) {
+      case 'completed':
+        return (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'in_progress':
+        return (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'reviewed':
+        return (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getFilteredAndSortedWorksheets = () => {
+    let filtered = worksheets;
+
+    // Apply filters
+    if (filterBy !== 'all') {
+      if (['completed', 'in_progress', 'reviewed'].includes(filterBy)) {
+        filtered = filtered.filter(worksheet => worksheet.status === filterBy);
+      } else {
+        // Filter by category
+        filtered = filtered.filter(worksheet => worksheet.category === filterBy);
+      }
+    }
+
+    // Apply sorting
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'date':
+          return new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime();
+        case 'status':
+          return a.status.localeCompare(b.status);
+        case 'category':
+          return a.category.localeCompare(b.category);
+        case 'submissions':
+          return b.submissionCount - a.submissionCount;
+        default:
+          return 0;
+      }
+    });
+  };
+
+  const filteredWorksheets = getFilteredAndSortedWorksheets();
+
+  return (
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 p-6 h-[508px] flex flex-col">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900">My Worksheets</h3>
+        <span className="text-sm text-gray-500">{filteredWorksheets.length} of {worksheets.length}</span>
+      </div>
+
+      {/* Sort and Filter Controls */}
+      <div className="flex items-center gap-2 mb-4">
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as 'date' | 'status' | 'category' | 'submissions')}
+          className="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="date">Sort by Date</option>
+          <option value="status">Sort by Status</option>
+          <option value="category">Sort by Category</option>
+          <option value="submissions">Sort by Submissions</option>
+        </select>
+
+        <select
+          value={filterBy}
+          onChange={(e) => setFilterBy(e.target.value as 'all' | 'completed' | 'in_progress' | 'reviewed' | 'Self-Assessment' | 'Planning' | 'Skills Development')}
+          className="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="all">All Worksheets</option>
+          <option value="completed">Completed</option>
+          <option value="in_progress">In Progress</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="Self-Assessment">Self-Assessment</option>
+          <option value="Planning">Planning</option>
+          <option value="Skills Development">Skills Development</option>
+        </select>
+
+        <button className="ml-auto text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Add Worksheet
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto space-y-4">
+        {filteredWorksheets.map((worksheet) => (
+          <div key={worksheet.id} className="p-4 rounded-xl border border-gray-200 bg-gray-50">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900 text-sm mb-1">{worksheet.title}</h4>
+                <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <span>{worksheet.submissionCount} submissions</span>
+                  <span className="text-gray-400">•</span>
+                  <span>Last updated: {new Date(worksheet.lastUpdated).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs px-2 py-1 rounded-full flex items-center gap-1 ${getStatusColor(worksheet.status)}`}>
+                  {getStatusIcon(worksheet.status)}
+                  {worksheet.status.replace('_', ' ')}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                {worksheet.category}
+              </span>
+              <button className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition-colors">
+                Review/Edit
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsDashboard() {
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+
+  // Mock analytics data
+  const analyticsData = {
+    '7d': {
+      totalActivities: 28,
+      avgPerDay: 4.0,
+      completionRate: 89,
+      topCategory: 'Videos'
+    },
+    '30d': {
+      totalActivities: 127,
+      avgPerDay: 4.2,
+      completionRate: 85,
+      topCategory: 'Worksheets'
+    },
+    '90d': {
+      totalActivities: 394,
+      avgPerDay: 4.4,
+      completionRate: 87,
+      topCategory: 'Bold Actions'
+    }
+  };
+
+  const currentData = analyticsData[timeRange];
+
+  // Mock activity trend data (simplified bar chart)
+  const trendData = timeRange === '7d'
+    ? [3, 5, 4, 6, 3, 4, 3]
+    : timeRange === '30d'
+    ? [4, 5, 3, 6, 4, 5, 4, 3, 5, 6, 4, 3, 5, 4, 6, 3, 4, 5, 3, 6, 4, 5, 3, 4, 5, 6, 3, 4, 5, 3]
+    : [4, 5, 4, 5, 4, 3, 5, 4, 6, 3, 4, 5]; // 90d shows weekly averages
+
+  const maxValue = Math.max(...trendData);
+
+  return (
+    <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/50 p-6 h-[508px] flex flex-col">
+      {/* Header with Time Range Selector */}
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-900">Analytics Dashboard</h3>
+        <select
+          value={timeRange}
+          onChange={(e) => setTimeRange(e.target.value as '7d' | '30d' | '90d')}
+          className="text-xs border border-gray-300 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="7d">Last 7 Days</option>
+          <option value="30d">Last 30 Days</option>
+          <option value="90d">Last 90 Days</option>
+        </select>
+      </div>
+
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3 border border-blue-200">
+          <div className="text-xs text-blue-600 font-medium">Total Activities</div>
+          <div className="text-lg font-bold text-blue-900">{currentData.totalActivities}</div>
+        </div>
+        <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-3 border border-green-200">
+          <div className="text-xs text-green-600 font-medium">Avg Per Day</div>
+          <div className="text-lg font-bold text-green-900">{currentData.avgPerDay}</div>
+        </div>
+        <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-3 border border-purple-200">
+          <div className="text-xs text-purple-600 font-medium">Completion Rate</div>
+          <div className="text-lg font-bold text-purple-900">{currentData.completionRate}%</div>
+        </div>
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-3 border border-orange-200">
+          <div className="text-xs text-orange-600 font-medium">Top Category</div>
+          <div className="text-lg font-bold text-orange-900">{currentData.topCategory}</div>
+        </div>
+      </div>
+
+      {/* Activity Trend Chart */}
+      <div className="flex-1 bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-sm font-medium text-gray-700">Activity Trend</h4>
+          <span className="text-xs text-gray-500">
+            {timeRange === '90d' ? 'Weekly Avg' : 'Daily Count'}
+          </span>
+        </div>
+
+        {/* Simple Bar Chart */}
+        <div className="flex items-end justify-between h-32 gap-1">
+          {trendData.map((value, index) => (
+            <div key={index} className="flex-1 flex flex-col items-center">
+              <div
+                className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t min-h-[4px]"
+                style={{ height: `${(value / maxValue) * 100}%` }}
+              />
+              <span className="text-xs text-gray-500 mt-1">
+                {timeRange === '7d'
+                  ? ['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]
+                  : timeRange === '30d'
+                  ? (index + 1).toString()
+                  : `W${index + 1}`
+                }
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Activity Heatmap (Last 7 Days) */}
+      <div className="mt-4 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">Recent Activity Heatmap</h4>
+        <div className="grid grid-cols-7 gap-1">
+          {[3, 5, 4, 6, 3, 4, 3].map((intensity, index) => (
+            <div key={index} className="flex flex-col items-center">
+              <div
+                className={`w-6 h-6 rounded text-xs flex items-center justify-center text-white font-medium ${
+                  intensity >= 5 ? 'bg-green-500' :
+                  intensity >= 4 ? 'bg-green-400' :
+                  intensity >= 3 ? 'bg-green-300' :
+                  intensity >= 2 ? 'bg-green-200' :
+                  'bg-gray-200'
+                }`}
+              >
+                {intensity}
+              </div>
+              <span className="text-xs text-gray-500 mt-1">
+                {['M', 'T', 'W', 'T', 'F', 'S', 'S'][index]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Standup Calendar Modal Component - Design System Compliant
 function StandupModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -1082,34 +1427,34 @@ export default function MarcusDashboardMockup() {
                 {/* Fire Streak Rosette */}
                 <div className="relative group">
                   <div className="relative">
-                    <svg width="36" height="36" viewBox="0 0 36 36" className="drop-shadow-lg">
-                      {/* Rosette petals - outer layer */}
-                      <g transform="translate(18,18)">
-                        <circle cx="0" cy="-14" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="9.9" cy="-9.9" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="14" cy="0" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="9.9" cy="9.9" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="0" cy="14" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="-9.9" cy="9.9" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="-14" cy="0" r="4" fill="#f97316" opacity="0.7"/>
-                        <circle cx="-9.9" cy="-9.9" r="4" fill="#f97316" opacity="0.7"/>
+                    <svg width="36" height="48" viewBox="0 0 36 48" className="drop-shadow-lg">
+                      {/* Classic rosette pleated edge */}
+                      <g transform="translate(18,20)">
+                        {/* 8 pleated petals - simple and clean */}
+                        <polygon points="0,-16 4,-12 0,-8 -4,-12" fill="#f97316"/>
+                        <polygon points="11.3,-11.3 15.3,-7.3 11.3,-3.3 7.3,-7.3" fill="#ea580c"/>
+                        <polygon points="16,0 20,4 16,8 12,4" fill="#f97316"/>
+                        <polygon points="11.3,11.3 15.3,15.3 11.3,19.3 7.3,15.3" fill="#ea580c"/>
+                        <polygon points="0,16 4,20 0,24 -4,20" fill="#f97316"/>
+                        <polygon points="-11.3,11.3 -7.3,15.3 -11.3,19.3 -15.3,15.3" fill="#ea580c"/>
+                        <polygon points="-16,0 -12,4 -16,8 -20,4" fill="#f97316"/>
+                        <polygon points="-11.3,-11.3 -7.3,-7.3 -11.3,-3.3 -15.3,-7.3" fill="#ea580c"/>
                       </g>
-                      {/* Rosette petals - inner layer */}
-                      <g transform="translate(18,18) rotate(22.5)">
-                        <circle cx="0" cy="-11" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="7.8" cy="-7.8" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="11" cy="0" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="7.8" cy="7.8" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="0" cy="11" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="-7.8" cy="7.8" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="-11" cy="0" r="3" fill="#ea580c" opacity="0.8"/>
-                        <circle cx="-7.8" cy="-7.8" r="3" fill="#ea580c" opacity="0.8"/>
-                      </g>
-                      {/* Center circle */}
-                      <circle cx="18" cy="18" r="8" fill="#dc2626"/>
-                      <circle cx="18" cy="18" r="6" fill="white"/>
+
+                      {/* Center circle - larger and cleaner */}
+                      <circle cx="18" cy="20" r="10" fill="white"/>
+                      <circle cx="18" cy="20" r="9" fill="#fef3c7"/>
+
                       {/* Center number */}
-                      <text x="18" y="23" textAnchor="middle" className="text-sm font-bold fill-orange-600">7</text>
+                      <text x="18" y="26" textAnchor="middle" className="text-xl font-bold fill-orange-600">7</text>
+
+                      {/* Simple ribbon streamers */}
+                      <g transform="translate(18,30)">
+                        <rect x="-3" y="0" width="2" height="14" fill="#f97316"/>
+                        <rect x="1" y="0" width="2" height="14" fill="#f97316"/>
+                        <polygon points="-3,14 -1,14 -2,18" fill="#f97316"/>
+                        <polygon points="1,14 3,14 2,18" fill="#f97316"/>
+                      </g>
                     </svg>
                   </div>
                   {/* Hover tooltip */}
@@ -1121,36 +1466,36 @@ export default function MarcusDashboardMockup() {
                 {/* Goal Crusher Rosette */}
                 <div className="relative group">
                   <div className="relative">
-                    <svg width="36" height="36" viewBox="0 0 36 36" className="drop-shadow-lg">
-                      {/* Rosette petals - outer layer */}
-                      <g transform="translate(18,18)">
-                        <circle cx="0" cy="-14" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="9.9" cy="-9.9" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="14" cy="0" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="9.9" cy="9.9" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="0" cy="14" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="-9.9" cy="9.9" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="-14" cy="0" r="4" fill="#22c55e" opacity="0.7"/>
-                        <circle cx="-9.9" cy="-9.9" r="4" fill="#22c55e" opacity="0.7"/>
+                    <svg width="36" height="48" viewBox="0 0 36 48" className="drop-shadow-lg">
+                      {/* Classic rosette pleated edge */}
+                      <g transform="translate(18,20)">
+                        {/* 8 pleated petals - simple and clean */}
+                        <polygon points="0,-16 4,-12 0,-8 -4,-12" fill="#22c55e"/>
+                        <polygon points="11.3,-11.3 15.3,-7.3 11.3,-3.3 7.3,-7.3" fill="#16a34a"/>
+                        <polygon points="16,0 20,4 16,8 12,4" fill="#22c55e"/>
+                        <polygon points="11.3,11.3 15.3,15.3 11.3,19.3 7.3,15.3" fill="#16a34a"/>
+                        <polygon points="0,16 4,20 0,24 -4,20" fill="#22c55e"/>
+                        <polygon points="-11.3,11.3 -7.3,15.3 -11.3,19.3 -15.3,15.3" fill="#16a34a"/>
+                        <polygon points="-16,0 -12,4 -16,8 -20,4" fill="#22c55e"/>
+                        <polygon points="-11.3,-11.3 -7.3,-7.3 -11.3,-3.3 -15.3,-7.3" fill="#16a34a"/>
                       </g>
-                      {/* Rosette petals - inner layer */}
-                      <g transform="translate(18,18) rotate(22.5)">
-                        <circle cx="0" cy="-11" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="7.8" cy="-7.8" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="11" cy="0" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="7.8" cy="7.8" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="0" cy="11" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="-7.8" cy="7.8" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="-11" cy="0" r="3" fill="#16a34a" opacity="0.8"/>
-                        <circle cx="-7.8" cy="-7.8" r="3" fill="#16a34a" opacity="0.8"/>
+
+                      {/* Center circle - larger and cleaner */}
+                      <circle cx="18" cy="20" r="10" fill="white"/>
+                      <circle cx="18" cy="20" r="9" fill="#dcfce7"/>
+
+                      {/* Target/bullseye icon */}
+                      <circle cx="18" cy="20" r="6" fill="none" stroke="#16a34a" strokeWidth="1"/>
+                      <circle cx="18" cy="20" r="4" fill="none" stroke="#16a34a" strokeWidth="1"/>
+                      <circle cx="18" cy="20" r="2" fill="#16a34a"/>
+
+                      {/* Simple ribbon streamers */}
+                      <g transform="translate(18,30)">
+                        <rect x="-3" y="0" width="2" height="14" fill="#22c55e"/>
+                        <rect x="1" y="0" width="2" height="14" fill="#22c55e"/>
+                        <polygon points="-3,14 -1,14 -2,18" fill="#22c55e"/>
+                        <polygon points="1,14 3,14 2,18" fill="#22c55e"/>
                       </g>
-                      {/* Center circle */}
-                      <circle cx="18" cy="18" r="8" fill="#15803d"/>
-                      <circle cx="18" cy="18" r="6" fill="white"/>
-                      {/* Target icon */}
-                      <circle cx="18" cy="18" r="4" fill="#16a34a" opacity="0.3"/>
-                      <circle cx="18" cy="18" r="2.5" fill="#16a34a" opacity="0.6"/>
-                      <circle cx="18" cy="18" r="1.5" fill="#16a34a"/>
                     </svg>
                   </div>
                   {/* Hover tooltip */}
@@ -1159,42 +1504,44 @@ export default function MarcusDashboardMockup() {
                   </div>
                 </div>
 
-                {/* Rising Star Rosette */}
+                                {/* Excellence Rosette */}
                 <div className="relative group">
                   <div className="relative">
-                    <svg width="36" height="36" viewBox="0 0 36 36" className="drop-shadow-lg">
-                      {/* Rosette petals - outer layer */}
-                      <g transform="translate(18,18)">
-                        <circle cx="0" cy="-14" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="9.9" cy="-9.9" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="14" cy="0" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="9.9" cy="9.9" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="0" cy="14" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="-9.9" cy="9.9" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="-14" cy="0" r="4" fill="#3b82f6" opacity="0.7"/>
-                        <circle cx="-9.9" cy="-9.9" r="4" fill="#3b82f6" opacity="0.7"/>
+                    <svg width="36" height="48" viewBox="0 0 36 48" className="drop-shadow-lg">
+                      {/* Classic rosette pleated edge */}
+                      <g transform="translate(18,20)">
+                        {/* 8 pleated petals - simple and clean */}
+                        <polygon points="0,-16 4,-12 0,-8 -4,-12" fill="#3b82f6"/>
+                        <polygon points="11.3,-11.3 15.3,-7.3 11.3,-3.3 7.3,-7.3" fill="#2563eb"/>
+                        <polygon points="16,0 20,4 16,8 12,4" fill="#3b82f6"/>
+                        <polygon points="11.3,11.3 15.3,15.3 11.3,19.3 7.3,15.3" fill="#2563eb"/>
+                        <polygon points="0,16 4,20 0,24 -4,20" fill="#3b82f6"/>
+                        <polygon points="-11.3,11.3 -7.3,15.3 -11.3,19.3 -15.3,15.3" fill="#2563eb"/>
+                        <polygon points="-16,0 -12,4 -16,8 -20,4" fill="#3b82f6"/>
+                        <polygon points="-11.3,-11.3 -7.3,-7.3 -11.3,-3.3 -15.3,-7.3" fill="#2563eb"/>
                       </g>
-                      {/* Rosette petals - inner layer */}
-                      <g transform="translate(18,18) rotate(22.5)">
-                        <circle cx="0" cy="-11" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="7.8" cy="-7.8" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="11" cy="0" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="7.8" cy="7.8" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="0" cy="11" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="-7.8" cy="7.8" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="-11" cy="0" r="3" fill="#2563eb" opacity="0.8"/>
-                        <circle cx="-7.8" cy="-7.8" r="3" fill="#2563eb" opacity="0.8"/>
-                      </g>
-                      {/* Center circle */}
-                      <circle cx="18" cy="18" r="8" fill="#1d4ed8"/>
-                      <circle cx="18" cy="18" r="6" fill="white"/>
+
+                      {/* Center circle - larger and cleaner */}
+                      <circle cx="18" cy="20" r="10" fill="white"/>
+                      <circle cx="18" cy="20" r="9" fill="#dbeafe"/>
+
                       {/* Star icon */}
-                      <polygon points="18,12 19.5,16.5 24,16.5 20.5,19.5 22,24 18,21 14,24 15.5,19.5 12,16.5 16.5,16.5" fill="#2563eb"/>
+                      <g transform="translate(18,20) scale(1.2)">
+                        <polygon points="0,-5 1.5,-1.5 5,-1.5 2,1.5 3.5,5 0,3 -3.5,5 -2,1.5 -5,-1.5 -1.5,-1.5" fill="#3b82f6"/>
+                      </g>
+
+                      {/* Simple ribbon streamers */}
+                      <g transform="translate(18,30)">
+                        <rect x="-3" y="0" width="2" height="14" fill="#3b82f6"/>
+                        <rect x="1" y="0" width="2" height="14" fill="#3b82f6"/>
+                        <polygon points="-3,14 -1,14 -2,18" fill="#3b82f6"/>
+                        <polygon points="1,14 3,14 2,18" fill="#3b82f6"/>
+                      </g>
                     </svg>
                   </div>
                   {/* Hover tooltip */}
                   <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                    Rising Star
+                    Excellence Award
                   </div>
                 </div>
               </div>
@@ -1240,8 +1587,29 @@ export default function MarcusDashboardMockup() {
 
         </div>
 
-        {/* Two Column Layout Below the fold: My Activity, Leaderboard */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        {/* Two Column Layout Row 3: My Worksheets, Leaderboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-8">
+
+          {/* My Worksheets Section */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">My Worksheets</h2>
+            <div className="w-full">
+              <MyWorksheets worksheets={mockWorksheetData} />
+            </div>
+          </section>
+
+          {/* Leaderboard Section */}
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Leaderboard</h2>
+            <div className="w-full h-[508px]">
+              <List schema={mockLeaderboardData} />
+            </div>
+          </section>
+
+        </div>
+
+        {/* Two Column Layout Row 4: My Activity, Analytics Dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-8">
 
           {/* My Activity Section */}
           <section>
@@ -1251,11 +1619,11 @@ export default function MarcusDashboardMockup() {
             </div>
           </section>
 
-          {/* Leaderboard Section */}
+          {/* Analytics Dashboard Section */}
           <section>
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Leaderboard</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Analytics Dashboard</h2>
             <div className="w-full h-[508px]">
-              <List schema={mockLeaderboardData} />
+              <AnalyticsDashboard />
             </div>
           </section>
 
