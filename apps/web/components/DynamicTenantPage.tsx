@@ -122,16 +122,27 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       return;
     }
 
-    // ✅ FIX: Wait for user preferences to finish loading before trying to restore
-    // Check if userPrefs is empty object (placeholder data) or actually has content
-    const hasRealUserPrefs = userPrefs && Object.keys(userPrefs).length > 0;
+    // ✅ FIX: Check for actual preference properties (not just object length) to detect real vs placeholder data
+    // Placeholder data is {} but real data has properties like theme, navigationState, etc.
+    const hasRealUserPrefs = userPrefs && (
+      'theme' in userPrefs ||
+      'navigationState' in userPrefs ||
+      'language' in userPrefs ||
+      Object.keys(userPrefs).length > 0
+    );
 
     if (!session?.user?.id || !hasRealUserPrefs || hasRestoredTenant || userPrefsLoading) {
       if (userPrefsLoading) {
         console.log('[DynamicTenantPage] ⏳ Waiting for user preferences to load...');
       }
       if (!hasRealUserPrefs && userPrefs) {
-        console.log('[DynamicTenantPage] ⏳ User preferences is empty placeholder, waiting for real data...');
+        console.log('[DynamicTenantPage] ⏳ User preferences is empty placeholder, waiting for real data...', {
+          userPrefs,
+          hasTheme: 'theme' in userPrefs,
+          hasNavigationState: 'navigationState' in userPrefs,
+          hasLanguage: 'language' in userPrefs,
+          objectKeys: Object.keys(userPrefs)
+        });
       }
       return;
     }
@@ -200,16 +211,27 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       return;
     }
 
-    // ✅ FIX: Wait for user preferences to finish loading before trying to restore navigation
-    // Check if userPrefs is empty object (placeholder data) or actually has content
-    const hasRealUserPrefs = userPrefs && Object.keys(userPrefs).length > 0;
+    // ✅ FIX: Check for actual preference properties (not just object length) to detect real vs placeholder data
+    // Placeholder data is {} but real data has properties like theme, navigationState, etc.
+    const hasRealUserPrefs = userPrefs && (
+      'theme' in userPrefs ||
+      'navigationState' in userPrefs ||
+      'language' in userPrefs ||
+      Object.keys(userPrefs).length > 0
+    );
 
     if (!session?.user?.id || !hasRealUserPrefs || !hasRestoredTenant || userPrefsLoading) {
       if (userPrefsLoading) {
         console.log('[DynamicTenantPage] ⏳ Waiting for user preferences to load for navigation restoration...');
       }
       if (!hasRealUserPrefs && userPrefs) {
-        console.log('[DynamicTenantPage] ⏳ User preferences is empty placeholder for navigation, waiting for real data...');
+        console.log('[DynamicTenantPage] ⏳ User preferences is empty placeholder for navigation, waiting for real data...', {
+          userPrefs,
+          hasTheme: 'theme' in userPrefs,
+          hasNavigationState: 'navigationState' in userPrefs,
+          hasLanguage: 'language' in userPrefs,
+          objectKeys: Object.keys(userPrefs)
+        });
       }
       return;
     }
