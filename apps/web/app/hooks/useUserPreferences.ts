@@ -13,14 +13,36 @@ import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/us
  * @param options - Optional query options to override defaults
  */
 export function useUserPreferences(userId: string, options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? !!userId;
+
+  console.log('[useUserPreferences] 🔍 HOOK DEBUG:', {
+    userId,
+    enabled,
+    optionsEnabled: options?.enabled,
+    hasUserId: !!userId,
+    timestamp: new Date().toISOString()
+  });
+
   return useQuery({
     queryKey: ['user-preferences', userId],
     queryFn: async () => {
-      const result = await fetchUserPreferences(userId);
-      // ✅ FIX: Ensure we never return undefined - React Query expects a value
-      return result ?? {};
+      console.log('[useUserPreferences] 🚀 Starting API call for user:', userId);
+      try {
+        const result = await fetchUserPreferences(userId);
+        console.log('[useUserPreferences] ✅ API call successful:', {
+          userId,
+          hasResult: !!result,
+          resultKeys: result ? Object.keys(result) : [],
+          result
+        });
+        // ✅ FIX: Ensure we never return undefined - React Query expects a value
+        return result ?? {};
+      } catch (error) {
+        console.error('[useUserPreferences] ❌ API call failed:', { userId, error });
+        throw error;
+      }
     },
-    enabled: options?.enabled ?? !!userId,
+    enabled,
     // Reduce stale time to prevent navigation state staleness
     staleTime: 30 * 1000, // 30 seconds (matches API cache)
     gcTime: 5 * 60 * 1000, // 5 minutes garbage collection

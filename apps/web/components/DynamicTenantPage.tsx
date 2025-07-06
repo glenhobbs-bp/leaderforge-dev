@@ -91,8 +91,28 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     { enabled: shouldFetchUserPrefs && !!session?.user?.id }
   );
 
+  // Debug the enabled condition
+  console.log('[DynamicTenantPage] 🔍 USER PREFS HOOK DEBUG:', {
+    shouldFetchUserPrefs,
+    hasSessionUserId: !!session?.user?.id,
+    sessionUserId: session?.user?.id,
+    enabled: shouldFetchUserPrefs && !!session?.user?.id,
+    isLoading: userPrefsLoading,
+    hasData: !!userPrefs,
+    hasError: !!userPrefsError
+  });
+
   // Trigger user preferences fetch on initial mount when session is available
   useEffect(() => {
+    console.log('[DynamicTenantPage] 🔍 USER PREFS TRIGGER DEBUG:', {
+      hasSessionUserId: !!session?.user?.id,
+      sessionUserId: session?.user?.id,
+      hasTriggeredUserPrefsFetch: hasTriggeredUserPrefsFetch.current,
+      shouldFetchUserPrefs,
+      hasMounted: hasMounted.current,
+      willTrigger: session?.user?.id && !hasTriggeredUserPrefsFetch.current && !shouldFetchUserPrefs && hasMounted.current
+    });
+
     if (session?.user?.id && !hasTriggeredUserPrefsFetch.current && !shouldFetchUserPrefs && hasMounted.current) {
       console.log('[DynamicTenantPage] Triggering initial user preferences fetch for session:', session.user.id);
       hasTriggeredUserPrefsFetch.current = true;
