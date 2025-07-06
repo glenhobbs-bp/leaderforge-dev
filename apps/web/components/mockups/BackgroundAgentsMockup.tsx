@@ -7,7 +7,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Shield, Target, Users, TrendingUp, BarChart3, Globe, UserCheck } from 'lucide-react';
+import { Shield, Target, Users, TrendingUp, BarChart3, Globe, UserCheck, Search } from 'lucide-react';
 import { useCopilotAction, useCopilotReadable } from "@copilotkit/react-core";
 
 interface Agent {
@@ -15,19 +15,35 @@ interface Agent {
   name: string;
   icon: React.ReactNode;
   description: string;
+  category: string;
+  tags: string[];
   isActive?: boolean;
   price?: string;
   isFeatured?: boolean;
   type: 'active' | 'available';
 }
 
+const categories = [
+  'All Agents',
+  'Security & Risk',
+  'Growth & Strategy',
+  'Team Management',
+  'Analytics & Insights',
+  'Operations'
+];
+
 export default function BackgroundAgentsMockup() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All Agents');
+
   const [activeAgents, setActiveAgents] = useState<Agent[]>([
     {
       id: 'threat-radar',
       name: 'Threat Radar',
       icon: <Shield className="h-5 w-5 text-red-500" />,
       description: 'Monitors competitive threats, market changes, and potential business risks. Sends alerts when immediate attention is needed.',
+      category: 'Security & Risk',
+      tags: ['threats', 'security', 'monitoring', 'alerts'],
       isActive: true,
       type: 'active'
     },
@@ -36,6 +52,8 @@ export default function BackgroundAgentsMockup() {
       name: 'Opportunity Scout',
       icon: <Target className="h-5 w-5 text-green-500" />,
       description: 'Identifies growth opportunities, partnerships, and market openings aligned with your business strategy.',
+      category: 'Growth & Strategy',
+      tags: ['opportunities', 'growth', 'partnerships', 'strategy'],
       isActive: true,
       type: 'active'
     },
@@ -44,6 +62,8 @@ export default function BackgroundAgentsMockup() {
       name: 'Team Pulse Monitor',
       icon: <Users className="h-5 w-5 text-blue-500" />,
       description: 'Tracks team engagement, performance indicators, and morale signals to help you lead proactively.',
+      category: 'Team Management',
+      tags: ['team', 'engagement', 'performance', 'morale'],
       isActive: true,
       type: 'active'
     }
@@ -55,6 +75,8 @@ export default function BackgroundAgentsMockup() {
       name: 'Revenue Optimizer',
       icon: <TrendingUp className="h-5 w-5 text-yellow-500" />,
       description: 'Analyzes revenue streams, identifies optimization opportunities, and tracks financial KPIs to maximize profitability.',
+      category: 'Analytics & Insights',
+      tags: ['revenue', 'optimization', 'financial', 'kpis'],
       price: '$29/month',
       isFeatured: true,
       type: 'available'
@@ -64,6 +86,8 @@ export default function BackgroundAgentsMockup() {
       name: 'Performance Tracker',
       icon: <BarChart3 className="h-5 w-5 text-purple-500" />,
       description: 'Monitors key performance indicators and sends weekly performance summaries with actionable insights.',
+      category: 'Analytics & Insights',
+      tags: ['performance', 'tracking', 'metrics', 'reporting'],
       price: '$19/month',
       type: 'available'
     },
@@ -72,6 +96,8 @@ export default function BackgroundAgentsMockup() {
       name: 'Market Intelligence',
       icon: <Globe className="h-5 w-5 text-indigo-500" />,
       description: 'Provides comprehensive market analysis, competitor intelligence, and industry trend reports.',
+      category: 'Growth & Strategy',
+      tags: ['market', 'intelligence', 'competitors', 'trends'],
       price: '$39/month',
       type: 'available'
     },
@@ -80,26 +106,45 @@ export default function BackgroundAgentsMockup() {
       name: 'HR Assistant',
       icon: <UserCheck className="h-5 w-5 text-teal-500" />,
       description: 'Streamlines HR processes, tracks employee satisfaction, and provides recruitment insights.',
+      category: 'Operations',
+      tags: ['hr', 'recruitment', 'satisfaction', 'processes'],
       price: '$24/month',
       type: 'available'
     }
   ]);
 
+  // Filter agents based on search and category
+  const allAgents = [...activeAgents, ...availableAgents];
+  const filteredAgents = allAgents.filter(agent => {
+    const matchesSearch = agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         agent.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         agent.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = selectedCategory === 'All Agents' || agent.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const filteredActiveAgents = filteredAgents.filter(agent => agent.type === 'active');
+  const filteredAvailableAgents = filteredAgents.filter(agent => agent.type === 'available');
+
   // Make background agents data available to CopilotKit AI context
   // Filter out React elements (icons) to avoid circular reference issues
-  const serializableActiveAgents = activeAgents.map(agent => ({
+  const serializableActiveAgents = filteredActiveAgents.map(agent => ({
     id: agent.id,
     name: agent.name,
     description: agent.description,
+    category: agent.category,
+    tags: agent.tags,
     isActive: agent.isActive,
     price: agent.price,
     isFeatured: agent.isFeatured,
     type: agent.type
   }));
-  const serializableAvailableAgents = availableAgents.map(agent => ({
+  const serializableAvailableAgents = filteredAvailableAgents.map(agent => ({
     id: agent.id,
     name: agent.name,
     description: agent.description,
+    category: agent.category,
+    tags: agent.tags,
     isActive: agent.isActive,
     price: agent.price,
     isFeatured: agent.isFeatured,
@@ -111,8 +156,11 @@ export default function BackgroundAgentsMockup() {
     value: {
       activeAgents: serializableActiveAgents,
       availableAgents: serializableAvailableAgents,
-      totalActiveAgents: activeAgents.filter(a => a.isActive).length,
-      availableAgentsCount: availableAgents.length
+      totalActiveAgents: filteredActiveAgents.filter(a => a.isActive).length,
+      availableAgentsCount: filteredAvailableAgents.length,
+      searchQuery,
+      selectedCategory,
+      categories
     }
   });
 
@@ -193,6 +241,38 @@ export default function BackgroundAgentsMockup() {
         <p className="text-gray-600">AI agents working behind the scenes to monitor, analyze, and alert you to important developments</p>
       </div>
 
+      {/* Search & Filter - Combined Glassmorphism Card */}
+      <div className="card-glass-subtle p-4 mb-6">
+        {/* Search Bar */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search agents by name, description, or tags..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                selectedCategory === category
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* My Active Agents */}
         <div>
@@ -202,14 +282,31 @@ export default function BackgroundAgentsMockup() {
           </div>
 
           <div className="space-y-4">
-            {activeAgents.map((agent) => (
+            {filteredActiveAgents.map((agent) => (
               <div key={agent.id} className="card-glass-subtle hover:card-glass-interactive p-4 transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-3">
                     {agent.icon}
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 text-sm">{agent.name}</h3>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-medium text-gray-900 text-sm">{agent.name}</h3>
+                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+                          {agent.category}
+                        </span>
+                      </div>
                       <p className="text-xs text-gray-600 mt-1">{agent.description}</p>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {agent.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -265,7 +362,7 @@ export default function BackgroundAgentsMockup() {
               <p className="text-xs opacity-90">Most popular this month</p>
             </div>
 
-            {availableAgents.map((agent) => (
+            {filteredAvailableAgents.map((agent) => (
               <div key={agent.id} className={`card-glass-subtle hover:card-glass-interactive p-4 transition-all ${
                 agent.isFeatured ? 'border-2 border-yellow-200' : ''
               }`}>
@@ -273,13 +370,28 @@ export default function BackgroundAgentsMockup() {
                   <div className="flex items-start space-x-3">
                     {agent.icon}
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-medium text-gray-900 text-sm">{agent.name}</h3>
+                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded">
+                          {agent.category}
+                        </span>
                         {agent.price && (
                           <span className="text-xs font-medium text-blue-600">{agent.price}</span>
                         )}
                       </div>
                       <p className="text-xs text-gray-600 mt-1">{agent.description}</p>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {agent.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
