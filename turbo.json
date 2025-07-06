@@ -5,7 +5,21 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "TRIBE_SOCIAL_TOKEN",
+        "TRIBE_SOCIAL_API_URL",
+        "OPENAI_API_KEY",
+        "LANGGRAPH_DEPLOYMENT_URL",
+        "POSTHOG_API_KEY",
+        "POSTHOG_HOST",
+        "ANTHROPIC_API_KEY",
+        "LANGSMITH_API_KEY",
+        "LANGSMITH_PROJECT",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
