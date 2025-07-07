@@ -6,7 +6,7 @@
 // Tags: UI, navigation, context-based, React
 
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, LogOut, Scale } from "lucide-react";
 import ContextSelector from "./ContextSelector";
 import { useSupabase } from '../SupabaseProvider';
 import { useNavigation } from '../../hooks/useNavigation';
@@ -15,6 +15,7 @@ import { useNavigationState } from '../../app/hooks/useNavigationState';
 import { authService } from '../../app/lib/authService';
 import * as LucideIcons from "lucide-react";
 import { UserProfileModal } from "./UserProfileModal";
+import { LegalTermsModal } from "./LegalTermsModal";
 
 // Export function to force avatar refresh for a user (now uses React Query)
 export function forceAvatarRefresh(userId: string) {
@@ -96,6 +97,7 @@ export default function NavPanel({
   const [selectedNav, setSelectedNav] = useState<string | null>(null);
   const [hasUserInteracted, setHasUserInteracted] = useState(false); // Track user interaction
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isLegalTermsModalOpen, setIsLegalTermsModalOpen] = useState(false);
   const hasRestoredNav = useRef(false); // Prevent multiple restoration calls
   const { supabase } = useSupabase();
 
@@ -478,6 +480,27 @@ export default function NavPanel({
                 {!isCollapsed && <span className="text-[13px]">Sign Out</span>}
               </button>
             </div>
+
+            {/* Copyright Footer - Only shown when not collapsed */}
+            {!isCollapsed && (
+              <div className="mt-2 pt-2 border-t border-white/20 space-y-1">
+                <div className="text-center">
+                  <p className="text-glass-tiny">
+                    © {new Date().getFullYear()} LeaderForge, Inc.
+                  </p>
+                </div>
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => setIsLegalTermsModalOpen(true)}
+                    className="flex items-center justify-center gap-1 mx-auto px-2 py-1 rounded-md transition-all hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500"
+                  >
+                    <Scale className="w-3 h-3 text-gray-400" strokeWidth={1.6} />
+                    <span className="text-glass-tiny hover:text-glass-secondary">Legal Terms</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -502,6 +525,12 @@ export default function NavPanel({
             setIsProfileModalOpen(false);
           }}
           userId={userId || ""}
+        />
+
+        {/* Legal Terms Modal */}
+        <LegalTermsModal
+          isOpen={isLegalTermsModalOpen}
+          onClose={() => setIsLegalTermsModalOpen(false)}
         />
       </aside>
     </div>
