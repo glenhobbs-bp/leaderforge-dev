@@ -135,11 +135,13 @@ export default function MyTeamMockup() {
               </div>
 
               {/* Center - Zone and Score */}
-              <div className="text-center">
-                <div className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+              <div className="text-center w-32">
+                <div className={`w-full px-2 py-1 rounded text-xs font-medium ${
                   member.zoneColor === 'green' ? 'bg-green-100 text-green-800' :
                   member.zoneColor === 'blue' ? 'bg-blue-100 text-blue-800' :
-                  'bg-orange-100 text-orange-800'
+                  member.zoneColor === 'orange' ? 'bg-orange-100 text-orange-800' :
+                  member.zoneColor === 'red' ? 'bg-red-100 text-red-800' :
+                  'bg-gray-100 text-gray-800'
                 }`}>
                   {member.zone}
                 </div>
@@ -152,7 +154,7 @@ export default function MyTeamMockup() {
                                                         {/* Right side - All elements arranged horizontally */}
               <div className="flex items-center space-x-6">
                 {/* Rank and Points */}
-                <div className="text-center">
+                <div className="text-center w-20">
                   <div className="text-lg font-bold text-purple-600">
                     {member.rank}
                     <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
@@ -161,7 +163,7 @@ export default function MyTeamMockup() {
                 </div>
 
                 {/* Badges */}
-                <div className="flex space-x-1">
+                <div className="flex space-x-1 w-16 justify-center">
                   {member.badges.map((badge, index) => (
                     <span key={index} className="text-lg">{badge}</span>
                   ))}
