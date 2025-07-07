@@ -12,6 +12,7 @@ import ExecutiveDashboard from '../../components/mockups/ExecutiveDashboardMocku
 import PromptLibraryMockup from '../../components/mockups/PromptLibraryMockup';
 import BackgroundAgentsMockup from '../../components/mockups/BackgroundAgentsMockup';
 import PowerPromptsMockup from '../../components/mockups/PowerPromptsMockup';
+import CompanySettingsMockup from '../../components/mockups/CompanySettingsMockup';
 
 // Mockup registry interface
 export interface MockupConfig {
@@ -80,6 +81,16 @@ export const MOCKUP_REGISTRY: Record<string, MockupConfig> = {
     name: 'PowerPrompts',
     description: 'AI-driven sequences that proactively guide your development with personalized prompts and challenges',
     featureFlag: 'ENABLE_POWERPROMPTS_MOCKUP',
+    enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
+  },
+
+  // Company Settings - Admin-level company management
+  'bd60dca8-8346-48ea-9d6a-7caa4b69740f': {
+    component: CompanySettingsMockup,
+    name: 'Company Settings',
+    description: 'Admin-level company management interface for settings, user roles, and invite links',
+    featureFlag: 'ENABLE_COMPANY_SETTINGS_MOCKUP',
+    entitlementName: 'admin-company-settings',
     enabledForAll: process.env.ENABLE_MOCKUPS_FOR_ALL === 'true',
   },
 };
