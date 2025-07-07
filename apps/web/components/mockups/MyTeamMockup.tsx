@@ -48,32 +48,32 @@ export default function MyTeamMockup() {
       name: 'Marcus Rivera',
       initials: 'MR',
       nextCheckin: 'Wednesday 3:00 PM',
-      status: 'Needs support',
-      statusIcon: '↘',
-      zone: 'UNDER-CHALLENGED',
-      zoneColor: 'blue',
+      status: 'Over-committed',
+      statusIcon: '⚠',
+      zone: 'OVER-STRETCHED',
+      zoneColor: 'orange',
       score: '3.1',
-      actions: '1 action • Low impact',
+      actions: '4 actions • Too many!',
       rank: '#8',
       rankChange: '+3',
       points: '34 pts',
-      badges: ['🏆']
+      badges: ['😊']
     },
     {
       id: 'lisa',
       name: 'Lisa Thompson',
       initials: 'LT',
       nextCheckin: 'Friday 1:00 PM',
-      status: 'Over-committed',
+      status: 'Needs support',
       statusIcon: '⚠',
-      zone: 'OVER-STRETCHED',
-      zoneColor: 'orange',
+      zone: 'UNDER-CHALLENGED',
+      zoneColor: 'red',
       score: '9.8',
-      actions: '4 actions • Too many!',
+      actions: '2 actions • High impact',
       rank: '#1',
       rankChange: '+1',
       points: '203 pts',
-      badges: ['🥇', '🔥', '⚡']
+      badges: ['😊', '🔥', '⚡']
     }
   ];
 
@@ -123,7 +123,11 @@ export default function MyTeamMockup() {
                 <div>
                   <h3 className="text-sm font-medium text-glass-primary">{member.name}</h3>
                   <p className="text-xs text-glass-muted">Next check-in: {member.nextCheckin}</p>
-                  <p className="text-xs text-glass-secondary flex items-center">
+                  <p className={`text-xs flex items-center ${
+                    member.status === 'Growing momentum' ? 'text-green-600' :
+                    member.status === 'Needs support' || member.status === 'Over-committed' ? 'text-red-600' :
+                    'text-glass-secondary'
+                  }`}>
                     <span className="mr-1">{member.statusIcon}</span>
                     {member.status}
                   </p>
@@ -140,24 +144,26 @@ export default function MyTeamMockup() {
                   {member.zone}
                 </div>
                 <div className="text-xl font-bold text-blue-600 mt-1">{member.score}</div>
-                <div className="text-xs text-glass-muted">{member.actions}</div>
+                <div className={`text-xs ${
+                  member.actions.includes('Too many') ? 'text-red-600' : 'text-glass-muted'
+                }`}>{member.actions}</div>
               </div>
 
-              {/* Right side - Rank, Points, Actions */}
-              <div className="text-right space-y-1">
-                <div className="text-sm font-bold text-purple-600">
+                            {/* Right side - Rank, Points, Actions */}
+              <div className="text-right space-y-2">
+                <div className="text-lg font-bold text-purple-600">
                   {member.rank}
-                  <span className="text-xs text-green-500 ml-1">{member.rankChange}</span>
+                  <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
                 </div>
-                <div className="text-xs text-glass-secondary">{member.points}</div>
+                <div className="text-sm text-glass-secondary">{member.points}</div>
                 <div className="flex space-x-1 justify-end">
                   {member.badges.map((badge, index) => (
-                    <span key={index} className="text-sm">{badge}</span>
+                    <span key={index} className="text-lg">{badge}</span>
                   ))}
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex space-x-2 mt-2">
+                <div className="flex flex-col space-y-1 mt-3">
                   <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
                     Talking Points
                   </button>
