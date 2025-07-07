@@ -135,8 +135,8 @@ export default function MyTeamMockup() {
               </div>
 
               {/* Center - Zone and Score */}
-              <div className="text-center w-32">
-                <div className={`w-full px-2 py-1 rounded text-xs font-medium ${
+              <div className="text-center w-40">
+                <div className={`w-full px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
                   member.zoneColor === 'green' ? 'bg-green-100 text-green-800' :
                   member.zoneColor === 'blue' ? 'bg-blue-100 text-blue-800' :
                   member.zoneColor === 'orange' ? 'bg-orange-100 text-orange-800' :
@@ -145,14 +145,14 @@ export default function MyTeamMockup() {
                 }`}>
                   {member.zone}
                 </div>
-                <div className="text-xl font-bold text-blue-600 mt-1">{member.score}</div>
-                <div className={`text-xs ${
+                <div className="text-xl font-bold text-blue-600 mt-2">{member.score}</div>
+                <div className={`text-xs mt-1 ${
                   member.actions.includes('Too many') ? 'text-red-600' : 'text-glass-muted'
                 }`}>{member.actions}</div>
               </div>
 
-                                                        {/* Right side - All elements arranged horizontally */}
-              <div className="flex items-center space-x-6">
+                                                                      {/* Right side - All elements arranged horizontally */}
+              <div className="flex items-center space-x-8">
                 {/* Rank and Points */}
                 <div className="text-center w-20">
                   <div className="text-lg font-bold text-purple-600">
@@ -163,14 +163,14 @@ export default function MyTeamMockup() {
                 </div>
 
                 {/* Badges */}
-                <div className="flex space-x-1 w-16 justify-center">
+                <div className="flex space-x-1 w-20 justify-center">
                   {member.badges.map((badge, index) => (
                     <span key={index} className="text-lg">{badge}</span>
                   ))}
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex flex-col space-y-1">
+                <div className="flex flex-col space-y-1 ml-4">
                   <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
                     Talking Points
                   </button>
