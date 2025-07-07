@@ -150,8 +150,9 @@ const CompanySettingsMockup: React.FC = () => {
 
         <button
           onClick={handleUpdateCompany}
-          className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          className="flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition-colors"
         >
+          <Edit className="w-4 h-4" />
           Update Company
         </button>
       </div>
