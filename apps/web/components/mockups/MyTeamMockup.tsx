@@ -77,48 +77,53 @@ export default function MyTeamMockup() {
     }
   ];
 
-  return (
+    return (
     <div className="p-6 min-h-screen bg-gray-50">
       {/* Header Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-blue-600 mb-2">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
           Team Growth Dashboard
         </h1>
+        <p className="text-sm text-gray-600">
+          Track team member growth, challenge levels, and coaching opportunities
+        </p>
 
-        {/* Top Stats Row */}
-        <div className="flex items-center space-x-8 text-sm text-gray-600 mb-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-green-600">7.8</span>
-            <span>AVG GROWTH SCORE</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-blue-600">12</span>
-            <span>ACTIVE BOLD ACTIONS</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-green-600">92%</span>
-            <span>ENGAGEMENT RATE</span>
+        {/* Top Stats Row - Glassmorphism Card */}
+        <div className="card-glass-subtle p-4 mt-6">
+          <div className="flex items-center space-x-8 text-xs">
+            <div className="flex items-center space-x-2">
+              <span className="text-xl font-bold text-green-600">7.8</span>
+              <span className="text-glass-muted">AVG GROWTH SCORE</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xl font-bold text-blue-600">12</span>
+              <span className="text-glass-muted">ACTIVE BOLD ACTIONS</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xl font-bold text-green-600">92%</span>
+              <span className="text-glass-muted">ENGAGEMENT RATE</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Team Members Grid */}
+            {/* Team Members Grid */}
       <div className="space-y-4">
         {teamMembers.map((member) => (
-          <div key={member.id} className="bg-white rounded-lg border border-gray-200 p-6">
+          <div key={member.id} className="card-glass-subtle hover:card-glass-interactive p-4">
             <div className="flex items-center justify-between">
               {/* Left side - Member info */}
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
                 {/* Avatar */}
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                   {member.initials}
                 </div>
 
                 {/* Member details */}
                 <div>
-                  <h3 className="font-semibold text-gray-900">{member.name}</h3>
-                  <p className="text-sm text-gray-500">Next check-in: {member.nextCheckin}</p>
-                  <p className="text-sm text-gray-700 flex items-center">
+                  <h3 className="text-sm font-medium text-glass-primary">{member.name}</h3>
+                  <p className="text-xs text-glass-muted">Next check-in: {member.nextCheckin}</p>
+                  <p className="text-xs text-glass-secondary flex items-center">
                     <span className="mr-1">{member.statusIcon}</span>
                     {member.status}
                   </p>
@@ -127,36 +132,36 @@ export default function MyTeamMockup() {
 
               {/* Center - Zone and Score */}
               <div className="text-center">
-                <div className={`inline-block px-3 py-1 rounded text-xs font-medium ${
+                <div className={`inline-block px-2 py-1 rounded text-xs font-medium ${
                   member.zoneColor === 'green' ? 'bg-green-100 text-green-800' :
                   member.zoneColor === 'blue' ? 'bg-blue-100 text-blue-800' :
                   'bg-orange-100 text-orange-800'
                 }`}>
                   {member.zone}
                 </div>
-                <div className="text-2xl font-bold text-blue-600 mt-2">{member.score}</div>
-                <div className="text-xs text-gray-500">{member.actions}</div>
+                <div className="text-xl font-bold text-blue-600 mt-1">{member.score}</div>
+                <div className="text-xs text-glass-muted">{member.actions}</div>
               </div>
 
               {/* Right side - Rank, Points, Actions */}
-              <div className="text-right space-y-2">
-                <div className="text-lg font-bold text-purple-600">
+              <div className="text-right space-y-1">
+                <div className="text-sm font-bold text-purple-600">
                   {member.rank}
-                  <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
+                  <span className="text-xs text-green-500 ml-1">{member.rankChange}</span>
                 </div>
-                <div className="text-sm text-gray-700">{member.points}</div>
-                <div className="flex space-x-1">
+                <div className="text-xs text-glass-secondary">{member.points}</div>
+                <div className="flex space-x-1 justify-end">
                   {member.badges.map((badge, index) => (
-                    <span key={index} className="text-lg">{badge}</span>
+                    <span key={index} className="text-sm">{badge}</span>
                   ))}
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex space-x-2 mt-3">
-                  <button className="px-3 py-1 bg-blue-600 text-white text-xs rounded">
+                <div className="flex space-x-2 mt-2">
+                  <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
                     Talking Points
                   </button>
-                  <button className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                  <button className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded transition-colors">
                     View Details
                   </button>
                 </div>
