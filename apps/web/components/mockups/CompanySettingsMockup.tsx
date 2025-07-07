@@ -1,14 +1,13 @@
 /**
- * File: apps/web/components/mockups/CompanySettingsMockup.tsx
  * Purpose: Company Settings mockup component for admin-level company management
- * Owner: Frontend Team
- * Tags: React components, mockups, admin interface, company settings
+ * Owner: LeaderForge Platform Team
+ * Tags: mockup, company-settings, admin-interface, glassmorphism
  */
 
 "use client";
 
 import React, { useState } from 'react';
-import { Copy, Users, Settings, Link as LinkIcon, ChevronDown } from "lucide-react";
+import { Copy, Building, Mail, Shield, Edit, ChevronDown } from "lucide-react";
 import { useCopilotReadable } from "@copilotkit/react-core";
 
 interface User {
@@ -106,77 +105,80 @@ const CompanySettingsMockup: React.FC = () => {
 
 
     return (
-    <div className="space-y-6 p-6 max-w-6xl mx-auto">
-      <div className="flex items-center space-x-2 mb-6">
-        <Settings className="h-6 w-6 text-blue-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Company Settings</h1>
-          <p className="text-gray-600">Manage your company information and access settings.</p>
-        </div>
+    <div className="p-6 min-h-screen bg-gray-50">
+      {/* Header Section - Following established pattern */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          Company Settings
+        </h1>
+        <p className="text-sm text-gray-600">
+          Manage your company information, team access, and administrative settings
+        </p>
       </div>
 
-      {/* Company Information */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <Settings className="h-5 w-5" />
-            <h2 className="text-lg font-semibold text-gray-900">Company Information</h2>
-          </div>
-          <p className="text-sm text-gray-600 mt-1">Update your company details and configuration</p>
-        </div>
-        <div className="p-6 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="company-name" className="block text-sm font-medium text-gray-700">Company Name</label>
-              <input
-                id="company-name"
-                type="text"
-                value={companyInfo.name}
-                onChange={(e) => setCompanyInfo({...companyInfo, name: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="company-size" className="block text-sm font-medium text-gray-700">Company Size</label>
-              <input
-                id="company-size"
-                type="text"
-                value={companyInfo.size}
-                onChange={(e) => setCompanyInfo({...companyInfo, size: e.target.value})}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-          <button
-            onClick={handleUpdateCompany}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Update Company
-          </button>
-        </div>
-      </div>
-
-      {/* Invite Links */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <LinkIcon className="h-5 w-5" />
-            <h2 className="text-lg font-semibold text-gray-900">Invite Links</h2>
-          </div>
-          <p className="text-sm text-gray-600 mt-1">Generate and manage invite links for team members and supervisors</p>
-        </div>
-        <div className="p-6 space-y-4">
+      {/* Company Information - Glassmorphism Card */}
+      <div className="card-glass-subtle p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Building className="h-5 w-5 text-blue-600" />
           <div>
-            <label className="block text-sm font-medium text-gray-700">Team Member Invite Link</label>
-            <div className="flex items-center space-x-2 mt-1">
+            <h2 className="text-lg font-medium text-glass-primary">Company Information</h2>
+            <p className="text-sm text-glass-secondary">Update your company details and configuration</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-glass-primary mb-1">Company Name</label>
+            <input
+              type="text"
+              value={companyInfo.name}
+              onChange={(e) => setCompanyInfo({...companyInfo, name: e.target.value})}
+              placeholder="Enter company name"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-glass-primary mb-1">Company Size</label>
+            <input
+              type="text"
+              value={companyInfo.size}
+              onChange={(e) => setCompanyInfo({...companyInfo, size: e.target.value})}
+              placeholder="e.g. 1-10 employees"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handleUpdateCompany}
+          className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+        >
+          Update Company
+        </button>
+      </div>
+
+      {/* Invite Links - Glassmorphism Card */}
+      <div className="card-glass-subtle p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Mail className="h-5 w-5 text-green-600" />
+          <div>
+            <h2 className="text-lg font-medium text-glass-primary">Invite Links</h2>
+            <p className="text-sm text-glass-secondary">Generate and manage invite links for team members and supervisors</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-glass-primary mb-1">Team Member Invite Link</label>
+            <div className="flex items-center gap-2">
               <input
                 value={inviteLinks.teamMember}
                 readOnly
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-600"
               />
               <button
                 onClick={() => handleCopy(inviteLinks.teamMember)}
-                className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1"
               >
                 <Copy className="h-4 w-4" />
                 Copy
@@ -184,16 +186,16 @@ const CompanySettingsMockup: React.FC = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Supervisor Invite Link</label>
-            <div className="flex items-center space-x-2 mt-1">
+            <label className="block text-sm font-medium text-glass-primary mb-1">Supervisor Invite Link</label>
+            <div className="flex items-center gap-2">
               <input
                 value={inviteLinks.supervisor}
                 readOnly
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-600"
               />
               <button
                 onClick={() => handleCopy(inviteLinks.supervisor)}
-                className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="px-3 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1"
               >
                 <Copy className="h-4 w-4" />
                 Copy
@@ -203,50 +205,50 @@ const CompanySettingsMockup: React.FC = () => {
         </div>
       </div>
 
-      {/* User Management */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <Users className="h-5 w-5" />
-            <h2 className="text-lg font-semibold text-gray-900">User Management</h2>
+      {/* User Management - Glassmorphism Card */}
+      <div className="card-glass-subtle p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Shield className="h-5 w-5 text-purple-600" />
+          <div>
+            <h2 className="text-lg font-medium text-glass-primary">User Management</h2>
+            <p className="text-sm text-glass-secondary">Manage user roles and supervisor assignments</p>
           </div>
-          <p className="text-sm text-gray-600 mt-1">Manage user roles and supervisor assignments</p>
         </div>
-        <div className="p-6">
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="relative">
-              <select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select role...</option>
-                <option value="team_member">Team Member</option>
-                <option value="supervisor">Supervisor</option>
-                <option value="executive">Executive</option>
-              </select>
-              <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
-            </div>
-            <div className="relative">
-              <select
-                value={selectedSupervisor}
-                onChange={(e) => setSelectedSupervisor(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-md px-3 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Select supervisor...</option>
-                {supervisors.map(supervisor => (
-                  <option key={supervisor} value={supervisor}>{supervisor}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
-            </div>
-            <button
-              onClick={handleUpdateSelected}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        <div className="flex items-center gap-4 mb-6">
+          <div className="relative">
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              Update Selected
-            </button>
+              <option value="">Select role...</option>
+              <option value="team_member">Team Member</option>
+              <option value="supervisor">Supervisor</option>
+              <option value="executive">Executive</option>
+            </select>
+            <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
           </div>
+          <div className="relative">
+            <select
+              value={selectedSupervisor}
+              onChange={(e) => setSelectedSupervisor(e.target.value)}
+              className="appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Select supervisor...</option>
+              {supervisors.map(supervisor => (
+                <option key={supervisor} value={supervisor}>{supervisor}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
+          </div>
+          <button
+            onClick={handleUpdateSelected}
+            className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+          >
+            <Edit className="h-4 w-4" />
+            Update Selected
+          </button>
+        </div>
 
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
@@ -308,7 +310,6 @@ const CompanySettingsMockup: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </div>
       </div>
     </div>
   );
