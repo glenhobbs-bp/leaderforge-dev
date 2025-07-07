@@ -149,14 +149,19 @@ export default function MyTeamMockup() {
                 }`}>{member.actions}</div>
               </div>
 
-                                                        {/* Right side - Rank, Points, Actions */}
-              <div className="text-right space-y-4">
-                <div className="text-lg font-bold text-purple-600">
-                  {member.rank}
-                  <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
+                                                        {/* Right side - All elements arranged horizontally */}
+              <div className="flex items-center space-x-6">
+                {/* Rank and Points */}
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-600">
+                    {member.rank}
+                    <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
+                  </div>
+                  <div className="text-sm text-glass-secondary">{member.points}</div>
                 </div>
-                <div className="text-sm text-glass-secondary">{member.points}</div>
-                <div className="flex space-x-1 justify-end mb-4">
+
+                {/* Badges */}
+                <div className="flex space-x-1">
                   {member.badges.map((badge, index) => (
                     <span key={index} className="text-lg">{badge}</span>
                   ))}
