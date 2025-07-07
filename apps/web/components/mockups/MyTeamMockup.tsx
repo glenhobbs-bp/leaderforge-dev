@@ -6,9 +6,12 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
+import { TalkingPointsModal } from '../ui/TalkingPointsModal';
 
 export default function MyTeamMockup() {
+  const [selectedMemberForTalking, setSelectedMemberForTalking] = useState<string | null>(null);
+
   // Mock team data based on images
   const teamMembers = [
     {
@@ -25,7 +28,20 @@ export default function MyTeamMockup() {
       rank: '#3',
       rankChange: '+2',
       points: '145 pts',
-      badges: ['🥇', '👥', '🏆']
+      badges: ['🥇', '👥', '🏆'],
+      coachingData: {
+        challengeLevel: 'Optimal Zone (7.5/10)',
+        challengeZone: 'Optimal Zone',
+        boldActionScore: '8.4 (↑15% vs last month)',
+        completionRate: '95% (excellent)',
+        videoEngagement: '12 videos completed this month',
+        recentTrend: 'Growing momentum',
+        lastMeetingNotes: 'Discussed automation project. Alex excited about impact on team efficiency. Suggested connecting with Lisa on content optimization. Follow up on progress this week.',
+        currentBoldActions: [
+          { title: 'Implement automated reporting system', dueDate: 'Due in 5 days' },
+          { title: 'Create team onboarding playbook', dueDate: 'Due in 12 days' }
+        ]
+      }
     },
     {
       id: 'sarah',
@@ -41,7 +57,20 @@ export default function MyTeamMockup() {
       rank: '#5',
       rankChange: '—',
       points: '89 pts',
-      badges: ['👥', '🏆']
+      badges: ['👥', '🏆'],
+      coachingData: {
+        challengeLevel: 'Good Zone (6.2/10)',
+        challengeZone: 'Good Zone',
+        boldActionScore: '6.2 (steady)',
+        completionRate: '85% (good)',
+        videoEngagement: '8 videos completed this month',
+        recentTrend: 'Steady progress',
+        lastMeetingNotes: 'Working on time management. Needs support with delegation skills.',
+        currentBoldActions: [
+          { title: 'Improve delegation framework', dueDate: 'Due in 8 days' },
+          { title: 'Complete leadership assessment', dueDate: 'Due in 15 days' }
+        ]
+      }
     },
     {
       id: 'marcus',
@@ -57,7 +86,20 @@ export default function MyTeamMockup() {
       rank: '#8',
       rankChange: '+3',
       points: '34 pts',
-      badges: ['😊']
+      badges: ['😊'],
+      coachingData: {
+        challengeLevel: 'Over-stretched (3.1/10)',
+        challengeZone: 'Over-stretched',
+        boldActionScore: '3.1 (needs adjustment)',
+        completionRate: '45% (concerning)',
+        videoEngagement: '3 videos completed this month',
+        recentTrend: 'Over-committed',
+        lastMeetingNotes: 'Taking on too much. Need to reduce Bold Actions and focus on core priorities.',
+        currentBoldActions: [
+          { title: 'Streamline current projects', dueDate: 'Due in 3 days' },
+          { title: 'Focus on top priority only', dueDate: 'Due in 7 days' }
+        ]
+      }
     },
     {
       id: 'lisa',
@@ -73,7 +115,20 @@ export default function MyTeamMockup() {
       rank: '#1',
       rankChange: '+1',
       points: '203 pts',
-      badges: ['😊', '🔥', '⚡']
+      badges: ['😊', '🔥', '⚡'],
+      coachingData: {
+        challengeLevel: 'Under-challenged (9.8/10)',
+        challengeZone: 'Under-challenged',
+        boldActionScore: '9.8 (needs more challenge)',
+        completionRate: '98% (excellent)',
+        videoEngagement: '15 videos completed this month',
+        recentTrend: 'Needs support',
+        lastMeetingNotes: 'Performing excellently but looking for bigger challenges. Ready for stretch assignments.',
+        currentBoldActions: [
+          { title: 'Lead cross-team innovation project', dueDate: 'Due in 10 days' },
+          { title: 'Mentor junior team member', dueDate: 'Due in 14 days' }
+        ]
+      }
     }
   ];
 
@@ -171,7 +226,10 @@ export default function MyTeamMockup() {
 
                 {/* Action buttons */}
                 <div className="flex flex-col space-y-1 ml-4">
-                  <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
+                  <button
+                    onClick={() => setSelectedMemberForTalking(member.id)}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors"
+                  >
                     Talking Points
                   </button>
                   <button className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded transition-colors">
@@ -183,6 +241,25 @@ export default function MyTeamMockup() {
           </div>
         ))}
       </div>
+
+      {/* Talking Points Modal */}
+      {selectedMemberForTalking && (
+        <TalkingPointsModal
+          isOpen={!!selectedMemberForTalking}
+          onClose={() => setSelectedMemberForTalking(null)}
+          memberName={teamMembers.find(m => m.id === selectedMemberForTalking)?.name || ''}
+          memberData={teamMembers.find(m => m.id === selectedMemberForTalking)?.coachingData || {
+            challengeLevel: '',
+            challengeZone: '',
+            boldActionScore: '',
+            completionRate: '',
+            videoEngagement: '',
+            recentTrend: '',
+            lastMeetingNotes: '',
+            currentBoldActions: []
+          }}
+        />
+      )}
     </div>
   );
 }
