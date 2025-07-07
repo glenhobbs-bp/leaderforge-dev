@@ -149,24 +149,21 @@ export default function MyTeamMockup() {
                 }`}>{member.actions}</div>
               </div>
 
-                                          {/* Right side - Rank, Points, Actions */}
-              <div className="text-right flex flex-col justify-between h-full min-h-[120px]">
-                {/* Top section - Rank and Points */}
-                <div className="space-y-3">
-                  <div className="text-lg font-bold text-purple-600">
-                    {member.rank}
-                    <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
-                  </div>
-                  <div className="text-sm text-glass-secondary">{member.points}</div>
-                  <div className="flex space-x-1 justify-end">
-                    {member.badges.map((badge, index) => (
-                      <span key={index} className="text-lg">{badge}</span>
-                    ))}
-                  </div>
+                                                        {/* Right side - Rank, Points, Actions */}
+              <div className="text-right space-y-4">
+                <div className="text-lg font-bold text-purple-600">
+                  {member.rank}
+                  <span className="text-sm text-green-500 ml-1">{member.rankChange}</span>
+                </div>
+                <div className="text-sm text-glass-secondary">{member.points}</div>
+                <div className="flex space-x-1 justify-end mb-4">
+                  {member.badges.map((badge, index) => (
+                    <span key={index} className="text-lg">{badge}</span>
+                  ))}
                 </div>
 
-                {/* Bottom section - Action buttons */}
-                <div className="flex flex-col space-y-1 mt-6">
+                {/* Action buttons */}
+                <div className="flex flex-col space-y-1">
                   <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
                     Talking Points
                   </button>
