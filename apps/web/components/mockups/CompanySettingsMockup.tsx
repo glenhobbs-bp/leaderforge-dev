@@ -32,7 +32,6 @@ const CompanySettingsMockup: React.FC = () => {
   const [users, setUsers] = useState<User[]>([
     { id: '1', name: 'Allie Bishop', role: 'team_member', supervisor: 'Admin Account' },
     { id: '2', name: 'Cindy Deininger', role: 'team_member', supervisor: 'Jenny Taylor' },
-    { id: '3', name: 'Matt Higham', role: 'supervisor', supervisor: 'Jenny Taylor' },
     { id: '4', name: 'Michael Andrews', role: 'team_member', supervisor: 'Jenny Taylor' },
     { id: '5', name: 'Danielle Ross', role: 'team_member', supervisor: 'Jenny Taylor' },
     { id: '6', name: 'Dionne van Zyl', role: 'executive', supervisor: undefined },
@@ -47,7 +46,7 @@ const CompanySettingsMockup: React.FC = () => {
     supervisor: 'https://www.myleaderforge.com/join/supervisor?company=Brilliant%20Perspectives'
   };
 
-  const supervisors = ['Admin Account', 'Jenny Taylor', 'Matt Higham'];
+  const supervisors = ['No Supervisor', 'Admin Account', 'Jenny Taylor'];
 
   // Make data available to CopilotKit
   const readableData = {
@@ -243,73 +242,73 @@ const CompanySettingsMockup: React.FC = () => {
           </div>
           <button
             onClick={handleUpdateSelected}
-            className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+            className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded transition-colors flex items-center gap-1"
           >
-            <Edit className="h-4 w-4" />
+            <Edit className="h-3 w-3" />
             Update Selected
           </button>
         </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left p-3 w-8"></th>
-                  <th className="text-left p-3 text-sm font-medium text-gray-700">Name</th>
-                  <th className="text-left p-3 text-sm font-medium text-gray-700">Role</th>
-                  <th className="text-left p-3 text-sm font-medium text-gray-700">Supervisor</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="p-3">
-                      <input
-                        type="checkbox"
-                        checked={user.selected || false}
-                        onChange={(e) => handleUserSelect(user.id, e.target.checked)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                    </td>
-                    <td className="p-3 font-medium text-gray-900">{user.name}</td>
-                    <td className="p-3">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left p-2 w-8"></th>
+                <th className="text-left p-2 text-xs font-medium text-gray-700">Name</th>
+                <th className="text-left p-2 text-xs font-medium text-gray-700">Role</th>
+                <th className="text-left p-2 text-xs font-medium text-gray-700">Supervisor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="p-2">
+                    <input
+                      type="checkbox"
+                      checked={user.selected || false}
+                      onChange={(e) => handleUserSelect(user.id, e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </td>
+                  <td className="p-2 font-medium text-gray-900 text-sm">{user.name}</td>
+                  <td className="p-2">
+                    <div className="relative">
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleUserRoleChange(user.id, e.target.value)}
+                        className="appearance-none bg-white border border-gray-200 rounded-lg px-2 py-1 pr-6 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="team_member">Team Member</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="executive">Executive</option>
+                      </select>
+                      <ChevronDown className="absolute right-1 top-1.5 h-3 w-3 text-gray-400 pointer-events-none" />
+                    </div>
+                  </td>
+                  <td className="p-2">
+                    {user.role === 'executive' ? (
+                      <span className="text-gray-500 text-xs">No supervisor</span>
+                    ) : (
                       <div className="relative">
                         <select
-                          value={user.role}
-                          onChange={(e) => handleUserRoleChange(user.id, e.target.value)}
-                          className="appearance-none bg-white border border-gray-300 rounded-md px-2 py-1 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          value={user.supervisor || ''}
+                          onChange={(e) => handleUserSupervisorChange(user.id, e.target.value)}
+                          className="appearance-none bg-white border border-gray-200 rounded-lg px-2 py-1 pr-6 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                          <option value="team_member">Team Member</option>
-                          <option value="supervisor">Supervisor</option>
-                          <option value="executive">Executive</option>
+                          <option value="">Select supervisor...</option>
+                          {supervisors.map(supervisor => (
+                            <option key={supervisor} value={supervisor}>{supervisor}</option>
+                          ))}
                         </select>
                         <ChevronDown className="absolute right-1 top-1.5 h-3 w-3 text-gray-400 pointer-events-none" />
                       </div>
-                    </td>
-                    <td className="p-3">
-                      {user.role === 'executive' ? (
-                        <span className="text-gray-500 text-sm">No supervisor</span>
-                      ) : (
-                        <div className="relative">
-                          <select
-                            value={user.supervisor || ''}
-                            onChange={(e) => handleUserSupervisorChange(user.id, e.target.value)}
-                            className="appearance-none bg-white border border-gray-300 rounded-md px-2 py-1 pr-6 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          >
-                            <option value="">Select supervisor...</option>
-                            {supervisors.map(supervisor => (
-                              <option key={supervisor} value={supervisor}>{supervisor}</option>
-                            ))}
-                          </select>
-                          <ChevronDown className="absolute right-1 top-1.5 h-3 w-3 text-gray-400 pointer-events-none" />
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
