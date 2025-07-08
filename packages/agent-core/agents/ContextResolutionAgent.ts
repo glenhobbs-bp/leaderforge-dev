@@ -205,8 +205,8 @@ export class ContextResolutionAgent {
     try {
       // Get all available contexts
       const { data: contexts, error: contextsError } = await this.supabase
-        .from('prompt_contexts')
-        .select('id, name, description, scope, priority, is_active')
+        .from('core.prompt_contexts')
+        .select('id, name, description, context_type, priority, is_active')
         .eq('tenant_key', tenantKey)
         .eq('is_active', true)
         .order('priority', { ascending: false });
@@ -218,7 +218,7 @@ export class ContextResolutionAgent {
 
       // Get user preferences
       const { data: preferences, error: preferencesError } = await this.supabase
-        .from('user_context_preferences')
+        .from('core.user_context_preferences')
         .select('context_id, is_enabled')
         .eq('user_id', userId)
         .eq('tenant_key', tenantKey);
@@ -239,7 +239,7 @@ export class ContextResolutionAgent {
         id: context.id,
         name: context.name,
         description: context.description,
-        scope: context.scope,
+        scope: context.context_type, // Map context_type to scope for UI compatibility
         priority: context.priority,
         isEnabled: preferenceMap.get(context.id) ?? true, // Default enabled
         canEdit: true, // TODO: Check permissions

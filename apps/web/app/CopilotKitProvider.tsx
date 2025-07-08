@@ -94,12 +94,7 @@ export function CopilotKitProvider({
     fetchAgentContext();
   }, [session?.user?.id]);
 
-  // Only render CopilotKit after ready and session is stable
-  if (!isReady || loading || agentLoading) {
-    return <>{children}</>;
-  }
-
-  // Use agent-generated instructions or fallback
+  // Prepare data before any conditional rendering (all hooks must come before early returns)
   const fullInstructions = agentContext?.systemInstructions ||
     `You are a helpful assistant for LeaderForge, an AI-powered leadership development platform.`;
 
@@ -117,13 +112,18 @@ export function CopilotKitProvider({
     agentContextId: agentContext?.metadata?.contextId || null
   };
 
-  // Log the properties being sent
+  // Log the properties being sent - this hook must come before any early returns
   useEffect(() => {
     if (isReady && !loading && !agentLoading) {
       console.log('[CopilotKitProvider] Sending user properties:', userProperties);
       console.log('[CopilotKitProvider] Using agent instructions:', !!agentContext?.systemInstructions);
     }
   }, [isReady, loading, agentLoading, userProperties, agentContext]);
+
+  // Only render CopilotKit after ready and session is stable
+  if (!isReady || loading || agentLoading) {
+    return <>{children}</>;
+  }
 
   return (
     <CopilotKit

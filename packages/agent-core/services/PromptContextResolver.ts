@@ -11,13 +11,13 @@ export interface PromptContext {
   id: string;
   name: string;
   description: string;
-  system_message: string;
-  behavior_modifiers: Record<string, unknown>;
-  scope: 'global' | 'organization' | 'team' | 'personal';
+  content: string; // Maps to database 'content' column (contains system message)
+  context_type: 'global' | 'organization' | 'team' | 'personal'; // Maps to database 'context_type' column
   priority: number;
   tenant_key: string;
   created_by?: string;
   is_active: boolean;
+  template_variables?: Record<string, unknown>; // Maps to database 'template_variables' column
 }
 
 export interface ResolvedContext {
@@ -89,7 +89,7 @@ export class PromptContextResolver {
   private async getAvailableContexts(userId: string, tenantKey: string): Promise<PromptContext[]> {
     // TODO: Add entitlement checking - for now get all active contexts
     const { data: contexts, error } = await this.supabase
-      .from('prompt_contexts')
+      .from('core.prompt_contexts')
       .select('*')
       .eq('tenant_key', tenantKey)
       .eq('is_active', true)
@@ -116,7 +116,7 @@ export class PromptContextResolver {
 
     // Get user's preferences for these contexts
     const { data: preferences, error } = await this.supabase
-      .from('user_context_preferences')
+      .from('core.user_context_preferences')
       .select('context_id, is_enabled')
       .eq('user_id', userId)
       .in('context_id', contextIds);
@@ -147,9 +147,9 @@ export class PromptContextResolver {
     const scopeOrder = ['global', 'organization', 'team', 'personal'];
 
     return contexts.sort((a, b) => {
-      // Primary sort: by scope hierarchy
-      const scopeA = scopeOrder.indexOf(a.scope);
-      const scopeB = scopeOrder.indexOf(b.scope);
+      // Primary sort: by context_type hierarchy
+      const scopeA = scopeOrder.indexOf(a.context_type);
+      const scopeB = scopeOrder.indexOf(b.context_type);
 
       if (scopeA !== scopeB) {
         return scopeA - scopeB;
@@ -161,26 +161,26 @@ export class PromptContextResolver {
   }
 
   /**
-   * Merge contexts into final system message and behavior modifiers
+   * Merge contexts into final system message and template variables
    */
   private mergeContexts(orderedContexts: PromptContext[]): {
     systemMessage: string;
     behaviorModifiers: Record<string, unknown>;
   } {
-    // Build system message by concatenating all context system messages
+    // Build system message by concatenating all context content
     const systemParts = orderedContexts
-      .filter(ctx => ctx.system_message?.trim())
-      .map(ctx => ctx.system_message.trim());
+      .filter(ctx => ctx.content?.trim())
+      .map(ctx => ctx.content.trim());
 
     const systemMessage = systemParts.length > 0
       ? systemParts.join('\n\n')
       : 'You are a helpful AI assistant.';
 
-    // Merge behavior modifiers (later contexts override earlier ones)
+    // Merge template variables (later contexts override earlier ones)
     const behaviorModifiers: Record<string, unknown> = {};
     orderedContexts.forEach(ctx => {
-      if (ctx.behavior_modifiers && typeof ctx.behavior_modifiers === 'object') {
-        Object.assign(behaviorModifiers, ctx.behavior_modifiers);
+      if (ctx.template_variables && typeof ctx.template_variables === 'object') {
+        Object.assign(behaviorModifiers, ctx.template_variables);
       }
     });
 
@@ -198,7 +198,7 @@ export class PromptContextResolver {
   ): Promise<boolean> {
     try {
       const { error } = await this.supabase
-        .from('user_context_preferences')
+        .from('core.user_context_preferences')
         .upsert({
           user_id: userId,
           context_id: contextId,
@@ -224,7 +224,7 @@ export class PromptContextResolver {
   async getUserContextPreferences(userId: string, tenantKey: string = 'leaderforge'): Promise<UserContextPreference[]> {
     try {
       const { data: preferences, error } = await this.supabase
-        .from('user_context_preferences')
+        .from('core.user_context_preferences')
         .select('*')
         .eq('user_id', userId)
         .eq('tenant_key', tenantKey);
