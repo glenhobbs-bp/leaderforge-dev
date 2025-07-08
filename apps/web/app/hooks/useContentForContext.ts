@@ -11,8 +11,8 @@ export function useContentForContext(contextKey: string, userId: string) {
     queryKey: ['content-for-context', contextKey, userId],
     queryFn: () => fetchContentForContext(contextKey, userId),
     enabled: !!contextKey && !!userId,
-    onError: (err) => console.error('[hook] useContentForContext error:', err),
-    onSuccess: (data) => console.log('[hook] useContentForContext success:', data),
+    // Note: onError and onSuccess are deprecated in newer React Query versions
+    // Error handling should be done in components using error boundaries or status checks
   });
 }
 

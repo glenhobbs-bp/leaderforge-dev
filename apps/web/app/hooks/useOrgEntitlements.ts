@@ -10,8 +10,7 @@ export function useOrgEntitlements(orgId: string) {
     queryKey: ['org-entitlements', orgId],
     queryFn: () => fetchOrgEntitlements(orgId),
     enabled: !!orgId,
-    onError: (err) => console.error('[hook] useOrgEntitlements error:', err),
-    onSuccess: (data) => console.log('[hook] useOrgEntitlements success:', data),
+    // Note: onError and onSuccess deprecated in newer React Query versions
   });
 }
 

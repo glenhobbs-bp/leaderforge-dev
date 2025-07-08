@@ -48,28 +48,41 @@
 - [ ] Consider migrating API routes to App Router for consistency
 - [ ] Ensure all API endpoints are thin and agent-native
 
+### 7. Model Routing & Provider Management
+- [ ] **Centralized Model Configuration**: Create ModelConfigService for unified model management
+- [ ] **Dynamic Model Selection**: Route queries to optimal models based on complexity and user tier
+- [ ] **Multi-Provider Support**: Integrate local models (free tier) and cloud providers (premium)
+- [ ] **Cost Optimization**: Use cheaper models for simple queries, premium for complex reasoning
+- [ ] **Fallback Strategy**: Graceful degradation when preferred models are unavailable
+- [ ] **Usage Analytics**: Track model performance, costs, and user satisfaction by provider
+- [ ] **A/B Testing Framework**: Compare model outputs for quality and user preference
+- [ ] **Model Configuration UI**: Admin interface for model routing rules and provider settings
+- **Current State**: Hardcoded models in multiple locations (gpt-4o, claude-3-sonnet)
+- **Target Architecture**: Database-driven model routing with entitlement-aware selection
+- **Dependencies**: Enhanced entitlement system, usage analytics, cost tracking
+
 ---
 
 ## Technical Debt & Quality
 
-### 7. Error Handling & Reliability
+### 8. Error Handling & Reliability
 - [ ] Add robust error boundaries in frontend
 - [ ] Ensure agents always return valid schema (never null/undefined)
 - [ ] Fix periodic Next.js static asset errors on first load
 - [ ] Improve backend error logging and user-friendly error surfaces
 
-### 8. General Architectural Cleanup
+### 9. General Architectural Cleanup
 - [ ] Search and fix all TODO, FIXME, temporary, workaround, hack, patch, hardcoded items
 - [ ] Ensure all business logic is in agents/tools, not UI or API
 - [ ] Ensure all UI is schema-driven and generic
 - [ ] Ensure all tools are stateless, composable, and context-driven
 
-### 9. Testing & Observability
+### 10. Testing & Observability
 - [ ] Add end-to-end tests for all major flows (content, progress, sync, nav)
 - [ ] Add comprehensive logging for all agent runs and tool calls
 - [ ] Implement performance monitoring and alerting
 
-### 10. Data Integrity & Validation
+### 11. Data Integrity & Validation
 - [ ] **Nav Section Data Integrity**: Ensure all nav_options with same section have same section_order value
 - [ ] Add admin UI validation for nav data consistency
 - [ ] Consider migration to separate nav_sections table if needed
@@ -80,13 +93,13 @@
 
 ## User Experience & UI
 
-### 11. Avatar Handling Enhancement
+### 12. Avatar Handling Enhancement
 - [ ] Refactor NavPanel to fetch user avatar via signed URL from API
 - [ ] Use fallback to default avatar if fetch fails
 - [ ] Remove hardcoded userId and wire to real user management
 - [ ] Ensure both header and footer avatars use signed URL
 
-### 12. Metadata & SEO
+### 13. Metadata & SEO
 - [x] ~~Enable favicon display by properly configuring metadata~~ ✅ **Complete**
 - [x] ~~Refactor metadata export for Next.js App Router compliance~~ ✅ **Complete**
 - [ ] Add proper Open Graph meta tags
@@ -97,14 +110,14 @@
 
 ## Development Experience
 
-### 13. Linting & Code Quality
+### 14. Linting & Code Quality
 - [ ] Add ESLint configuration for the monorepo
 - [ ] Add lint scripts to all package.json files
 - [ ] Ensure linting runs in CI and locally
 - [ ] Fix all existing linter errors and warnings
 - [ ] Document linting rules and workflow
 
-### 14. Environment & Configuration
+### 15. Environment & Configuration
 - [ ] Update Google OAuth credentials for production
 - [ ] Ensure all production/staging domains are configured
 - [ ] Implement config schema validation
@@ -114,13 +127,13 @@
 
 ## Future Feature Enhancements
 
-### 15. Fine-Grained Access Control
+### 16. Fine-Grained Access Control
 - [ ] Implement feature-level entitlements (e.g., analytics, chat)
 - [ ] Add content-level access policies
 - [ ] Create admin UI for access management
 - [ ] Design integration with context-level entitlement
 
-### 16. Dynamic Worksheet Generation (Phase 3 - Agent-Native)
+### 17. Dynamic Worksheet Generation (Phase 3 - Agent-Native)
 - **Status**: Phase 2 Complete (agent-driven template selection), Phase 3 planned
 - **Current**: Agent selects from existing templates via database prompt instructions
 - **Goal**: Agent generates completely custom worksheets per video content and user context
@@ -135,7 +148,7 @@
 - **Dependencies**: Enhanced agent capabilities, video transcript access, user context data
 - **Impact**: Infinite scalability, personalized learning, no manual worksheet creation needed
 
-### 17. Static Worksheets & Assessments (Current System)
+### 18. Static Worksheets & Assessments (Current System)
 - [x] ~~Design worksheet system architecture~~ ✅ **Complete** (Schema-driven forms)
 - [x] ~~Implement worksheet creation and submission~~ ✅ **Complete** (FormWidget system)
 - [x] ~~Add progress tracking for worksheet completion~~ ✅ **Complete** (Universal Input System)
@@ -144,7 +157,7 @@
 - [ ] Add worksheet analytics and completion insights
 - [ ] Implement instructor/admin worksheet management UI
 
-### 18. Real-Time Features
+### 19. Real-Time Features
 - [ ] Add real-time progress updates
 - [ ] Implement collaborative features
 - [ ] Add notification system
@@ -154,13 +167,13 @@
 
 ## Performance & Scalability
 
-### 19. Caching & Optimization
+### 20. Caching & Optimization
 - [ ] Implement intelligent content caching
 - [ ] Add image optimization and CDN integration
 - [ ] Optimize agent response times
 - [ ] Add progressive loading for large content sets
 
-### 20. Multi-Tenancy Enhancements
+### 21. Multi-Tenancy Enhancements
 - [ ] Optimize tenant isolation
 - [ ] Add tenant-specific customization options
 - [ ] Implement tenant analytics and reporting

@@ -10,8 +10,7 @@ export function useUserEntitlements(userId: string) {
     queryKey: ['entitlements', userId],
     queryFn: () => fetchUserEntitlements(userId),
     enabled: !!userId,
-    onError: (err) => console.error('[hook] useUserEntitlements error:', err),
-    onSuccess: (data) => console.log('[hook] useUserEntitlements success:', data),
+    // Note: onError and onSuccess deprecated in newer React Query versions
   });
 }
 

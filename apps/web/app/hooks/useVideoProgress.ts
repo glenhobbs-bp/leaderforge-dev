@@ -31,7 +31,7 @@ export function useVideoProgress({ userId, contentId, duration = 0 }: UseVideoPr
 
     // Local state for optimistic updates
   const [localProgress, setLocalProgress] = useState<VideoProgress | null>(null);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const saveTimeoutRef = useRef<number>();
 
   // Get initial progress from user preferences
   const preferences = userPrefs?.preferences as UserPreferences;
@@ -123,7 +123,7 @@ export function useVideoProgress({ userId, contentId, duration = 0 }: UseVideoPr
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+        window.clearTimeout(saveTimeoutRef.current);
       }
     };
   }, []);

@@ -13,6 +13,7 @@ import { useSupabase } from '../components/SupabaseProvider';
 import { useEffect, useState } from 'react';
 import { EntitlementActions } from '../components/copilot/EntitlementActions';
 
+
 export function CopilotKitProvider({
   children,
 }: {
@@ -48,76 +49,92 @@ export function CopilotKitProvider({
     });
   }, [session, loading, isReady]);
 
-  // Determine user context with proper admin level detection (matching API route logic)
-  const getAdminLevel = (user: { user_metadata?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean }; raw_user_meta_data?: { is_super_admin?: boolean; is_admin?: boolean; tenant_admin?: boolean; account_admin?: boolean } } | null) => {
-    if (!user) return 'none';
+  interface AgentContext {
+    systemInstructions: string;
+    metadata?: {
+      contextId?: string;
+      [key: string]: unknown;
+    };
+  }
 
-    const metadata = user.user_metadata || {};
-    const rawMetadata = user.raw_user_meta_data || {};
+  const [agentContext, setAgentContext] = useState<AgentContext | null>(null);
+  const [agentLoading, setAgentLoading] = useState(true);
 
-    if (metadata.is_super_admin === true || rawMetadata.is_super_admin === true) {
-      return 'i49_super_admin';
-    }
+  // Fetch agent-generated context and instructions
+  useEffect(() => {
+    if (!session?.user?.id) return;
 
-    if (metadata.is_admin === true || rawMetadata.is_admin === true) {
-      return 'platform_admin';
-    }
+    const fetchAgentContext = async () => {
+      try {
+        setAgentLoading(true);
 
-    if (metadata.tenant_admin || rawMetadata.tenant_admin) {
-      return 'tenant_admin';
-    }
+        const response = await fetch('/api/agent/context', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            message: 'Generate CopilotKit configuration',
+            context: 'leaderforge'
+          })
+        });
 
-    if (metadata.account_admin || rawMetadata.account_admin) {
-      return 'account_admin';
-    }
+        if (response.ok) {
+          const data = await response.json();
+          setAgentContext(data);
+        } else {
+          console.warn('[CopilotKitProvider] Failed to fetch agent context, using fallback');
+        }
+      } catch (error) {
+        console.warn('[CopilotKitProvider] Agent context error, using fallback:', error);
+      } finally {
+        setAgentLoading(false);
+      }
+    };
 
-    return 'none';
-  };
+    fetchAgentContext();
+  }, [session?.user?.id]);
 
-  const userId = session?.user?.id || 'anonymous';
-  const adminLevel = getAdminLevel(session?.user);
+  // Only render CopilotKit after ready and session is stable
+  if (!isReady || loading || agentLoading) {
+    return <>{children}</>;
+  }
+
+  // Use agent-generated instructions or fallback
+  const fullInstructions = agentContext?.systemInstructions ||
+    `You are a helpful assistant for LeaderForge, an AI-powered leadership development platform.`;
+
   const userName = session?.user?.user_metadata?.full_name ||
                    session?.user?.user_metadata?.name ||
                    session?.user?.email?.split('@')[0] ||
                    'User';
-  const userEmail = session?.user?.email || '';
 
   const userProperties = {
-    userId,
-    adminLevel,
+    userId: session?.user?.id || 'anonymous',
     userName,
-    userEmail,
+    userEmail: session?.user?.email || '',
     isAuthenticated: !!session,
-    isAdmin: adminLevel !== 'none',
-    tenantKey: 'leaderforge', // Add tenant context
+    tenantKey: 'leaderforge',
+    agentContextId: agentContext?.metadata?.contextId || null
   };
 
   // Log the properties being sent
   useEffect(() => {
-    if (isReady && !loading) {
+    if (isReady && !loading && !agentLoading) {
       console.log('[CopilotKitProvider] Sending user properties:', userProperties);
+      console.log('[CopilotKitProvider] Using agent instructions:', !!agentContext?.systemInstructions);
     }
-  }, [isReady, loading, userProperties]);
-
-  // Only render CopilotKit after ready and session is stable
-  if (!isReady || loading) {
-    return <>{children}</>;
-  }
+  }, [isReady, loading, agentLoading, userProperties, agentContext]);
 
   return (
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       properties={userProperties}
-      key={`copilot-${userId}`} // Force re-render when user changes
+      key={`copilot-${userProperties.userId}`} // Force re-render when user changes
     >
       {children}
       <EntitlementActions />
-            <CopilotPopup
-        instructions={`You are a helpful assistant for LeaderForge, an AI-powered leadership development platform.
-
-You are helping ${userName} (${userEmail}) who has ${adminLevel} access level in the ${userProperties.tenantKey} organization.
-
-Help users navigate the platform, understand content, manage entitlements, and achieve their leadership goals. You have access to admin functions for managing user entitlements.`}
+      <CopilotPopup
+        instructions={fullInstructions}
         labels={{
           title: "LeaderForge Assistant",
           initial: `Hi ${userName}! I'm your LeaderForge assistant. How can I help you today?`,

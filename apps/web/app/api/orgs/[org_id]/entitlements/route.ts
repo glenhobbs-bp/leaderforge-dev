@@ -37,7 +37,7 @@ export async function GET(
     return NextResponse.json({ error: 'Missing or invalid org_id' }, { status: 400 });
   }
   try {
-    const entitlements = await entitlementService.getOrgEntitlements(org_id);
+    const entitlements = await entitlementService.getOrgEntitlements(supabase, org_id);
     console.log(`[API] Found ${entitlements.length} entitlements for org ${org_id}`);
     return NextResponse.json(entitlements, { status: 200 });
   } catch (error: any) {

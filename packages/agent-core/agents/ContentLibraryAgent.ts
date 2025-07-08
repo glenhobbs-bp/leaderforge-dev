@@ -8,7 +8,8 @@ import { TribeSocialContentTool } from '../tools/TribeSocialContentTool';
 import type { UserProgress } from '../tools/UserProgressTool';
 
 // Initialize tools
-const userProgressTool = new UserProgressTool(new SupabaseUserProgressRepository());
+// TODO: Fix Supabase client dependency for UserProgressTool
+// const userProgressTool = new UserProgressTool(new SupabaseUserProgressRepository());
 const tribeContentTool = new TribeSocialContentTool();
 // const tracer = new LangSmithTracer({ project: 'leaderforge-content-library' });
 

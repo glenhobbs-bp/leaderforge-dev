@@ -1,13 +1,16 @@
-import { supabase } from '../../../apps/web/app/lib/supabaseClient';
 import { TribeSocialContentTool } from '../tools/TribeSocialContentTool';
 import type { GridSchema, ComponentSchema } from '../types/ComponentSchema';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * ContentSyncAgent: Syncs TribeSocial content into modules.content for a given context.
  * - Upserts all fetched content with is_active=true
  * - Marks any local content not present in the latest fetch as is_active=false
  */
-export async function runContentSyncAgent(contextKey: string): Promise<{ synced: number, deactivated: number }> {
+export async function runContentSyncAgent(
+  contextKey: string,
+  supabaseClient: SupabaseClient
+): Promise<{ synced: number, deactivated: number }> {
   const tribeTool = new TribeSocialContentTool();
   // 1. Fetch all content for the context from TribeSocial
   const tribeContent = await tribeTool.listContentAsComponentSchema(
@@ -31,7 +34,7 @@ export async function runContentSyncAgent(contextKey: string): Promise<{ synced:
   let synced = 0;
   for (const item of items) {
     const { id, title, subtitle, image, videoUrl, description, longDescription, publishedDate } = item.props;
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .schema('modules')
       .from('content')
       .upsert([
@@ -57,7 +60,7 @@ export async function runContentSyncAgent(contextKey: string): Promise<{ synced:
   }
 
   // 3. Mark any local content not present in the latest fetch as is_active=false
-  const { data: localContent, error: fetchError } = await supabase
+  const { data: localContent, error: fetchError } = await supabaseClient
     .schema('modules')
     .from('content')
     .select('id')
@@ -65,10 +68,10 @@ export async function runContentSyncAgent(contextKey: string): Promise<{ synced:
     .eq('is_active', true);
   let deactivated = 0;
   if (!fetchError && localContent) {
-    const localIds = localContent.map((c: any) => c.id);
+    const localIds = localContent.map((c: unknown) => (c as { id: string }).id);
     const toDeactivate = localIds.filter((id: string) => !tribeIds.includes(id));
     if (toDeactivate.length > 0) {
-      const { error: deactivateError } = await supabase
+      const { error: deactivateError } = await supabaseClient
         .schema('modules')
         .from('content')
         .update({ is_active: false })

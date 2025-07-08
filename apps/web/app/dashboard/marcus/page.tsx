@@ -129,7 +129,11 @@ export default function MarcusDashboard() {
           schema={{
             ...dashboard.composition,
             id: 'marcus-dashboard-grid',
-            version: '1.0.0'
+            version: '1.0.0',
+            data: {
+              ...dashboard.composition.data,
+              source: 'dashboard'
+            }
           }}
           userId={dashboard.user_id}
           tenantKey='brilliant'

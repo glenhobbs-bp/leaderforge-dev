@@ -7,7 +7,6 @@
 // Place these in your .env file for local dev or in your deployment environment.
 
 import type { ComponentSchema, CardSchema } from "../types/ComponentSchema";
-import { supabase } from '../../../apps/web/app/lib/supabaseClient';
 
 export interface TribeSocialContent {
   id: number;
@@ -43,7 +42,7 @@ export class TribeSocialContentTool {
       throw new Error("Missing required collectionId");
     }
     // Use absolute URL in Node.js, relative in browser
-    const isServer = typeof window === 'undefined';
+    const isServer = typeof globalThis.window === 'undefined';
     // Point to centralized API proxy in apps/api
     const baseUrl = isServer
       ? process.env.INTERNAL_API_BASE_URL || 'http://localhost:3000'
@@ -139,7 +138,7 @@ export class TribeSocialContentTool {
     // Debug log outgoing request
     console.log('[TribeSocialContentTool] Fetching:', url);
     console.log('[TribeSocialContentTool] Headers:', headers);
-    const res = await fetch(url, { headers, cache: 'no-store' });
+    const res = await fetch(url, { headers });
     const text = await res.text();
     let data;
     try {

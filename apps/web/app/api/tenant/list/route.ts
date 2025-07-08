@@ -42,7 +42,8 @@ export async function GET() {
 
     // Optionally filter by entitlement (if required_entitlements is set)
     // For now, just return all contexts (add entitlement filtering as needed)
-    return NextResponse.json(data as ContextConfig[], { status: 200 });
+    // Note: Legacy data structure doesn't match ContextConfig interface
+    return NextResponse.json(data as unknown as ContextConfig[], { status: 200 });
   } catch (err) {
     const error = err as Error;
     const message = error.message || 'Failed to fetch contexts';

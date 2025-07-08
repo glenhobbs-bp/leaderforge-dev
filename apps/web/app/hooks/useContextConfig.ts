@@ -11,8 +11,7 @@ export function useContextConfig(contextKey: string, userId?: string) {
     queryKey: ['context-config', contextKey, userId],
     queryFn: () => fetchContextConfig(contextKey, userId),
     enabled: !!contextKey && !!userId,
-    onError: (err) => console.error('[hook] useContextConfig error:', err),
-    onSuccess: (data) => console.log('[hook] useContextConfig success:', data),
+    // Note: onError and onSuccess deprecated in newer React Query versions
   });
 }
 

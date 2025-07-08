@@ -12,8 +12,12 @@ export async function isFeatureEnabled(
   userId?: string,
   contextKey?: string,
 ): Promise<boolean> {
+  if (!client) {
+    return false;
+  }
+
   const distinctId = userId || "anonymous";
-  const properties: Record<string, any> = {};
+  const properties: Record<string, unknown> = {};
   if (contextKey) properties.contextKey = contextKey;
   return await client.isFeatureEnabled(flag, distinctId, properties);
 }
@@ -23,7 +27,20 @@ export async function getFeatureFlags(
   contextKey?: string,
 ): Promise<Record<string, boolean>> {
   const distinctId = userId || "anonymous";
-  const properties: Record<string, any> = {};
+  const properties: Record<string, unknown> = {};
   if (contextKey) properties.contextKey = contextKey;
-  return await client.getAllFlags(distinctId, properties);
+
+  if (!client) {
+    return {};
+  }
+
+  const flags = await client.getAllFlags(distinctId, properties);
+
+  // Convert FeatureFlagValue to boolean
+  const booleanFlags: Record<string, boolean> = {};
+  Object.entries(flags).forEach(([key, value]) => {
+    booleanFlags[key] = Boolean(value);
+  });
+
+  return booleanFlags;
 }

@@ -11,7 +11,8 @@ import {
   SchemaError,
   SchemaWarning,
   SchemaEvolution,
-  WidgetRegistration
+  WidgetRegistration,
+  WidgetConfig
 } from '../types/UniversalWidgetSchema';
 
 export class SchemaProcessor {
@@ -129,11 +130,11 @@ export class SchemaProcessor {
       });
     }
 
-    // Validate required props based on JSON schema
+    // Validate required config based on JSON schema
     if (registration && registration.schema) {
-      const propValidation = this.validateProps(schema.props, registration.schema);
-      errors.push(...propValidation.errors);
-      warnings.push(...propValidation.warnings);
+      const configValidation = this.validateProps(schema.config, registration.schema);
+      errors.push(...configValidation.errors);
+      warnings.push(...configValidation.warnings);
     }
 
     // Validate children recursively
@@ -164,9 +165,9 @@ export class SchemaProcessor {
   }
 
   /**
-   * Validate props against JSON schema
+   * Validate config against JSON schema
    */
-  private validateProps(props: Record<string, unknown>, jsonSchema: object): {
+  private validateProps(config: Record<string, unknown> | WidgetConfig, jsonSchema: object): {
     errors: SchemaError[];
     warnings: SchemaWarning[];
   } {
@@ -177,11 +178,14 @@ export class SchemaProcessor {
     // TODO: Implement full JSON schema validation using the jsonSchema parameter
     console.debug('[SchemaProcessor] JSON Schema validation:', jsonSchema);
 
+    // Convert WidgetConfig to Record for validation
+    const configRecord = config as Record<string, unknown>;
+
     // Check for null/undefined required values
-    Object.entries(props).forEach(([key, value]) => {
+    Object.entries(configRecord).forEach(([key, value]) => {
       if (value === null || value === undefined) {
         warnings.push({
-          path: `props.${key}`,
+          path: `config.${key}`,
           message: `Property '${key}' is null or undefined`,
           suggestion: 'Consider providing a default value'
         });
@@ -199,8 +203,10 @@ export class SchemaProcessor {
     if (schema.fallback?.type) {
       return {
         type: schema.fallback.type,
+        id: `${schema.id}-fallback`,
         version: this.evolution.currentVersion,
-        props: schema.fallback.props || {},
+        data: { source: 'fallback', staticContent: {} },
+        config: schema.fallback.config || {},
         metadata: {
           attributes: {
             originalType: schema.type,
@@ -215,8 +221,10 @@ export class SchemaProcessor {
     if (registration?.fallbackWidget && this.registrations.has(registration.fallbackWidget)) {
       return {
         type: registration.fallbackWidget,
+        id: `${schema.id}-registered-fallback`,
         version: this.evolution.currentVersion,
-        props: this.simplifyProps(schema.props),
+        data: { source: 'fallback', staticContent: {} },
+        config: this.simplifyConfig(schema.config),
         metadata: {
           attributes: {
             originalType: schema.type,
@@ -243,12 +251,23 @@ export class SchemaProcessor {
 
     return {
       type: 'error-widget',
+      id: `${schema.id}-error`,
       version: this.evolution.currentVersion,
-      props: {
-        originalType: schema.type,
-        errorDisplay,
-        errors: errors.map(e => e.message),
-        showDetails: process.env.NODE_ENV === 'development'
+      data: {
+        source: 'error',
+        staticContent: {
+          originalType: schema.type,
+          errorDisplay,
+          errors: errors.map(e => e.message),
+          showDetails: process.env.NODE_ENV === 'development'
+        }
+      },
+      config: {
+        title: `Error: ${schema.type}`,
+        custom: {
+          originalType: schema.type,
+          errorDisplay
+        }
       },
       metadata: {
         attributes: {
@@ -275,31 +294,38 @@ export class SchemaProcessor {
   }
 
   /**
-   * Simplify props for fallback widgets
+   * Simplify config for fallback widgets
    */
-  private simplifyProps(props: Record<string, unknown>): Record<string, unknown> {
-    // Extract common props that most widgets understand
-    const commonProps: Record<string, unknown> = {};
+  private simplifyConfig(config: WidgetConfig): WidgetConfig {
+    // Extract common config that most widgets understand
+    const simplifiedConfig: WidgetConfig = {};
 
-    if (props.title) commonProps.title = props.title;
-    if (props.text) commonProps.text = props.text;
-    if (props.value) commonProps.value = props.value;
-    if (props.description) commonProps.description = props.description;
+    if (config.title) simplifiedConfig.title = config.title;
+    if (config.subtitle) simplifiedConfig.subtitle = config.subtitle;
+    if (config.layout) simplifiedConfig.layout = config.layout;
+    if (config.displayMode) simplifiedConfig.displayMode = config.displayMode;
 
-    return commonProps;
+    return simplifiedConfig;
   }
 
   /**
    * Find generic fallback based on widget capabilities
    */
   private findGenericFallback(schema: UniversalWidgetSchema): UniversalWidgetSchema | null {
-    // If it has text content, fallback to simple text widget
-    if (schema.props.title || schema.props.text || schema.props.description) {
+    // If it has text content in config, fallback to simple text widget
+    if (schema.config.title || schema.config.subtitle) {
       return {
         type: 'text-widget',
+        id: `${schema.id}-text-fallback`,
         version: this.evolution.currentVersion,
-        props: {
-          text: schema.props.title || schema.props.text || schema.props.description
+        data: {
+          source: 'fallback',
+          staticContent: {
+            text: schema.config.title || schema.config.subtitle
+          }
+        },
+        config: {
+          title: schema.config.title || schema.config.subtitle
         },
         metadata: {
           attributes: {

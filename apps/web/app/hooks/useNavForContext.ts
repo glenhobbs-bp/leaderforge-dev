@@ -11,8 +11,7 @@ export function useNavForContext(contextKey: string, userId: string) {
     queryKey: ['nav-for-context', contextKey, userId],
     queryFn: () => fetchNavForContext(contextKey, userId),
     enabled: !!contextKey && !!userId,
-    onError: (err) => console.error('[hook] useNavForContext error:', err),
-    onSuccess: (data) => console.log('[hook] useNavForContext success:', data),
+    // Note: onError and onSuccess deprecated in newer React Query versions
   });
 }
 

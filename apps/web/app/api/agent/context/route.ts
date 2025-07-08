@@ -1,7 +1,14 @@
+/**
+ * File: apps/web/app/api/agent/context/route.ts
+ * Purpose: Agent-native endpoint for context discovery and UI schema generation
+ * Owner: Engineering Team
+ * Tags: #api #agent-native #context #ui-schema
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
-import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
-import type { TenantConfig } from '../../../lib/types';
-import { cookies as nextCookies } from 'next/headers';
+import { cookies } from 'next/headers';
+import { restoreSession } from '../../../lib/supabaseServerClient';
+import { createContextResolutionAgent } from 'agent-core/agents/ContextResolutionAgent';
 
 /**
  * POST /api/agent/context
@@ -12,94 +19,53 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now();
   console.log('[API] POST /api/agent/context - agent-native context discovery');
 
-    try {
-    // 📝 PARSE REQUEST BODY FIRST to enable fallback authentication
+  try {
+    // Parse request body
     const requestBody = await req.json().catch(() => ({}));
     const userMessage = requestBody.message || 'What should I see on my dashboard?';
-    const requestedContext = requestBody.context; // Extract context parameter
+    const requestedContext = requestBody.context || 'leaderforge';
     console.log('[API] Request body:', JSON.stringify(requestBody, null, 2));
 
-    // Debug: Log all cookies to see what's available
-    const cookieStore = await nextCookies();
-    const allCookies = cookieStore.getAll();
-    console.log('[API] All cookies received:', allCookies.map(c => ({ name: c.name, hasValue: !!c.value })));
+    // Get authenticated session
+    const cookieStore = await cookies();
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    const supabase = createSupabaseServerClient(cookieStore);
-
-    // Get authenticated user - try refreshing session first
-    let { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    // If no session, try refreshing with the refresh token
-    if (!session?.user?.id && !sessionError) {
-      console.log('[API] No active session, attempting refresh...');
-      const refreshResult = await supabase.auth.refreshSession();
-      if (refreshResult.data.session) {
-        session = refreshResult.data.session;
-        console.log('[API] ✅ Session refreshed successfully');
-      } else if (refreshResult.error) {
-        console.log('[API] Session refresh failed:', refreshResult.error.message);
-        sessionError = refreshResult.error;
-      }
-    }
-
-    // Request body already parsed above
-
-    // Try to get user ID from session first, then fallback to request body
-    let userId = session?.user?.id;
-
-    if (!userId) {
-      console.log('[API] No authenticated user found - session:', JSON.stringify(session, null, 2));
-
-      if (sessionError) {
-        console.error('[API] Session error:', sessionError);
-      }
-
-      // Check for auth cookies manually
-      const authCookie = cookieStore.get('sb-pcjaagjqydyqfsthsmac-auth-token');
-      const refreshCookie = cookieStore.get('sb-pcjaagjqydyqfsthsmac-refresh-token');
-      console.log('[API] Auth token cookie present:', !!authCookie?.value);
-      console.log('[API] Refresh token cookie present:', !!refreshCookie?.value);
-
-      // 🔧 TEMPORARY FALLBACK: Use userId from request body if provided (for debugging)
-      if (requestBody.userId) {
-        console.log('[API] ⚠️ Using userId from request body as fallback:', requestBody.userId);
-        userId = requestBody.userId;
-      } else {
-        console.log('[API] ❌ No userId found in request body either');
-        return NextResponse.json({
-          error: 'Unauthorized',
-          debug: {
-            hasAuthCookie: !!authCookie?.value,
-            hasRefreshCookie: !!refreshCookie?.value,
-            sessionData: session,
-            sessionError: sessionError?.message,
-            requestBody
-          }
-        }, { status: 401 });
-      }
-    }
-
-    console.log('[API] ✅ Authenticated user:', userId);
-
-    // Use authenticated client if available, otherwise use service account for DB access
-    // ✅ SSR COMPLIANCE: No service role fallback - all operations must use authenticated client
-    if (!session?.user?.id) {
-      console.log('[API] ❌ No valid session - rejecting request');
+    if (sessionError || !session?.user) {
+      console.log('[API] No authenticated session found');
       return NextResponse.json({
-        error: 'Authentication required',
-        details: 'SSR session is required for all operations'
+        error: 'Unauthorized',
+        details: 'Authentication required for context discovery'
       }, { status: 401 });
     }
 
-    const dbClient = supabase; // ✅ Always use authenticated client
+    const userId = session.user.id;
+    console.log('[API] ✅ Authenticated user:', userId);
 
-    // 🤖 AGENT-DRIVEN: Let the agent determine what context/UI to show
-    const agentResponse = await invokeContextAgent({
+    // Agent-native: Use ContextResolutionAgent to orchestrate entire context discovery
+    const agent = createContextResolutionAgent(supabase);
+    const contextResult = await agent.resolveUserContexts({
       userId,
+      tenantKey: requestedContext,
       userMessage,
-      requestedContext,
-      supabase: dbClient
+      includePreferences: true
     });
+
+    // Build response with agent-generated context
+    const agentResponse = {
+      type: 'agent_context_discovery',
+      context: requestedContext,
+      userId,
+      resolvedContext: contextResult.resolvedContext,
+      systemInstructions: contextResult.systemInstructions,
+      userPreferences: contextResult.userPreferences,
+      appliedContexts: contextResult.appliedContexts,
+      metadata: {
+        ...contextResult.metadata,
+        responseTime: Date.now() - startTime,
+        userMessage,
+        requestedContext
+      }
+    };
 
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -126,502 +92,4 @@ export async function POST(req: NextRequest) {
       details: err.message
     }, { status: 500 });
   }
-}
-
-/**
- * Invoke the context discovery agent to determine what UI/context to show
- */
-async function invokeContextAgent({ userId, userMessage, requestedContext, supabase }: {
-  userId: string;
-  userMessage: string;
-  requestedContext?: string;
-  supabase: ReturnType<typeof createSupabaseServerClient>;
-}) {
-  console.log(`[Agent] Determining context for user: ${userId}`);
-
-  // 1. Load user's actual entitlements from database
-  let entitlementIds: string[] = [];
-  try {
-    const { entitlementService } = await import('../../../lib/entitlementService');
-    const userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
-    entitlementIds = userEntitlements.map(e => e.entitlement_id);
-    console.log(`[Agent] User has ${entitlementIds.length} entitlements:`, entitlementIds);
-  } catch (error) {
-    console.warn(`[Agent] ⚠️ Failed to fetch entitlements:`, error);
-    entitlementIds = [];
-  }
-
-  // If no entitlements found, user will get minimal access
-  if (entitlementIds.length === 0) {
-    console.log(`[Agent] ⚠️ No entitlements found for user: ${userId} - providing minimal access`);
-  }
-
-  // 2. Load available contexts from configuration (not hardcoded)
-  let availableContexts: TenantConfig[] = [];
-  try {
-    const { tenantService } = await import('../../../lib/tenantService');
-    const allContexts = await tenantService.getAllTenantConfigs(supabase);
-    availableContexts = allContexts || [];
-    console.log(`[Agent] Found ${availableContexts.length} available contexts`);
-  } catch (error) {
-    console.warn(`[Agent] ⚠️ Failed to load contexts:`, error);
-  }
-
-  // 3. Load user's preferences/last location using authenticated context
-  let userProfile = null;
-  try {
-    const { data: user, error: userError } = await supabase
-      .schema('core')
-      .from('users')
-      .select('id, email, first_name, last_name, full_name, avatar_url, preferences')
-      .eq('id', userId)
-      .single();
-
-    if (!userError && user) {
-      userProfile = user;
-      console.log(`[Agent] User profile loaded:`, userProfile?.preferences || {});
-    } else {
-      console.warn(`[Agent] ⚠️ Failed to load user profile:`, userError);
-    }
-  } catch (error) {
-    console.warn(`[Agent] ⚠️ Failed to load user profile:`, error);
-  }
-
-    // 4. 🤖 AGENT LOGIC: Dynamically determine accessible content
-  const contextSchema = await generateDynamicContextSchema({
-    entitlementIds,
-    availableContexts,
-    userProfile,
-    userMessage,
-    requestedContext,
-    userId,
-    supabase
-  });
-
-  return {
-    type: 'context_schema',
-    schema: contextSchema,
-    metadata: {
-      userId,
-      entitlements: entitlementIds,
-      availableContexts: availableContexts.length,
-      generatedAt: new Date().toISOString(),
-      agentVersion: '2.0.0'
-    }
-  };
-}
-
-/**
- * Agent logic to dynamically generate UI schema based on actual data
- */
-async function generateDynamicContextSchema({
-  entitlementIds,
-  availableContexts,
-  userProfile,
-  userMessage,
-  requestedContext,
-  userId,
-  supabase
-}: {
-  entitlementIds: string[];
-  availableContexts: TenantConfig[];
-  userProfile: any;
-  userMessage: string;
-  requestedContext?: string;
-  userId: string;
-  supabase: ReturnType<typeof createSupabaseServerClient>;
-}) {
-  console.log('[Agent] Dynamically generating UI schema based on user data...');
-
-  // 🧠 AGENT DECISION LOGIC: What contexts can this user access?
-  const accessibleContexts = availableContexts.filter(context => {
-    // Check if user has required entitlements for this context
-    const requiredEntitlements = Array.isArray(context.required_entitlements)
-      ? context.required_entitlements as string[]
-      : [];
-
-    if (requiredEntitlements.length === 0) {
-      return true; // Public context
-    }
-
-    // Check if user has at least one required entitlement
-    return requiredEntitlements.some(reqEntitlement =>
-      entitlementIds.includes(reqEntitlement)
-    );
-  });
-
-  console.log(`[Agent] User can access ${accessibleContexts.length} contexts:`,
-    accessibleContexts.map(c => c.tenant_key));
-
-  // 🎯 AGENT DETERMINES PRIMARY CONTEXT
-  let primaryContext = null;
-
-  // 1. Use explicitly requested context if provided and accessible
-  if (requestedContext) {
-    primaryContext = accessibleContexts.find(c => c.tenant_key === requestedContext);
-    if (primaryContext) {
-      console.log(`[Agent] Using requested context: ${requestedContext}`);
-    } else {
-      console.log(`[Agent] ⚠️ Requested context '${requestedContext}' not accessible, falling back`);
-    }
-  }
-
-  // 2. Use user's last tenant preference if available and accessible
-  if (!primaryContext) {
-    const lastTenant = userProfile?.preferences?.navigationState?.lastTenant;
-    if (lastTenant) {
-      primaryContext = accessibleContexts.find(c => c.tenant_key === lastTenant);
-      if (primaryContext) {
-        console.log(`[Agent] Using user's last tenant: ${lastTenant}`);
-      }
-    }
-  }
-
-  // 3. If no preference or not accessible, use first accessible context
-  if (!primaryContext && accessibleContexts.length > 0) {
-    primaryContext = accessibleContexts[0];
-    console.log(`[Agent] Using first accessible context: ${primaryContext.tenant_key}`);
-  }
-
-  // 3. If no accessible contexts, provide limited access message
-  if (!primaryContext) {
-    console.log(`[Agent] No accessible contexts - providing limited access`);
-    return {
-      contextKey: 'limited',
-      contextName: 'Limited Access',
-      theme: {
-        primary: '#6b7280',
-        secondary: '#9ca3af',
-        accent: '#6b7280',
-        bg_light: '#f9fafb',
-        bg_neutral: '#f3f4f6',
-        text_primary: '#374151'
-      },
-      navigation: [],
-      content: {
-        recommendations: [{
-          type: 'access_notice',
-          title: 'Limited Access',
-          description: 'Contact your administrator for access to additional features.',
-          action: 'Contact Support'
-        }],
-        availableModules: []
-      },
-      chat: {
-        heading: 'Support Assistant',
-        message: "I can help you with basic support questions."
-      }
-    };
-  }
-
-  // 🎨 AGENT GENERATES NAVIGATION: Based on accessible contexts and entitlements
-  const navigation = await generateNavigationSchema(primaryContext.tenant_key, entitlementIds, userId, supabase);
-
-  // 📋 AGENT GENERATES CONTENT: Based on user's context and intent
-  const content = await generateContentSchema(primaryContext.tenant_key, entitlementIds, userMessage);
-
-  return {
-    contextKey: primaryContext.tenant_key,
-    contextName: primaryContext.context_name,
-    theme: primaryContext.theme || {
-      primary: '#667eea',
-      secondary: '#764ba2',
-      accent: '#4ecdc4',
-      bg_light: '#f8f9ff',
-      bg_neutral: '#e8f4f8',
-      text_primary: '#333333'
-    },
-    navigation,
-    content,
-    chat: {
-      heading: primaryContext.chat_config?.heading || 'AI Assistant',
-      message: primaryContext.chat_config?.message || "I'm here to help you navigate and learn."
-    }
-  };
-}
-
-/**
- * Agent generates navigation options based on context and entitlements
- * Now uses the navService to load all navigation options from the database
- * and groups them by section with proper ordering
- */
-async function generateNavigationSchema(contextKey: string, entitlementIds: string[], userId: string, supabase: any) {
-  console.log(`[Agent] Generating navigation for context: ${contextKey}, user: ${userId}`);
-
-  try {
-    // Import navService
-    const { navService } = await import('../../../lib/navService');
-
-    // Get user entitlements (or use mock entitlements if none found)
-    const { entitlementService } = await import('../../../lib/entitlementService');
-    let userEntitlements = [];
-
-    try {
-      userEntitlements = await entitlementService.getUserEntitlements(supabase, userId);
-    } catch (error) {
-      console.warn(`[Agent] Failed to fetch user entitlements in nav generation:`, error);
-      userEntitlements = [];
-    }
-
-    // 🔧 TEMPORARY WORKAROUND: If no entitlements, create mock entitlement objects
-    if (userEntitlements.length === 0) {
-      console.log(`[Agent] 🔧 Creating mock entitlement objects for navigation`);
-
-      const mockEntitlementIds = [
-        'brilliant-admin',
-        'leaderforge-admin',
-        'coaching-access',
-        'library-access',
-        'community-access',
-        'business-access',
-        'business-coaching',
-        'training-access'
-      ];
-
-      userEntitlements = mockEntitlementIds.map(id => ({
-        id: id,
-        entitlement_id: id,
-        user_id: userId,
-        granted_at: new Date().toISOString(),
-        entitlement: {
-          id: id,
-          name: id,
-          description: `Mock ${id} entitlement`
-        }
-      }));
-
-      console.log(`[Agent] 🔧 Created ${userEntitlements.length} mock entitlements for navigation`);
-    }
-
-    // Load navigation options from database using navService
-    const navOptions = await navService.getNavOptionsWithEntitlements(
-      supabase,
-      contextKey,
-      userEntitlements
-    );
-
-    console.log(`[Agent] Found ${navOptions?.length || 0} navigation options for context: ${contextKey}`);
-
-        // Ensure navOptions is an array
-    const navOptionsArray = Array.isArray(navOptions) ? navOptions : [];
-
-    // Group navigation options by section
-    const sectionMap = new Map<string, any[]>();
-
-    navOptionsArray.forEach((navOption: any) => {
-      const sectionKey = navOption.section || 'default';
-
-      if (!sectionMap.has(sectionKey)) {
-        sectionMap.set(sectionKey, []);
-      }
-
-      // Transform nav option to the expected navigation item format
-      const navItem = {
-        id: navOption.nav_key || navOption.id,
-        label: navOption.label,
-        icon: navOption.icon || 'default',
-        description: navOption.description || '',
-        href: navOption.href || navOption.route || `/${navOption.nav_key || navOption.id}`,
-        agent_id: navOption.agent_id, // Include agent_id for proper agent invocation
-        order: navOption.order || 0,
-        section_order: navOption.section_order || 0
-      };
-
-      sectionMap.get(sectionKey)?.push(navItem);
-    });
-
-    // Convert sections map to sorted array
-    const sections: any[] = [];
-
-    // Get unique sections with their order values
-    const sectionOrders = new Map<string, number>();
-    navOptionsArray.forEach((navOption: any) => {
-      const sectionKey = navOption.section || 'default';
-      if (!sectionOrders.has(sectionKey)) {
-        sectionOrders.set(sectionKey, navOption.section_order || 0);
-      }
-    });
-
-    // Sort sections by section_order
-    const sortedSections = Array.from(sectionOrders.entries())
-      .sort(([,orderA], [,orderB]) => orderA - orderB);
-
-    // Build the sections array in the correct format
-    sortedSections.forEach(([sectionKey]) => {
-      const items = sectionMap.get(sectionKey) || [];
-
-      // Sort items within section by their order
-      items.sort((a, b) => a.order - b.order);
-
-      // Remove internal ordering fields from items
-      items.forEach(item => {
-        delete item.order;
-        delete item.section_order;
-      });
-
-      sections.push({
-        title: sectionKey === 'default' ? null : sectionKey.toUpperCase(),
-        items
-      });
-    });
-
-    // Always add support as its own section if not already present
-    const hasSupport = navOptionsArray.some((nav: any) =>
-      (nav.nav_key || nav.id) === 'support' ||
-      nav.label?.toLowerCase()?.includes('support')
-    );
-
-    if (!hasSupport) {
-      sections.push({
-        title: null,
-        items: [{
-          id: 'support',
-          label: 'Support',
-          icon: 'support',
-          description: 'Get help',
-          href: '/support'
-        }]
-      });
-    }
-
-    console.log(`[Agent] Generated ${sections.length} navigation sections:`,
-      sections.map(s => `${s.title || 'Ungrouped'} (${s.items.length} items)`));
-
-    return sections;
-
-  } catch (error) {
-    console.error(`[Agent] Error generating navigation schema:`, error);
-
-    // Fallback to basic navigation if database fails
-    return [{
-      title: null,
-      items: [{
-        id: 'support',
-        label: 'Support',
-        icon: 'support',
-        description: 'Get help',
-        href: '/support'
-      }]
-    }];
-  }
-}
-
-/**
- * Agent generates content recommendations based on context and user intent
- * Enhanced to fetch actual content from TribeSocial when specific content is requested
- */
-async function generateContentSchema(contextKey: string, entitlementIds: string[], userMessage: string) {
-  console.log(`[Agent] Generating content for context: ${contextKey}, message: "${userMessage}"`);
-
-  // 🤖 AGENT ANALYZES USER INTENT and generates relevant content
-  const contentRecommendations = [];
-
-  // 📚 LEADERSHIP LIBRARY: Fetch actual videos from TribeSocial
-  if (userMessage.toLowerCase().includes('leadership-library') ||
-      userMessage.toLowerCase().includes('leadership library') ||
-      userMessage.toLowerCase().includes('training library') ||
-      userMessage.toLowerCase().includes('content library')) {
-
-    console.log(`[Agent] Detected Leadership Library request for context: ${contextKey}`);
-
-        try {
-      // Fetch content directly from TribeSocial API for LeaderForge context
-      let collectionId = 99735660; // LeaderForge collection ID
-
-      if (contextKey === 'brilliant') {
-        // Use a different collection ID for Brilliant context if needed
-        collectionId = 99735660; // Use same for now, can be updated later
-      }
-
-      const TRIBE_SOCIAL_API_URL = process.env.TRIBE_SOCIAL_API_URL || 'https://edge.tribesocial.io';
-      const TRIBE_SOCIAL_TOKEN = process.env.TRIBE_SOCIAL_TOKEN;
-
-      if (!TRIBE_SOCIAL_TOKEN) {
-        throw new Error('TribeSocial token not configured');
-      }
-
-      console.log(`[Agent] Fetching TribeSocial collection: ${collectionId} for context: ${contextKey}`);
-
-      const response = await fetch(`${TRIBE_SOCIAL_API_URL}/api/collection-by-id/${collectionId}`, {
-        headers: {
-          'Accept': 'application/json',
-          'Cookie': `token=${TRIBE_SOCIAL_TOKEN}`,
-          'User-Agent': 'LeaderForge-Agent/1.0',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`TribeSocial API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const contents = data.Contents || [];
-
-      if (contents.length > 0) {
-        console.log(`[Agent] ✅ Fetched ${contents.length} videos from TribeSocial for Leadership Library`);
-
-        // Transform TribeSocial content to our card format
-        const contentCards = contents.map((item: any) => ({
-          type: 'Card',
-          props: {
-            title: item.title,
-            subtitle: item.type || 'Video',
-            description: item.description || '',
-            image: item.featuredImage ? `https://cdn.tribesocial.io/${item.featuredImage}` : undefined,
-            videoUrl: item.video ? `https://cdn.tribesocial.io/${item.video}` : undefined,
-            publishedDate: item.publishedDate,
-          }
-        }));
-
-        contentRecommendations.push({
-          type: 'video_grid',
-          title: 'Leadership Library',
-          description: 'Forge ahead, Glen!',
-          action: 'View Videos',
-          cards: contentCards
-        });
-      } else {
-        console.log(`[Agent] ⚠️ No content found for context: ${contextKey}`);
-        contentRecommendations.push({
-          type: 'error',
-          title: 'Leadership Library',
-          description: 'No training videos available at this time',
-          action: 'Try Again Later'
-        });
-      }
-    } catch (error) {
-      console.error(`[Agent] Failed to fetch Leadership Library content:`, error);
-      contentRecommendations.push({
-        type: 'error',
-        title: 'Leadership Library',
-        description: 'Unable to load training videos. Please try again.',
-        action: 'Retry'
-      });
-    }
-  }
-  // 📹 GENERAL VIDEO REQUESTS: Fallback for video/training keywords
-  else if (userMessage.toLowerCase().includes('video') || userMessage.toLowerCase().includes('training')) {
-    contentRecommendations.push({
-      type: 'video_library',
-      title: 'Recommended Training',
-      description: 'Videos curated for your learning path',
-      action: 'Browse Library'
-    });
-  }
-
-  // Default welcome content - always show this for clean experience
-  if (contentRecommendations.length === 0) {
-    const contextName = contextKey === 'brilliant' ? 'Brilliant Movement' : 'LeaderForge';
-    contentRecommendations.push({
-      type: 'welcome',
-      title: `${contextName}`,
-      description: 'Select an option from the navigation to get started.',
-      action: 'Browse Navigation'
-    });
-  }
-
-  return {
-    recommendations: contentRecommendations,
-    availableModules: entitlementIds
-  };
 }

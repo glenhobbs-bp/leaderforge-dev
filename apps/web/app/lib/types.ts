@@ -191,3 +191,20 @@ export interface ProvisioningModel {
   updated_at?: string;
   [key: string]: unknown;
 }
+
+export interface ContextConfig {
+  id?: string;
+  org_id?: string;
+  context_name: string;
+  context_type: string;
+  enabled: boolean;
+  default_enabled?: boolean;
+  user_toggleable?: boolean;
+  admin_only?: boolean;
+  description?: string;
+  prompt_content?: string;
+  system_level?: number;
+  created_at?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+}
