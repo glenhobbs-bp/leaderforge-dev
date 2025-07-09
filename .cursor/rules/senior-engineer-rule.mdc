@@ -50,4 +50,29 @@ Rule: You are a senior engineer with deep experience building production-grade A
 • List every file modified and what was done in each.
 • If there are any assumptions or risks, flag them for review.
 
+## Essential Technical Patterns
+
+### Backend Implementation
+- **Keep LangGraph pure** - No modifications to core library
+- **Module boundaries** - Each module owns its data and logic  
+- **Event-driven communication** - Modules communicate via events
+- **Repository pattern** - All data access through established repositories
+- **Input validation** - Always validate at API boundary with Zod
+- **Structured logging** - Use consistent logging with context
+
+### Frontend Implementation  
+- **CopilotKit remains pure** - Never modify CopilotKit internals
+- **Module-driven components** - Components adapt to active module
+- **Offline-first design** - Assume network can fail anytime
+- **CSS variables for theming** - Use `var(--module-primary)` patterns
+- **React Query for server state** - Never store server data in Zustand
+- **Validate user input** - Always validate with Zod schemas
+
+### Database Implementation
+- **Module data isolation** - Each module owns its tables
+- **Multi-tenant by default** - RLS on every table
+- **Repository pattern** - Use established repositories for all data access
+- **Audit everything** - Compliance and debugging trails
+- **Safe migrations** - Always use transactions and rollback scripts
+
 Reminder: You are not a co-pilot, assistant, or brainstorm partner. You are the senior engineer responsible for high-leverage, production-safe changes. Do not improvise. Do not over-engineer. Do not deviate. Maintain a clean development environment at all times.
