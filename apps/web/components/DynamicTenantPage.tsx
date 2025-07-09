@@ -20,6 +20,7 @@ const DynamicVideoPlayerModal = lazy(() =>
 );
 import { useUserPreferences } from '../app/hooks/useUserPreferences';
 import type { UserPreferences, TenantConfig } from '../app/lib/types';
+import { defaultActionRegistry, initializeDefaultHandlers, type ActionData } from '../app/lib/widgetActionRegistry';
 
 // Diagnostic: Track module load
 console.log('[DynamicTenantPage] Module loaded - Database-driven mode');
@@ -108,6 +109,14 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     console.log('[DynamicTenantPage] 🎯 Component mounting...');
     hasMounted.current = true;
     console.log('[DynamicTenantPage] ✅ Component mounted, hasMounted set to true');
+
+    // Initialize widget action registry with existing handlers
+    initializeDefaultHandlers({
+      setVideoModalData,
+      setIsVideoModalOpen,
+      setWorksheetModalData,
+      setIsWorksheetModalOpen
+    });
   }, []);
 
   // Trigger user preferences fetch on initial mount when session is available
@@ -393,52 +402,14 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
 
 
   // Action handler for Universal Widget Schema interactions
-  const handleAction = useCallback(async (action: { action: string; label: string; [key: string]: unknown }) => {
+  const handleAction = useCallback(async (action: ActionData) => {
     console.log('[DynamicTenantPage] Action triggered:', action);
 
-    switch (action.action) {
-      case 'openVideoModal':
-        console.log('[DynamicTenantPage] Opening video modal:', action);
-        setVideoModalData(action);
-        setIsVideoModalOpen(true);
-        break;
-
-      case 'openWorksheet': {
-        console.log('[DynamicTenantPage] Opening worksheet with action:', JSON.stringify(action, null, 2));
-        const actionParams = action.parameters as Record<string, unknown>;
-
-        // Phase 2: Agent-driven template selection with observability
-        const agentReasoning = actionParams?.reasoning as string;
-        const contentAnalysis = actionParams?.contentAnalysis as string;
-
-        if (agentReasoning || contentAnalysis) {
-          console.log('[DynamicTenantPage] Agent template selection:', {
-            templateId: actionParams?.templateId,
-            reasoning: agentReasoning,
-            contentAnalysis: contentAnalysis
-          });
-        }
-
-        setWorksheetModalData({
-          contentId: (action.contentId as string) || (actionParams?.contentId as string) || 'unknown',
-          title: (action.title as string) || (actionParams?.title as string) || 'Content Worksheet',
-          templateId: (action.templateId as string) || (actionParams?.templateId as string) || '663570eb-babd-41cd-9bfa-18972275863b',
-          // Phase 2: Include agent decision metadata for observability
-          agentReasoning,
-          contentAnalysis
-        });
-        setIsWorksheetModalOpen(true);
-        break;
-      }
-
-      case 'completeProgress':
-        console.log('[DynamicTenantPage] Completing progress:', action);
-        // TODO: Implement progress completion
-        break;
-
-      default:
-        console.warn('[DynamicTenantPage] Unknown action:', action);
-        break;
+    // ✅ ARCHITECTURAL FIX: Use action registry instead of hardcoded switch statement
+    try {
+      await defaultActionRegistry.handle(action);
+    } catch (error) {
+      console.error('[DynamicTenantPage] Action handling failed:', error);
     }
   }, []);
 
