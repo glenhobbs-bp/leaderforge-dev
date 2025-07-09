@@ -1,10 +1,10 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/9/2025, 7:07:02 AM*
+*Generated on 7/9/2025, 1:50:59 PM*
 
 ## Overview
 
-- **Total Files**: 362
+- **Total Files**: 367
 - **Total Size**: 2.91 MB
 - **Generator Version**: 1.0.0
 
@@ -12,22 +12,22 @@
 
 - **.ts**: 145 files
 - **.md**: 128 files
-- **.tsx**: 59 files
+- **.tsx**: 64 files
 - **.json**: 18 files
 - **.js**: 10 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 204 files
-- **AI agent**: 188 files
+- **TypeScript**: 209 files
+- **AI agent**: 190 files
 - **documentation**: 132 files
 - **security**: 101 files
+- **React**: 64 files
 - **API**: 61 files
-- **React**: 59 files
 - **Next.js API**: 59 files
-- **UI**: 49 files
-- **React hooks**: 47 files
+- **UI**: 54 files
+- **React hooks**: 50 files
 - **utility**: 36 files
 
 ## File Inventory
@@ -1141,10 +1141,10 @@ File: apps/web/components/copilot/EntitlementActions.tsx
 
 ### `apps/web/components/DynamicTenantPage.tsx`
 
-Agent-native 3-panel layout. Pure renderer - displays only what agents return.
+Agent-native 3-panel layout orchestrator using modular components for clean architecture
 
-**Complexity**: high • **Size**: 48.7KB
-**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
+**Owner**: Frontend Team • **Complexity**: low • **Size**: 2.6KB
+**Tags**: `#tenant-page #orchestration #modular #performance`, `React`, `TypeScript`, `UI`, `React hooks`
 **Modified**: 7/9/2025
 
 
@@ -1283,6 +1283,15 @@ Start with initialSession to prevent auth flash
 **Modified**: 7/6/2025
 
 
+### `apps/web/components/ui/AuthenticationGuard.tsx`
+
+Handles authentication checks, redirects, and loading states for authenticated pages
+
+**Owner**: Frontend Team • **Complexity**: low • **Size**: 2.8KB
+**Tags**: `#authentication #guard #loading #redirect`, `React`, `TypeScript`, `UI`, `React hooks`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/components/ui/ContentPanel.tsx`
 
 —
@@ -1290,6 +1299,15 @@ Start with initialSession to prevent auth flash
 **Complexity**: low • **Size**: 0.3KB
 **Tags**: `React`, `TypeScript`, `UI`
 **Modified**: 6/27/2025
+
+
+### `apps/web/components/ui/ContentRenderer.tsx`
+
+Handles content rendering for different schema types with memoization and error states
+
+**Owner**: Frontend Team • **Complexity**: high • **Size**: 12.2KB
+**Tags**: `#content #rendering #schema #universal-widget`, `React`, `TypeScript`, `UI`, `AI agent`
+**Modified**: 7/9/2025
 
 
 ### `apps/web/components/ui/ContextSelector.tsx`
@@ -1346,6 +1364,24 @@ Purpose: Mockup Renderer - Dynamically renders JSX mockup components from agent 
 **Modified**: 6/29/2025
 
 
+### `apps/web/components/ui/ModalManager.tsx`
+
+Manages video and worksheet modals with dynamic loading and proper state management
+
+**Owner**: Frontend Team • **Complexity**: medium • **Size**: 5.8KB
+**Tags**: `#modals #video #worksheet #performance`, `React`, `TypeScript`, `UI`, `AI agent`
+**Modified**: 7/9/2025
+
+
+### `apps/web/components/ui/NavigationOrchestrator.tsx`
+
+Orchestrates navigation, agent calls, and layout management for the main tenant page
+
+**Owner**: Frontend Team • **Complexity**: high • **Size**: 14.9KB
+**Tags**: `#navigation #agent-orchestration #layout #tenant-management`, `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/components/ui/NavPanel.tsx`
 
 Navigation panel for agent-native app, themed via contextConfig
@@ -1389,6 +1425,15 @@ Three-panel layout component with theme context and collapsible navigation
 **Owner**: Frontend team • **Complexity**: low • **Size**: 2.4KB
 **Tags**: `UI`, `layout`, `theme`, `React`, `client component`, `TypeScript`, `React hooks`
 **Modified**: 7/4/2025
+
+
+### `apps/web/components/ui/UserPreferencesManager.tsx`
+
+Manages user preferences, tenant restoration, and navigation state management
+
+**Owner**: Frontend Team • **Complexity**: medium • **Size**: 11.7KB
+**Tags**: `#user-preferences #tenant-restoration #navigation #state-management`, `React`, `TypeScript`, `UI`, `React hooks`
+**Modified**: 7/9/2025
 
 
 ### `apps/web/components/ui/UserProfileModal.tsx`
@@ -2727,7 +2772,7 @@ First update Firestore
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 184.4KB
+**Size**: 185.8KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 
@@ -2736,7 +2781,7 @@ docs.copilotkit.ai/guides/frontend-actions",
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 70.6KB
+**Size**: 71.2KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 

@@ -1,23 +1,23 @@
 {
   "metadata": {
-    "generated_at": "2025-07-09T11:07:02.071Z",
+    "generated_at": "2025-07-09T17:50:59.336Z",
     "generator_version": "1.0.0",
-    "total_files": 362,
-    "total_size_bytes": 3053023,
+    "total_files": 367,
+    "total_size_bytes": 3056281,
     "file_types": {
       ".ts": 145,
       ".json": 18,
-      ".tsx": 59,
+      ".tsx": 64,
       ".js": 10,
       ".md": 128,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 204,
+      "TypeScript": 209,
       "API": 61,
-      "AI agent": 188,
-      "React": 59,
-      "React hooks": 47,
+      "AI agent": 190,
+      "React": 64,
+      "React hooks": 50,
       "Next.js API": 59,
       "security": 101,
       "navigation": 7,
@@ -53,17 +53,23 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 49,
+      "#tenant-page #orchestration #modular #performance": 1,
+      "UI": 54,
+      "#authentication #guard #loading #redirect": 1,
+      "#content #rendering #schema #universal-widget": 1,
       "modal": 1,
       "legal": 1,
       "design-system": 1,
       "glassmorphism": 1,
+      "#modals #video #worksheet #performance": 1,
       "context-based": 1,
+      "#navigation #agent-orchestration #layout #tenant-management": 1,
       "UI component": 1,
       "progress tracking": 1,
       "video": 1,
       "layout": 1,
       "theme": 1,
+      "#user-preferences #tenant-restoration #navigation #state-management": 1,
       "avatar": 1,
       "dashboard": 1,
       "agent context": 1,
@@ -2711,28 +2717,27 @@
       "name": "DynamicTenantPage.tsx",
       "directory": "apps/web/components",
       "extension": ".tsx",
-      "purpose": "Agent-native 3-panel layout. Pure renderer - displays only what agents return.",
+      "purpose": "Agent-native 3-panel layout orchestrator using modular components for clean architecture",
+      "owner": "Frontend Team",
       "tags": [
+        "#tenant-page #orchestration #modular #performance",
         "React",
         "TypeScript",
         "UI",
-        "React hooks",
-        "AI agent"
+        "React hooks"
       ],
       "dependencies": [
         "react",
-        "./ui/ThreePanelLayout",
-        "./ui/NavPanel",
-        "./ai/UniversalSchemaRenderer",
-        "../../../packages/agent-core/types/ComponentSchema",
-        "../../../packages/agent-core/types/UniversalWidgetSchema",
-        "./forms/FormWidget",
+        "./ui/AuthenticationGuard",
+        "./ui/UserPreferencesManager",
+        "./ui/NavigationOrchestrator",
+        "../app/lib/types",
         "./SupabaseProvider"
       ],
-      "last_modified": "2025-07-09T11:03:07.019Z",
-      "size_bytes": 49839,
-      "hash": "5233c5b7",
-      "complexity": "high"
+      "last_modified": "2025-07-09T17:50:51.000Z",
+      "size_bytes": 2613,
+      "hash": "74d4c5a0",
+      "complexity": "low"
     },
     {
       "path": "apps/web/components/forms/EntitlementCheckboxForm.tsx",
@@ -3067,6 +3072,32 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/components/ui/AuthenticationGuard.tsx",
+      "name": "AuthenticationGuard.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Handles authentication checks, redirects, and loading states for authenticated pages",
+      "owner": "Frontend Team",
+      "tags": [
+        "#authentication #guard #loading #redirect",
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "../SupabaseProvider"
+      ],
+      "exports": [
+        "AuthenticationGuard"
+      ],
+      "last_modified": "2025-07-09T17:46:00.560Z",
+      "size_bytes": 2834,
+      "hash": "b9f15a30",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/components/ui/ContentPanel.tsx",
       "name": "ContentPanel.tsx",
       "directory": "apps/web/components/ui",
@@ -3084,6 +3115,32 @@
       "size_bytes": 312,
       "hash": "2c291e49",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/ContentRenderer.tsx",
+      "name": "ContentRenderer.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Handles content rendering for different schema types with memoization and error states",
+      "owner": "Frontend Team",
+      "tags": [
+        "#content #rendering #schema #universal-widget",
+        "React",
+        "TypeScript",
+        "UI",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../ai/UniversalSchemaRenderer",
+        "../../../../packages/agent-core/types/ComponentSchema",
+        "../../../../packages/agent-core/types/UniversalWidgetSchema",
+        "../../app/lib/widgetActionRegistry"
+      ],
+      "last_modified": "2025-07-09T17:48:25.517Z",
+      "size_bytes": 12489,
+      "hash": "789f4707",
+      "complexity": "high"
     },
     {
       "path": "apps/web/components/ui/ContextSelector.tsx",
@@ -3244,6 +3301,59 @@
       "complexity": "high"
     },
     {
+      "path": "apps/web/components/ui/ModalManager.tsx",
+      "name": "ModalManager.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Manages video and worksheet modals with dynamic loading and proper state management",
+      "owner": "Frontend Team",
+      "tags": [
+        "#modals #video #worksheet #performance",
+        "React",
+        "TypeScript",
+        "UI",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../../../../packages/agent-core/types/UniversalWidgetSchema",
+        "../forms/FormWidget"
+      ],
+      "last_modified": "2025-07-09T17:45:39.631Z",
+      "size_bytes": 5957,
+      "hash": "e05e0666",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/ui/NavigationOrchestrator.tsx",
+      "name": "NavigationOrchestrator.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Orchestrates navigation, agent calls, and layout management for the main tenant page",
+      "owner": "Frontend Team",
+      "tags": [
+        "#navigation #agent-orchestration #layout #tenant-management",
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "./ThreePanelLayout",
+        "./NavPanel",
+        "./ContentRenderer",
+        "./ModalManager",
+        "../../app/lib/types",
+        "../../app/lib/widgetActionRegistry"
+      ],
+      "last_modified": "2025-07-09T17:49:47.718Z",
+      "size_bytes": 15223,
+      "hash": "14d8d0ba",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/components/ui/NavPanel.tsx",
       "name": "NavPanel.tsx",
       "directory": "apps/web/components/ui",
@@ -3369,6 +3479,33 @@
       "size_bytes": 2410,
       "hash": "1fb21da5",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/ui/UserPreferencesManager.tsx",
+      "name": "UserPreferencesManager.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "Manages user preferences, tenant restoration, and navigation state management",
+      "owner": "Frontend Team",
+      "tags": [
+        "#user-preferences #tenant-restoration #navigation #state-management",
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "../../app/hooks/useUserPreferences",
+        "../../app/lib/types"
+      ],
+      "exports": [
+        "UserPreferencesManager"
+      ],
+      "last_modified": "2025-07-09T17:47:30.591Z",
+      "size_bytes": 12025,
+      "hash": "d9fd8bb9",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/ui/UserProfileModal.tsx",
@@ -5759,9 +5896,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T10:19:52.471Z",
-      "size_bytes": 188868,
-      "hash": "debe8814"
+      "last_modified": "2025-07-09T11:07:02.078Z",
+      "size_bytes": 190237,
+      "hash": "8a75692a"
     },
     {
       "path": "docs/manifest.md",
@@ -5774,9 +5911,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T10:19:52.482Z",
-      "size_bytes": 72292,
-      "hash": "877d8afc"
+      "last_modified": "2025-07-09T11:07:02.104Z",
+      "size_bytes": 72879,
+      "hash": "8b668870"
     },
     {
       "path": "docs/mockup-system-guide.md",
