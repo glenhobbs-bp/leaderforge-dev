@@ -156,6 +156,9 @@ export default function NavPanel({
     // Prevent multiple restoration calls
     if (hasRestoredNav.current) return;
 
+    // Only run if we have the required data
+    if (!lastNavOptionId && !selectedNavOptionId) return;
+
     // Prioritize prop value over persisted state
     const navToRestore = selectedNavOptionId || lastNavOptionId;
 
@@ -184,7 +187,16 @@ export default function NavPanel({
                 hasUserInteracted ? 'user has interacted' : 'unknown'
       });
     }
-  }, [lastNavOptionId, selectedNavOptionId, hasUserInteracted, tenantKey]); // Track user interaction to prevent override
+  }, [tenantKey, lastNavOptionId, selectedNavOptionId]); // ✅ FIX: Run when these values are available
+
+  // Handle selectedNavOptionId prop changes (from NavigationOrchestrator)
+  useEffect(() => {
+    if (selectedNavOptionId && selectedNavOptionId !== selectedNav) {
+      console.log('[NavPanel] 🔄 Updating selectedNav from prop:', selectedNavOptionId);
+      setSelectedNav(selectedNavOptionId);
+      setHasUserInteracted(true); // Mark as interacted to prevent overrides
+    }
+  }, [selectedNavOptionId]);
 
   // Reset restoration flag when tenant changes
   useEffect(() => {

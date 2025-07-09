@@ -55,6 +55,7 @@ interface NavigationOrchestratorProps {
   defaultTenantKey?: string;
   userId?: string;
   isReady: boolean;
+  selectedNavOptionId?: string | null;
 }
 
 export function NavigationOrchestrator({
@@ -62,7 +63,8 @@ export function NavigationOrchestrator({
   initialTenantConfig,
   defaultTenantKey,
   userId,
-  isReady
+  isReady,
+  selectedNavOptionId: propSelectedNavOptionId
 }: NavigationOrchestratorProps) {
   // Core tenant state
   const [currentTenant, setCurrentTenant] = useState<string>(
@@ -102,6 +104,16 @@ export function NavigationOrchestrator({
     }
   }, [isReady]);
 
+  // Handle selected navigation option from props (e.g., user preferences restoration)
+  useEffect(() => {
+    if (propSelectedNavOptionId && propSelectedNavOptionId !== selectedNavOptionId && isReady && userId) {
+      console.log('[NavigationOrchestrator] Loading content for prop selectedNavOptionId:', propSelectedNavOptionId);
+      setSelectedNavOptionId(propSelectedNavOptionId);
+      // Use a flag to prevent saving state during prop-driven navigation
+      loadContentForNavOption(propSelectedNavOptionId, false, true);
+    }
+  }, [propSelectedNavOptionId, selectedNavOptionId, isReady, userId]);
+
   // 🤖 AGENT-NATIVE: Fetch agent schema for navigation option
   const fetchAgentSchema = async (navId: string) => {
     if (!userId) {
@@ -114,11 +126,22 @@ export function NavigationOrchestrator({
       setContentLoading(true);
       setError(null);
 
-      // Construct the agent API URL
-      const agentUrl = `/api/agent/content?tenantKey=${encodeURIComponent(currentTenant)}&navId=${encodeURIComponent(navId)}&userId=${encodeURIComponent(userId)}`;
-      console.log('[NavigationOrchestrator] Agent URL:', agentUrl);
+      // Use POST request as expected by the agent content API
+      const response = await fetch('/api/agent/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          tenantKey: currentTenant,
+          navOptionId: navId,
+          intent: {
+            message: `Load content for navigation option ${navId}`
+          }
+        })
+      });
 
-      const response = await fetch(agentUrl);
       console.log('[NavigationOrchestrator] Agent response status:', response.status, response.statusText);
 
       if (!response.ok) {
@@ -152,15 +175,15 @@ export function NavigationOrchestrator({
   };
 
   // Load content for a specific navigation option
-  const loadContentForNavOption = async (navId: string, updateSelection: boolean = true) => {
-    console.log('[NavigationOrchestrator] 🔧 Loading content for nav option:', navId, 'updateSelection:', updateSelection);
+  const loadContentForNavOption = async (navId: string, updateSelection: boolean = true, skipStateSave: boolean = false) => {
+    console.log('[NavigationOrchestrator] 🔧 Loading content for nav option:', navId, 'updateSelection:', updateSelection, 'skipStateSave:', skipStateSave);
 
     if (updateSelection) {
       setSelectedNavOptionId(navId);
     }
 
-    // Save navigation state to user preferences via API call
-    if (userId) {
+    // Save navigation state to user preferences via API call (skip if this is prop-driven navigation)
+    if (userId && !skipStateSave) {
       try {
         console.log('[NavigationOrchestrator] 💾 Saving navigation state:', {
           tenantKey: currentTenant,
@@ -168,11 +191,10 @@ export function NavigationOrchestrator({
           userId: userId
         });
 
-        const saveResponse = await fetch('/api/user/preferences', {
+        const saveResponse = await fetch(`/api/user/${userId}/preferences`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userId: userId,
             preferences: {
               navigationState: {
                 lastTenant: currentTenant,
@@ -201,7 +223,7 @@ export function NavigationOrchestrator({
   const handleNavSelect = async (navId: string) => {
     // Update selection and load content
     setSelectedNavOptionId(navId);
-    await loadContentForNavOption(navId, false); // Don't update selection again
+    await loadContentForNavOption(navId, false, true); // Don't update selection again, and skip state save (NavPanel handles it)
   };
 
   // Create nav component using database-driven approach

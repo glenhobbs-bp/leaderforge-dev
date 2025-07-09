@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-07-09T17:50:59.336Z",
+    "generated_at": "2025-07-09T21:46:59.141Z",
     "generator_version": "1.0.0",
-    "total_files": 367,
-    "total_size_bytes": 3056281,
+    "total_files": 368,
+    "total_size_bytes": 3071196,
     "file_types": {
       ".ts": 145,
       ".json": 18,
       ".tsx": 64,
       ".js": 10,
-      ".md": 128,
+      ".md": 129,
       ".sql": 2
     },
     "tags": {
       "TypeScript": 209,
       "API": 61,
-      "AI agent": 190,
+      "AI agent": 191,
       "React": 64,
       "React hooks": 50,
       "Next.js API": 59,
-      "security": 101,
+      "security": 102,
       "navigation": 7,
       "routing": 3,
       "API endpoint": 4,
@@ -80,7 +80,7 @@
       "feature-flags": 3,
       "prototyping": 1,
       "exports": 1,
-      "documentation": 132,
+      "documentation": 133,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -1933,9 +1933,9 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-07-08T16:54:19.255Z",
-      "size_bytes": 27198,
-      "hash": "5fe6ef64",
+      "last_modified": "2025-07-09T18:46:59.397Z",
+      "size_bytes": 28640,
+      "hash": "5db34fb2",
       "complexity": "high"
     },
     {
@@ -2734,9 +2734,9 @@
         "../app/lib/types",
         "./SupabaseProvider"
       ],
-      "last_modified": "2025-07-09T17:50:51.000Z",
-      "size_bytes": 2613,
-      "hash": "74d4c5a0",
+      "last_modified": "2025-07-09T18:33:06.534Z",
+      "size_bytes": 2722,
+      "hash": "c7dcd5b4",
       "complexity": "low"
     },
     {
@@ -3137,9 +3137,9 @@
         "../../../../packages/agent-core/types/UniversalWidgetSchema",
         "../../app/lib/widgetActionRegistry"
       ],
-      "last_modified": "2025-07-09T17:48:25.517Z",
-      "size_bytes": 12489,
-      "hash": "789f4707",
+      "last_modified": "2025-07-09T18:50:18.800Z",
+      "size_bytes": 12543,
+      "hash": "76f6d2cd",
       "complexity": "high"
     },
     {
@@ -3348,9 +3348,9 @@
         "../../app/lib/types",
         "../../app/lib/widgetActionRegistry"
       ],
-      "last_modified": "2025-07-09T17:49:47.718Z",
-      "size_bytes": 15223,
-      "hash": "14d8d0ba",
+      "last_modified": "2025-07-09T21:46:05.989Z",
+      "size_bytes": 16215,
+      "hash": "b1d4c717",
       "complexity": "high"
     },
     {
@@ -3382,9 +3382,9 @@
         "./UserProfileModal",
         "./LegalTermsModal"
       ],
-      "last_modified": "2025-07-07T01:16:17.241Z",
-      "size_bytes": 21736,
-      "hash": "92f99dad",
+      "last_modified": "2025-07-09T21:25:07.959Z",
+      "size_bytes": 22235,
+      "hash": "220e74fc",
       "complexity": "high"
     },
     {
@@ -5896,9 +5896,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T11:07:02.078Z",
-      "size_bytes": 190237,
-      "hash": "8a75692a"
+      "last_modified": "2025-07-09T21:25:59.880Z",
+      "size_bytes": 195147,
+      "hash": "04917c79"
     },
     {
       "path": "docs/manifest.md",
@@ -5911,9 +5911,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T11:07:02.104Z",
-      "size_bytes": 72879,
-      "hash": "8b668870"
+      "last_modified": "2025-07-09T21:25:59.906Z",
+      "size_bytes": 74878,
+      "hash": "40ba0cfd"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -6082,6 +6082,21 @@
       "last_modified": "2025-06-27T21:33:12.257Z",
       "size_bytes": 8697,
       "hash": "d45062de"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0004-static-page-agent-support-fix.md",
+      "name": "QA-0004-static-page-agent-support-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "/(rsc)/./app/lib/agentService.ts:51:23)",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-09T21:25:42.592Z",
+      "size_bytes": 4910,
+      "hash": "1b6e220f"
     },
     {
       "path": "docs/quality-assurance/README.md",

@@ -1,17 +1,17 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/9/2025, 1:50:59 PM*
+*Generated on 7/9/2025, 5:46:59 PM*
 
 ## Overview
 
-- **Total Files**: 367
-- **Total Size**: 2.91 MB
+- **Total Files**: 368
+- **Total Size**: 2.93 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
 - **.ts**: 145 files
-- **.md**: 128 files
+- **.md**: 129 files
 - **.tsx**: 64 files
 - **.json**: 18 files
 - **.js**: 10 files
@@ -20,9 +20,9 @@
 ## Most Common Tags
 
 - **TypeScript**: 209 files
-- **AI agent**: 190 files
-- **documentation**: 132 files
-- **security**: 101 files
+- **AI agent**: 191 files
+- **documentation**: 133 files
+- **security**: 102 files
 - **React**: 64 files
 - **API**: 61 files
 - **Next.js API**: 59 files
@@ -792,9 +792,9 @@ Get initial session server-side for SSR using the same restoration logic
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: high • **Size**: 26.6KB
+**Complexity**: high • **Size**: 28.0KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 7/8/2025
+**Modified**: 7/9/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -1143,7 +1143,7 @@ File: apps/web/components/copilot/EntitlementActions.tsx
 
 Agent-native 3-panel layout orchestrator using modular components for clean architecture
 
-**Owner**: Frontend Team • **Complexity**: low • **Size**: 2.6KB
+**Owner**: Frontend Team • **Complexity**: low • **Size**: 2.7KB
 **Tags**: `#tenant-page #orchestration #modular #performance`, `React`, `TypeScript`, `UI`, `React hooks`
 **Modified**: 7/9/2025
 
@@ -1377,7 +1377,7 @@ Manages video and worksheet modals with dynamic loading and proper state managem
 
 Orchestrates navigation, agent calls, and layout management for the main tenant page
 
-**Owner**: Frontend Team • **Complexity**: high • **Size**: 14.9KB
+**Owner**: Frontend Team • **Complexity**: high • **Size**: 15.8KB
 **Tags**: `#navigation #agent-orchestration #layout #tenant-management`, `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 7/9/2025
 
@@ -1386,9 +1386,9 @@ Orchestrates navigation, agent calls, and layout management for the main tenant 
 
 Navigation panel for agent-native app, themed via contextConfig
 
-**Owner**: Frontend team • **Complexity**: high • **Size**: 21.2KB
+**Owner**: Frontend team • **Complexity**: high • **Size**: 21.7KB
 **Tags**: `UI`, `navigation`, `context-based`, `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 7/6/2025
+**Modified**: 7/9/2025
 
 
 ### `apps/web/components/ui/ProgressBar.tsx`
@@ -2772,7 +2772,7 @@ First update Firestore
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 185.8KB
+**Size**: 190.6KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 
@@ -2781,7 +2781,7 @@ docs.copilotkit.ai/guides/frontend-actions",
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 71.2KB
+**Size**: 73.1KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 
@@ -2892,6 +2892,15 @@ Links to specific video content
 **Size**: 8.5KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/27/2025
+
+
+### `docs/quality-assurance/audits/QA-0004-static-page-agent-support-fix.md`
+
+/(rsc)/./app/lib/agentService.ts:51:23)
+
+**Size**: 4.8KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/9/2025
 
 
 ### `docs/quality-assurance/README.md`

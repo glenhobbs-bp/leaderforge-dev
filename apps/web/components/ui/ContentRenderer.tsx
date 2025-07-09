@@ -124,6 +124,7 @@ export function ContentRenderer({
 
       // Map routes to their corresponding page components
       const routeComponentMap: Record<string, string> = {
+        '/context/preferences': 'PromptContextsPage',
         'context/preferences': 'PromptContextsPage'
       };
 

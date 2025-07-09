@@ -10,7 +10,7 @@ export interface Agent {
   id: string;
   name: string;
   display_name: string | null;
-  type: 'llm' | 'langgraph' | 'tool' | 'workflow' | 'mockup' | 'direct';
+  type: 'llm' | 'langgraph' | 'tool' | 'workflow' | 'mockup' | 'direct' | 'static_page';
   prompt: string | null;
   tools: string[] | null;
   model: string | null;
@@ -103,6 +103,9 @@ export class AgentService {
 
       case 'direct':
         return this.invokeDirectAgent(agent, request);
+
+      case 'static_page':
+        return this.invokeStaticPageAgent(agent, request);
 
       default:
         throw new Error(`Unsupported agent type: ${agent.type}`);
@@ -729,6 +732,48 @@ export class AgentService {
       metadata: {
         agentType: 'direct',
         executionTime: 0, // Instant navigation
+        userId: request.userId,
+        tenantKey: request.tenantKey,
+        directRoute: route
+      }
+    };
+  }
+
+  /**
+   * Invoke static page agent - handles direct routing to Next.js pages (ADR-0025)
+   * ✅ STATIC PAGE ROUTING: Highest performance pattern for simple CRUD operations
+   */
+  private async invokeStaticPageAgent(
+    agent: Agent,
+    request: AgentInvocationRequest
+  ): Promise<AgentInvocationResponse> {
+    console.log(`[AgentService] Invoking static page agent: ${agent.name}`);
+
+    const route = agent.config?.route;
+    if (!route) {
+      throw new Error(`Static page agent ${agent.name} missing route config`);
+    }
+
+    // Return static page response for frontend routing
+    return {
+      type: 'static_page',
+      content: {
+        route: route,
+        title: agent.config?.title || agent.display_name || agent.name,
+        description: agent.config?.description || 'Static page content',
+        componentId: agent.config?.componentId,
+        metadata: {
+          agentId: agent.id,
+          agentName: agent.name,
+          targetRoute: route,
+          performanceTier: 'high',
+          routingType: 'static_page',
+          timestamp: new Date().toISOString()
+        }
+      },
+      metadata: {
+        agentType: 'static_page',
+        executionTime: 0, // Instant static page rendering
         userId: request.userId,
         tenantKey: request.tenantKey,
         directRoute: route

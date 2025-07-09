@@ -31,6 +31,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     props.defaultTenantKey || props.initialTenants?.[0]?.tenant_key || 'leaderforge'
   );
   const [isPreferencesReady, setIsPreferencesReady] = useState(false);
+  const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
 
   // Handle tenant changes from user preferences
   const handleTenantChange = (tenantKey: string) => {
@@ -41,7 +42,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   // Handle navigation option selection from user preferences
   const handleNavOptionSelect = (navId: string) => {
     console.log('[DynamicTenantPage] Navigation option selected:', navId);
-    // Navigation selection is handled by NavigationOrchestrator
+    setSelectedNavOptionId(navId);
   };
 
   // Handle preferences ready callback
@@ -66,6 +67,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           defaultTenantKey={props.defaultTenantKey}
           userId={session?.user?.id}
           isReady={isPreferencesReady}
+          selectedNavOptionId={selectedNavOptionId}
         />
       )}
     </AuthenticationGuard>
