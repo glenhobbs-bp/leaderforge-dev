@@ -597,17 +597,17 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         }
 
         // 🗄️ DATABASE-DRIVEN: Create simple welcome schema without agent calls
-        const contextNames: Record<string, string> = {
-          'brilliant': 'Brilliant Movement',
-          'leaderforge': 'LeaderForge',
-          'wealth': 'Wealth Academy'
-        };
+                // ✅ FIXED: Use database display_name instead of hard-coded contextNames
+        const tenantConfig = props.initialTenants?.find(t => t.tenant_key === currentTenant);
+        const tenantDisplayName = (tenantConfig as Record<string, unknown>)?.display_name as string ||
+                                  tenantConfig?.name ||
+                                  currentTenant.charAt(0).toUpperCase() + currentTenant.slice(1);
 
         const welcomeSchema: AgentSchema = {
           type: 'content_schema',
           content: {
             type: 'welcome',
-            title: contextNames[currentTenant] || currentTenant.charAt(0).toUpperCase() + currentTenant.slice(1),
+            title: tenantDisplayName,
             description: 'Select an option from the navigation to get started.',
             action: 'Browse Navigation'
           }
