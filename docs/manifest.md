@@ -1,17 +1,17 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/9/2025, 6:19:52 AM*
+*Generated on 7/9/2025, 7:07:02 AM*
 
 ## Overview
 
-- **Total Files**: 359
-- **Total Size**: 2.89 MB
+- **Total Files**: 362
+- **Total Size**: 2.91 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 143 files
-- **.md**: 127 files
+- **.ts**: 145 files
+- **.md**: 128 files
 - **.tsx**: 59 files
 - **.json**: 18 files
 - **.js**: 10 files
@@ -19,16 +19,16 @@
 
 ## Most Common Tags
 
-- **TypeScript**: 202 files
-- **AI agent**: 185 files
-- **documentation**: 131 files
+- **TypeScript**: 204 files
+- **AI agent**: 188 files
+- **documentation**: 132 files
 - **security**: 101 files
 - **API**: 61 files
 - **React**: 59 files
 - **Next.js API**: 59 files
 - **UI**: 49 files
 - **React hooks**: 47 files
-- **utility**: 34 files
+- **utility**: 36 files
 
 ## File Inventory
 
@@ -950,6 +950,15 @@ Service for organization and membership logic. All business rules and data acces
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/lib/performanceMonitor.ts`
+
+File: apps/web/app/lib/performanceMonitor.ts
+
+**Complexity**: high • **Size**: 9.8KB
+**Tags**: `TypeScript`, `utility`, `AI agent`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/app/lib/provisioningService.ts`
 
 Service for provisioning users, orgs, and entitlements. All business rules and data access for provisioning live here.
@@ -1058,6 +1067,15 @@ User service layer with optimized database operations and caching
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/lib/widgetActionRegistry.ts`
+
+File: apps/web/app/lib/widgetActionRegistry.ts
+
+**Complexity**: medium • **Size**: 4.4KB
+**Tags**: `TypeScript`, `utility`, `AI agent`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/app/login/page.tsx`
 
 Public login page with styled Supabase Auth UI and token synchronization
@@ -1125,7 +1143,7 @@ File: apps/web/components/copilot/EntitlementActions.tsx
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 49.7KB
+**Complexity**: high • **Size**: 48.7KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 7/9/2025
 
@@ -2541,6 +2559,15 @@ Mock data schema patterns
 **Size**: 3.2KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/3/2025
+
+
+### `docs/engineering/implementation-plans/dynamic-tenant-page-performance-refactor.md`
+
+—
+
+**Size**: 6.8KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/9/2025
 
 
 ### `docs/engineering/implementation-plans/prompt-contexts-schema-design.md`

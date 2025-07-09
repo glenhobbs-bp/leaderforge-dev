@@ -1,21 +1,21 @@
 {
   "metadata": {
-    "generated_at": "2025-07-09T10:19:52.462Z",
+    "generated_at": "2025-07-09T11:07:02.071Z",
     "generator_version": "1.0.0",
-    "total_files": 359,
-    "total_size_bytes": 3032473,
+    "total_files": 362,
+    "total_size_bytes": 3053023,
     "file_types": {
-      ".ts": 143,
+      ".ts": 145,
       ".json": 18,
       ".tsx": 59,
       ".js": 10,
-      ".md": 127,
+      ".md": 128,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 202,
+      "TypeScript": 204,
       "API": 61,
-      "AI agent": 185,
+      "AI agent": 188,
       "React": 59,
       "React hooks": 47,
       "Next.js API": 59,
@@ -42,7 +42,7 @@
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 34,
+      "utility": 36,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
@@ -74,7 +74,7 @@
       "feature-flags": 3,
       "prototyping": 1,
       "exports": 1,
-      "documentation": 131,
+      "documentation": 132,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -2282,6 +2282,22 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/lib/performanceMonitor.ts",
+      "name": "performanceMonitor.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/lib/performanceMonitor.ts",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-09T11:05:56.349Z",
+      "size_bytes": 10070,
+      "hash": "9069f01b",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/app/lib/provisioningService.ts",
       "name": "provisioningService.ts",
       "directory": "apps/web/app/lib",
@@ -2520,6 +2536,22 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/lib/widgetActionRegistry.ts",
+      "name": "widgetActionRegistry.ts",
+      "directory": "apps/web/app/lib",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/lib/widgetActionRegistry.ts",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-09T11:02:43.119Z",
+      "size_bytes": 4521,
+      "hash": "b0eb3a55",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/app/login/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/login",
@@ -2697,9 +2729,9 @@
         "./forms/FormWidget",
         "./SupabaseProvider"
       ],
-      "last_modified": "2025-07-09T10:18:38.064Z",
-      "size_bytes": 50850,
-      "hash": "710ac050",
+      "last_modified": "2025-07-09T11:03:07.019Z",
+      "size_bytes": 49839,
+      "hash": "5233c5b7",
       "complexity": "high"
     },
     {
@@ -5444,6 +5476,20 @@
       "hash": "669d4148"
     },
     {
+      "path": "docs/engineering/implementation-plans/dynamic-tenant-page-performance-refactor.md",
+      "name": "dynamic-tenant-page-performance-refactor.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-09T10:45:18.547Z",
+      "size_bytes": 6970,
+      "hash": "4125a523"
+    },
+    {
       "path": "docs/engineering/implementation-plans/prompt-contexts-schema-design.md",
       "name": "prompt-contexts-schema-design.md",
       "directory": "docs/engineering/implementation-plans",
@@ -5713,9 +5759,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T10:08:55.382Z",
+      "last_modified": "2025-07-09T10:19:52.471Z",
       "size_bytes": 188868,
-      "hash": "38582def"
+      "hash": "debe8814"
     },
     {
       "path": "docs/manifest.md",
@@ -5728,9 +5774,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T10:08:55.407Z",
+      "last_modified": "2025-07-09T10:19:52.482Z",
       "size_bytes": 72292,
-      "hash": "5a233fd8"
+      "hash": "877d8afc"
     },
     {
       "path": "docs/mockup-system-guide.md",
