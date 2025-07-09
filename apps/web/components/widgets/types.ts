@@ -13,6 +13,11 @@ export enum WidgetCapabilities {
   MODAL_DISPLAY = 'modal-display',
   GRID_LAYOUT = 'grid-layout',
   RESPONSIVE_LAYOUT = 'responsive-layout',
+  DATA_DISPLAY = 'data-display',
+  PREFERENCE_MANAGEMENT = 'preference-management',
+  REAL_TIME_TOGGLE = 'real-time-toggle',
+  GROUPING_SUPPORT = 'grouping-support',
+  LOADING_STATES = 'loading-states',
 }
 
 export enum AssetCapabilities {
@@ -37,6 +42,7 @@ export interface RegisteredWidget {
   metadata: WidgetMetadata;
   component: React.ComponentType<unknown>;
   componentPath: string;
+  schemaToProps?: (schema: unknown) => Record<string, unknown>;
 }
 
 export class WidgetRegistry {

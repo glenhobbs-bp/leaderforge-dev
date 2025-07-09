@@ -10,7 +10,7 @@ export interface Agent {
   id: string;
   name: string;
   display_name: string | null;
-  type: 'llm' | 'langgraph' | 'tool' | 'workflow' | 'mockup';
+  type: 'llm' | 'langgraph' | 'tool' | 'workflow' | 'mockup' | 'direct';
   prompt: string | null;
   tools: string[] | null;
   model: string | null;
@@ -100,6 +100,9 @@ export class AgentService {
 
       case 'mockup':
         return this.invokeMockupAgent(agent, request);
+
+      case 'direct':
+        return this.invokeDirectAgent(agent, request);
 
       default:
         throw new Error(`Unsupported agent type: ${agent.type}`);
@@ -573,6 +576,162 @@ export class AgentService {
         executionTime: Date.now(),
         userId: request.userId,
         tenantKey: request.tenantKey
+      }
+    };
+  }
+
+  /**
+   * Invoke direct agent - handles instant navigation to pages without LangGraph
+   * ✅ DIRECT ROUTING: Bypasses agent orchestration for instant page navigation or ContentPanel rendering
+   */
+  private async invokeDirectAgent(
+    agent: Agent,
+    request: AgentInvocationRequest
+  ): Promise<AgentInvocationResponse> {
+    console.log(`[AgentService] Invoking direct agent: ${agent.name}`);
+
+    // Check if this should render within ContentPanel
+    if (agent.config?.renderInContentPanel) {
+      console.log(`[AgentService] Direct agent configured for ContentPanel rendering`);
+
+      const componentType = agent.config?.componentType;
+      if (!componentType) {
+        throw new Error(`Direct agent ${agent.name} configured for ContentPanel but missing componentType`);
+      }
+
+      // For PromptContext components, fetch the contexts and create the schema
+      if (componentType === 'PromptContext') {
+        try {
+          // Fetch contexts directly from Supabase
+          const { data: contextData, error } = await this.supabase
+            .schema('core')
+            .from('prompt_contexts')
+            .select('id, name, description, context_type, priority, is_active')
+            .eq('tenant_key', request.tenantKey)
+            .eq('is_active', true)
+            .order('priority', { ascending: false });
+
+          let contexts = [];
+          if (!error && contextData) {
+            // Transform to expected format for the widget
+            contexts = contextData.map((ctx: any) => ({
+              id: ctx.id,
+              name: ctx.name,
+              description: ctx.description,
+              scope: ctx.context_type,
+              isEnabled: false, // TODO: Get actual user preferences
+              canEdit: true,
+              requiresLicense: false,
+              priority: ctx.priority
+            }));
+          }
+
+          // Create PromptContext widget schema
+          const promptContextSchema = {
+            type: "PromptContext",
+            id: "prompt-context-management",
+            version: "1.0.0",
+            data: {
+              source: "agent",
+              contextData: {
+                contexts: contexts,
+                groupByScope: true,
+                showScopeIcons: true,
+                enableRealTimeToggle: true,
+                apiEndpoint: '/api/context/preferences'
+              }
+            },
+            config: {
+              title: agent.config?.title || "Prompt Context Management",
+              subtitle: agent.config?.subtitle || "Configure how AI understands and responds to you"
+            }
+          };
+
+          return {
+            type: 'content_schema',
+            content: promptContextSchema,
+            metadata: {
+              agentId: agent.id,
+              agentName: agent.name,
+              agentType: 'direct',
+              componentType,
+              renderInContentPanel: true,
+              executionTime: 0,
+              userId: request.userId,
+              tenantKey: request.tenantKey
+            }
+          };
+
+        } catch (error) {
+          console.error(`[AgentService] Error loading contexts for direct agent:`, error);
+          // Return error content schema
+          return {
+            type: 'content_schema',
+            content: {
+              type: 'error',
+              title: 'Failed to Load Contexts',
+              description: 'Unable to load prompt contexts. Please try again.',
+              action: 'Retry'
+            },
+            metadata: {
+              agentId: agent.id,
+              agentName: agent.name,
+              error: true
+            }
+          };
+        }
+      }
+
+      // For other component types, return a generic schema
+      return {
+        type: 'content_schema',
+        content: {
+          type: componentType,
+          title: agent.config?.title || agent.display_name || agent.name,
+          subtitle: agent.config?.subtitle || 'Direct component rendering',
+          config: agent.config
+        },
+        metadata: {
+          agentId: agent.id,
+          agentName: agent.name,
+          agentType: 'direct',
+          componentType,
+          renderInContentPanel: true,
+          executionTime: 0,
+          userId: request.userId,
+          tenantKey: request.tenantKey
+        }
+      };
+    }
+
+    // Original direct routing behavior for navigation
+    const route = agent.config?.route;
+    if (!route) {
+      throw new Error(`Direct agent ${agent.name} missing route config`);
+    }
+
+    // Return direct route instruction for frontend
+    return {
+      type: 'direct_route',
+      content: {
+        route: route,
+        title: `Direct Route: ${agent.display_name || agent.name}`,
+        description: agent.config?.description || 'Direct navigation to page',
+        metadata: {
+          agentId: agent.id,
+          agentName: agent.name,
+          targetRoute: route,
+          bypassLangGraph: true,
+          routingType: 'direct',
+          timestamp: new Date().toISOString()
+        }
+      },
+      metadata: {
+        agentType: 'direct',
+        executionTime: 0, // Instant navigation
+        userId: request.userId,
+        tenantKey: request.tenantKey,
+        directRoute: route
       }
     };
   }

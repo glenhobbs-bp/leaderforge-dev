@@ -31,7 +31,8 @@ const WIDGET_TYPE_MAP: Record<string, string> = {
   'Panel': 'panel',
   'Grid': 'grid',
   'Form': 'form',
-  'Table': 'table'
+  'Table': 'table',
+  'PromptContext': 'prompt-context'
 };
 
 /**
@@ -99,16 +100,34 @@ export function WidgetDispatcher({ schema, userId, tenantKey, onAction, onProgre
       );
     }
 
-    // Standard widget rendering (includes VideoPlayer now handled by registry)
-    return (
-      <WidgetComponent
-        schema={schema}
-        userId={userId}
-        tenantKey={tenantKey}
-        onAction={onAction}
-        onProgressUpdate={onProgressUpdate}
-      />
-    );
+    // Standard widget rendering with schema transformation support
+    let componentProps: Record<string, unknown> = {
+      schema,
+      userId,
+      tenantKey,
+      onAction,
+      onProgressUpdate
+    };
+
+    // Use schemaToProps if available in widget registration
+    if (registeredWidget.schemaToProps) {
+      console.log('[WidgetDispatcher] Using schemaToProps for widget:', widgetId);
+      try {
+        const transformedProps = registeredWidget.schemaToProps(schema);
+        componentProps = {
+          ...transformedProps,
+          userId,
+          tenantKey,
+          onAction,
+          onProgressUpdate
+        };
+        console.log('[WidgetDispatcher] Transformed props:', transformedProps);
+      } catch (error) {
+        console.error('[WidgetDispatcher] schemaToProps failed for widget:', widgetId, error);
+      }
+    }
+
+    return <WidgetComponent {...componentProps} />;
   }
 
   // Unknown widget type error (registry-aware)

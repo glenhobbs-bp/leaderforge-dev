@@ -89,8 +89,9 @@ export class PromptContextResolver {
   private async getAvailableContexts(userId: string, tenantKey: string): Promise<PromptContext[]> {
     // TODO: Add entitlement checking - for now get all active contexts
     const { data: contexts, error } = await this.supabase
-      .from('core.prompt_contexts')
-      .select('*')
+      .schema('core')
+      .from('prompt_contexts')
+      .select('id, name, description, content, context_type, priority, tenant_key, created_by, is_active, template_variables')
       .eq('tenant_key', tenantKey)
       .eq('is_active', true)
       .order('priority', { ascending: false });
@@ -116,7 +117,8 @@ export class PromptContextResolver {
 
     // Get user's preferences for these contexts
     const { data: preferences, error } = await this.supabase
-      .from('core.user_context_preferences')
+      .schema('core')
+      .from('user_context_preferences')
       .select('context_id, is_enabled')
       .eq('user_id', userId)
       .in('context_id', contextIds);
@@ -198,7 +200,8 @@ export class PromptContextResolver {
   ): Promise<boolean> {
     try {
       const { error } = await this.supabase
-        .from('core.user_context_preferences')
+        .schema('core')
+        .from('user_context_preferences')
         .upsert({
           user_id: userId,
           context_id: contextId,
@@ -224,7 +227,8 @@ export class PromptContextResolver {
   async getUserContextPreferences(userId: string, tenantKey: string = 'leaderforge'): Promise<UserContextPreference[]> {
     try {
       const { data: preferences, error } = await this.supabase
-        .from('core.user_context_preferences')
+        .schema('core')
+        .from('user_context_preferences')
         .select('*')
         .eq('user_id', userId)
         .eq('tenant_key', tenantKey);

@@ -26,7 +26,7 @@ console.log('[DynamicTenantPage] Module loaded - Database-driven mode');
 
 // Agent schema types - includes mockup support for agent-native mockups
 interface AgentSchema {
-  type: 'content_schema' | 'no_agent' | 'error' | 'mockup';
+  type: 'content_schema' | 'no_agent' | 'error' | 'mockup' | 'direct_route' | 'static_page';
   content?: unknown; // ComponentSchema, mockup data, or simple content objects
   message?: string; // For no_agent responses
   metadata?: {
@@ -35,6 +35,7 @@ interface AgentSchema {
     agentId?: string;
     agentName?: string;
     agentType?: string;
+    directRoute?: string; // For direct_route responses
   };
 }
 
@@ -346,10 +347,15 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     return agentSchema?.content as ComponentSchema | { type: string; title?: string; description?: string; action?: string; message?: string } | undefined;
   }, [agentSchema?.content]);
 
-  // Check if it's a ComponentSchema (Grid, Card, etc.) or simple content - also memoized
+  // Check if it's a ComponentSchema (Grid, Card, etc.) or UniversalWidgetSchema - also memoized
   const isComponentSchema = useMemo(() => {
     return content && typeof content === 'object' && 'type' in content &&
       (content.type === 'Grid' || content.type === 'Card' || 'props' in content);
+  }, [content]);
+
+  // Check if it's a UniversalWidgetSchema (PromptContext, etc.)
+  const isUniversalWidgetSchema = useMemo(() => {
+    return content && typeof content === 'object' && 'type' in content && 'id' in content && 'data' in content && 'config' in content && 'version' in content;
   }, [content]);
 
   const isWelcomeContent = useMemo(() => {
@@ -445,6 +451,46 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       return createLoadingContent();
     }
 
+    // Check for static page response
+    if (schemaType === 'static_page' && content && typeof content === 'object' && 'route' in content) {
+      console.log('[DynamicTenantPage] Rendering static page within ContentPanel:', content);
+      const staticPageContent = content as {
+        route: string;
+        title?: string;
+        componentId?: string;
+      };
+
+      // Map routes to their corresponding page components
+      const routeComponentMap: Record<string, string> = {
+        'context/preferences': 'PromptContextsPage'
+      };
+
+      const componentName = routeComponentMap[staticPageContent.route];
+
+      if (componentName) {
+        // Dynamically import the page component through mockup system
+        const PageComponent = React.lazy(() => import(`./mockups/${componentName}`));
+
+        return (
+          <div className="static-page-content">
+            <React.Suspense fallback={createLoadingContent()}>
+              <PageComponent />
+            </React.Suspense>
+          </div>
+        );
+      } else {
+        console.warn('[DynamicTenantPage] No component mapped for static page route:', staticPageContent.route);
+        return (
+          <div className="p-6">
+            <div className="text-center">
+              <div className="text-gray-500 mb-4">📄</div>
+              <p className="text-gray-600">Static page component not found for route: {staticPageContent.route}</p>
+            </div>
+          </div>
+        );
+      }
+    }
+
     // Check for mockup agent response
     if (schemaType === 'mockup' && content && typeof content === 'object' && 'component' in content) {
       console.log('[DynamicTenantPage] Rendering mockup agent response:', content);
@@ -472,12 +518,13 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
       );
     }
 
-    if (isComponentSchema) {
+    if (isComponentSchema || isUniversalWidgetSchema) {
       console.log('[DynamicTenantPage] Rendering UniversalSchemaRenderer with userId:', {
         session: !!session,
         userId: session?.user?.id,
         authLoading,
-        sessionUser: session?.user
+        sessionUser: session?.user,
+        schemaType: content && typeof content === 'object' && 'type' in content ? content.type : 'unknown'
       });
       return (
         <div className="p-6">
@@ -526,7 +573,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         </div>
       </div>
     );
-  }, [contentLoading, isComponentSchema, isWelcomeContent, content, schemaType]);
+  }, [contentLoading, isComponentSchema, isUniversalWidgetSchema, isWelcomeContent, content, schemaType]);
 
   // 🤖 AGENT-NATIVE: Single API call to get complete UI schema
   useEffect(() => {
@@ -648,11 +695,59 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     // Show loading state while fetching content
     setContentLoading(true);
 
-    // 20-second timeout for agent content API (LangGraph needs 8-13 seconds)
+        // 20-second timeout for agent content API (LangGraph needs 8-13 seconds)
     const controller = new AbortController();
     let timeoutId: ReturnType<typeof setTimeout>;
 
     try {
+      // ✅ FIRST: Check if this is a direct route navigation option
+      console.log('[DynamicTenantPage] 🔍 Checking navigation option routing type...');
+
+      const navCheckResponse = await fetch('/api/nav/option-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          navOptionId: navId,
+          tenantKey: currentTenant
+        })
+      });
+
+      if (navCheckResponse.ok) {
+        const navDetails = await navCheckResponse.json();
+        console.log('[DynamicTenantPage] 📋 Navigation option details:', navDetails);
+
+        // Handle different routing types
+        if (navDetails.routing_type === 'direct') {
+          console.log('[DynamicTenantPage] 🔀 Direct route detected, navigating to:', navDetails.nav_key);
+          setContentLoading(false);
+          window.location.href = `/${navDetails.nav_key}`;
+          return;
+        } else if (navDetails.routing_type === 'static_page') {
+          console.log('[DynamicTenantPage] 📄 Static page detected, rendering in ContentPanel:', navDetails.nav_key);
+          setContentLoading(false);
+
+          // Render static page within ContentPanel instead of navigating away
+          setAgentSchema({
+            type: 'static_page',
+            content: {
+              type: 'static_page_content',
+              route: navDetails.nav_key,
+              title: navDetails.label,
+              componentId: `static-${navDetails.nav_key.replace('/', '-')}`
+            },
+            metadata: {
+              agentId: navDetails.agent_id,
+              agentType: 'static_page'
+            }
+          });
+          return;
+        }
+      }
+
+      // ✅ FALLBACK: Continue with agent-based routing
+      console.log('[DynamicTenantPage] 🤖 Using agent-based routing...');
+
       timeoutId = setTimeout(() => controller.abort(), 20000);
 
       // Call the agent content API
@@ -731,6 +826,30 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
           content: agentResponse.content,
           metadata: agentResponse.metadata
         });
+      } else if (agentResponse.type === 'direct_route') {
+        // Direct route agent response - navigate immediately to the route
+        console.log('[DynamicTenantPage] Direct route agent response:', agentResponse);
+        const routeInfo = agentResponse.content as { route: string; title?: string; description?: string };
+
+        if (routeInfo?.route) {
+          console.log('[DynamicTenantPage] 🔀 Direct agent route detected, navigating to:', routeInfo.route);
+          setContentLoading(false);
+
+          // Navigate directly to the route (route already includes leading slash)
+          window.location.href = routeInfo.route;
+          return;
+        } else {
+          console.error('[DynamicTenantPage] Direct route response missing route information');
+          setAgentSchema({
+            type: 'error',
+            content: {
+              type: 'error',
+              title: 'Invalid Direct Route',
+              description: 'Direct route response is missing route information',
+              action: 'Retry'
+            }
+          });
+        }
       } else if (agentResponse.type === 'content_schema' || agentResponse.schema) {
         // Agent returned content schema
         setAgentSchema(agentResponse);
@@ -891,7 +1010,7 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   console.log('[DynamicTenantPage] Checking agentSchema type:', agentSchema?.type, 'has content:', !!agentSchema?.content, 'contentLoading:', contentLoading);
 
   // If we're loading content or have content, show the layout with navigation
-  if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error' || agentSchema?.type === 'mockup') && agentSchema.content)) {
+  if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error' || agentSchema?.type === 'mockup' || agentSchema?.type === 'static_page') && agentSchema.content)) {
     console.log('[DynamicTenantPage] Handling content_schema response or loading state');
     console.log('[DynamicTenantPage] agentSchema.content:', agentSchema?.content);
 

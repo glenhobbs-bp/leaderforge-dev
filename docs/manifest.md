@@ -1,33 +1,33 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/7/2025, 9:21:46 PM*
+*Generated on 7/9/2025, 6:19:52 AM*
 
 ## Overview
 
-- **Total Files**: 351
-- **Total Size**: 2.81 MB
+- **Total Files**: 359
+- **Total Size**: 2.89 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 142 files
-- **.md**: 123 files
-- **.tsx**: 56 files
+- **.ts**: 143 files
+- **.md**: 127 files
+- **.tsx**: 59 files
 - **.json**: 18 files
 - **.js**: 10 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 198 files
-- **AI agent**: 177 files
-- **documentation**: 127 files
-- **security**: 98 files
-- **API**: 60 files
-- **Next.js API**: 58 files
-- **React**: 56 files
-- **UI**: 47 files
-- **React hooks**: 44 files
+- **TypeScript**: 202 files
+- **AI agent**: 185 files
+- **documentation**: 131 files
+- **security**: 101 files
+- **API**: 61 files
+- **React**: 59 files
+- **Next.js API**: 59 files
+- **UI**: 49 files
+- **React hooks**: 47 files
 - **utility**: 34 files
 
 ## File Inventory
@@ -437,6 +437,15 @@ API route to return entitlement-filtered nav options for a given tenant. SSR/ses
 **Modified**: 7/4/2025
 
 
+### `apps/web/app/api/nav/option-details/route.ts`
+
+API route to get navigation option details for routing decisions
+
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 4.1KB
+**Tags**: `navigation`, `routing`, `API endpoint`, `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/app/api/orgs/[org_id]/entitlements/route.ts`
 
 GET /api/orgs/[org_id]/entitlements
@@ -617,6 +626,15 @@ Create service role Supabase client for backend operations
 **Modified**: 7/2/2025
 
 
+### `apps/web/app/context/preferences/page.tsx`
+
+Purpose: Schema-driven Prompt Context Management Page - Uses PromptContextWidget
+
+**Complexity**: medium • **Size**: 4.5KB
+**Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`
+**Modified**: 7/8/2025
+
+
 ### `apps/web/app/copilotkit/page.tsx`
 
 🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions
@@ -774,9 +792,9 @@ Get initial session server-side for SSR using the same restoration logic
 
 AgentService - Central service for invoking agents based on type
 
-**Complexity**: high • **Size**: 21.4KB
+**Complexity**: high • **Size**: 26.6KB
 **Tags**: `TypeScript`, `utility`, `AI agent`
-**Modified**: 7/4/2025
+**Modified**: 7/8/2025
 
 
 ### `apps/web/app/lib/apiClient/batch.ts`
@@ -1107,9 +1125,9 @@ File: apps/web/components/copilot/EntitlementActions.tsx
 
 Agent-native 3-panel layout. Pure renderer - displays only what agents return.
 
-**Complexity**: high • **Size**: 44.8KB
+**Complexity**: high • **Size**: 49.7KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/6/2025
+**Modified**: 7/9/2025
 
 
 ### `apps/web/components/forms/EntitlementCheckboxForm.tsx`
@@ -1209,6 +1227,15 @@ Purpose: Prompt Context Management Mockup - Agent-native mockup component for UX
 **Complexity**: medium • **Size**: 11.6KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 7/6/2025
+
+
+### `apps/web/components/mockups/PromptContextsPage.tsx`
+
+Purpose: Prompt Contexts Page Wrapper - Renders the real functional page through the mockup system
+
+**Complexity**: low • **Size**: 0.6KB
+**Tags**: `React`, `TypeScript`, `UI`, `AI agent`
+**Modified**: 7/7/2025
 
 
 ### `apps/web/components/mockups/PromptLibraryMockup.tsx`
@@ -1413,9 +1440,9 @@ File: apps/web/components/widgets/Grid.tsx
 
 File: apps/web/components/widgets/index.ts
 
-**Complexity**: medium • **Size**: 7.3KB
+**Complexity**: medium • **Size**: 8.2KB
 **Tags**: `TypeScript`, `UI`
-**Modified**: 7/4/2025
+**Modified**: 7/7/2025
 
 
 ### `apps/web/components/widgets/Leaderboard.tsx`
@@ -1454,6 +1481,15 @@ File: apps/web/components/widgets/Panel.tsx
 **Modified**: 6/27/2025
 
 
+### `apps/web/components/widgets/PromptContextWidget.tsx`
+
+File: apps/web/components/widgets/PromptContextWidget.tsx
+
+**Complexity**: high • **Size**: 11.9KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/components/widgets/StatCard.tsx`
 
 File: apps/web/components/widgets/StatCard.tsx
@@ -1476,9 +1512,9 @@ File: apps/web/components/widgets/TableWidget.tsx
 
 Local Widget Types
 
-**Complexity**: low • **Size**: 1.3KB
+**Complexity**: low • **Size**: 1.6KB
 **Tags**: `TypeScript`, `UI`
-**Modified**: 6/27/2025
+**Modified**: 7/7/2025
 
 
 ### `apps/web/components/widgets/VideoList.tsx`
@@ -1503,9 +1539,9 @@ VideoPlayerModal.tsx
 
 File: apps/web/components/widgets/WidgetDispatcher.tsx
 
-**Complexity**: medium • **Size**: 4.5KB
+**Complexity**: medium • **Size**: 5.2KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 7/4/2025
+**Modified**: 7/9/2025
 
 
 ### `apps/web/hooks/useAvatar.ts`
@@ -2318,6 +2354,15 @@ ANTI-PATTERN: Hardcoded business logic
 **Modified**: 7/7/2025
 
 
+### `docs/architecture/adr/0025-agent-complexity-spectrum-optimization.md`
+
+Database agent configuration
+
+**Size**: 7.3KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/9/2025
+
+
 ### `docs/architecture/adr/adr-template.md`
 
 —
@@ -2424,6 +2469,15 @@ Current: Each new feature compounds performance problems
 **Size**: 8.9KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/7/2025
+
+
+### `docs/engineering/how-to-add-or-change-components.md`
+
+Widget type (e.g., 'Card', 'Grid', 'PromptContext')
+
+**Size**: 11.2KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/8/2025
 
 
 ### `docs/engineering/how-to/README.md`
@@ -2543,6 +2597,15 @@ Form Templates
 **Modified**: 7/3/2025
 
 
+### `docs/engineering/pattern-selection-guide.md`
+
+Next.js app/feature/page.tsx
+
+**Size**: 9.8KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/9/2025
+
+
 ### `docs/engineering/performance-analysis-report.md`
 
 —
@@ -2550,6 +2613,15 @@ Form Templates
 **Size**: 11.2KB
 **Tags**: `documentation`, `AI agent`
 **Modified**: 6/27/2025
+
+
+### `docs/engineering/performance-benchmarking-framework.md`
+
+tests/performance/benchmark-config.ts
+
+**Size**: 12.9KB
+**Tags**: `documentation`, `React hooks`, `AI agent`
+**Modified**: 7/9/2025
 
 
 ### `docs/engineering/phase-2-performance-baseline.md`
@@ -2628,18 +2700,18 @@ First update Firestore
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 175.0KB
+**Size**: 184.4KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/7/2025
+**Modified**: 7/9/2025
 
 
 ### `docs/manifest.md`
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 66.8KB
+**Size**: 70.6KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/7/2025
+**Modified**: 7/9/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -2853,9 +2925,9 @@ ContentSyncAgent: Syncs TribeSocial content into modules.content for a given con
 
 File: packages/agent-core/agents/ContextResolutionAgent.ts
 
-**Complexity**: high • **Size**: 8.8KB
+**Complexity**: high • **Size**: 8.9KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/7/2025
+**Modified**: 7/8/2025
 
 
 ### `packages/agent-core/agents/ProgressAwareAgent.js`
@@ -2934,9 +3006,9 @@ File: packages/agent-core/services/AnthropicContextService.ts
 
 File: packages/agent-core/services/PromptContextResolver.ts
 
-**Complexity**: medium • **Size**: 7.5KB
+**Complexity**: medium • **Size**: 7.8KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/7/2025
+**Modified**: 7/8/2025
 
 
 ### `packages/agent-core/tools/__tests__/ProgressAwareAgent.test.ts`

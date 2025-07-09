@@ -205,8 +205,9 @@ export class ContextResolutionAgent {
     try {
       // Get all available contexts
       const { data: contexts, error: contextsError } = await this.supabase
-        .from('core.prompt_contexts')
-        .select('id, name, description, context_type, priority, is_active')
+        .schema('core')
+        .from('prompt_contexts')
+        .select('id, name, description, content, context_type, priority, tenant_key, created_by, is_active, template_variables')
         .eq('tenant_key', tenantKey)
         .eq('is_active', true)
         .order('priority', { ascending: false });
@@ -218,7 +219,8 @@ export class ContextResolutionAgent {
 
       // Get user preferences
       const { data: preferences, error: preferencesError } = await this.supabase
-        .from('core.user_context_preferences')
+        .schema('core')
+        .from('user_context_preferences')
         .select('context_id, is_enabled')
         .eq('user_id', userId)
         .eq('tenant_key', tenantKey);

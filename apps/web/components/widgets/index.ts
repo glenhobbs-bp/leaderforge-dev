@@ -14,6 +14,7 @@ import Grid from './Grid';
 import { LeaderForgeCard } from './LeaderForgeCard';
 import { FormWidget, formSchemaToProps } from './FormWidget';
 import { TableWidget, tableSchemaToProps } from './TableWidget';
+import { PromptContextWidget, promptContextSchemaToProps } from './PromptContextWidget';
 // 🚀 PERFORMANCE FIX: Lazy load VideoPlayerModal to avoid bundling hls.js (400kB)
 // import { VideoPlayerModal } from './VideoPlayerModal'; // ❌ Removed static import
 
@@ -251,6 +252,34 @@ widgetRegistry.registerWidget({
   schemaToProps: tableSchemaToProps,
 });
 
+// Register PromptContextWidget
+widgetRegistry.registerWidget({
+  metadata: {
+    id: 'prompt-context',
+    type: 'Widget',
+    name: 'Prompt Context',
+    description: 'Prompt context management with real-time toggle and scope grouping',
+    version: '1.0.0',
+    category: 'input',
+    capabilities: [
+      WidgetCapabilities.PREFERENCE_MANAGEMENT,
+      WidgetCapabilities.REAL_TIME_TOGGLE,
+      WidgetCapabilities.GROUPING_SUPPORT,
+      WidgetCapabilities.LOADING_STATES,
+      'prompt-context-management',
+      'real-time-toggle',
+      'ai-context-management'
+    ],
+    tags: ['prompt-contexts', 'ai-contexts', 'toggles', 'scope', 'real-time'],
+    author: 'Widget Team',
+    sizeHint: 'medium',
+    themeable: true,
+  },
+  component: PromptContextWidget,
+  componentPath: './PromptContextWidget',
+  schemaToProps: promptContextSchemaToProps,
+});
+
 // Export widgets and dispatcher
 export { default as StatCard } from './StatCard';
 export { default as Leaderboard } from './Leaderboard';
@@ -260,6 +289,7 @@ export { default as Grid } from './Grid';
 export { LeaderForgeCard } from './LeaderForgeCard';
 export { FormWidget } from './FormWidget';
 export { TableWidget } from './TableWidget';
+export { PromptContextWidget } from './PromptContextWidget';
 // ✅ PERFORMANCE: VideoPlayerModal export removed to avoid SSR errors
 // Component is imported dynamically when needed to prevent bundle bloat
 export { WidgetDispatcher, isWidgetTypeAvailable } from './WidgetDispatcher';

@@ -1,27 +1,29 @@
 {
   "metadata": {
-    "generated_at": "2025-07-08T01:21:46.912Z",
+    "generated_at": "2025-07-09T10:19:52.462Z",
     "generator_version": "1.0.0",
-    "total_files": 351,
-    "total_size_bytes": 2942245,
+    "total_files": 359,
+    "total_size_bytes": 3032473,
     "file_types": {
-      ".ts": 142,
+      ".ts": 143,
       ".json": 18,
-      ".tsx": 56,
+      ".tsx": 59,
       ".js": 10,
-      ".md": 123,
+      ".md": 127,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 198,
-      "API": 60,
-      "AI agent": 177,
-      "React": 56,
-      "React hooks": 44,
-      "Next.js API": 58,
-      "security": 98,
+      "TypeScript": 202,
+      "API": 61,
+      "AI agent": 185,
+      "React": 59,
+      "React hooks": 47,
+      "Next.js API": 59,
+      "security": 101,
+      "navigation": 7,
+      "routing": 3,
+      "API endpoint": 4,
       "test": 13,
-      "API endpoint": 3,
       "navigation state": 2,
       "user preferences": 4,
       "SSR auth": 4,
@@ -51,12 +53,11 @@
       "Supabase Auth UI": 1,
       "login": 1,
       "client component": 2,
-      "UI": 47,
+      "UI": 49,
       "modal": 1,
       "legal": 1,
       "design-system": 1,
       "glassmorphism": 1,
-      "navigation": 6,
       "context-based": 1,
       "UI component": 1,
       "progress tracking": 1,
@@ -72,9 +73,8 @@
       "mockups": 3,
       "feature-flags": 3,
       "prototyping": 1,
-      "routing": 2,
       "exports": 1,
-      "documentation": 127,
+      "documentation": 131,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -985,6 +985,33 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/app/api/nav/option-details/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/nav/option-details",
+      "extension": ".ts",
+      "purpose": "API route to get navigation option details for routing decisions",
+      "owner": "Frontend team",
+      "tags": [
+        "navigation",
+        "routing",
+        "API endpoint",
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-07-09T10:04:09.222Z",
+      "size_bytes": 4249,
+      "hash": "26605179",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/app/api/orgs/[org_id]/entitlements/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/orgs/[org_id]/entitlements",
@@ -1445,6 +1472,29 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/app/context/preferences/page.tsx",
+      "name": "page.tsx",
+      "directory": "apps/web/app/context/preferences",
+      "extension": ".tsx",
+      "purpose": "Purpose: Schema-driven Prompt Context Management Page - Uses PromptContextWidget",
+      "tags": [
+        "React",
+        "TypeScript",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "lucide-react",
+        "next/navigation",
+        "../../../components/ai/UniversalSchemaRenderer"
+      ],
+      "last_modified": "2025-07-08T09:32:20.236Z",
+      "size_bytes": 4574,
+      "hash": "a1c35d61",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/app/copilotkit/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/copilotkit",
@@ -1490,9 +1540,9 @@
       "exports": [
         "CopilotKitProvider"
       ],
-      "last_modified": "2025-07-08T00:59:43.266Z",
-      "size_bytes": 4358,
-      "hash": "34cc5b80",
+      "last_modified": "2025-07-08T01:29:22.009Z",
+      "size_bytes": 4449,
+      "hash": "ade33ef9",
       "complexity": "medium"
     },
     {
@@ -1877,9 +1927,9 @@
       "dependencies": [
         "../../../../packages/env"
       ],
-      "last_modified": "2025-07-05T02:15:52.053Z",
-      "size_bytes": 21882,
-      "hash": "de9b1103",
+      "last_modified": "2025-07-08T16:54:19.255Z",
+      "size_bytes": 27198,
+      "hash": "5fe6ef64",
       "complexity": "high"
     },
     {
@@ -2647,9 +2697,9 @@
         "./forms/FormWidget",
         "./SupabaseProvider"
       ],
-      "last_modified": "2025-07-06T18:13:47.435Z",
-      "size_bytes": 45879,
-      "hash": "d58ade6e",
+      "last_modified": "2025-07-09T10:18:38.064Z",
+      "size_bytes": 50850,
+      "hash": "710ac050",
       "complexity": "high"
     },
     {
@@ -2889,6 +2939,30 @@
       "size_bytes": 11876,
       "hash": "13408502",
       "complexity": "medium"
+    },
+    {
+      "path": "apps/web/components/mockups/PromptContextsPage.tsx",
+      "name": "PromptContextsPage.tsx",
+      "directory": "apps/web/components/mockups",
+      "extension": ".tsx",
+      "purpose": "Purpose: Prompt Contexts Page Wrapper - Renders the real functional page through the mockup system",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "../../app/context/preferences/page"
+      ],
+      "exports": [
+        "PromptContextsPage"
+      ],
+      "last_modified": "2025-07-08T02:12:29.452Z",
+      "size_bytes": 603,
+      "hash": "914a02f4",
+      "complexity": "low"
     },
     {
       "path": "apps/web/components/mockups/PromptLibraryMockup.tsx",
@@ -3446,11 +3520,12 @@
         "./Grid",
         "./LeaderForgeCard",
         "./FormWidget",
-        "./TableWidget"
+        "./TableWidget",
+        "./PromptContextWidget"
       ],
-      "last_modified": "2025-07-05T02:15:52.060Z",
-      "size_bytes": 7430,
-      "hash": "458c4a36",
+      "last_modified": "2025-07-08T02:19:52.510Z",
+      "size_bytes": 8439,
+      "hash": "c2f04212",
       "complexity": "medium"
     },
     {
@@ -3543,6 +3618,28 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/components/widgets/PromptContextWidget.tsx",
+      "name": "PromptContextWidget.tsx",
+      "directory": "apps/web/components/widgets",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/widgets/PromptContextWidget.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "AI agent"
+      ],
+      "dependencies": [
+        "react",
+        "lucide-react"
+      ],
+      "last_modified": "2025-07-09T09:37:45.813Z",
+      "size_bytes": 12179,
+      "hash": "421080ac",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/components/widgets/StatCard.tsx",
       "name": "StatCard.tsx",
       "directory": "apps/web/components/widgets",
@@ -3597,9 +3694,9 @@
         "TypeScript",
         "UI"
       ],
-      "last_modified": "2025-06-27T21:33:12.102Z",
-      "size_bytes": 1330,
-      "hash": "5077070b",
+      "last_modified": "2025-07-08T02:16:13.032Z",
+      "size_bytes": 1597,
+      "hash": "df9ab102",
       "complexity": "low"
     },
     {
@@ -3664,9 +3761,9 @@
         "../../../../packages/agent-core/types/UniversalWidgetSchema",
         "./index"
       ],
-      "last_modified": "2025-07-05T02:15:52.059Z",
-      "size_bytes": 4627,
-      "hash": "8e91c618",
+      "last_modified": "2025-07-09T09:45:51.827Z",
+      "size_bytes": 5286,
+      "hash": "9e372d52",
       "complexity": "medium"
     },
     {
@@ -5045,6 +5142,21 @@
       "hash": "30821013"
     },
     {
+      "path": "docs/architecture/adr/0025-agent-complexity-spectrum-optimization.md",
+      "name": "0025-agent-complexity-spectrum-optimization.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "Database agent configuration",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-09T10:02:29.396Z",
+      "size_bytes": 7505,
+      "hash": "7ad22dae"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -5215,6 +5327,20 @@
       "last_modified": "2025-07-07T22:29:00.364Z",
       "size_bytes": 9094,
       "hash": "a5f27c4f"
+    },
+    {
+      "path": "docs/engineering/how-to-add-or-change-components.md",
+      "name": "how-to-add-or-change-components.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "Widget type (e.g., 'Card', 'Grid', 'PromptContext')",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-08T14:26:51.406Z",
+      "size_bytes": 11483,
+      "hash": "7f228666"
     },
     {
       "path": "docs/engineering/how-to/README.md",
@@ -5404,6 +5530,21 @@
       "hash": "9b616128"
     },
     {
+      "path": "docs/engineering/pattern-selection-guide.md",
+      "name": "pattern-selection-guide.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "Next.js app/feature/page.tsx",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-09T10:07:32.043Z",
+      "size_bytes": 10022,
+      "hash": "3317493d"
+    },
+    {
       "path": "docs/engineering/performance-analysis-report.md",
       "name": "performance-analysis-report.md",
       "directory": "docs/engineering",
@@ -5416,6 +5557,21 @@
       "last_modified": "2025-06-27T21:33:12.252Z",
       "size_bytes": 11499,
       "hash": "b6fe5928"
+    },
+    {
+      "path": "docs/engineering/performance-benchmarking-framework.md",
+      "name": "performance-benchmarking-framework.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "tests/performance/benchmark-config.ts",
+      "tags": [
+        "documentation",
+        "React hooks",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-09T10:08:40.431Z",
+      "size_bytes": 13209,
+      "hash": "518f7d2d"
     },
     {
       "path": "docs/engineering/phase-2-performance-baseline.md",
@@ -5557,9 +5713,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-07T20:47:51.584Z",
-      "size_bytes": 179158,
-      "hash": "bde37248"
+      "last_modified": "2025-07-09T10:08:55.382Z",
+      "size_bytes": 188868,
+      "hash": "38582def"
     },
     {
       "path": "docs/manifest.md",
@@ -5572,9 +5728,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-07T20:47:51.609Z",
-      "size_bytes": 68429,
-      "hash": "b6568e05"
+      "last_modified": "2025-07-09T10:08:55.407Z",
+      "size_bytes": 72292,
+      "hash": "5a233fd8"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -5926,9 +6082,9 @@
         "../services/PromptContextResolver",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-08T00:55:40.689Z",
-      "size_bytes": 8980,
-      "hash": "6c4f273c",
+      "last_modified": "2025-07-08T14:26:51.391Z",
+      "size_bytes": 9145,
+      "hash": "e08b096d",
       "complexity": "high"
     },
     {
@@ -6085,9 +6241,9 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-07T22:30:49.188Z",
-      "size_bytes": 7653,
-      "hash": "def87602",
+      "last_modified": "2025-07-08T14:26:51.388Z",
+      "size_bytes": 8006,
+      "hash": "1a405156",
       "complexity": "medium"
     },
     {
