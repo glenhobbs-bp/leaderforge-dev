@@ -378,9 +378,7 @@
   color: var(--primary);
 }
 
-body {
-    @apply bg-red-100;
-}
+/* Removed temporary red background debug styling */
 
 /* Custom scrollbar styles for NavPanel */
 .custom-scrollbar::-webkit-scrollbar {
