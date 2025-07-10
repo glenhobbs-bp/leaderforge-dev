@@ -115,7 +115,7 @@ export function ContentRenderer({
 
     // Check for static page response
     if (schemaType === 'static_page' && content && typeof content === 'object' && 'route' in content) {
-      console.log('[ContentRenderer] Rendering static page within ContentPanel:', content);
+      // ✅ FIX: Remove console logs that were contributing to infinite render loops
       const staticPageContent = content as {
         route: string;
         title?: string;

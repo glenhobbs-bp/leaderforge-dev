@@ -36,16 +36,8 @@ export function UserPreferencesManager({
     { enabled: shouldFetchUserPrefs && !!userId }
   );
 
-  // Debug the enabled condition
-  console.log('[UserPreferencesManager] 🔍 USER PREFS HOOK DEBUG:', {
-    shouldFetchUserPrefs,
-    hasSessionUserId: !!userId,
-    sessionUserId: userId,
-    enabled: shouldFetchUserPrefs && !!userId,
-    isLoading: userPrefsLoading,
-    hasData: !!userPrefs,
-    hasError: !!userPrefsError
-  });
+      // ✅ FIX: Remove debug logging that was causing infinite render loops
+  // Debugging disabled to prevent performance issues and infinite loops
 
   // Mark component as mounted on initial render
   useEffect(() => {
@@ -97,7 +89,7 @@ export function UserPreferencesManager({
     }
 
     // ✅ FIX: Check for actual preference properties (not just object length) to detect real vs placeholder data
-    // Placeholder data is {} but real data has properties like theme, navigationState, etc.
+    // Wait for actual data before proceeding
     const hasRealUserPrefs = userPrefs && (
       'theme' in userPrefs ||
       'navigationState' in userPrefs ||
@@ -106,18 +98,7 @@ export function UserPreferencesManager({
     );
 
     if (!userId || !hasRealUserPrefs || hasRestoredTenant || userPrefsLoading) {
-      if (userPrefsLoading) {
-        console.log('[UserPreferencesManager] ⏳ Waiting for user preferences to load...');
-      }
-      if (!hasRealUserPrefs && userPrefs) {
-        console.log('[UserPreferencesManager] ⏳ User preferences is empty placeholder, waiting for real data...', {
-          userPrefs,
-          hasTheme: 'theme' in userPrefs,
-          hasNavigationState: 'navigationState' in userPrefs,
-          hasLanguage: 'language' in userPrefs,
-          objectKeys: Object.keys(userPrefs)
-        });
-      }
+      // ✅ FIX: Remove console logs that were contributing to infinite render loops
       return;
     }
 

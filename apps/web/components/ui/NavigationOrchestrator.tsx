@@ -244,7 +244,7 @@ export function NavigationOrchestrator({
 
   // Create nav component using database-driven approach
   const NavComponent = useCallback(({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
-    console.log('[NavigationOrchestrator] 🧭 NavComponent rendering with selectedNavOptionId:', selectedNavOptionId, 'currentTenant:', currentTenant);
+    // ✅ FIX: Remove console logs that were contributing to infinite render loops
     return (
       <NavPanel
         tenantKey={currentTenant}
@@ -318,8 +318,7 @@ export function NavigationOrchestrator({
 
   // If we're loading content or have content, show the layout with navigation
   if (contentLoading || ((agentSchema?.type === 'content_schema' || agentSchema?.type === 'error' || agentSchema?.type === 'mockup' || agentSchema?.type === 'static_page') && agentSchema.content)) {
-    console.log('[NavigationOrchestrator] Handling content_schema response or loading state');
-    console.log('[NavigationOrchestrator] agentSchema.content:', agentSchema?.content);
+    // ✅ FIX: Remove console logs that were contributing to infinite render loops
 
     return (
       <div

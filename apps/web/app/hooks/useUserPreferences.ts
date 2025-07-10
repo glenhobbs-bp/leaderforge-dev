@@ -3,6 +3,7 @@
 // Owner: Frontend team
 // Tags: React hooks, React Query, user preferences, caching, cross-invalidation
 
+import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/userPreferences';
 
@@ -15,37 +16,36 @@ import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/us
 export function useUserPreferences(userId: string, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? !!userId;
 
-  console.log('[useUserPreferences] 🔍 HOOK DEBUG:', {
-    userId,
-    enabled,
-    optionsEnabled: options?.enabled,
-    hasUserId: !!userId,
-    timestamp: new Date().toISOString()
-  });
+  // ✅ FIX: Remove console logging that was causing performance issues and infinite loops
+  // Only log in development mode and throttle to prevent spam
+  if (process.env.NODE_ENV === 'development') {
+    // Use a ref to throttle logs to once per second
+    const lastLogTime = React.useRef(0);
+    const now = Date.now();
+    if (now - lastLogTime.current > 1000) {
+      console.log('[useUserPreferences] Hook called:', { userId: userId?.slice(0, 8), enabled });
+      lastLogTime.current = now;
+    }
+  }
 
   return useQuery({
     queryKey: ['user-preferences', userId],
     queryFn: async () => {
-      console.log('[useUserPreferences] 🚀 Starting API call for user:', userId);
       try {
         const result = await fetchUserPreferences(userId);
-        console.log('[useUserPreferences] ✅ API call successful:', {
-          userId,
-          hasResult: !!result,
-          resultKeys: result ? Object.keys(result) : [],
-          result
-        });
         // ✅ FIX: Ensure we never return undefined - React Query expects a value
         return result ?? {};
       } catch (error) {
-        console.error('[useUserPreferences] ❌ API call failed:', { userId, error });
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[useUserPreferences] API call failed:', { userId: userId?.slice(0, 8), error });
+        }
         throw error;
       }
     },
     enabled,
-    // Reduce stale time to prevent navigation state staleness
-    staleTime: 30 * 1000, // 30 seconds (matches API cache)
-    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection
+    // ✅ FIX: Increase stale time to reduce re-fetching that causes render loops
+    staleTime: 5 * 60 * 1000, // 5 minutes - much longer to prevent excessive queries
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
     retry: (failureCount, error) => {
       // Don't retry on authentication errors (401, 403)
       if (error instanceof Error && error.message.includes('Authentication')) {
@@ -56,10 +56,10 @@ export function useUserPreferences(userId: string, options?: { enabled?: boolean
     },
     refetchOnWindowFocus: false, // Don't refetch on focus to prevent annoying page reloads when switching tabs
     refetchOnReconnect: false, // Don't refetch on reconnect
+    refetchOnMount: false, // ✅ FIX: Don't refetch on mount if data exists
     networkMode: 'offlineFirst', // Support offline-first
     throwOnError: false, // Don't throw errors, handle them gracefully
-    // ✅ FIX: Provide default data to prevent undefined state
-    placeholderData: {},
+    // ✅ FIX: Remove placeholderData that was causing render loops - let it be undefined initially
     meta: {
       errorMessage: 'Failed to load user preferences'
     }
