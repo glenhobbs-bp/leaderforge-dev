@@ -48,6 +48,12 @@ export default function SupabaseProvider({
       console.log('[SupabaseProvider] Auth event:', event, session?.user?.id || 'no-user');
 
       if (isMounted) {
+        // CRITICAL FIX: Don't override valid server session with INITIAL_SESSION no-user
+        if (event === 'INITIAL_SESSION' && !session && initialSession?.user?.id) {
+          console.log('[SupabaseProvider] 🚫 Ignoring INITIAL_SESSION no-user - keeping server session');
+          return; // Keep the server session, don't override it
+        }
+
         setSession(session);
         setLoading(false);
       }
