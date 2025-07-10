@@ -10,14 +10,23 @@ interface UseAvatarOptions {
   staleTime?: number;
 }
 
+// ✅ FIX: Avatar fallback hierarchy for better reliability
+const AVATAR_FALLBACKS = [
+  "/icons/default-avatar.svg",
+  "/icons/user.svg",
+  "/icons/users.svg",
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='%23666'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 8-4 8-4s8 0 8 4'/%3E%3C/svg%3E" // Inline SVG as ultimate fallback
+];
+
 export function useAvatar(userId: string | null, options: UseAvatarOptions = {}) {
   const { enabled = true, staleTime = 5 * 60 * 1000 } = options; // Default 5 minutes cache
 
   return useQuery({
     queryKey: ['avatar', userId],
     queryFn: async (): Promise<string> => {
+      // ✅ FIX: Always return default avatar if no userId
       if (!userId) {
-        return "/icons/default-avatar.svg";
+        return AVATAR_FALLBACKS[0];
       }
 
       try {
@@ -25,19 +34,38 @@ export function useAvatar(userId: string | null, options: UseAvatarOptions = {})
           // Include credentials for authentication
           credentials: 'include',
           headers: {
-            'Cache-Control': 'public, max-age=300', // 5 minutes browser cache
+            'Cache-Control': 'no-cache', // ✅ FIX: Prevent browser caching issues
           },
         });
 
         if (!response.ok) {
-          throw new Error(`Avatar fetch failed: ${response.status}`);
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('[useAvatar] Avatar API failed, using default:', response.status);
+          }
+          return AVATAR_FALLBACKS[0];
         }
 
-        const data = await response.json();
-        return data.url || "/icons/default-avatar.svg";
+                const data = await response.json();
+        const avatarUrl = data.url || AVATAR_FALLBACKS[0];
+
+        // ✅ FIX: Validate that the returned URL is accessible
+        if (!AVATAR_FALLBACKS.includes(avatarUrl)) {
+          try {
+            const validateResponse = await fetch(avatarUrl, { method: 'HEAD' });
+            if (!validateResponse.ok) {
+              return AVATAR_FALLBACKS[0];
+            }
+          } catch {
+            return AVATAR_FALLBACKS[0];
+          }
+        }
+
+        return avatarUrl;
       } catch (error) {
-        console.error('[useAvatar] Error fetching avatar:', error);
-        return "/icons/default-avatar.svg";
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[useAvatar] Error fetching avatar, using default:', error);
+        }
+        return AVATAR_FALLBACKS[0];
       }
     },
     enabled: enabled && !!userId,
