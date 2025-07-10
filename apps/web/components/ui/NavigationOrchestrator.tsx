@@ -221,15 +221,21 @@ export function NavigationOrchestrator({
 
   // 🤖 AGENT-NATIVE: Navigation selection with agent invocation
   const handleNavSelect = useCallback(async (navId: string) => {
-    console.log('[NavigationOrchestrator] handleNavSelect called with navId:', navId);
+    console.log('[NavigationOrchestrator] 🎯 handleNavSelect called with navId:', navId, 'current selectedNavOptionId:', selectedNavOptionId);
+
     // Update selection and load content
+    console.log('[NavigationOrchestrator] 🔄 Setting selectedNavOptionId to:', navId);
     setSelectedNavOptionId(navId);
+
+    console.log('[NavigationOrchestrator] 🔧 Loading content for navId:', navId);
     await loadContentForNavOption(navId, true, true); // Update selection and skip state save (NavPanel handles it)
-  }, [loadContentForNavOption]);
+
+    console.log('[NavigationOrchestrator] ✅ handleNavSelect completed for navId:', navId);
+  }, [loadContentForNavOption, selectedNavOptionId]);
 
   // Create nav component using database-driven approach
   const NavComponent = useCallback(({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
-    console.log('[NavigationOrchestrator] 🔧 NavComponent rendering with selectedNavOptionId:', selectedNavOptionId);
+    console.log('[NavigationOrchestrator] 🧭 NavComponent rendering with selectedNavOptionId:', selectedNavOptionId, 'currentTenant:', currentTenant);
     return (
       <NavPanel
         tenantKey={currentTenant}

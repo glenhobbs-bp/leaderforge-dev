@@ -191,12 +191,19 @@ export default function NavPanel({
 
   // Handle selectedNavOptionId prop changes (from NavigationOrchestrator)
   useEffect(() => {
+    console.log('[NavPanel] 🔍 selectedNavOptionId prop change detected:', {
+      selectedNavOptionId,
+      currentSelectedNav: selectedNav,
+      shouldUpdate: selectedNavOptionId && selectedNavOptionId !== selectedNav,
+      tenantKey
+    });
+
     if (selectedNavOptionId && selectedNavOptionId !== selectedNav) {
-      console.log('[NavPanel] 🔄 Updating selectedNav from prop:', selectedNavOptionId);
+      console.log('[NavPanel] 🔄 Updating selectedNav from prop:', selectedNavOptionId, '(was:', selectedNav, ')');
       setSelectedNav(selectedNavOptionId);
       setHasUserInteracted(true); // Mark as interacted to prevent overrides
     }
-  }, [selectedNavOptionId]);
+  }, [selectedNavOptionId, selectedNav, tenantKey]);
 
   // Reset restoration flag when tenant changes
   useEffect(() => {
@@ -204,30 +211,29 @@ export default function NavPanel({
   }, [tenantKey]);
 
   const handleNavClick = (navOptionId: string) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[NavPanel] handleNavClick:', {
-        navOptionId,
-        tenantKey: tenantKey,
-        userId,
-        previousSelection: selectedNav
-      });
-    }
+    console.log('[NavPanel] 🖱️ handleNavClick called:', {
+      navOptionId,
+      tenantKey: tenantKey,
+      userId,
+      previousSelection: selectedNav,
+      currentProps: { selectedNavOptionId, hasUserInteracted }
+    });
 
     // Mark that user has interacted to prevent restoration override
     setHasUserInteracted(true);
 
     // Always update local state immediately for responsive UI
     setSelectedNav(navOptionId);
+    console.log('[NavPanel] 🔄 Updated local selectedNav to:', navOptionId);
 
     // Persist navigation state (async, non-blocking)
     if (userId && tenantKey) {
       updateNavigationState(navOptionId);
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[NavPanel] Persisting navigation state:', { tenantKey: tenantKey, navOptionId });
-      }
+      console.log('[NavPanel] 💾 Persisting navigation state:', { tenantKey: tenantKey, navOptionId });
     }
 
     if (onNavSelect) {
+      console.log('[NavPanel] 📡 Calling onNavSelect with:', navOptionId);
       onNavSelect(navOptionId);
     }
   };
