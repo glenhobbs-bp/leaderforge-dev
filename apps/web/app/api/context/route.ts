@@ -101,7 +101,14 @@ export async function POST(req: NextRequest) {
     const cookieStore = await cookies();
     const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
+    console.log('[Context API] Auth debug:', {
+      hasSession: !!session,
+      userId: session?.user?.id,
+      sessionError: sessionError?.message
+    });
+
     if (sessionError || !session?.user) {
+      console.log('[Context API] Auth failed:', { sessionError, hasUser: !!session?.user });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -122,6 +129,13 @@ export async function POST(req: NextRequest) {
 
     // For now, create context directly via database until agent method is implemented
     // TODO: Implement createContext method in ContextResolutionAgent
+
+    console.log('[Context API] About to insert context with data:', {
+      name: validatedData.name,
+      context_type: validatedData.scope.toLowerCase(),
+      created_by: session.user.id
+    });
+
     const { data: context, error } = await supabase
       .schema('core')
       .from('prompt_contexts')
@@ -129,7 +143,7 @@ export async function POST(req: NextRequest) {
         name: validatedData.name,
         description: validatedData.description,
         content: validatedData.content,
-        context_type: validatedData.scope,
+        context_type: validatedData.scope.toLowerCase(), // Convert to lowercase for database
         priority: validatedData.priority,
         template_variables: validatedData.template_variables,
         tenant_key: tenantKey,
@@ -142,7 +156,8 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error('[Context API] Database error:', error);
       return NextResponse.json({
-        error: 'Failed to create context'
+        error: 'Failed to create context',
+        details: error.message
       }, { status: 500 });
     }
 

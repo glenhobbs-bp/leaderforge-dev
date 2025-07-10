@@ -3,7 +3,6 @@
 // Owner: Frontend team
 // Tags: React hooks, React Query, user preferences, caching, cross-invalidation
 
-import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/userPreferences';
 
@@ -16,17 +15,8 @@ import { fetchUserPreferences, updateUserPreferences } from '../lib/apiClient/us
 export function useUserPreferences(userId: string, options?: { enabled?: boolean }) {
   const enabled = options?.enabled ?? !!userId;
 
-  // ✅ FIX: Remove console logging that was causing performance issues and infinite loops
-  // Only log in development mode and throttle to prevent spam
-  if (process.env.NODE_ENV === 'development') {
-    // Use a ref to throttle logs to once per second
-    const lastLogTime = React.useRef(0);
-    const now = Date.now();
-    if (now - lastLogTime.current > 1000) {
-      console.log('[useUserPreferences] Hook called:', { userId: userId?.slice(0, 8), enabled });
-      lastLogTime.current = now;
-    }
-  }
+  // ✅ CRITICAL FIX: Remove ALL console logging from render path to prevent infinite loops
+  // React hooks must not have side effects in the render phase
 
   return useQuery({
     queryKey: ['user-preferences', userId],

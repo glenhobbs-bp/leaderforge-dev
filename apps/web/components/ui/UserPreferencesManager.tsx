@@ -41,24 +41,12 @@ export function UserPreferencesManager({
 
   // Mark component as mounted on initial render
   useEffect(() => {
-    console.log('[UserPreferencesManager] 🎯 Component mounting...');
     hasMounted.current = true;
-    console.log('[UserPreferencesManager] ✅ Component mounted, hasMounted set to true');
   }, []);
 
   // Trigger user preferences fetch on initial mount when session is available
   useEffect(() => {
-    console.log('[UserPreferencesManager] 🔍 USER PREFS TRIGGER DEBUG:', {
-      hasSessionUserId: !!userId,
-      sessionUserId: userId,
-      hasTriggeredUserPrefsFetch: hasTriggeredUserPrefsFetch.current,
-      shouldFetchUserPrefs,
-      hasMounted: hasMounted.current,
-      willTrigger: userId && !hasTriggeredUserPrefsFetch.current && !shouldFetchUserPrefs && hasMounted.current
-    });
-
     if (userId && !hasTriggeredUserPrefsFetch.current && !shouldFetchUserPrefs && hasMounted.current) {
-      console.log('[UserPreferencesManager] Triggering initial user preferences fetch for session:', userId);
       hasTriggeredUserPrefsFetch.current = true;
       setShouldFetchUserPrefs(true);
     }
@@ -67,7 +55,6 @@ export function UserPreferencesManager({
   // Handle user preferences errors gracefully
   useEffect(() => {
     if (userPrefsError) {
-      console.warn('[UserPreferencesManager] User preferences failed to load:', userPrefsError);
       // Don't block the app, just mark restoration as complete to proceed
       if (!hasRestoredTenant) {
         setHasRestoredTenant(true);
@@ -81,7 +68,6 @@ export function UserPreferencesManager({
     // If user preferences failed to load, proceed without restoration
     if (userPrefsError) {
       if (!hasRestoredTenant) {
-        console.log('[UserPreferencesManager] Skipping tenant restoration due to user preferences error');
         setHasRestoredTenant(true);
         onPreferencesReady();
       }
@@ -102,42 +88,19 @@ export function UserPreferencesManager({
       return;
     }
 
-    // ✅ FIX: Add detailed debugging for user preferences structure
-    console.log('[UserPreferencesManager] 🔍 DEBUG: Full userPrefs data:', userPrefs);
-    console.log('[UserPreferencesManager] 🔍 DEBUG: User prefs loading state:', { userPrefsLoading, userPrefsError, hasUserPrefs: !!userPrefs });
+    // ✅ CRITICAL FIX: Remove debugging console logs to prevent infinite render loops
 
     // ✅ FIX: userPrefs IS the preferences object (API client extracts it)
     const preferences = userPrefs as UserPreferences;
     const navigationState = preferences?.navigationState;
     const lastTenant = navigationState?.lastTenant;
 
-    console.log('[UserPreferencesManager] 🔍 DEBUG: Navigation state details:', {
-      preferences,
-      navigationState,
-      lastTenant,
-      lastNavOption: navigationState?.lastNavOption,
-      lastUpdated: navigationState?.lastUpdated
-    });
-
-    console.log('[UserPreferencesManager] Tenant restoration:', {
-      lastTenant,
-      currentTenant,
-      hasRestoredTenant
-    });
+    // Navigation state details extracted for processing
 
     // ✅ FIXED: Only restore tenant if it's actually different AND not already set
     // Prevent infinite loops when tenant is already correct
     if (lastTenant && lastTenant !== currentTenant && hasRestoredTenant === false) {
-      console.log('[UserPreferencesManager] Restoring last tenant:', lastTenant);
       onTenantChange(lastTenant);
-    } else {
-      console.log('[UserPreferencesManager] Tenant restoration skipped:', {
-        hasLastTenant: !!lastTenant,
-        tenantsDifferent: lastTenant !== currentTenant,
-        contextNotRestored: hasRestoredTenant === false,
-        reason: !lastTenant ? 'no saved tenant' :
-                lastTenant === currentTenant ? 'tenant already correct' : 'context already restored'
-      });
     }
 
     setHasRestoredTenant(true);
@@ -151,18 +114,8 @@ export function UserPreferencesManager({
       return;
     }
 
-    console.log('[UserPreferencesManager] 🔄 Navigation restoration effect triggered:', {
-      hasSession: !!userId,
-      hasUserPrefs: !!userPrefs,
-      hasUserPrefsError: !!userPrefsError,
-      hasRestoredTenant,
-      currentTenant,
-      userPrefsLoading
-    });
-
     // If user preferences failed to load, skip navigation restoration
     if (userPrefsError) {
-      console.log('[UserPreferencesManager] Skipping navigation restoration due to user preferences error');
       hasNavigationRestored.current = true; // Mark as attempted to prevent retry loops
       return;
     }
@@ -177,18 +130,6 @@ export function UserPreferencesManager({
     );
 
     if (!userId || !hasRealUserPrefs || !hasRestoredTenant || userPrefsLoading) {
-      if (userPrefsLoading) {
-        console.log('[UserPreferencesManager] ⏳ Waiting for user preferences to load for navigation restoration...');
-      }
-      if (!hasRealUserPrefs && userPrefs) {
-        console.log('[UserPreferencesManager] ⏳ User preferences is empty placeholder for navigation, waiting for real data...', {
-          userPrefs,
-          hasTheme: 'theme' in userPrefs,
-          hasNavigationState: 'navigationState' in userPrefs,
-          hasLanguage: 'language' in userPrefs,
-          objectKeys: Object.keys(userPrefs)
-        });
-      }
       return;
     }
 
@@ -198,41 +139,17 @@ export function UserPreferencesManager({
     const lastTenant = navigationState?.lastTenant;
     const lastNavOption = navigationState?.lastNavOption;
 
-    console.log('[UserPreferencesManager] 📊 Navigation restoration data:', {
-      navigationState,
-      lastTenant,
-      lastNavOption,
-      currentTenant,
-      shouldRestore: lastNavOption && lastTenant === currentTenant,
-      // ✅ DEBUG: Add more detailed debugging
-      userPrefsStructure: userPrefs,
-      preferencesIsUserPrefs: preferences === userPrefs,
-      navigationStateRaw: navigationState
-    });
+    // Extract navigation restoration data
 
     // Only restore navigation option if we're in the correct tenant and have a saved option
     if (lastNavOption && lastTenant === currentTenant) {
-      console.log('[UserPreferencesManager] ✅ RESTORING navigation state:', {
-        lastNavOption,
-        lastTenant,
-        currentTenant,
-        timestamp: navigationState?.lastUpdated
-      });
-
       hasNavigationRestored.current = true; // Mark as restored
 
       // Trigger content loading for the restored navigation option
       setTimeout(() => {
-        console.log('[UserPreferencesManager] ⏳ Triggering content load for restored nav option:', lastNavOption);
         onNavOptionSelect(lastNavOption);
       }, 200); // Small delay to ensure context is fully set
     } else {
-      console.log('[UserPreferencesManager] 📋 No navigation state to restore:', {
-        hasLastNavOption: !!lastNavOption,
-        lastTenant: lastTenant || 'none',
-        currentTenant,
-        reason: !lastNavOption ? 'no saved navigation' : 'tenant mismatch'
-      });
       hasNavigationRestored.current = true; // Mark as attempted even if no restoration
     }
   }, [userId, userPrefs, userPrefsError, hasRestoredTenant, currentTenant, userPrefsLoading, onNavOptionSelect]);

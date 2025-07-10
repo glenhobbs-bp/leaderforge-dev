@@ -241,7 +241,7 @@ export class ContextResolutionAgent {
         id: context.id,
         name: context.name,
         description: context.description,
-        scope: context.context_type, // Map context_type to scope for UI compatibility
+        scope: context.context_type.charAt(0).toUpperCase() + context.context_type.slice(1), // Map context_type to scope with proper capitalization
         priority: context.priority,
         isEnabled: preferenceMap.get(context.id) ?? true, // Default enabled
         canEdit: true, // TODO: Check permissions

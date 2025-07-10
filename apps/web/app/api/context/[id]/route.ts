@@ -51,8 +51,8 @@ export async function GET(
 
     // Check if user can view this context (basic permission check)
     const canView = context.created_by === session.user.id ||
-                   context.context_type === 'Global' ||
-                   context.context_type === 'Organizational';
+                   context.context_type === 'global' ||
+                   context.context_type === 'organizational';
 
     if (!canView) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -65,7 +65,7 @@ export async function GET(
         name: context.name,
         description: context.description,
         content: context.content,
-        scope: context.context_type,
+        scope: context.context_type.charAt(0).toUpperCase() + context.context_type.slice(1),
         priority: context.priority,
         template_variables: context.template_variables,
         created_by: context.created_by,
@@ -142,7 +142,7 @@ export async function PUT(
         name: validatedData.name,
         description: validatedData.description,
         content: validatedData.content,
-        context_type: validatedData.scope,
+        context_type: validatedData.scope.toLowerCase(),
         priority: validatedData.priority,
         template_variables: validatedData.template_variables,
         updated_at: new Date().toISOString()

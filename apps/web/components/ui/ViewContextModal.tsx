@@ -103,14 +103,11 @@ export function ViewContextModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" aria-describedby="view-context-description">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle
-            id="view-context-title"
-            className="flex items-center justify-between text-base"
-          >
+          <DialogTitle className="flex items-center justify-between text-base">
             <span className="truncate">{context.name}</span>
-            <div className="flex items-center gap-1.5 ml-4">
+            <div className="flex items-center gap-3 ml-4">
               {showEditButton && context.is_editable && (
                 <button
                   onClick={handleEdit}
@@ -132,7 +129,7 @@ export function ViewContextModal({
               </button>
             </div>
           </DialogTitle>
-          <DialogDescription id="view-context-description" className="text-xs">
+          <DialogDescription className="text-xs">
             View context details, metadata, and usage information
           </DialogDescription>
         </DialogHeader>

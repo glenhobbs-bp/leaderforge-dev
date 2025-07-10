@@ -11,9 +11,6 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './dialog';
 import { Save, AlertCircle, Loader2 } from 'lucide-react';
 import {
-  CreateContextSchema,
-  UpdateContextSchema,
-  TemplateVariablesTextSchema,
   parseTemplateVariables,
   templateVariablesToText,
   type PromptContext
@@ -83,45 +80,46 @@ export function EditContextModal({ isOpen, onClose, context, onSave }: EditConte
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    try {
-      // Validate template variables text format first
-      TemplateVariablesTextSchema.parse(templateVariablesText);
-
-      // Parse template variables for schema validation
-      const templateVariables = parseTemplateVariables(templateVariablesText);
-
-      // Prepare data for validation
-      const contextData = {
-        ...formData,
-        template_variables: templateVariables
-      };
-
-      // Use appropriate schema based on whether this is create or update
-      const schema = context ? UpdateContextSchema : CreateContextSchema;
-      schema.parse(contextData);
-
-        } catch (error) {
-      // Handle Zod validation errors
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const zodErrors = (error as { errors: Array<{ path: string[]; message: string }> }).errors;
-        for (const zodError of zodErrors) {
-          const path = zodError.path.join('.');
-          newErrors[path as keyof FormErrors] = zodError.message;
-        }
-      }
-
-      // Handle template variables validation separately
-      try {
-        TemplateVariablesTextSchema.parse(templateVariablesText);
-      } catch (templateError) {
-        if (templateError && typeof templateError === 'object' && 'errors' in templateError) {
-          const zodErrors = (templateError as { errors: Array<{ message: string }> }).errors;
-          for (const zodError of zodErrors) {
-            newErrors.template_variables = zodError.message;
-          }
-        }
-      }
+    // Name validation
+    if (!formData.name?.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    } else if (formData.name.trim().length > 100) {
+      newErrors.name = 'Name must be less than 100 characters';
     }
+
+    // Description validation
+    if (!formData.description?.trim()) {
+      newErrors.description = 'Description is required';
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = 'Description must be at least 10 characters';
+    } else if (formData.description.trim().length > 500) {
+      newErrors.description = 'Description must be less than 500 characters';
+    }
+
+    // Content validation
+    if (!formData.content?.trim()) {
+      newErrors.content = 'Content is required';
+    } else if (formData.content.trim().length < 20) {
+      newErrors.content = 'Content must be at least 20 characters';
+    } else if (formData.content.trim().length > 10000) {
+      newErrors.content = 'Content must be less than 10,000 characters';
+    }
+
+    // Priority validation
+    if (typeof formData.priority !== 'number' || formData.priority < 1 || formData.priority > 100) {
+      newErrors.priority = 'Priority must be between 1 and 100';
+    }
+
+         // Template variables validation
+     if (templateVariablesText.trim()) {
+       try {
+         parseTemplateVariables(templateVariablesText);
+       } catch {
+         newErrors.template_variables = 'Invalid template variables format. Use key=value pairs, one per line.';
+       }
+     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -217,9 +215,9 @@ export function EditContextModal({ isOpen, onClose, context, onSave }: EditConte
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-lg" aria-describedby="edit-context-description">
+              <DialogContent className="sm:max-w-2xl w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-lg max-h-[95vh]">
         <div
-          className="relative rounded-lg p-4 border border-white/20 max-h-[90vh] overflow-y-auto"
+          className="relative rounded-lg p-4 border border-white/20 h-full overflow-y-auto"
           style={{
             background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%)',
             backdropFilter: 'blur(24px)',
@@ -227,32 +225,32 @@ export function EditContextModal({ isOpen, onClose, context, onSave }: EditConte
             boxShadow: '0 8px 16px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)',
           }}
         >
-          <DialogDescription className="sr-only" id="edit-context-description">
-            {isEditMode ? 'Edit existing prompt context' : 'Create new prompt context'}
-          </DialogDescription>
-
           {/* Header */}
           <DialogHeader className="mb-4">
-            <DialogTitle
-              id="edit-context-title"
-              className="text-base font-semibold text-slate-800 tracking-tight"
-            >
+            <DialogTitle className="text-base font-semibold text-slate-800 tracking-tight">
               {isEditMode ? 'Edit Context' : 'Create New Context'}
             </DialogTitle>
+            <DialogDescription className="text-xs text-slate-600">
+              {isEditMode ? 'Edit existing prompt context' : 'Create new prompt context'}
+            </DialogDescription>
           </DialogHeader>
 
           {/* Banner Notification */}
           {banner && (
             <div
-              className={`mb-3 p-2 rounded border transition-all duration-400 ${
+              className={`mb-3 p-2 rounded-md text-xs font-medium transition-all duration-400 ease-in-out ${
+                banner.visible
+                  ? 'opacity-100 transform translate-y-0'
+                  : 'opacity-0 transform -translate-y-2'
+              } ${
                 banner.type === 'success'
-                  ? 'bg-green-50 border-green-200 text-green-700'
-                  : 'bg-red-50 border-red-200 text-red-700'
-              } ${banner.visible ? 'opacity-100' : 'opacity-0'}`}
+                  ? 'bg-green-50 text-green-800 border border-green-200'
+                  : 'bg-red-50 text-red-800 border border-red-200'
+              }`}
             >
-              <div className="flex items-center gap-2">
-                {banner.type === 'error' && <AlertCircle className="w-3 h-3" />}
-                <span className="text-xs font-medium">{banner.message}</span>
+              <div className="flex items-center gap-1.5">
+                <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                <span>{banner.message}</span>
               </div>
             </div>
           )}
@@ -332,9 +330,9 @@ export function EditContextModal({ isOpen, onClose, context, onSave }: EditConte
                 value={formData.content || ''}
                 onChange={(e) => handleInputChange('content', e.target.value)}
                 placeholder="Enter the context content that will be provided to AI"
-                rows={6}
+                rows={15}
                 disabled={!canEdit}
-                className={`w-full px-2 py-1.5 text-xs border rounded focus:outline-none focus:ring-1 transition-all duration-200 resize-none ${
+                className={`w-full px-2 py-1.5 text-xs border rounded focus:outline-none focus:ring-1 transition-all duration-200 resize-vertical ${
                   errors.content
                     ? 'border-red-300 focus:ring-red-500/30 focus:border-red-400'
                     : 'border-slate-200/80 focus:ring-slate-400/30 focus:border-slate-300'
@@ -443,7 +441,7 @@ export function EditContextModal({ isOpen, onClose, context, onSave }: EditConte
                   ) : (
                     <>
                       <Save className="w-3 h-3" aria-hidden="true" />
-                      {isEditMode ? 'Update Worksheet' : 'Create Context'}
+                      {isEditMode ? 'Update Context' : 'Create Context'}
                     </>
                   )}
                 </button>

@@ -110,27 +110,79 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
             created_by: result.context.created_by
           });
         } else {
-          // Fallback to transformed data if API call fails
-          setFullContextData(transformToModalContext(context));
+          // Fallback to transformed data with content unavailable message
+          const fallbackData = transformToModalContext(context);
+          fallbackData.content = 'Content temporarily unavailable. Please try refreshing the page.';
+          setFullContextData(fallbackData);
         }
       } else {
         console.warn('[PromptContextWidget] Failed to fetch full context data:', response.status);
-        // Fallback to transformed data
-        setFullContextData(transformToModalContext(context));
+        // Fallback to transformed data with content unavailable message
+        const fallbackData = transformToModalContext(context);
+        fallbackData.content = `Content temporarily unavailable (Error ${response.status}). Please try refreshing the page.`;
+        setFullContextData(fallbackData);
       }
     } catch (error) {
       console.error('[PromptContextWidget] Error fetching full context data:', error);
-      // Fallback to transformed data
-      setFullContextData(transformToModalContext(context));
+      // Fallback to transformed data with content unavailable message
+      const fallbackData = transformToModalContext(context);
+      fallbackData.content = 'Content temporarily unavailable. Please try refreshing the page.';
+      setFullContextData(fallbackData);
     } finally {
       setIsLoadingFullContext(false);
       setShowViewModal(true);
     }
   };
 
-  const handleEditContext = (context: PromptContext) => {
+  const handleEditContext = async (context: PromptContext) => {
     setSelectedContext(context);
-    setShowEditModal(true);
+    setIsLoadingFullContext(true);
+
+    try {
+      // Fetch full context data including content from API before editing
+      const response = await fetch(`/api/context/${context.id}`, {
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.context) {
+          setFullContextData({
+            id: result.context.id,
+            name: result.context.name,
+            description: result.context.description,
+            content: result.context.content, // Now we get the actual content!
+            scope: result.context.scope,
+            priority: result.context.priority,
+            template_variables: result.context.template_variables || {},
+            is_editable: result.context.is_editable,
+            created_at: result.context.created_at,
+            updated_at: result.context.updated_at,
+            created_by: result.context.created_by
+          });
+        } else {
+          // Fallback to transformed data with content unavailable message
+          const fallbackData = transformToModalContext(context);
+          fallbackData.content = 'Content temporarily unavailable. Please try refreshing the page.';
+          setFullContextData(fallbackData);
+        }
+      } else {
+        console.warn('[PromptContextWidget] Failed to fetch full context data for edit:', response.status);
+        // Fallback to transformed data with content unavailable message
+        const fallbackData = transformToModalContext(context);
+        fallbackData.content = `Content temporarily unavailable (Error ${response.status}). Please try refreshing the page.`;
+        setFullContextData(fallbackData);
+      }
+    } catch (error) {
+      console.error('[PromptContextWidget] Error fetching full context data for edit:', error);
+      // Fallback to transformed data with content unavailable message
+      const fallbackData = transformToModalContext(context);
+      fallbackData.content = 'Content temporarily unavailable. Please try refreshing the page.';
+      setFullContextData(fallbackData);
+    } finally {
+      setIsLoadingFullContext(false);
+      setShowEditModal(true);
+    }
   };
 
   const handleCloseModals = () => {
@@ -141,8 +193,16 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
   };
 
   const handleNewContext = () => {
+    // Close any open modals first
+    setShowViewModal(false);
+    setShowEditModal(false);
     setSelectedContext(null); // null context means create mode
-    setShowEditModal(true);
+    setFullContextData(null);
+
+    // Then open edit modal for new context
+    setTimeout(() => {
+      setShowEditModal(true);
+    }, 50); // Small delay to ensure cleanup
   };
 
   const getContextIcon = (type: string) => {
@@ -286,49 +346,56 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
         </p>
       </div>
 
-            {/* Modals */}
-      <ViewContextModal
-        context={isLoadingFullContext ? null : fullContextData}
-        isOpen={showViewModal}
-        onClose={handleCloseModals}
-        onEdit={() => {
-          setShowViewModal(false);
-          setShowEditModal(true);
-        }}
-      />
+      {/* Modals - Only render one at a time to prevent accessibility conflicts */}
+      {showViewModal && !showEditModal && (
+        <ViewContextModal
+          context={isLoadingFullContext ? null : fullContextData}
+          isOpen={showViewModal}
+          onClose={handleCloseModals}
+          onEdit={() => {
+            setShowViewModal(false);
+            // Small delay to ensure ViewContextModal is fully closed before opening EditContextModal
+            setTimeout(() => {
+              setShowEditModal(true);
+            }, 50);
+          }}
+        />
+      )}
 
-            <EditContextModal
-        context={fullContextData || (selectedContext ? transformToModalContext(selectedContext) : null)}
-        isOpen={showEditModal}
-        onClose={handleCloseModals}
-        onSave={(updatedContext) => {
-          // Transform the context data for the widget
-          const transformedContext: PromptContext = {
-            id: updatedContext.id || selectedContext?.id || '',
-            name: updatedContext.name || '',
-            description: updatedContext.description || '',
-            type: (updatedContext.scope?.toLowerCase() || 'personal') as 'personal' | 'team' | 'organization' | 'external',
-            isActive: selectedContext?.isActive || true,
-            canEdit: updatedContext.is_editable || true,
-            icon: updatedContext.scope?.toLowerCase() || 'personal',
-            priority: updatedContext.priority || 1,
-            lastUpdated: 'Just now',
-            usage: selectedContext?.usage || 0
-          };
+      {showEditModal && !showViewModal && (
+        <EditContextModal
+          context={fullContextData || (selectedContext ? transformToModalContext(selectedContext) : null)}
+          isOpen={showEditModal}
+          onClose={handleCloseModals}
+          onSave={(updatedContext) => {
+            // Transform the context data for the widget
+            const transformedContext: PromptContext = {
+              id: updatedContext.id || selectedContext?.id || '',
+              name: updatedContext.name || '',
+              description: updatedContext.description || '',
+              type: (updatedContext.scope?.toLowerCase() || 'personal') as 'personal' | 'team' | 'organization' | 'external',
+              isActive: selectedContext?.isActive || true,
+              canEdit: updatedContext.is_editable || true,
+              icon: updatedContext.scope?.toLowerCase() || 'personal',
+              priority: updatedContext.priority || 1,
+              lastUpdated: 'Just now',
+              usage: selectedContext?.usage || 0
+            };
 
-          if (selectedContext) {
-            // Update existing context
-            setContexts(contexts.map(ctx =>
-              ctx.id === transformedContext.id ? transformedContext : ctx
-            ));
-          } else {
-            // Add new context
-            setContexts([...contexts, transformedContext]);
-          }
+            if (selectedContext) {
+              // Update existing context
+              setContexts(contexts.map(ctx =>
+                ctx.id === transformedContext.id ? transformedContext : ctx
+              ));
+            } else {
+              // Add new context
+              setContexts([...contexts, transformedContext]);
+            }
 
-          handleCloseModals();
-        }}
-      />
+            handleCloseModals();
+          }}
+        />
+      )}
     </div>
   );
 }
