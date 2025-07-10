@@ -55,6 +55,8 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedContext, setSelectedContext] = useState<PromptContext | null>(null);
+  const [fullContextData, setFullContextData] = useState<ModalPromptContext | null>(null);
+  const [isLoadingFullContext, setIsLoadingFullContext] = useState(false);
 
   const handleToggleContext = (contextId: string) => {
     setContexts(contexts.map(ctx =>
@@ -81,9 +83,49 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
     };
   };
 
-  const handleViewContext = (context: PromptContext) => {
+  const handleViewContext = async (context: PromptContext) => {
     setSelectedContext(context);
-    setShowViewModal(true);
+    setIsLoadingFullContext(true);
+
+    try {
+      // Fetch full context data including content from API
+      const response = await fetch(`/api/context/${context.id}`, {
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.context) {
+          setFullContextData({
+            id: result.context.id,
+            name: result.context.name,
+            description: result.context.description,
+            content: result.context.content, // Now we get the actual content!
+            scope: result.context.scope,
+            priority: result.context.priority,
+            template_variables: result.context.template_variables || {},
+            is_editable: result.context.is_editable,
+            created_at: result.context.created_at,
+            updated_at: result.context.updated_at,
+            created_by: result.context.created_by
+          });
+        } else {
+          // Fallback to transformed data if API call fails
+          setFullContextData(transformToModalContext(context));
+        }
+      } else {
+        console.warn('[PromptContextWidget] Failed to fetch full context data:', response.status);
+        // Fallback to transformed data
+        setFullContextData(transformToModalContext(context));
+      }
+    } catch (error) {
+      console.error('[PromptContextWidget] Error fetching full context data:', error);
+      // Fallback to transformed data
+      setFullContextData(transformToModalContext(context));
+    } finally {
+      setIsLoadingFullContext(false);
+      setShowViewModal(true);
+    }
   };
 
   const handleEditContext = (context: PromptContext) => {
@@ -95,6 +137,7 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
     setShowEditModal(false);
     setShowViewModal(false);
     setSelectedContext(null);
+    setFullContextData(null);
   };
 
   const handleNewContext = () => {
@@ -245,7 +288,7 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
 
             {/* Modals */}
       <ViewContextModal
-        context={selectedContext ? transformToModalContext(selectedContext) : null}
+        context={isLoadingFullContext ? null : fullContextData}
         isOpen={showViewModal}
         onClose={handleCloseModals}
         onEdit={() => {
@@ -255,7 +298,7 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
       />
 
             <EditContextModal
-        context={selectedContext ? transformToModalContext(selectedContext) : null}
+        context={fullContextData || (selectedContext ? transformToModalContext(selectedContext) : null)}
         isOpen={showEditModal}
         onClose={handleCloseModals}
         onSave={(updatedContext) => {
