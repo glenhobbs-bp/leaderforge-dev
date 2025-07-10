@@ -40,22 +40,15 @@ export default function SupabaseProvider({
       console.log('[SupabaseProvider] Using initial session directly');
       hasInitialized.current = true;
     } else {
-      // If no valid initialSession, try to restore session client-side
-      console.log('[SupabaseProvider] No initial session, attempting client-side session restoration');
-      setLoading(true);
+      // SECURITY FIX: No client-side session restoration when server-side auth fails
+      // If server-side authentication didn't provide a session, respect that decision
+      console.log('[SupabaseProvider] No initial session from server - respecting server-side auth decision');
+      setLoading(false);
+      hasInitialized.current = true;
 
-      // Try to get session from client-side storage
-      supabase.auth.getSession().then(({ data: { session: clientSession }, error }) => {
-        if (isMounted) {
-          if (clientSession && !error) {
-            console.log('[SupabaseProvider] Client-side session found:', clientSession.user.id);
-            setSession(clientSession);
-          } else {
-            console.log('[SupabaseProvider] No client-side session found');
-          }
-          setLoading(false);
-          hasInitialized.current = true;
-        }
+      // Clear any stale client-side session data to prevent auth bypass
+      supabase.auth.signOut().catch(error => {
+        console.warn('[SupabaseProvider] Error clearing stale session:', error);
       });
     }
 
