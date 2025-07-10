@@ -15,26 +15,21 @@ interface AuthenticationGuardProps {
 export function AuthenticationGuard({ children, onAuthenticationChange }: AuthenticationGuardProps) {
   const { session, loading: authLoading } = useSupabase();
 
-  // Authentication guard - redirect to login if no session and auth loading is complete
+  // Simplified authentication check - only redirect when we're certain there's no session
   useEffect(() => {
-    // Only redirect if we're sure there's no session (not loading and no session)
-    if (!authLoading && !session) {
-      console.log('[AuthenticationGuard] No session found after auth loading complete, redirecting to login');
-      // Add a small delay to prevent flash during normal loading sequences
-      const redirectTimer = setTimeout(() => {
-        window.location.href = '/login';
-      }, 100);
-
-      return () => clearTimeout(redirectTimer);
-    }
-
     // Notify parent component of authentication changes
     if (onAuthenticationChange) {
       onAuthenticationChange(!!session);
     }
+
+    // Only redirect if we have a definitive "no session" state
+    if (!authLoading && !session) {
+      console.log('[AuthenticationGuard] No session found - redirecting to login');
+      window.location.href = '/login';
+    }
   }, [authLoading, session, onAuthenticationChange]);
 
-  // Show loading state while authentication is being determined
+  // Show loading state only if we're actually loading
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
@@ -51,11 +46,9 @@ export function AuthenticationGuard({ children, onAuthenticationChange }: Authen
     );
   }
 
-  // SYNC authentication check - redirect immediately if no session
-  if (!authLoading && !session) {
-    console.log('[AuthenticationGuard] No session - redirecting to login synchronously');
-    window.location.href = '/login';
-    return null; // Prevent any rendering
+  // If no session and not loading, redirect will happen in useEffect
+  if (!session) {
+    return null;
   }
 
   // Render children if authenticated

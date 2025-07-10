@@ -26,44 +26,34 @@ export default function SupabaseProvider({
     )
   );
 
-  // Start with initialSession to prevent auth flash
+  // Use initialSession directly - no complex loading states
   const [session, setSession] = useState<Session | null>(initialSession);
-  const [loading, setLoading] = useState(!initialSession); // Only show loading if no initial session
-
+  const [loading, setLoading] = useState(false); // Simplified - only true during auth transitions
   const hasInitialized = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    // If we have a valid initialSession, use it and mark as initialized
+    // Simple initialization - use what the server provided
     if (initialSession?.user?.id) {
-      console.log('[SupabaseProvider] Using valid initial session from server');
-      setSession(initialSession);
-      setLoading(false);
-      hasInitialized.current = true;
-      return;
+      console.log('[SupabaseProvider] ✅ Using server session for user:', initialSession.user.id);
+    } else {
+      console.log('[SupabaseProvider] No server session - will rely on auth state changes');
     }
 
-    // CRITICAL: If no initial session from server, respect that decision
-    console.log('[SupabaseProvider] No initial session from server - respecting server-side auth decision');
-
-    // Don't attempt client-side session restoration if server didn't provide a session
-    // This prevents bypassing authentication
-    setSession(null);
-    setLoading(false);
-    hasInitialized.current = true;
-
-    // Set up auth state listener for future changes
+    // Always set up auth state listener for login/logout events
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[SupabaseProvider] Auth state changed:', event, session?.user?.id);
+      console.log('[SupabaseProvider] Auth event:', event, session?.user?.id || 'no-user');
 
       if (isMounted) {
         setSession(session);
         setLoading(false);
       }
     });
+
+    hasInitialized.current = true;
 
     return () => {
       isMounted = false;

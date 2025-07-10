@@ -38,23 +38,14 @@ export default async function RootLayout({
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
 
-  console.log('[layout] Token debug:', {
-    hasAccessToken: !!accessToken,
-    hasRefreshToken: !!refreshToken,
-    accessTokenLength: accessToken?.length || 0,
-    refreshTokenLength: refreshToken?.length || 0,
-    projectRef
-  });
-
   const supabase = createSupabaseServerClient(cookieStore);
-
   let initialSession = null;
 
-  // CRITICAL: Only attempt session restoration if we have BOTH tokens
-  // Access tokens are JWTs (longer), refresh tokens can be shorter (even 12 chars is valid)
-  if (accessToken && refreshToken && accessToken.length > 50 && refreshToken.length > 3) {
+  // Simplified token validation - if both tokens exist and have reasonable lengths, attempt restoration
+  if (accessToken && refreshToken && accessToken.length > 10 && refreshToken.length > 3) {
     try {
-      console.log('[layout] Attempting session restoration with valid tokens');
+      console.log('[layout] Attempting session restoration with tokens (access: %d chars, refresh: %d chars)',
+        accessToken.length, refreshToken.length);
 
       const { data, error } = await supabase.auth.setSession({
         access_token: accessToken,
@@ -62,20 +53,21 @@ export default async function RootLayout({
       });
 
       if (error) {
-        console.warn('[layout] setSession error:', error);
-        // Don't set initialSession - let client handle this
+        console.warn('[layout] Session restoration failed:', error.message);
       } else if (data.session?.user?.id) {
-        console.log('[layout] Session restored successfully');
+        console.log('[layout] ✅ Session restored successfully for user:', data.session.user.id);
         initialSession = data.session;
       } else {
         console.warn('[layout] Session restoration returned no user');
       }
     } catch (error) {
-      console.error('[layout] Session restoration failed:', error);
-      // Don't set initialSession - let client handle this
+      console.error('[layout] Session restoration exception:', error);
     }
   } else {
-    console.log('[layout] No valid tokens found - no session restoration attempted');
+    console.log('[layout] No session restoration - missing or invalid tokens (access: %s, refresh: %s)',
+      accessToken ? `${accessToken.length} chars` : 'missing',
+      refreshToken ? `${refreshToken.length} chars` : 'missing'
+    );
   }
 
   return (
