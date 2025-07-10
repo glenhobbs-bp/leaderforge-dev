@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from './dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './dialog';
 import { Camera, User, Edit3 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { forceAvatarRefresh } from './NavPanel';
@@ -267,7 +267,7 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
 
 
       <Dialog open={isOpen} onOpenChange={handleModalClose}>
-        <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
+        <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl" aria-describedby="profile-modal-description">
         <div
           className="relative rounded-2xl p-5 border border-white/20"
           style={{
@@ -277,16 +277,18 @@ export function UserProfileModal({ isOpen, onClose, userId }: UserProfileModalPr
             boxShadow: '0 20px 40px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
           }}
         >
-          <DialogDescription className="sr-only">
+          <DialogDescription className="sr-only" id="profile-modal-description">
             Manage your profile settings including personal information, theme preferences, and notification settings
           </DialogDescription>
 
           {/* Header */}
-          <div className="flex items-center justify-between mb-5">
-            <DialogTitle className="text-base font-semibold text-slate-800 tracking-tight">
-              Profile Settings
-            </DialogTitle>
-          </div>
+          <DialogHeader className="mb-5">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-base font-semibold text-slate-800 tracking-tight">
+                Profile Settings
+              </DialogTitle>
+            </div>
+          </DialogHeader>
 
           {/* Avatar Section */}
           <div className="flex flex-col items-center mb-6">

@@ -14,7 +14,7 @@ import { Video, Search, CheckCircle, Clock, FileText } from 'lucide-react'
 import { Progress } from "@/components/ui/progress"
 import { tribeApiFetch } from '@/lib/tribe-api'
 import Hls from 'hls.js'
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 
 interface Training {
   id: string
@@ -98,7 +98,13 @@ const VideoModal = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] p-0">
+      <DialogContent className="sm:max-w-[800px] p-0" aria-describedby="video-modal-description">
+        <DialogDescription className="sr-only" id="video-modal-description">
+          Training video player for {title}
+        </DialogDescription>
+        <DialogHeader className="sr-only">
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
         <div className="aspect-video w-full">
           <VideoPlayer url={url} />
         </div>

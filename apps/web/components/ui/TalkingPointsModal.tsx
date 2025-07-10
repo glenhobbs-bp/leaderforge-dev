@@ -7,7 +7,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent } from './dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './dialog';
 import { Video, Target, TrendingUp, Lightbulb, PenTool, Mic, PlayCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface TalkingPointsModalProps {
@@ -35,18 +35,24 @@ export function TalkingPointsModal({ isOpen, onClose, memberName, memberData }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-6xl w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl">
+      <DialogContent className="sm:max-w-6xl w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-2xl" aria-describedby="talking-points-description">
         <div className="card-glass-premium p-6 max-h-[90vh] overflow-y-auto">
+          <DialogDescription className="sr-only" id="talking-points-description">
+            Coaching session talking points and member progress information for check-in meeting
+          </DialogDescription>
+
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-glass-primary">
-              Check-in - {memberName}
-            </h2>
-            <button className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
-              <Video className="w-4 h-4" />
-              <span>Start Call</span>
-            </button>
-          </div>
+          <DialogHeader className="mb-6">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-semibold text-glass-primary">
+                Check-in - {memberName}
+              </DialogTitle>
+              <button className="flex items-center space-x-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
+                <Video className="w-4 h-4" />
+                <span>Start Call</span>
+              </button>
+            </div>
+          </DialogHeader>
 
           {/* Three Column Layout */}
           <div className="grid grid-cols-3 gap-6">
