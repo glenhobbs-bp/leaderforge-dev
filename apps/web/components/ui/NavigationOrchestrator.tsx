@@ -115,7 +115,7 @@ export function NavigationOrchestrator({
   }, [propSelectedNavOptionId, selectedNavOptionId, isReady, userId]);
 
   // 🤖 AGENT-NATIVE: Fetch agent schema for navigation option
-  const fetchAgentSchema = async (navId: string) => {
+  const fetchAgentSchema = useCallback(async (navId: string) => {
     if (!userId) {
       console.error('[NavigationOrchestrator] No user session - cannot fetch agent schema');
       return;
@@ -163,19 +163,19 @@ export function NavigationOrchestrator({
     } finally {
       setContentLoading(false);
     }
-  };
+  }, [userId, currentTenant]);
 
   // Handle tenant changes - triggers context switch
-  const handleTenantChange = (tenantKey: string) => {
+  const handleTenantChange = useCallback((tenantKey: string) => {
     console.log('[NavigationOrchestrator] Tenant change:', tenantKey);
     setCurrentTenant(tenantKey);
     // Clear selected nav option when switching tenants
     setSelectedNavOptionId(null);
     setAgentSchema(null);
-  };
+  }, []);
 
   // Load content for a specific navigation option
-  const loadContentForNavOption = async (navId: string, updateSelection: boolean = true, skipStateSave: boolean = false) => {
+  const loadContentForNavOption = useCallback(async (navId: string, updateSelection: boolean = true, skipStateSave: boolean = false) => {
     console.log('[NavigationOrchestrator] 🔧 Loading content for nav option:', navId, 'updateSelection:', updateSelection, 'skipStateSave:', skipStateSave);
 
     if (updateSelection) {
@@ -217,14 +217,15 @@ export function NavigationOrchestrator({
 
     // Fetch content via agent
     await fetchAgentSchema(navId);
-  };
+  }, [userId, currentTenant, fetchAgentSchema]);
 
   // 🤖 AGENT-NATIVE: Navigation selection with agent invocation
-  const handleNavSelect = async (navId: string) => {
+  const handleNavSelect = useCallback(async (navId: string) => {
+    console.log('[NavigationOrchestrator] handleNavSelect called with navId:', navId);
     // Update selection and load content
     setSelectedNavOptionId(navId);
-    await loadContentForNavOption(navId, false, true); // Don't update selection again, and skip state save (NavPanel handles it)
-  };
+    await loadContentForNavOption(navId, true, true); // Update selection and skip state save (NavPanel handles it)
+  }, [loadContentForNavOption]);
 
   // Create nav component using database-driven approach
   const NavComponent = useCallback(({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
