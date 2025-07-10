@@ -4,7 +4,7 @@
 // Owner: Frontend Team
 // Tags: #navigation #agent-orchestration #layout #tenant-management
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ThreePanelLayout from './ThreePanelLayout';
 import NavPanel from './NavPanel';
 import { ContentRenderer } from './ContentRenderer';
@@ -78,6 +78,9 @@ export function NavigationOrchestrator({
   const [error, setError] = useState<string | null>(null);
   const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
 
+  // Ref to track the current navigation state and prevent race conditions
+  const currentNavIdRef = useRef<string | null>(null);
+
   // Modal state
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [videoModalData, setVideoModalData] = useState<VideoModalData | null>(null);
@@ -105,14 +108,16 @@ export function NavigationOrchestrator({
   }, [isReady]);
 
   // Handle selected navigation option from props (e.g., user preferences restoration)
+  // RACE CONDITION FIX: Only trigger when prop changes AND it's different from current state
   useEffect(() => {
-    if (propSelectedNavOptionId && propSelectedNavOptionId !== selectedNavOptionId && isReady && userId) {
-      console.log('[NavigationOrchestrator] Loading content for prop selectedNavOptionId:', propSelectedNavOptionId);
+    if (propSelectedNavOptionId && propSelectedNavOptionId !== currentNavIdRef.current && isReady && userId) {
+      console.log('[NavigationOrchestrator] 🔄 Prop selectedNavOptionId changed:', propSelectedNavOptionId, 'current ref:', currentNavIdRef.current);
+      currentNavIdRef.current = propSelectedNavOptionId;
       setSelectedNavOptionId(propSelectedNavOptionId);
       // Use a flag to prevent saving state during prop-driven navigation
       loadContentForNavOption(propSelectedNavOptionId, false, true);
     }
-  }, [propSelectedNavOptionId, selectedNavOptionId, isReady, userId]);
+  }, [propSelectedNavOptionId, isReady, userId]); // Using ref instead of state to prevent race condition
 
   // 🤖 AGENT-NATIVE: Fetch agent schema for navigation option
   const fetchAgentSchema = useCallback(async (navId: string) => {
@@ -179,6 +184,7 @@ export function NavigationOrchestrator({
     console.log('[NavigationOrchestrator] 🔧 Loading content for nav option:', navId, 'updateSelection:', updateSelection, 'skipStateSave:', skipStateSave);
 
     if (updateSelection) {
+      currentNavIdRef.current = navId;
       setSelectedNavOptionId(navId);
     }
 
@@ -221,7 +227,10 @@ export function NavigationOrchestrator({
 
   // 🤖 AGENT-NATIVE: Navigation selection with agent invocation
   const handleNavSelect = useCallback(async (navId: string) => {
-    console.log('[NavigationOrchestrator] 🎯 handleNavSelect called with navId:', navId, 'current selectedNavOptionId:', selectedNavOptionId);
+    console.log('[NavigationOrchestrator] 🎯 handleNavSelect called with navId:', navId, 'current ref:', currentNavIdRef.current);
+
+    // RACE CONDITION FIX: Update ref immediately to prevent duplicate loads
+    currentNavIdRef.current = navId;
 
     // Update selection and load content
     console.log('[NavigationOrchestrator] 🔄 Setting selectedNavOptionId to:', navId);
@@ -231,7 +240,7 @@ export function NavigationOrchestrator({
     await loadContentForNavOption(navId, true, true); // Update selection and skip state save (NavPanel handles it)
 
     console.log('[NavigationOrchestrator] ✅ handleNavSelect completed for navId:', navId);
-  }, [loadContentForNavOption, selectedNavOptionId]);
+  }, [loadContentForNavOption]);
 
   // Create nav component using database-driven approach
   const NavComponent = useCallback(({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {
