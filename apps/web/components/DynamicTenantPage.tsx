@@ -4,7 +4,7 @@
 // Owner: Frontend Team
 // Tags: #tenant-page #orchestration #modular #performance
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AuthenticationGuard } from './ui/AuthenticationGuard';
 import { UserPreferencesManager } from './ui/UserPreferencesManager';
 import { NavigationOrchestrator } from './ui/NavigationOrchestrator';
@@ -33,6 +33,9 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
   const [isPreferencesReady, setIsPreferencesReady] = useState(false);
   const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
 
+  // Add stabilization to prevent rapid re-renders
+  const [isStable, setIsStable] = useState(false);
+
   // Handle tenant changes from user preferences
   const handleTenantChange = (tenantKey: string) => {
     console.log('[DynamicTenantPage] Tenant change:', tenantKey);
@@ -45,11 +48,25 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
     setSelectedNavOptionId(navId);
   };
 
-  // Handle preferences ready callback
+  // Handle preferences ready callback with stabilization
   const handlePreferencesReady = () => {
     console.log('[DynamicTenantPage] User preferences ready');
     setIsPreferencesReady(true);
   };
+
+  // Stabilize component mounting after preferences are ready
+  useEffect(() => {
+    if (isPreferencesReady && !isStable) {
+      const timer = setTimeout(() => {
+        setIsStable(true);
+      }, 50); // Very short delay just to batch state updates
+
+      return () => clearTimeout(timer);
+    }
+  }, [isPreferencesReady, isStable]);
+
+  // Only show NavigationOrchestrator when both preferences are ready AND state is stable
+  const shouldShowOrchestrator = isPreferencesReady && isStable;
 
   return (
     <AuthenticationGuard>
@@ -60,13 +77,13 @@ export default function DynamicTenantPage(props: DynamicTenantPageProps) {
         onNavOptionSelect={handleNavOptionSelect}
         onPreferencesReady={handlePreferencesReady}
       />
-      {isPreferencesReady && (
+      {shouldShowOrchestrator && (
         <NavigationOrchestrator
           initialTenants={props.initialTenants}
           initialTenantConfig={props.initialTenantConfig}
           defaultTenantKey={props.defaultTenantKey}
           userId={session?.user?.id}
-          isReady={isPreferencesReady}
+          isReady={shouldShowOrchestrator}
           selectedNavOptionId={selectedNavOptionId}
         />
       )}
