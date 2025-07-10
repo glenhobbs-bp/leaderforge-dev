@@ -103,7 +103,7 @@ export function ViewContextModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" aria-describedby="view-context-description">
         <DialogHeader>
           <DialogTitle
             id="view-context-title"

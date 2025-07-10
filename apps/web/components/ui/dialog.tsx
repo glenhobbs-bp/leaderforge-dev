@@ -12,13 +12,13 @@ export function Dialog({ open, onOpenChange, children }: RadixDialog.DialogProps
   );
 }
 
-export function DialogContent({ children, className }: { children: React.ReactNode; className?: string }) {
+export function DialogContent({ children, className, ...props }: { children: React.ReactNode; className?: string } & React.ComponentPropsWithoutRef<typeof RadixDialog.Content>) {
   return (
     <RadixDialog.Portal>
       <RadixDialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40" />
       <RadixDialog.Content
         className={`fixed left-1/2 top-1/2 z-50 bg-white rounded-xl p-4 outline-none transform -translate-x-1/2 -translate-y-1/2 shadow-2xl max-h-[90vh] overflow-auto ${className || ""}`}
-        aria-describedby="dialog-description"
+        {...props}
       >
         <RadixDialog.Close asChild>
           <button className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 z-50 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105">

@@ -217,7 +217,7 @@ export function EditContextModal({ isOpen, onClose, context, onSave }: EditConte
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-lg">
+      <DialogContent className="sm:max-w-md w-full mx-4 p-0 overflow-hidden border-0 bg-transparent shadow-lg" aria-describedby="edit-context-description">
         <div
           className="relative rounded-lg p-4 border border-white/20 max-h-[90vh] overflow-y-auto"
           style={{
