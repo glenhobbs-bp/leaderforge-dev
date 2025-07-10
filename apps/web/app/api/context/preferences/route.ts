@@ -2,7 +2,12 @@
  * File: apps/web/app/api/context/preferences/route.ts
  * Purpose: API route for managing user context toggle preferences (agent-native)
  * Owner: Engineering Team
- * Tags: #api #context #preferences #agent-native
+ * Tags: #api #context #preferences #agent-native #adr-0026
+ *
+ * HTTP Methods (per ADR-0026):
+ * - GET: Retrieve user context preferences via agent
+ * - PATCH: Toggle single context preference
+ * - PUT: Bulk update context preferences via agent
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -42,8 +47,8 @@ export async function GET() {
   }
 }
 
-// POST: Update user's context preference via agent
-export async function POST(req: NextRequest) {
+// PATCH: Update user's context preference via agent (ADR-0026: Single resource updates)
+export async function PATCH(req: NextRequest) {
   try {
     const cookieStore = await cookies();
     const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
@@ -89,7 +94,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Context Preferences API] POST error:', error);
+    console.error('[Context Preferences API] PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

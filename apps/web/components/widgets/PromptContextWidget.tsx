@@ -8,7 +8,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Settings, Share2, Eye, Edit2, TestTube, CheckCircle2, Users, Building2, Globe, X } from 'lucide-react';
+import { Plus, Settings, Eye, Edit2, Users, Building2, Globe } from 'lucide-react';
+import { EditContextModal } from '../ui/EditContextModal';
+import { ViewContextModal } from '../ui/ViewContextModal';
+import { type PromptContext as ModalPromptContext } from '../../lib/validation/contextSchemas';
 
 interface PromptContext {
   id: string;
@@ -17,7 +20,6 @@ interface PromptContext {
   type: 'personal' | 'team' | 'organization' | 'external';
   isActive: boolean;
   canEdit: boolean;
-  canShare: boolean;
   icon: string;
   priority: number;
   lastUpdated: string;
@@ -47,9 +49,12 @@ interface AgentContextData {
 }
 
 export function PromptContextWidget({ data }: PromptContextWidgetProps) {
-  const [testPrompt, setTestPrompt] = useState('How should I handle a difficult team member?');
-  const [showResponse, setShowResponse] = useState(false);
   const [contexts, setContexts] = useState<PromptContext[]>(data?.contexts || []);
+
+  // Modal state management
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedContext, setSelectedContext] = useState<PromptContext | null>(null);
 
   const handleToggleContext = (contextId: string) => {
     setContexts(contexts.map(ctx =>
@@ -57,8 +62,44 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
     ));
   };
 
-  const handleTestResponse = () => {
-    setShowResponse(true);
+  // Transform widget context to modal context format
+  const transformToModalContext = (context: PromptContext): ModalPromptContext => {
+    return {
+      id: context.id,
+      name: context.name,
+      description: context.description,
+      content: '', // We don't have content in the widget context
+      scope: context.type === 'personal' ? 'Personal' :
+             context.type === 'team' ? 'Team' :
+             context.type === 'organization' ? 'Organizational' : 'Global',
+      priority: context.priority,
+      template_variables: {},
+      is_editable: context.canEdit,
+      created_at: undefined,
+      updated_at: undefined,
+      created_by: undefined
+    };
+  };
+
+  const handleViewContext = (context: PromptContext) => {
+    setSelectedContext(context);
+    setShowViewModal(true);
+  };
+
+  const handleEditContext = (context: PromptContext) => {
+    setSelectedContext(context);
+    setShowEditModal(true);
+  };
+
+  const handleCloseModals = () => {
+    setShowEditModal(false);
+    setShowViewModal(false);
+    setSelectedContext(null);
+  };
+
+  const handleNewContext = () => {
+    setSelectedContext(null); // null context means create mode
+    setShowEditModal(true);
   };
 
   const getContextIcon = (type: string) => {
@@ -93,61 +134,17 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
             Configure how AI understands and responds to you across all LeaderForge interactions
           </p>
         </div>
-        <button className="flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition-colors">
+        <button
+          onClick={handleNewContext}
+          className="flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded transition-colors"
+          title="Create new context"
+        >
           <Plus className="w-4 h-4" />
           New Context
         </button>
       </div>
 
-      {/* Test Section - Combined Glassmorphism Card like Prompt Library */}
-      <div className="card-glass-subtle p-4 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <TestTube className="w-4 h-4 text-green-600" />
-          <h2 className="text-lg font-medium text-glass-primary">Test Your Contexts</h2>
-        </div>
 
-        <div className="space-y-4">
-          <div>
-            <input
-              type="text"
-              value={testPrompt}
-              onChange={(e) => setTestPrompt(e.target.value)}
-              placeholder="Enter a question to test how your contexts affect AI responses..."
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
-          </div>
-
-          <button
-            onClick={handleTestResponse}
-            className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md hover:scale-105"
-          >
-            <TestTube className="w-3 h-3" />
-            Test Response
-          </button>
-
-          {showResponse && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-sm font-medium text-blue-900">AI Response Preview:</h3>
-                <button
-                  onClick={() => setShowResponse(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                  title="Close preview"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <p className="text-xs text-blue-800 leading-relaxed">
-                Based on your Kingdom leadership approach and thin slicing preference, I recommend first seeking to understand what this team member needs to flourish. Use the opposite spirit principle - respond with encouragement where they expect correction. Break the conversation into smaller, manageable pieces rather than addressing everything at once.
-              </p>
-              <div className="mt-3 flex items-center gap-2 text-xs text-blue-600">
-                <CheckCircle2 className="w-3 h-3" />
-                <span>Response influenced by {contexts.filter(ctx => ctx.isActive).length} active contexts</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Context Cards Grid - Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -200,18 +197,20 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
               {/* Action Buttons - Smaller */}
               <div className="flex items-center gap-1 ml-2">
                 {context.canEdit && (
-                  <button className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                  <button
+                    onClick={() => handleEditContext(context)}
+                    className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    title="Edit context"
+                  >
                     <Edit2 className="w-3 h-3" />
                   </button>
                 )}
 
-                {context.canShare && (
-                  <button className="p-1 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors">
-                    <Share2 className="w-3 h-3" />
-                  </button>
-                )}
-
-                <button className="p-1 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors">
+                <button
+                  onClick={() => handleViewContext(context)}
+                  className="p-1 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                  title="View context details"
+                >
                   <Eye className="w-3 h-3" />
                 </button>
 
@@ -243,6 +242,50 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
           Lower-level contexts override higher-level ones for conflicting directives while additively merging complementary information.
         </p>
       </div>
+
+            {/* Modals */}
+      <ViewContextModal
+        context={selectedContext ? transformToModalContext(selectedContext) : null}
+        isOpen={showViewModal}
+        onClose={handleCloseModals}
+        onEdit={() => {
+          setShowViewModal(false);
+          setShowEditModal(true);
+        }}
+      />
+
+            <EditContextModal
+        context={selectedContext ? transformToModalContext(selectedContext) : null}
+        isOpen={showEditModal}
+        onClose={handleCloseModals}
+        onSave={(updatedContext) => {
+          // Transform the context data for the widget
+          const transformedContext: PromptContext = {
+            id: updatedContext.id || selectedContext?.id || '',
+            name: updatedContext.name || '',
+            description: updatedContext.description || '',
+            type: (updatedContext.scope?.toLowerCase() || 'personal') as 'personal' | 'team' | 'organization' | 'external',
+            isActive: selectedContext?.isActive || true,
+            canEdit: updatedContext.is_editable || true,
+            icon: updatedContext.scope?.toLowerCase() || 'personal',
+            priority: updatedContext.priority || 1,
+            lastUpdated: 'Just now',
+            usage: selectedContext?.usage || 0
+          };
+
+          if (selectedContext) {
+            // Update existing context
+            setContexts(contexts.map(ctx =>
+              ctx.id === transformedContext.id ? transformedContext : ctx
+            ));
+          } else {
+            // Add new context
+            setContexts([...contexts, transformedContext]);
+          }
+
+          handleCloseModals();
+        }}
+      />
     </div>
   );
 }
@@ -278,7 +321,6 @@ export function promptContextSchemaToProps(schema: {
     type: (ctx.scope || 'personal') as 'personal' | 'team' | 'organization' | 'external',
     isActive: ctx.isEnabled ?? true,
     canEdit: ctx.canEdit ?? true,
-    canShare: true,
     icon: ctx.scope || 'personal',
     priority: ctx.priority || 1,
     lastUpdated: 'Recently', // Agent doesn't provide this yet

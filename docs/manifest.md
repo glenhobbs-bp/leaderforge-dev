@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/9/2025, 5:46:59 PM*
+*Generated on 7/9/2025, 8:05:14 PM*
 
 ## Overview
 
-- **Total Files**: 368
-- **Total Size**: 2.93 MB
+- **Total Files**: 379
+- **Total Size**: 3.05 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 145 files
-- **.md**: 129 files
-- **.tsx**: 64 files
+- **.ts**: 149 files
+- **.md**: 134 files
+- **.tsx**: 66 files
 - **.json**: 18 files
 - **.js**: 10 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 209 files
-- **AI agent**: 191 files
-- **documentation**: 133 files
-- **security**: 102 files
-- **React**: 64 files
-- **API**: 61 files
-- **Next.js API**: 59 files
-- **UI**: 54 files
-- **React hooks**: 50 files
-- **utility**: 36 files
+- **TypeScript**: 215 files
+- **AI agent**: 197 files
+- **documentation**: 138 files
+- **security**: 109 files
+- **React**: 66 files
+- **API**: 63 files
+- **Next.js API**: 63 files
+- **UI**: 56 files
+- **React hooks**: 52 files
+- **utility**: 38 files
 
 ## File Inventory
 
@@ -203,13 +203,31 @@ File: apps/web/app/api/auth/set-session/route.ts
 **Modified**: 6/27/2025
 
 
+### `apps/web/app/api/context/[id]/route.ts`
+
+File: apps/web/app/api/context/[id]/route.ts
+
+**Complexity**: medium • **Size**: 7.5KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/app/api/context/preferences/route.ts`
 
 File: apps/web/app/api/context/preferences/route.ts
 
-**Complexity**: medium • **Size**: 4.7KB
+**Complexity**: medium • **Size**: 5.0KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 7/7/2025
+**Modified**: 7/9/2025
+
+
+### `apps/web/app/api/context/route.ts`
+
+File: apps/web/app/api/context/route.ts
+
+**Complexity**: medium • **Size**: 5.3KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 7/9/2025
 
 
 ### `apps/web/app/api/copilotkit/route.ts`
@@ -632,7 +650,7 @@ Purpose: Schema-driven Prompt Context Management Page - Uses PromptContextWidget
 
 **Complexity**: medium • **Size**: 4.5KB
 **Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 7/8/2025
+**Modified**: 7/9/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
@@ -704,7 +722,7 @@ File: apps/web/app/hooks/useContextPreferences.ts
 
 **Complexity**: medium • **Size**: 5.1KB
 **Tags**: `TypeScript`, `hooks`, `React hooks`
-**Modified**: 7/7/2025
+**Modified**: 7/9/2025
 
 
 ### `apps/web/app/hooks/useNavForContext.ts`
@@ -1328,6 +1346,15 @@ Get icon image path
 **Modified**: 6/27/2025
 
 
+### `apps/web/components/ui/EditContextModal.tsx`
+
+File: apps/web/components/ui/EditContextModal.tsx
+
+**Complexity**: high • **Size**: 18.1KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `security`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/components/ui/legacy_course_modal.tsx`
 
 Simple Button component
@@ -1445,6 +1472,15 @@ Fetch user data from API
 **Modified**: 7/4/2025
 
 
+### `apps/web/components/ui/ViewContextModal.tsx`
+
+File: apps/web/components/ui/ViewContextModal.tsx
+
+**Complexity**: medium • **Size**: 10.8KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `security`
+**Modified**: 7/9/2025
+
+
 ### `apps/web/components/ui/xxxChatPanel.tsx`
 
 —
@@ -1548,7 +1584,7 @@ File: apps/web/components/widgets/Panel.tsx
 
 File: apps/web/components/widgets/PromptContextWidget.tsx
 
-**Complexity**: high • **Size**: 11.9KB
+**Complexity**: high • **Size**: 14.8KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
 **Modified**: 7/9/2025
 
@@ -1695,6 +1731,24 @@ Routes navigation to mockups when enabled, falls back to agent content
 **Complexity**: low • **Size**: 0.3KB
 **Tags**: `TypeScript`, `utility`
 **Modified**: 6/27/2025
+
+
+### `apps/web/lib/types/api.ts`
+
+File: apps/web/lib/types/api.ts
+
+**Complexity**: medium • **Size**: 3.9KB
+**Tags**: `TypeScript`, `utility`, `AI agent`
+**Modified**: 7/9/2025
+
+
+### `apps/web/lib/validation/contextSchemas.ts`
+
+File: apps/web/lib/validation/contextSchemas.ts
+
+**Complexity**: medium • **Size**: 4.4KB
+**Tags**: `TypeScript`, `utility`
+**Modified**: 7/9/2025
 
 
 ### `apps/web/next-env.d.ts`
@@ -2426,6 +2480,15 @@ Database agent configuration
 **Modified**: 7/9/2025
 
 
+### `docs/architecture/adr/0026-http-method-conventions.md`
+
+GET: Simple data retrieval (no business logic, idempotent)
+
+**Size**: 7.2KB
+**Tags**: `documentation`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/9/2025
+
+
 ### `docs/architecture/adr/adr-template.md`
 
 —
@@ -2520,9 +2583,9 @@ Current: Each new feature compounds performance problems
 
 —
 
-**Size**: 4.7KB
-**Tags**: `documentation`, `security`
-**Modified**: 7/6/2025
+**Size**: 6.6KB
+**Tags**: `documentation`, `AI agent`, `security`
+**Modified**: 7/9/2025
 
 
 ### `docs/engineering/future-enhancements.md`
@@ -2612,6 +2675,15 @@ Mock data schema patterns
 
 **Size**: 6.8KB
 **Tags**: `documentation`, `AI agent`
+**Modified**: 7/9/2025
+
+
+### `docs/engineering/implementation-plans/prompt-context-management-implementation-plan.md`
+
+—
+
+**Size**: 16.7KB
+**Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 
 
@@ -2714,6 +2786,15 @@ Register agent with proper typing
 **Modified**: 6/27/2025
 
 
+### `docs/engineering/zod-validation-schemas-guide.md`
+
+❌ DANGEROUS: No validation
+
+**Size**: 17.7KB
+**Tags**: `documentation`, `Next.js API`, `security`
+**Modified**: 7/9/2025
+
+
 ### `docs/governance/cursor-rules-reference.md`
 
 —
@@ -2739,6 +2820,24 @@ Register agent with proper typing
 **Size**: 11.0KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 6/27/2025
+
+
+### `docs/help/prompt-context-help.md`
+
+—
+
+**Size**: 15.4KB
+**Tags**: `documentation`, `security`
+**Modified**: 7/9/2025
+
+
+### `docs/help/README.md`
+
+—
+
+**Size**: 1.3KB
+**Tags**: `documentation`
+**Modified**: 7/9/2025
 
 
 ### `docs/how-to/creating-and-implementing-mockups.md`
@@ -2772,7 +2871,7 @@ First update Firestore
 
 docs.copilotkit.ai/guides/frontend-actions",
 
-**Size**: 190.6KB
+**Size**: 196.2KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 
@@ -2781,7 +2880,7 @@ docs.copilotkit.ai/guides/frontend-actions",
 
 docs.copilotkit.ai/guides/frontend-actions
 
-**Size**: 73.1KB
+**Size**: 75.2KB
 **Tags**: `documentation`, `AI agent`, `security`
 **Modified**: 7/9/2025
 
@@ -2952,9 +3051,9 @@ Timer could accumulate without cleanup
 
 —
 
-**Size**: 6.4KB
+**Size**: 6.8KB
 **Tags**: `documentation`, `AI agent`
-**Modified**: 6/27/2025
+**Modified**: 7/9/2025
 
 
 ### `docs/stakeholder-review-mockups.md`

@@ -107,6 +107,51 @@ This document tracks critical regressions that must be addressed before producti
 
 ---
 
+## P2 - HTTP Method Conventions Compliance Audit (ADR-0026)
+
+**Issue**: Comprehensive audit and remediation of API endpoints to comply with new HTTP method conventions established in ADR-0026.
+
+**Current State**:
+- ADR-0026 established hybrid agent-native HTTP method conventions
+- Context preferences API partially updated (POST → PATCH for single updates)
+- 50+ API endpoints need systematic review for compliance
+- TypeScript types and validation utilities created but not fully integrated
+
+**Scope of Work**:
+1. **Systematic Endpoint Audit**: Review all API endpoints against ADR-0026 conventions
+2. **Method Corrections**: Update endpoints using incorrect HTTP methods
+3. **Client-Side Updates**: Update frontend code to use correct HTTP methods
+4. **Validation Integration**: Integrate TypeScript validation utilities
+5. **Documentation Updates**: Update API documentation to reflect new conventions
+
+**Files Requiring Audit**:
+- All files in `apps/web/app/api/` directory (50+ endpoints)
+- Frontend API client code in `apps/web/lib/apiClient/`
+- Hook implementations using API endpoints
+- Component code making direct API calls
+
+**Implementation Plan**:
+1. **Phase 1**: Complete audit of all existing endpoints
+2. **Phase 2**: Create migration plan with priority order
+3. **Phase 3**: Gradual migration during normal development cycles
+4. **Phase 4**: Integration testing and validation
+
+**Success Criteria**:
+- [ ] All API endpoints follow ADR-0026 conventions
+- [ ] TypeScript validation integrated and passing
+- [ ] Client-side code updated to use correct methods
+- [ ] Documentation reflects new conventions
+- [ ] No breaking changes for existing functionality
+
+**Priority**: P2 - Should be addressed as dedicated sprint work after critical features complete
+
+**Related Work**:
+- ADR-0026: HTTP Method Conventions for API Endpoints
+- TypeScript types created in `apps/web/lib/types/api.ts`
+- Context preferences API partially updated
+
+---
+
 ## Documentation Standards
 
 - All regressions must include impact assessment

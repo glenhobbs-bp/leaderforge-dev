@@ -7,7 +7,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, Settings, Share2, Eye, Edit2, TestTube, CheckCircle2, Users, Building, Globe, X } from 'lucide-react';
+import { Plus, Settings, Share2, Eye, Edit2, Users, Building, Globe } from 'lucide-react';
 
 interface PromptContext {
   id: string;
@@ -24,8 +24,6 @@ interface PromptContext {
 }
 
 export default function PromptContextMockup() {
-  const [testPrompt, setTestPrompt] = useState('How should I handle a difficult team member?');
-  const [showResponse, setShowResponse] = useState(false);
   const [contexts, setContexts] = useState<PromptContext[]>([
     {
       id: '1',
@@ -100,10 +98,6 @@ export default function PromptContextMockup() {
     ));
   };
 
-  const handleTestResponse = () => {
-    setShowResponse(true);
-  };
-
   const getContextIcon = (type: string) => {
     switch (type) {
       case 'personal': return <Settings className="w-4 h-4" />;
@@ -142,55 +136,7 @@ export default function PromptContextMockup() {
         </button>
       </div>
 
-      {/* Test Section - Combined Glassmorphism Card like Prompt Library */}
-      <div className="card-glass-subtle p-4 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <TestTube className="w-4 h-4 text-green-600" />
-          <h2 className="text-lg font-medium text-glass-primary">Test Your Contexts</h2>
-        </div>
 
-        <div className="space-y-4">
-          <div>
-            <input
-              type="text"
-              value={testPrompt}
-              onChange={(e) => setTestPrompt(e.target.value)}
-              placeholder="Enter a question to test how your contexts affect AI responses..."
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-            />
-          </div>
-
-          <button
-            onClick={handleTestResponse}
-            className="px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white shadow-sm hover:shadow-md hover:scale-105"
-          >
-            <TestTube className="w-3 h-3" />
-            Test Response
-          </button>
-
-          {showResponse && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-sm font-medium text-blue-900">AI Response Preview:</h3>
-                <button
-                  onClick={() => setShowResponse(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                  title="Close preview"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <p className="text-xs text-blue-800 leading-relaxed">
-                Based on your Kingdom leadership approach and thin slicing preference, I recommend first seeking to understand what this team member needs to flourish. Use the opposite spirit principle - respond with encouragement where they expect correction. Break the conversation into smaller, manageable pieces rather than addressing everything at once.
-              </p>
-              <div className="mt-3 flex items-center gap-2 text-xs text-blue-600">
-                <CheckCircle2 className="w-3 h-3" />
-                <span>Response influenced by {contexts.filter(ctx => ctx.isActive).length} active contexts</span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Context Cards Grid - Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

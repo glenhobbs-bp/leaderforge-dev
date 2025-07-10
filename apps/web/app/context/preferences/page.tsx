@@ -77,7 +77,7 @@ export default function PromptContextsPage() {
       setError(null);
 
       const response = await fetch('/api/context/preferences', {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },

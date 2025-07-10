@@ -13,7 +13,14 @@
 2. [Color System](#color-system)
 3. [Typography](#typography)
 4. [Spacing & Layout](#spacing--layout)
-5. [Component Library](#component-library)
+5. [Widget Library](#widget-library)
+   - [Glassmorphism Components](#premium-glassmorphism-components)
+   - [Button Widgets](#button-widgets)
+   - [Card Widgets](#card-widgets)
+   - [Input Widgets](#input-widgets)
+   - [Modal & Dialog Widgets](#modal--dialog-widgets)
+   - [Progress & Status Widgets](#progress--status-widgets)
+   - [Navigation Widgets](#navigation-widgets)
 6. [Animation & Effects](#animation--effects)
 7. [Iconography](#iconography)
 8. [Context Branding](#context-branding)
@@ -859,6 +866,387 @@ For use within glassmorphism components, special typography classes provide opti
 }
 ```
 
+### Modal & Dialog Widgets
+
+LeaderForge uses compact, accessible modals with glassmorphism effects for premium user experiences.
+
+#### Modal Container & Backdrop
+
+```css
+/* Modal Backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: var(--z-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+/* Modal Content Container */
+.modal-content {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-xl); /* 36rem / 576px */
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 0;
+  background: transparent;
+  box-shadow: var(--shadow-lg);
+  animation: slideInUp var(--duration-normal) var(--ease-out);
+}
+
+/* Compact Modal Variant */
+.modal-content-compact {
+  max-width: var(--container-lg); /* 32rem / 512px */
+}
+
+/* Large Modal Variant */
+.modal-content-large {
+  max-width: var(--container-2xl); /* 42rem / 672px */
+}
+```
+
+#### Modal Inner Content with Glassmorphism
+
+```css
+/* Standard Modal Inner */
+.modal-inner {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid rgba(255,255,255,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  /* Glassmorphism Effect */
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 8px 16px rgba(0,0,0,0.08),
+    0 4px 16px rgba(0,0,0,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* Premium Modal Inner - for critical actions */
+.modal-inner-premium {
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.1),
+    0 8px 32px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+```
+
+#### Modal Header & Content Structure
+
+```css
+/* Modal Header */
+.modal-header {
+  margin-bottom: var(--space-4);
+}
+
+.modal-title {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+  margin: 0;
+}
+
+.modal-description {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+  line-height: var(--leading-normal);
+}
+
+/* Modal Body */
+.modal-body {
+  margin-bottom: var(--space-4);
+}
+
+/* Modal Footer */
+.modal-footer {
+  display: flex;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  justify-content: flex-end;
+}
+```
+
+#### Compact Form Elements for Modals
+
+```css
+/* Compact Input Group */
+.input-group-compact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.input-label-compact {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+/* Compact Input Fields */
+.input-compact {
+  padding: var(--space-1-5) var(--space-2);
+  font-size: var(--text-xs);
+  border: var(--border) solid var(--border);
+  border-radius: var(--radius-base);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.2s ease-in-out;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary);
+    background: rgba(255,255,255,0.9);
+  }
+
+  &::placeholder {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+  }
+}
+
+/* Compact Textarea */
+.textarea-compact {
+  @extend .input-compact;
+  resize: none;
+  min-height: 3rem; /* 48px for 2 rows */
+  line-height: var(--leading-normal);
+}
+
+/* Compact Select */
+.select-compact {
+  @extend .input-compact;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--space-2) center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  padding-right: var(--space-8);
+}
+
+/* Compact Error Text */
+.input-error-compact {
+  font-size: var(--text-xs);
+  color: var(--error-500);
+  margin-top: var(--space-0-5);
+  line-height: var(--leading-normal);
+}
+```
+
+#### Modal Buttons
+
+```css
+/* Compact Modal Buttons */
+.btn-modal-compact {
+  padding: var(--space-1-5) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  border-radius: var(--radius-base);
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+
+  &:focus-visible {
+    outline: 1px solid var(--primary);
+    outline-offset: 1px;
+  }
+}
+
+/* Primary Modal Button */
+.btn-modal-primary {
+  @extend .btn-modal-compact;
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
+  color: var(--white);
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+/* Secondary Modal Button */
+.btn-modal-secondary {
+  @extend .btn-modal-compact;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* Modal Icon Sizing */
+.modal-icon {
+  width: var(--icon-xs); /* 12px */
+  height: var(--icon-xs);
+  flex-shrink: 0;
+}
+
+.modal-icon-sm {
+  width: var(--icon-sm); /* 16px */
+  height: var(--icon-sm);
+}
+```
+
+#### Banner Notifications in Modals
+
+```css
+/* Modal Banner */
+.modal-banner {
+  padding: var(--space-2);
+  border-radius: var(--radius-base);
+  border: 1px solid;
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all 0.4s ease-in-out;
+
+  &.banner-success {
+    background-color: var(--success-50);
+    border-color: var(--success-200);
+    color: var(--success-700);
+  }
+
+  &.banner-error {
+    background-color: var(--error-50);
+    border-color: var(--error-200);
+    color: var(--error-700);
+  }
+
+  &.banner-warning {
+    background-color: var(--warning-50);
+    border-color: var(--warning-200);
+    color: var(--warning-700);
+  }
+}
+
+.banner-icon {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  flex-shrink: 0;
+}
+
+.banner-message {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  line-height: var(--leading-normal);
+}
+```
+
+#### Modal Animations
+
+```css
+/* Modal Entry Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-8)) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Exit Animations */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(var(--space-8)) scale(0.96);
+  }
+}
+```
+
+#### Modal Usage Guidelines
+
+**When to Use Different Modal Sizes:**
+- **Compact** (`.modal-content-compact`) - Simple forms, confirmations, single-field inputs
+- **Standard** (`.modal-content`) - Multi-field forms, content viewing, most use cases
+- **Large** (`.modal-content-large`) - Complex forms, detailed content, data tables
+
+**Form Design in Modals:**
+- Use compact form elements (`.input-compact`, `.btn-modal-compact`)
+- Maintain consistent spacing with `var(--space-3)` between form groups
+- Keep form fields to 6 or fewer for optimal UX
+- Use grid layouts for related fields (scope/priority, etc.)
+
+**Accessibility Requirements:**
+- Modal must trap focus within the dialog
+- Escape key should close modal
+- Backdrop click should close modal (unless destructive action)
+- Use proper ARIA labels and descriptions
+- Ensure sufficient color contrast for all text
+
+**Performance Considerations:**
+- Use CSS transforms for animations (not position changes)
+- Implement backdrop blur carefully (can impact performance)
+- Consider `will-change` property for animated elements
+- Lazy load modal content when possible
+
 ### Navigation Widgets
 
 ```css
@@ -1018,26 +1406,47 @@ For use within glassmorphism components, special typography classes provide opti
   justify-content: center;
   z-index: var(--z-modal);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: var(--space-4);
 }
 
 .loading-content {
-  background-color: var(--surface);
-  border-radius: var(--radius-2xl);
-  padding: var(--space-8);
+  /* Uses modal glassmorphism pattern */
+  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 50%, rgba(241,245,249,0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
   text-align: center;
-  box-shadow: var(--shadow-2xl);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.1),
+    0 8px 32px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
   max-width: var(--container-sm);
   margin: var(--space-4);
 }
 
 .loading-spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 4px solid var(--primary-light);
-  border-top: 4px solid var(--primary);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid var(--primary-light);
+  border-top: 3px solid var(--primary);
   border-radius: var(--radius-full);
   margin: 0 auto var(--space-4);
   animation: spin var(--duration-slow) var(--ease-linear) infinite;
+}
+
+.loading-text {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-medium);
+}
+
+.loading-subtext {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  margin-top: var(--space-2);
 }
 ```
 

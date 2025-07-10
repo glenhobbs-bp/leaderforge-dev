@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-07-09T21:46:59.141Z",
+    "generated_at": "2025-07-10T00:05:14.405Z",
     "generator_version": "1.0.0",
-    "total_files": 368,
-    "total_size_bytes": 3071196,
+    "total_files": 379,
+    "total_size_bytes": 3195556,
     "file_types": {
-      ".ts": 145,
+      ".ts": 149,
       ".json": 18,
-      ".tsx": 64,
+      ".tsx": 66,
       ".js": 10,
-      ".md": 129,
+      ".md": 134,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 209,
-      "API": 61,
-      "AI agent": 191,
-      "React": 64,
-      "React hooks": 50,
-      "Next.js API": 59,
-      "security": 102,
+      "TypeScript": 215,
+      "API": 63,
+      "AI agent": 197,
+      "React": 66,
+      "React hooks": 52,
+      "Next.js API": 63,
+      "security": 109,
       "navigation": 7,
       "routing": 3,
       "API endpoint": 4,
@@ -42,7 +42,7 @@
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 36,
+      "utility": 38,
       "API client": 1,
       "error handling": 1,
       "authentication": 2,
@@ -54,7 +54,7 @@
       "login": 1,
       "client component": 2,
       "#tenant-page #orchestration #modular #performance": 1,
-      "UI": 54,
+      "UI": 56,
       "#authentication #guard #loading #redirect": 1,
       "#content #rendering #schema #universal-widget": 1,
       "modal": 1,
@@ -80,7 +80,7 @@
       "feature-flags": 3,
       "prototyping": 1,
       "exports": 1,
-      "documentation": 133,
+      "documentation": 138,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -447,6 +447,30 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/api/context/[id]/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/context/[id]",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/context/[id]/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient",
+        "../../../../lib/validation/contextSchemas"
+      ],
+      "last_modified": "2025-07-09T23:28:42.105Z",
+      "size_bytes": 7677,
+      "hash": "ec0c03ad",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/app/api/context/preferences/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/context/preferences",
@@ -464,9 +488,33 @@
         "../../../lib/supabaseServerClient",
         "agent-core/agents/ContextResolutionAgent"
       ],
-      "last_modified": "2025-07-08T00:56:57.330Z",
-      "size_bytes": 4848,
-      "hash": "fe411185",
+      "last_modified": "2025-07-09T23:14:43.929Z",
+      "size_bytes": 5083,
+      "hash": "999aac3e",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/app/api/context/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/context",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/context/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../lib/supabaseServerClient",
+        "agent-core/agents/ContextResolutionAgent",
+        "../../../lib/validation/contextSchemas"
+      ],
+      "last_modified": "2025-07-09T23:27:58.793Z",
+      "size_bytes": 5418,
+      "hash": "c7409428",
       "complexity": "medium"
     },
     {
@@ -1495,9 +1543,9 @@
         "next/navigation",
         "../../../components/ai/UniversalSchemaRenderer"
       ],
-      "last_modified": "2025-07-08T09:32:20.236Z",
-      "size_bytes": 4574,
-      "hash": "a1c35d61",
+      "last_modified": "2025-07-09T23:19:00.696Z",
+      "size_bytes": 4575,
+      "hash": "5eebdf74",
       "complexity": "medium"
     },
     {
@@ -1690,9 +1738,9 @@
       "dependencies": [
         "react"
       ],
-      "last_modified": "2025-07-08T00:17:29.370Z",
-      "size_bytes": 5230,
-      "hash": "cf088066",
+      "last_modified": "2025-07-09T23:18:53.284Z",
+      "size_bytes": 5231,
+      "hash": "2d680a85",
       "complexity": "medium"
     },
     {
@@ -3191,6 +3239,29 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/components/ui/EditContextModal.tsx",
+      "name": "EditContextModal.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/ui/EditContextModal.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "security"
+      ],
+      "dependencies": [
+        "react",
+        "./dialog",
+        "lucide-react"
+      ],
+      "last_modified": "2025-07-09T23:38:43.270Z",
+      "size_bytes": 18539,
+      "hash": "610d74be",
+      "complexity": "high"
+    },
+    {
       "path": "apps/web/components/ui/legacy_course_modal.tsx",
       "name": "legacy_course_modal.tsx",
       "directory": "apps/web/components/ui",
@@ -3533,6 +3604,30 @@
       "complexity": "high"
     },
     {
+      "path": "apps/web/components/ui/ViewContextModal.tsx",
+      "name": "ViewContextModal.tsx",
+      "directory": "apps/web/components/ui",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/ui/ViewContextModal.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks",
+        "security"
+      ],
+      "dependencies": [
+        "react",
+        "./dialog",
+        "lucide-react",
+        "../../lib/validation/contextSchemas"
+      ],
+      "last_modified": "2025-07-09T23:37:48.673Z",
+      "size_bytes": 11011,
+      "hash": "e0ecb866",
+      "complexity": "medium"
+    },
+    {
       "path": "apps/web/components/ui/xxxChatPanel.tsx",
       "name": "xxxChatPanel.tsx",
       "directory": "apps/web/components/ui",
@@ -3801,11 +3896,14 @@
       ],
       "dependencies": [
         "react",
-        "lucide-react"
+        "lucide-react",
+        "../ui/EditContextModal",
+        "../ui/ViewContextModal",
+        "../../lib/validation/contextSchemas"
       ],
-      "last_modified": "2025-07-09T09:37:45.813Z",
-      "size_bytes": 12179,
-      "hash": "421080ac",
+      "last_modified": "2025-07-10T00:00:11.021Z",
+      "size_bytes": 15147,
+      "hash": "39dcb336",
       "complexity": "high"
     },
     {
@@ -4187,6 +4285,48 @@
       "size_bytes": 277,
       "hash": "d901b247",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/lib/types/api.ts",
+      "name": "api.ts",
+      "directory": "apps/web/lib/types",
+      "extension": ".ts",
+      "purpose": "File: apps/web/lib/types/api.ts",
+      "tags": [
+        "TypeScript",
+        "utility",
+        "AI agent"
+      ],
+      "exports": [
+        "validateHTTPMethod"
+      ],
+      "last_modified": "2025-07-09T23:14:08.173Z",
+      "size_bytes": 4032,
+      "hash": "ac63cbd0",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/lib/validation/contextSchemas.ts",
+      "name": "contextSchemas.ts",
+      "directory": "apps/web/lib/validation",
+      "extension": ".ts",
+      "purpose": "File: apps/web/lib/validation/contextSchemas.ts",
+      "tags": [
+        "TypeScript",
+        "utility"
+      ],
+      "dependencies": [
+        "zod"
+      ],
+      "exports": [
+        "ContextScopeEnum",
+        "TemplateVariablesSchema",
+        "PromptContextSchema"
+      ],
+      "last_modified": "2025-07-09T23:27:33.664Z",
+      "size_bytes": 4537,
+      "hash": "56c68d17",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/next-env.d.ts",
@@ -5326,6 +5466,22 @@
       "hash": "7ad22dae"
     },
     {
+      "path": "docs/architecture/adr/0026-http-method-conventions.md",
+      "name": "0026-http-method-conventions.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "GET: Simple data retrieval (no business logic, idempotent)",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-09T23:13:46.888Z",
+      "size_bytes": 7370,
+      "hash": "544fad25"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -5476,11 +5632,12 @@
       "purpose": "—",
       "tags": [
         "documentation",
+        "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-06T11:11:24.657Z",
-      "size_bytes": 4775,
-      "hash": "72bd6808"
+      "last_modified": "2025-07-09T23:15:13.331Z",
+      "size_bytes": 6728,
+      "hash": "464834fb"
     },
     {
       "path": "docs/engineering/future-enhancements.md",
@@ -5625,6 +5782,21 @@
       "last_modified": "2025-07-09T10:45:18.547Z",
       "size_bytes": 6970,
       "hash": "4125a523"
+    },
+    {
+      "path": "docs/engineering/implementation-plans/prompt-context-management-implementation-plan.md",
+      "name": "prompt-context-management-implementation-plan.md",
+      "directory": "docs/engineering/implementation-plans",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-09T22:49:22.931Z",
+      "size_bytes": 17089,
+      "hash": "ec0c39a0"
     },
     {
       "path": "docs/engineering/implementation-plans/prompt-contexts-schema-design.md",
@@ -5786,6 +5958,21 @@
       "hash": "17cf591f"
     },
     {
+      "path": "docs/engineering/zod-validation-schemas-guide.md",
+      "name": "zod-validation-schemas-guide.md",
+      "directory": "docs/engineering",
+      "extension": ".md",
+      "purpose": "❌ DANGEROUS: No validation",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "security"
+      ],
+      "last_modified": "2025-07-09T23:35:05.560Z",
+      "size_bytes": 18156,
+      "hash": "8df8679f"
+    },
+    {
       "path": "docs/governance/cursor-rules-reference.md",
       "name": "cursor-rules-reference.md",
       "directory": "docs/governance",
@@ -5826,6 +6013,33 @@
       "last_modified": "2025-06-27T21:33:12.254Z",
       "size_bytes": 11283,
       "hash": "bc9d5528"
+    },
+    {
+      "path": "docs/help/prompt-context-help.md",
+      "name": "prompt-context-help.md",
+      "directory": "docs/help",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "security"
+      ],
+      "last_modified": "2025-07-10T00:05:06.605Z",
+      "size_bytes": 15743,
+      "hash": "61569a70"
+    },
+    {
+      "path": "docs/help/README.md",
+      "name": "README.md",
+      "directory": "docs/help",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-09T23:44:53.292Z",
+      "size_bytes": 1310,
+      "hash": "7c7db862"
     },
     {
       "path": "docs/how-to/creating-and-implementing-mockups.md",
@@ -5896,9 +6110,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T21:25:59.880Z",
-      "size_bytes": 195147,
-      "hash": "04917c79"
+      "last_modified": "2025-07-09T23:46:38.749Z",
+      "size_bytes": 200935,
+      "hash": "43dbccca"
     },
     {
       "path": "docs/manifest.md",
@@ -5911,9 +6125,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T21:25:59.906Z",
-      "size_bytes": 74878,
-      "hash": "40ba0cfd"
+      "last_modified": "2025-07-09T23:46:38.773Z",
+      "size_bytes": 76998,
+      "hash": "47c042c6"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -6175,9 +6389,9 @@
         "documentation",
         "AI agent"
       ],
-      "last_modified": "2025-06-27T21:33:12.233Z",
-      "size_bytes": 6514,
-      "hash": "4e1e780f"
+      "last_modified": "2025-07-09T23:46:30.038Z",
+      "size_bytes": 6926,
+      "hash": "f2329aa1"
     },
     {
       "path": "docs/stakeholder-review-mockups.md",

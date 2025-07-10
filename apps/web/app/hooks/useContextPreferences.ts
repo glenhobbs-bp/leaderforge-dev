@@ -82,7 +82,7 @@ export function useContextPreferences(): ContextPreferencesState & ContextPrefer
   const toggleContext = useCallback(async (contextId: string, isEnabled: boolean) => {
     try {
       const response = await fetch('/api/context/preferences', {
-        method: 'POST',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ contextId, isEnabled })

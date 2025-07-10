@@ -46,6 +46,13 @@ Development guides, implementation plans, and technical reference:
 - **API Reference**: Comprehensive API documentation
 - **Database**: Schema docs, migrations, policies
 
+### 📖 [Help](help/) - User-Facing Documentation
+User guides and help documentation for LeaderForge features:
+- **Feature Guides**: Step-by-step user guides for core features
+- **Best Practices**: Tips and recommendations for effective usage
+- **Troubleshooting**: Common issues and solutions
+- **FAQ**: Frequently asked questions and answers
+
 ### 🧪 [Quality Assurance](quality-assurance/) - Testing & Quality
 Quality processes, testing strategies, and quality gates:
 - **Testing Strategy**: Overall testing approach and automation
@@ -61,6 +68,7 @@ Quality processes, testing strategies, and quality gates:
 - **Architects**: Begin with [Architecture](architecture/) and [Governance](governance/)
 - **Engineers**: Check [Engineering](engineering/) and [Architecture](architecture/)
 - **QA Engineers**: Review [Quality Assurance](quality-assurance/) and [Engineering](engineering/)
+- **End Users**: Find feature help in [Help Documentation](help/)
 
 ### By Task
 - **Planning Features**: [Product Management PRDs](product-management/prds/) → [Architecture ADRs](architecture/adr/) → [Engineering Plans](engineering/implementation-plans/)
