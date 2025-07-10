@@ -4,7 +4,7 @@
 // Owner: Frontend Team
 // Tags: #user-preferences #tenant-restoration #navigation #state-management
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useUserPreferences } from '../../app/hooks/useUserPreferences';
 import type { UserPreferences } from '../../app/lib/types';
 
@@ -23,164 +23,80 @@ export function UserPreferencesManager({
   onNavOptionSelect,
   onPreferencesReady
 }: UserPreferencesManagerProps) {
-  // Core state - prevent multiple mounts
-  const hasMounted = useRef(false);
-  const hasNavigationRestored = useRef(false);
-  const hasTriggeredUserPrefsFetch = useRef(false);
-  const [hasRestoredTenant, setHasRestoredTenant] = useState(false);
-  const [shouldFetchUserPrefs, setShouldFetchUserPrefs] = useState(false);
+  // Core state - simplified approach
+  const hasInitialized = useRef(false);
 
-  // Only fetch user preferences when explicitly needed
+  // Fetch user preferences with shorter timeout
   const { data: userPrefs, error: userPrefsError, isLoading: userPrefsLoading } = useUserPreferences(
     userId || '',
-    { enabled: shouldFetchUserPrefs && !!userId }
+    { enabled: !!userId }
   );
 
-      // ✅ FIX: Remove debug logging that was causing infinite render loops
-  // Debugging disabled to prevent performance issues and infinite loops
-
-  // Mark component as mounted on initial render
+  // Single effect to handle initialization
   useEffect(() => {
-    hasMounted.current = true;
-  }, []);
-
-  // Trigger user preferences fetch on initial mount when session is available
-  useEffect(() => {
-    if (userId && !hasTriggeredUserPrefsFetch.current && !shouldFetchUserPrefs && hasMounted.current) {
-      hasTriggeredUserPrefsFetch.current = true;
-      setShouldFetchUserPrefs(true);
+    // Prevent multiple initializations
+    if (hasInitialized.current) {
+      return;
     }
-  }, [userId, shouldFetchUserPrefs]);
 
-  // Handle user preferences errors gracefully
-  useEffect(() => {
-    if (userPrefsError) {
-      // Don't block the app, just mark restoration as complete to proceed
-      if (!hasRestoredTenant) {
-        setHasRestoredTenant(true);
+    // Don't wait indefinitely - set a maximum wait time
+    const initializationTimeout = window.setTimeout(() => {
+      if (!hasInitialized.current) {
+        console.log('[UserPreferencesManager] Timeout reached - proceeding without user preferences');
+        hasInitialized.current = true;
         onPreferencesReady();
       }
-    }
-  }, [userPrefsError, hasRestoredTenant, onPreferencesReady]);
+    }, 2000); // Maximum 2 second wait
 
-  // Context restoration effect - restore last visited context
-  useEffect(() => {
-    // If user preferences failed to load, proceed without restoration
+    // If no userId, proceed immediately
+    if (!userId) {
+      hasInitialized.current = true;
+      onPreferencesReady();
+      window.clearTimeout(initializationTimeout);
+      return;
+    }
+
+    // If user preferences error, proceed without them
     if (userPrefsError) {
-      if (!hasRestoredTenant) {
-        setHasRestoredTenant(true);
-        onPreferencesReady();
+      console.warn('[UserPreferencesManager] User preferences error - proceeding without them:', userPrefsError);
+      hasInitialized.current = true;
+      onPreferencesReady();
+      window.clearTimeout(initializationTimeout);
+      return;
+    }
+
+    // If user preferences loaded successfully, restore state
+    if (userPrefs && !userPrefsLoading) {
+      const preferences = userPrefs as UserPreferences;
+      const navigationState = preferences?.navigationState;
+
+      // Restore tenant if different
+      const lastTenant = navigationState?.lastTenant;
+      if (lastTenant && lastTenant !== currentTenant) {
+        console.log('[UserPreferencesManager] Restoring saved tenant:', lastTenant);
+        onTenantChange(lastTenant);
       }
-      return;
-    }
 
-    // ✅ FIX: Check for actual preference properties (not just object length) to detect real vs placeholder data
-    // Wait for actual data before proceeding
-    const hasRealUserPrefs = userPrefs && (
-      'theme' in userPrefs ||
-      'navigationState' in userPrefs ||
-      'language' in userPrefs ||
-      Object.keys(userPrefs).length > 0
-    );
-
-    if (!userId || !hasRealUserPrefs || hasRestoredTenant || userPrefsLoading) {
-      // ✅ FIX: Remove console logs that were contributing to infinite render loops
-      return;
-    }
-
-    // ✅ CRITICAL FIX: Remove debugging console logs to prevent infinite render loops
-
-    // ✅ FIX: userPrefs IS the preferences object (API client extracts it)
-    const preferences = userPrefs as UserPreferences;
-    const navigationState = preferences?.navigationState;
-    const lastTenant = navigationState?.lastTenant;
-
-    // Navigation state details extracted for processing
-
-    // ✅ FIXED: Only restore tenant if it's actually different AND not already set
-    // Prevent infinite loops when tenant is already correct
-    if (lastTenant && lastTenant !== currentTenant && hasRestoredTenant === false) {
-      onTenantChange(lastTenant);
-    }
-
-    setHasRestoredTenant(true);
-    onPreferencesReady();
-  }, [userId, userPrefs, userPrefsError, hasRestoredTenant, currentTenant, userPrefsLoading, onTenantChange, onPreferencesReady]);
-
-  // Navigation option restoration effect - runs ONLY ONCE after context is restored
-  useEffect(() => {
-    // ✅ CRITICAL FIX: Early exit if already restored to prevent infinite loops
-    if (hasNavigationRestored.current || !hasMounted.current) {
-      return;
-    }
-
-    // If user preferences failed to load, skip navigation restoration
-    if (userPrefsError) {
-      hasNavigationRestored.current = true; // Mark as attempted to prevent retry loops
-      return;
-    }
-
-    // ✅ FIX: Check for actual preference properties (not just object length) to detect real vs placeholder data
-    // Placeholder data is {} but real data has properties like theme, navigationState, etc.
-    const hasRealUserPrefs = userPrefs && (
-      'theme' in userPrefs ||
-      'navigationState' in userPrefs ||
-      'language' in userPrefs ||
-      Object.keys(userPrefs).length > 0
-    );
-
-    if (!userId || !hasRealUserPrefs || !hasRestoredTenant || userPrefsLoading) {
-      return;
-    }
-
-    // ✅ FIX: userPrefs IS the preferences object (API client extracts it)
-    const preferences = userPrefs as UserPreferences;
-    const navigationState = preferences?.navigationState;
-    const lastTenant = navigationState?.lastTenant;
-    const lastNavOption = navigationState?.lastNavOption;
-
-    // Extract navigation restoration data
-
-    // Only restore navigation option if we're in the correct tenant and have a saved option
-    if (lastNavOption && lastTenant === currentTenant) {
-      hasNavigationRestored.current = true; // Mark as restored
-
-      // Trigger content loading for the restored navigation option
-      setTimeout(() => {
+      // Restore navigation option if in correct tenant
+      const lastNavOption = navigationState?.lastNavOption;
+      if (lastNavOption && (lastTenant === currentTenant || !lastTenant)) {
+        console.log('[UserPreferencesManager] Restoring saved navigation option:', lastNavOption);
+        // Use immediate callback instead of timeout
         onNavOptionSelect(lastNavOption);
-      }, 200); // Small delay to ensure context is fully set
-    } else {
-      hasNavigationRestored.current = true; // Mark as attempted even if no restoration
+      }
+
+      hasInitialized.current = true;
+      onPreferencesReady();
+      window.clearTimeout(initializationTimeout);
+      return;
     }
-  }, [userId, userPrefs, userPrefsError, hasRestoredTenant, currentTenant, userPrefsLoading, onNavOptionSelect]);
 
-  // Show loading state if preferences not ready
-  if (!hasRestoredTenant && !userPrefsError && userId) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
-        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-          <div className="flex flex-col items-center mb-6">
-            <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
-          </div>
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner mb-4"></div>
-            <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-              Loading Experience
-            </p>
-            <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-              Setting up your personalized experience...
-            </p>
-            <div className="mt-4 flex space-x-1">
-              <div className="w-2 h-2 bg-primary-dot rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-secondary-dot rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-accent-dot rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    // If still loading but taking too long, the timeout will handle it
+    return () => {
+      window.clearTimeout(initializationTimeout);
+    };
+  }, [userId, userPrefs, userPrefsError, userPrefsLoading, currentTenant, onTenantChange, onNavOptionSelect, onPreferencesReady]);
 
-  // Component is invisible when ready - it only manages state
+  // This component doesn't render anything - it's just for state management
   return null;
 }

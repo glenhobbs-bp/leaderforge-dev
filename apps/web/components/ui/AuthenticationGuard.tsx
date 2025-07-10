@@ -17,10 +17,15 @@ export function AuthenticationGuard({ children, onAuthenticationChange }: Authen
 
   // Authentication guard - redirect to login if no session and auth loading is complete
   useEffect(() => {
+    // Only redirect if we're sure there's no session (not loading and no session)
     if (!authLoading && !session) {
-      console.log('[AuthenticationGuard] No session found, redirecting to login');
-      window.location.href = '/login';
-      return;
+      console.log('[AuthenticationGuard] No session found after auth loading complete, redirecting to login');
+      // Add a small delay to prevent flash during normal loading sequences
+      const redirectTimer = setTimeout(() => {
+        window.location.href = '/login';
+      }, 100);
+
+      return () => clearTimeout(redirectTimer);
     }
 
     // Notify parent component of authentication changes
@@ -29,6 +34,23 @@ export function AuthenticationGuard({ children, onAuthenticationChange }: Authen
     }
   }, [authLoading, session, onAuthenticationChange]);
 
+  // Show loading state while authentication is being determined
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
+          </div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-spinner"></div>
+            <p className="mt-4 text-sm text-gray-600">Authenticating...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // SYNC authentication check - redirect immediately if no session
   if (!authLoading && !session) {
     console.log('[AuthenticationGuard] No session - redirecting to login synchronously');
@@ -36,33 +58,6 @@ export function AuthenticationGuard({ children, onAuthenticationChange }: Authen
     return null; // Prevent any rendering
   }
 
-  // Show loading state while waiting for auth
-  if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
-        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-          <div className="flex flex-col items-center mb-6">
-            <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
-          </div>
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner mb-4"></div>
-            <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-              Authenticating...
-            </p>
-            <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-              Verifying your credentials...
-            </p>
-            <div className="mt-4 flex space-x-1">
-              <div className="w-2 h-2 bg-primary-dot rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-secondary-dot rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-accent-dot rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // If authenticated, render children
+  // Render children if authenticated
   return <>{children}</>;
 }

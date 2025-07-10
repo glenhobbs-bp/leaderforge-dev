@@ -25,6 +25,24 @@ export default function LoginPage() {
   useEffect(() => {
     let mounted = true;
 
+    // Clear any corrupted cookies on mount if there are auth errors
+    const clearCorruptedCookies = async () => {
+      if (searchParams.get('error')?.includes('session_refresh_failed') ||
+          searchParams.get('error')?.includes('session_exception')) {
+        try {
+          await fetch('/api/auth/clear-session', {
+            method: 'POST',
+            credentials: 'same-origin',
+          });
+          console.log('[login/page] Cleared corrupted cookies');
+        } catch (error) {
+          console.warn('[login/page] Failed to clear cookies:', error);
+        }
+      }
+    };
+
+    clearCorruptedCookies();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -33,6 +51,11 @@ export default function LoginPage() {
       if (event === 'SIGNED_IN' && session) {
         setIsAuthenticating(true);
         try {
+          // Validate session before proceeding
+          if (!session.access_token || !session.refresh_token) {
+            throw new Error('Invalid session: missing tokens');
+          }
+
           const response = await fetch('/api/auth/set-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -44,8 +67,12 @@ export default function LoginPage() {
           });
 
           if (!response.ok) {
-            throw new Error(`Cookie sync failed: ${response.statusText}`);
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Cookie sync failed: ${response.statusText} - ${errorData.error || 'Unknown error'}`);
           }
+
+          // Add a small delay to ensure cookies are set before redirect
+          await new Promise(resolve => setTimeout(resolve, 100));
 
           // Redirect immediately after cookie sync
           console.log('[login/page] Redirecting to:', returnTo);
@@ -55,6 +82,13 @@ export default function LoginPage() {
           if (mounted) {
             setError('Authentication failed. Please try again.');
             setIsAuthenticating(false);
+
+            // Clear any potentially corrupted session data
+            try {
+              await supabase.auth.signOut();
+            } catch (signOutError) {
+              console.warn('[login/page] Error during cleanup signout:', signOutError);
+            }
           }
         }
       } else if (event === 'SIGNED_OUT') {
@@ -68,7 +102,7 @@ export default function LoginPage() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [supabase, router, returnTo]);
+  }, [supabase, router, returnTo, searchParams]);
 
   // Show loading state initially to prevent flash of unstyled content
   useEffect(() => {

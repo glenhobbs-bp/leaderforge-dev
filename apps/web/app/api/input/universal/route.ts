@@ -46,7 +46,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<Universal
 
     // ✅ Robust Session Restoration (same pattern as form-templates API)
     const allCookies = cookieStore.getAll();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+    if (!projectRef) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
     const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
     const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
 

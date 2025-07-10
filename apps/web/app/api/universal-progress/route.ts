@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     console.log('[Universal Progress API] Cookies available:', allCookies.map(c => ({ name: c.name, value: c.value?.substring(0, 10) + '...' })));
 
     // Extract tokens like the agent/content route does
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+    if (!projectRef) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
     const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
     const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
     console.log('[Universal Progress API] Extracted tokens:', { accessToken: accessToken ? 'present' : 'missing', refreshToken: refreshToken ? 'present' : 'missing' });

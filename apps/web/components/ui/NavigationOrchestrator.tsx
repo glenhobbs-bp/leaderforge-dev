@@ -73,7 +73,6 @@ export function NavigationOrchestrator({
 
   // Agent and content state
   const [agentSchema, setAgentSchema] = useState<AgentSchema | null>(null);
-  const [loading, setLoading] = useState(false);
   const [contentLoading, setContentLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedNavOptionId, setSelectedNavOptionId] = useState<string | null>(null);
@@ -103,7 +102,7 @@ export function NavigationOrchestrator({
   useEffect(() => {
     if (isReady) {
       // All initialization complete, ensure loading is false
-      setLoading(false);
+      setContentLoading(false);
     }
   }, [isReady]);
 
@@ -379,26 +378,117 @@ export function NavigationOrchestrator({
 
   // Check for valid agent response based on type
   if (!agentSchema) {
-    console.log('[NavigationOrchestrator] No agentSchema found - showing invalid response error');
-    console.log('[NavigationOrchestrator] Current state:', { agentSchema, loading, error });
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
-        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-          <div className="flex flex-col items-center mb-6">
-            <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
-          </div>
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="text-red-500 mb-4 text-2xl">⚠️</div>
-            <p className="text-sm font-medium text-gray-800 mb-2">Response Error</p>
-            <p className="text-xs text-gray-600 text-center mb-6">Invalid agent response - please refresh</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-[#4f49cf] text-white text-sm rounded-xl hover:bg-[#423db8] transition-colors"
-            >
-              Refresh
-            </button>
+    // Only show error if we're not loading and have actually attempted to load content
+    if (!contentLoading && selectedNavOptionId && error) {
+      console.log('[NavigationOrchestrator] No agentSchema found after load attempt - showing error');
+      return (
+        <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+          <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+            <div className="flex flex-col items-center mb-6">
+              <img src="/logos/leaderforge-icon-large.png" alt="LeaderForge" width={48} height={48} />
+            </div>
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="text-red-500 mb-4 text-2xl">⚠️</div>
+              <p className="text-sm font-medium text-gray-800 mb-2">Response Error</p>
+              <p className="text-xs text-gray-600 text-center mb-6">Invalid agent response - please refresh</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-[#4f49cf] text-white text-sm rounded-xl hover:bg-[#423db8] transition-colors"
+              >
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
+      );
+    }
+
+    // Show loading state or welcome message instead of error during normal flow
+    if (contentLoading) {
+      return (
+        <div
+          className={`tenant-${currentTenant}`}
+          style={{
+            '--primary': theme.primary,
+            '--secondary': theme.secondary,
+            '--accent': theme.accent,
+            '--bg-light': theme.bg_light,
+            '--bg-neutral': theme.bg_neutral,
+            '--text-primary': theme.text_primary,
+            '--card-bg': theme.bg_light || '#ffffff'
+          } as React.CSSProperties & Record<string, string>}>
+          <ThreePanelLayout
+            nav={<NavComponent />}
+            content={
+              <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
+                  <div className="flex flex-col items-center mb-6">
+                    <img src="/logos/leaderforge-icon.png" alt="LeaderForge Icon" width={40} height={40} />
+                  </div>
+                  <div className="space-y-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                    <h1 className="text-xl font-bold text-gray-800">Loading Content</h1>
+                    <p className="text-sm text-gray-600">Please wait while we prepare your content...</p>
+                  </div>
+                </div>
+              </div>
+            }
+            contextConfig={{
+              theme: {
+                primary: theme.primary,
+                secondary: theme.secondary,
+                accent: theme.accent,
+                bg_light: theme.bg_light,
+                bg_neutral: theme.bg_neutral,
+                text_primary: theme.text_primary,
+                bg_gradient: theme.bg_gradient
+              }
+            }}
+          />
+        </div>
+      );
+    }
+
+    // Show welcome state when no content is selected (normal initial state)
+    return (
+      <div
+        className={`tenant-${currentTenant}`}
+        style={{
+          '--primary': theme.primary,
+          '--secondary': theme.secondary,
+          '--accent': theme.accent,
+          '--bg-light': theme.bg_light,
+          '--bg-neutral': theme.bg_neutral,
+          '--text-primary': theme.text_primary,
+          '--card-bg': theme.bg_light || '#ffffff'
+        } as React.CSSProperties & Record<string, string>}>
+        <ThreePanelLayout
+          nav={<NavComponent />}
+          content={
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
+                <div className="flex flex-col items-center mb-6">
+                  <img src="/logos/leaderforge-icon.png" alt="LeaderForge Icon" width={40} height={40} />
+                </div>
+                <div className="space-y-4">
+                  <h1 className="text-xl font-bold text-gray-800">Welcome</h1>
+                  <p className="text-sm text-gray-600">Please select an option from the navigation to get started.</p>
+                </div>
+              </div>
+            </div>
+          }
+          contextConfig={{
+            theme: {
+              primary: theme.primary,
+              secondary: theme.secondary,
+              accent: theme.accent,
+              bg_light: theme.bg_light,
+              bg_neutral: theme.bg_neutral,
+              text_primary: theme.text_primary,
+              bg_gradient: theme.bg_gradient
+            }
+          }}
+        />
       </div>
     );
   }

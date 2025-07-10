@@ -22,7 +22,10 @@ export async function GET(
 
     // Fast path: Check for session existence without expensive restoration
     const cookieStore = await cookies();
-    const projectRef = 'pcjaagjqydyqfsthsmac';
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+    if (!projectRef) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
     const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
     const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
 

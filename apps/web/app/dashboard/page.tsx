@@ -40,7 +40,11 @@ export default async function DashboardPage() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
 
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  if (!projectRef) {
+    console.error('[dashboard/page] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+    redirect('/login?error=config_error');
+  }
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
 
@@ -93,9 +97,11 @@ export default async function DashboardPage() {
       userExists: !!finalSession?.user
     });
 
-    // If we have tokens but no session, try to refresh (even without explicit error)
-    if (accessToken && refreshToken) {
-      console.warn('[dashboard/page] Have tokens but no session, attempting refresh');
+    // CRITICAL FIX: Only attempt refresh if we have valid tokens AND an explicit error
+    // Don't refresh on every missing session to prevent token corruption
+    if (accessToken && refreshToken && finalSession) {
+      // Only refresh if we have a session object but missing user (token might be expired)
+      console.warn('[dashboard/page] Session exists but no user - attempting single refresh');
       try {
         const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession({
           refresh_token: refreshToken,
@@ -106,13 +112,17 @@ export default async function DashboardPage() {
           finalSession = refreshData.session;
         } else {
           console.error('[dashboard/page] Session refresh failed:', refreshError?.message);
+          // Clear invalid cookies before redirect to prevent loops
           redirect('/login?error=session_refresh_failed');
         }
       } catch (refreshException) {
         console.error('[dashboard/page] Session refresh exception:', refreshException);
+        // Clear invalid cookies before redirect to prevent loops
         redirect('/login?error=session_exception');
       }
     } else {
+      // No valid tokens or no session at all - redirect to login
+      console.warn('[dashboard/page] No valid session or tokens - redirecting to login');
       redirect('/login');
     }
   }

@@ -3,8 +3,14 @@
 
 import { NextResponse } from 'next/server';
 
-const accessTokenCookie = 'sb-pcjaagjqydyqfsthsmac-auth-token';
-const refreshTokenCookie = 'sb-pcjaagjqydyqfsthsmac-refresh-token';
+// Get cookie names from environment variable
+const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+if (!projectRef) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+}
+
+const accessTokenCookie = `sb-${projectRef}-auth-token`;
+const refreshTokenCookie = `sb-${projectRef}-refresh-token`;
 
 // CORS headers for Vercel production deployment
 const corsHeaders = {
@@ -63,27 +69,47 @@ export async function POST(req: Request) {
       return response;
     }
 
-    // Handle login - set cookies
-    if (access_token) {
-      response.cookies.set(accessTokenCookie, access_token, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7,
+    // Validate tokens before setting cookies
+    if (!access_token || !refresh_token) {
+      console.error('[set-session] ❌ Missing required tokens');
+      const errorResponse = NextResponse.json({ success: false, error: 'Missing tokens' }, { status: 400 });
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
       });
+      return errorResponse;
     }
 
-    if (refresh_token) {
-      response.cookies.set(refreshTokenCookie, refresh_token, {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 30,
+    // Basic token format validation (JWT should have 3 parts separated by dots)
+    const accessTokenParts = access_token.split('.');
+    const refreshTokenValid = refresh_token && refresh_token.length > 10; // Basic length check
+
+    if (accessTokenParts.length !== 3 || !refreshTokenValid) {
+      console.error('[set-session] ❌ Invalid token format');
+      const errorResponse = NextResponse.json({ success: false, error: 'Invalid token format' }, { status: 400 });
+      Object.entries(corsHeaders).forEach(([key, value]) => {
+        errorResponse.headers.set(key, value);
       });
+      return errorResponse;
     }
 
+    // Handle login - set cookies with validated tokens
+    response.cookies.set(accessTokenCookie, access_token, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    response.cookies.set(refreshTokenCookie, refresh_token, {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+    });
+
+    console.log('[set-session] ✅ Successfully set auth cookies');
     return response;
   } catch (err) {
     console.error('[set-session] ❌ Error setting cookies:', err);

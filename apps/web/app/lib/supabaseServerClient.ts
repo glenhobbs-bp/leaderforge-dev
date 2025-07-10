@@ -51,8 +51,13 @@ export async function restoreSession(cookieStore: ReadonlyRequestCookies) {
   // Get all cookies for manual session restoration
   const allCookies = cookieStore.getAll();
 
-  // Use the hardcoded project ref that matches our auth setup
-  const projectRef = 'pcjaagjqydyqfsthsmac';
+  // Get project ref from environment variable
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  if (!projectRef) {
+    console.error('[restoreSession] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+    const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
+    return { session: currentSession, supabase, error: currentError };
+  }
 
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
@@ -66,7 +71,16 @@ export async function restoreSession(cookieStore: ReadonlyRequestCookies) {
     return { session: currentSession, supabase, error: currentError };
   }
 
-  // Attempt session restoration with timeout
+  // Validate token format before attempting restoration
+  const accessTokenParts = accessToken.split('.');
+  const isValidTokenFormat = accessTokenParts.length === 3 && refreshToken.length > 10;
+
+  if (!isValidTokenFormat) {
+    console.warn('[restoreSession] Invalid token format detected, skipping restoration');
+    return { session: null, supabase, error: new Error('Invalid token format') };
+  }
+
+  // Attempt session restoration with timeout and better error handling
   try {
     const authPromise = supabase.auth.setSession({
       access_token: accessToken,
@@ -78,44 +92,58 @@ export async function restoreSession(cookieStore: ReadonlyRequestCookies) {
       setTimeout(() => reject(new Error('Auth timeout')), 3000)
     );
 
-    const setSessionRes = await Promise.race([authPromise, timeoutPromise]) as any;
+    const setSessionRes = await Promise.race([authPromise, timeoutPromise]) as Awaited<typeof authPromise>;
 
     if (setSessionRes.error) {
-      // Only try refresh if it's a JWT error and we have time
-      if (setSessionRes.error.message?.includes('JWT') ||
-          setSessionRes.error.message?.includes('expired')) {
+      const errorMessage = setSessionRes.error.message || '';
 
-        const refreshPromise = supabase.auth.refreshSession();
+      // Only try refresh for specific JWT-related errors, not for all errors
+      if ((errorMessage.includes('JWT') || errorMessage.includes('expired') || errorMessage.includes('invalid')) &&
+          !errorMessage.includes('refresh_token_not_found')) {
+
+        console.log('[restoreSession] JWT expired, attempting refresh...');
+
+        const refreshPromise = supabase.auth.refreshSession({ refresh_token: refreshToken });
         const refreshTimeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Refresh timeout')), 2000)
         );
 
         try {
-          const refreshRes = await Promise.race([refreshPromise, refreshTimeoutPromise]) as any;
-          if (!refreshRes.error) {
+          const refreshRes = await Promise.race([refreshPromise, refreshTimeoutPromise]) as Awaited<typeof refreshPromise>;
+          if (!refreshRes.error && refreshRes.data?.session) {
             session = refreshRes.data.session;
+            console.log('[restoreSession] Session refresh successful');
           } else {
-            sessionError = refreshRes.error;
+            sessionError = refreshRes.error || new Error('Refresh failed');
+            console.warn('[restoreSession] Session refresh failed:', refreshRes.error?.message);
           }
         } catch (error) {
           sessionError = error;
+          console.warn('[restoreSession] Session refresh threw error:', (error as Error).message);
         }
       } else {
         sessionError = setSessionRes.error;
+        console.warn('[restoreSession] Session restoration failed:', errorMessage);
       }
     } else {
       session = setSessionRes.data.session;
+      console.log('[restoreSession] Session restored successfully');
     }
   } catch (error) {
     sessionError = error;
+    console.warn('[restoreSession] Session restoration threw error:', (error as Error).message);
   }
 
-  // Final fallback session check (quick)
-  if (!session) {
-    const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
-    session = currentSession;
-    if (currentError && !sessionError) {
-      sessionError = currentError;
+  // Final fallback session check (quick) - only if no session and no critical error
+  if (!session && !sessionError) {
+    try {
+      const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
+      session = currentSession;
+      if (currentError) {
+        sessionError = currentError;
+      }
+    } catch (error) {
+      console.warn('[restoreSession] Final session check failed:', (error as Error).message);
     }
   }
 

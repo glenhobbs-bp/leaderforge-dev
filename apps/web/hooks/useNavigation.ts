@@ -28,17 +28,17 @@ interface NavigationSection {
 export function useNavigation(tenantKey: string, userId?: string) {
   const { navOptions, loading, error } = useNavOptions(tenantKey);
 
-  // Fetch user data for personalized greeting (with aggressive timeout)
+  // Fetch user data for personalized greeting (with improved timeout handling)
   const { data: userData } = useQuery({
     queryKey: ['user-navigation-data', userId],
     queryFn: async () => {
       if (!userId) return null;
 
-      // 5-second timeout to prevent 1+ minute hangs
+      // Increase timeout to 10 seconds and improve cleanup logic
       const controller = new AbortController();
       let timeoutId: number | undefined;
 
-      // ✅ FIX: Ensure timeout is always cleared
+      // Improved cleanup function
       const cleanup = () => {
         if (timeoutId) {
           window.clearTimeout(timeoutId);
@@ -46,33 +46,55 @@ export function useNavigation(tenantKey: string, userId?: string) {
         }
       };
 
+      // Set timeout with better error handling
       timeoutId = window.setTimeout(() => {
         cleanup();
-        controller.abort();
-      }, 5000);
+        // Only abort if the request is still pending
+        if (!controller.signal.aborted) {
+          controller.abort('Profile fetch timeout');
+        }
+      }, 10000); // Increased to 10 seconds for better reliability
 
       try {
         const response = await fetch(`/api/user/${userId}/profile`, {
           credentials: 'include',
-          signal: controller.signal
+          signal: controller.signal,
+          // Add cache control to prevent stale data issues
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
         });
+
         cleanup(); // Clear timeout on success
 
-        if (!response.ok) return null;
+        if (!response.ok) {
+          // Don't log 401/403 as warnings since they're expected during logout
+          if (response.status !== 401 && response.status !== 403) {
+            console.warn('[useNavigation] Profile fetch failed with status:', response.status);
+          }
+          return null;
+        }
+
         const result = await response.json();
         return result.user;
       } catch (error) {
         cleanup(); // Clear timeout on error
-        console.warn('[useNavigation] Profile fetch failed:', error);
+
+        // Only log non-abort errors to reduce noise
+        if (error instanceof Error && error.name !== 'AbortError') {
+          console.warn('[useNavigation] Profile fetch failed:', error.message);
+        }
         return null; // Graceful degradation
       }
     },
     enabled: !!userId,
-    staleTime: 10 * 60 * 1000, // 10 minutes - longer cache
-    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
+    staleTime: 15 * 60 * 1000, // Increased to 15 minutes for better caching
+    gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
     retry: false, // Don't retry on timeout to prevent cascading delays
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnMount: false, // Don't refetch on mount if data exists
+    // Add network mode for better offline handling
+    networkMode: 'offlineFirst',
   });
 
   const navSchema: NavPanelSchema | null = useMemo(() => {

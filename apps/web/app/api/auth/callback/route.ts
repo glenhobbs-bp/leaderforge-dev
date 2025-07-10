@@ -3,8 +3,14 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-const accessTokenCookie = 'sb-pcjaagjqydyqfsthsmac-auth-token';
-const refreshTokenCookie = 'sb-pcjaagjqydyqfsthsmac-refresh-token';
+// Get cookie names from environment variable
+const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+if (!projectRef) {
+  throw new Error('NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+}
+
+const accessTokenCookie = `sb-${projectRef}-auth-token`;
+const refreshTokenCookie = `sb-${projectRef}-refresh-token`;
 
 /**
  * Handles Supabase auth redirect and sets cookies for SSR session access.

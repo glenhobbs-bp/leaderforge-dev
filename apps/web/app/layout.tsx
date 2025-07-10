@@ -1,20 +1,17 @@
 import "./globals.css";
 import "@copilotkit/react-ui/styles.css";
 import "./copilotkit-styles.css";
-import { CopilotKitProvider } from "./CopilotKitProvider";
-import QueryClientProvider from "./QueryClientProvider";
-import SupabaseProvider from '../components/SupabaseProvider';
-import { cookies } from 'next/headers';
 import { createSupabaseServerClient } from './lib/supabaseServerClient';
+import { cookies } from 'next/headers';
+import SupabaseProvider from '../components/SupabaseProvider';
+import { CopilotKitProvider } from './CopilotKitProvider';
+import QueryClientProvider from './QueryClientProvider';
 import { Metadata } from 'next';
 import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: "LeaderForge",
-  description: "Building something epic!",
-  icons: {
-    icon: '/favicon.ico',
-  },
+  title: 'LeaderForge',
+  description: 'AI-powered leadership development platform',
 };
 
 export default async function RootLayout({
@@ -26,17 +23,39 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
 
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  if (!projectRef) {
+    console.error('[layout] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+    return (
+      <html lang="en">
+        <body>
+          <div>Configuration error: Missing project reference</div>
+        </body>
+      </html>
+    );
+  }
+
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+
+  console.log('[layout] Token debug:', {
+    hasAccessToken: !!accessToken,
+    hasRefreshToken: !!refreshToken,
+    accessTokenLength: accessToken?.length || 0,
+    refreshTokenLength: refreshToken?.length || 0,
+    projectRef
+  });
 
   const supabase = createSupabaseServerClient(cookieStore);
 
   let initialSession = null;
 
-  // Use the same session restoration logic as dashboard and root page
-  if (accessToken && refreshToken) {
+  // CRITICAL: Only attempt session restoration if we have BOTH tokens
+  // Access tokens are JWTs (longer), refresh tokens can be shorter (even 12 chars is valid)
+  if (accessToken && refreshToken && accessToken.length > 50 && refreshToken.length > 3) {
     try {
+      console.log('[layout] Attempting session restoration with valid tokens');
+
       const { data, error } = await supabase.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -44,30 +63,24 @@ export default async function RootLayout({
 
       if (error) {
         console.warn('[layout] setSession error:', error);
-      } else if (data.session) {
+        // Don't set initialSession - let client handle this
+      } else if (data.session?.user?.id) {
         console.log('[layout] Session restored successfully');
         initialSession = data.session;
+      } else {
+        console.warn('[layout] Session restoration returned no user');
       }
     } catch (error) {
-      console.warn('[layout] Session restoration failed:', error);
+      console.error('[layout] Session restoration failed:', error);
+      // Don't set initialSession - let client handle this
     }
-  }
-
-  // Only get session if we haven't already restored it
-  if (!initialSession) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    // Only set initialSession if we have a valid session
-    // Don't set it to null - let client-side handle null/undefined sessions
-    if (session) {
-      initialSession = session;
-    }
+  } else {
+    console.log('[layout] No valid tokens found - no session restoration attempted');
   }
 
   return (
     <html lang="en">
-      <body>
+      <body className="antialiased">
         <QueryClientProvider>
           <SupabaseProvider initialSession={initialSession}>
             <CopilotKitProvider>

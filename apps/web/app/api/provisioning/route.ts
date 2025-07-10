@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
   // SSR Auth: get cookies and hydrate session
   const cookieStore = await nextCookies();
   const allCookies = cookieStore.getAll();
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  if (!projectRef) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
   const supabase = createSupabaseServerClient(cookieStore);

@@ -28,73 +28,40 @@ export default function SupabaseProvider({
 
   // Start with initialSession to prevent auth flash
   const [session, setSession] = useState<Session | null>(initialSession);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!initialSession); // Only show loading if no initial session
 
   const hasInitialized = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    // If we have a valid initialSession, mark as initialized
+    // If we have a valid initialSession, use it and mark as initialized
     if (initialSession?.user?.id) {
-      console.log('[SupabaseProvider] Using initial session directly');
-      hasInitialized.current = true;
-    } else {
-      // SECURITY FIX: No client-side session restoration when server-side auth fails
-      // If server-side authentication didn't provide a session, respect that decision
-      console.log('[SupabaseProvider] No initial session from server - respecting server-side auth decision');
+      console.log('[SupabaseProvider] Using valid initial session from server');
+      setSession(initialSession);
       setLoading(false);
       hasInitialized.current = true;
-
-      // Clear any stale client-side session data to prevent auth bypass
-      supabase.auth.signOut().catch(error => {
-        console.warn('[SupabaseProvider] Error clearing stale session:', error);
-      });
+      return;
     }
 
-    // Auth state change listener
+    // CRITICAL: If no initial session from server, respect that decision
+    console.log('[SupabaseProvider] No initial session from server - respecting server-side auth decision');
+
+    // Don't attempt client-side session restoration if server didn't provide a session
+    // This prevents bypassing authentication
+    setSession(null);
+    setLoading(false);
+    hasInitialized.current = true;
+
+    // Set up auth state listener for future changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      if (!isMounted) return;
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[SupabaseProvider] Auth state changed:', event, session?.user?.id);
 
-      console.log('[SupabaseProvider] Auth state changed:', event, newSession?.user?.id || 'undefined');
-
-      // Handle auth events
-      switch (event) {
-        case 'INITIAL_SESSION':
-          // Only process INITIAL_SESSION if we don't have a server-side session
-          if (!hasInitialized.current) {
-            setSession(newSession);
-            setLoading(false);
-            hasInitialized.current = true;
-          }
-          break;
-
-        case 'SIGNED_IN':
-          setSession(newSession);
-          setLoading(false);
-          hasInitialized.current = true;
-          break;
-
-        case 'SIGNED_OUT':
-          setSession(null);
-          setLoading(false);
-          hasInitialized.current = true;
-          break;
-
-        case 'TOKEN_REFRESHED':
-          if (newSession) {
-            setSession(newSession);
-          }
-          break;
-
-        default:
-          // For other events, only update if session actually changed
-          if (newSession?.user?.id !== session?.user?.id) {
-            setSession(newSession);
-          }
-          break;
+      if (isMounted) {
+        setSession(session);
+        setLoading(false);
       }
     });
 

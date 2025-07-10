@@ -9,7 +9,11 @@ export default async function HomePage() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
 
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF || 'pcjaagjqydyqfsthsmac';
+  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  if (!projectRef) {
+    console.error('[page] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+    redirect('/login?error=config_error');
+  }
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
 

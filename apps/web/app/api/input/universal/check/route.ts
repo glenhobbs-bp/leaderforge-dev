@@ -29,13 +29,18 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get access and refresh tokens from cookies
-    const accessToken = request.cookies.get('sb-pcjaagjqydyqfsthsmac-auth-token')?.value;
-    const refreshToken = request.cookies.get('sb-pcjaagjqydyqfsthsmac-refresh-token')?.value;
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+    if (!projectRef) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+    }
+
+    const accessToken = request.cookies.get(`sb-${projectRef}-auth-token`)?.value;
+    const refreshToken = request.cookies.get(`sb-${projectRef}-refresh-token`)?.value;
 
     console.log('[UniversalInput/Check] Cookie tokens found:', {
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!refreshToken,
-      projectRef: 'pcjaagjqydyqfsthsmac'
+      projectRef
     });
 
     let session = null;
