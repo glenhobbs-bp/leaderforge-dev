@@ -50,20 +50,20 @@ export async function POST(req: NextRequest) {
       includePreferences: true
     });
 
-    // Build response with agent-generated context
+    // Build response with agent-generated context in the format CopilotKitProvider expects
     const agentResponse = {
-      type: 'agent_context_discovery',
-      context: requestedContext,
-      userId,
-      resolvedContext: contextResult.resolvedContext,
-      systemInstructions: contextResult.systemInstructions,
-      userPreferences: contextResult.userPreferences,
-      appliedContexts: contextResult.appliedContexts,
-      metadata: {
-        ...contextResult.metadata,
-        responseTime: Date.now() - startTime,
-        userMessage,
-        requestedContext
+      success: true,
+      context: {
+        systemInstructions: contextResult.systemInstructions,
+        appliedContexts: contextResult.appliedContexts,
+        userPreferences: contextResult.userPreferences,
+        metadata: {
+          ...contextResult.metadata,
+          responseTime: Date.now() - startTime,
+          userMessage,
+          requestedContext,
+          contextId: `context_${Date.now()}`
+        }
       }
     };
 

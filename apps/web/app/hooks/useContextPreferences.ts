@@ -98,6 +98,16 @@ export function useContextPreferences(): ContextPreferencesState & ContextPrefer
         throw new Error(data.error || 'Failed to update context');
       }
 
+      // Check if context was updated and trigger refresh
+      if (response.headers.get('X-Context-Updated') === 'true') {
+        console.log('[useContextPreferences] Context updated - triggering CopilotKit refresh');
+        // Trigger custom event for CopilotKit to refresh
+        window.dispatchEvent(new CustomEvent('context-preferences-updated'));
+        // Also store in localStorage for cross-tab communication
+        localStorage.setItem('context-preferences-updated', Date.now().toString());
+        localStorage.removeItem('context-preferences-updated'); // Trigger storage event
+      }
+
       // Optimistically update the state
       setState(prev => ({
         ...prev,
@@ -138,6 +148,16 @@ export function useContextPreferences(): ContextPreferencesState & ContextPrefer
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to bulk update contexts');
+      }
+
+      // Check if context was updated and trigger refresh
+      if (response.headers.get('X-Context-Updated') === 'true') {
+        console.log('[useContextPreferences] Contexts bulk updated - triggering CopilotKit refresh');
+        // Trigger custom event for CopilotKit to refresh
+        window.dispatchEvent(new CustomEvent('context-preferences-updated'));
+        // Also store in localStorage for cross-tab communication
+        localStorage.setItem('context-preferences-updated', Date.now().toString());
+        localStorage.removeItem('context-preferences-updated'); // Trigger storage event
       }
 
       // Optimistically update the state

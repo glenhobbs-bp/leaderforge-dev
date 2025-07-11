@@ -1,25 +1,28 @@
 {
   "metadata": {
-    "generated_at": "2025-07-10T00:05:14.405Z",
+    "generated_at": "2025-07-11T00:19:51.202Z",
     "generator_version": "1.0.0",
-    "total_files": 379,
-    "total_size_bytes": 3195556,
+    "total_files": 393,
+    "total_size_bytes": 3288561,
     "file_types": {
-      ".ts": 149,
+      ".ts": 153,
       ".json": 18,
       ".tsx": 66,
       ".js": 10,
-      ".md": 134,
+      ".md": 144,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 215,
-      "API": 63,
-      "AI agent": 197,
+      "TypeScript": 219,
+      "API": 67,
+      "AI agent": 199,
       "React": 66,
-      "React hooks": 52,
-      "Next.js API": 63,
-      "security": 109,
+      "React hooks": 55,
+      "Next.js API": 66,
+      "security": 112,
+      "authentication": 3,
+      "session management": 2,
+      "cookie cleanup": 1,
       "navigation": 7,
       "routing": 3,
       "API endpoint": 4,
@@ -45,10 +48,8 @@
       "utility": 38,
       "API client": 1,
       "error handling": 1,
-      "authentication": 2,
       "Supabase": 2,
       "service layer": 2,
-      "session management": 1,
       "performance optimization": 1,
       "Supabase Auth UI": 1,
       "login": 1,
@@ -80,7 +81,7 @@
       "feature-flags": 3,
       "prototyping": 1,
       "exports": 1,
-      "documentation": 138,
+      "documentation": 148,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -292,9 +293,9 @@
         "../../../lib/supabaseServerClient",
         "../../../../../../packages/env"
       ],
-      "last_modified": "2025-06-28T18:55:46.341Z",
-      "size_bytes": 7347,
-      "hash": "0667eacf",
+      "last_modified": "2025-07-10T23:19:50.190Z",
+      "size_bytes": 7440,
+      "hash": "fcad3d4c",
       "complexity": "medium"
     },
     {
@@ -399,9 +400,32 @@
       "exports": [
         "dynamic"
       ],
-      "last_modified": "2025-06-27T21:33:11.937Z",
-      "size_bytes": 1171,
-      "hash": "7dfd1369",
+      "last_modified": "2025-07-10T23:18:02.636Z",
+      "size_bytes": 1356,
+      "hash": "964072c6",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/auth/clear-session/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/auth/clear-session",
+      "extension": ".ts",
+      "purpose": "Clear corrupted authentication cookies to prevent login loops",
+      "owner": "Backend team",
+      "tags": [
+        "authentication",
+        "session management",
+        "cookie cleanup",
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-07-10T23:17:53.920Z",
+      "size_bytes": 1455,
+      "hash": "7d992a43",
       "complexity": "low"
     },
     {
@@ -418,9 +442,9 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-07-05T10:21:48.096Z",
-      "size_bytes": 2805,
-      "hash": "285f976d",
+      "last_modified": "2025-07-10T23:17:39.060Z",
+      "size_bytes": 4057,
+      "hash": "49139d8a",
       "complexity": "medium"
     },
     {
@@ -465,9 +489,9 @@
         "../../../lib/supabaseServerClient",
         "../../../../lib/validation/contextSchemas"
       ],
-      "last_modified": "2025-07-09T23:28:42.105Z",
-      "size_bytes": 7677,
-      "hash": "ec0c03ad",
+      "last_modified": "2025-07-10T18:59:49.025Z",
+      "size_bytes": 7747,
+      "hash": "51a3d2f6",
       "complexity": "medium"
     },
     {
@@ -512,9 +536,9 @@
         "agent-core/agents/ContextResolutionAgent",
         "../../../lib/validation/contextSchemas"
       ],
-      "last_modified": "2025-07-09T23:27:58.793Z",
-      "size_bytes": 5418,
-      "hash": "c7409428",
+      "last_modified": "2025-07-10T18:40:44.113Z",
+      "size_bytes": 5955,
+      "hash": "0b2533ae",
       "complexity": "medium"
     },
     {
@@ -557,6 +581,25 @@
       "complexity": "high"
     },
     {
+      "path": "apps/web/app/api/debug/avatar-test/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/avatar-test",
+      "extension": ".ts",
+      "purpose": "Debug endpoint to test avatar URL accessibility",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-07-10T11:07:38.722Z",
+      "size_bytes": 891,
+      "hash": "d399c528",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/api/debug/check-progress-schema/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/debug/check-progress-schema",
@@ -576,6 +619,28 @@
       "size_bytes": 2091,
       "hash": "9b52dd8f",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/check-prompt-contexts-rls/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/check-prompt-contexts-rls",
+      "extension": ".ts",
+      "purpose": "Debug API to check and fix RLS policies on core.prompt_contexts table",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient"
+      ],
+      "last_modified": "2025-07-10T18:39:52.484Z",
+      "size_bytes": 6154,
+      "hash": "49a8c51a",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/debug/check-session/route.ts",
@@ -681,28 +746,6 @@
       "complexity": "low"
     },
     {
-      "path": "apps/web/app/api/debug/nav-check/route.ts",
-      "name": "route.ts",
-      "directory": "apps/web/app/api/debug/nav-check",
-      "extension": ".ts",
-      "purpose": "Debug Navigation Options API Route",
-      "tags": [
-        "TypeScript",
-        "API",
-        "Next.js API",
-        "AI agent"
-      ],
-      "dependencies": [
-        "next/server",
-        "next/headers",
-        "../../../lib/supabaseServerClient"
-      ],
-      "last_modified": "2025-06-28T00:14:11.370Z",
-      "size_bytes": 1952,
-      "hash": "075576e5",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/api/debug/nav-raw/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/debug/nav-raw",
@@ -713,6 +756,41 @@
         "API"
       ],
       "last_modified": "2025-06-28T00:33:41.400Z",
+      "size_bytes": 1,
+      "hash": "36a9e7f1",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/nav-state-trace/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/nav-state-trace",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "API",
+        "React hooks",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-07-10T10:06:20.746Z",
+      "size_bytes": 719,
+      "hash": "ac43d2de",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/reset-nav-state/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/reset-nav-state",
+      "extension": ".ts",
+      "purpose": "—",
+      "tags": [
+        "TypeScript",
+        "API"
+      ],
+      "last_modified": "2025-07-10T02:03:59.494Z",
       "size_bytes": 1,
       "hash": "36a9e7f1",
       "complexity": "low"
@@ -987,9 +1065,9 @@
         "next/server",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-01T09:40:25.589Z",
-      "size_bytes": 4498,
-      "hash": "def26c5e",
+      "last_modified": "2025-07-10T23:18:35.495Z",
+      "size_bytes": 4649,
+      "hash": "b242a303",
       "complexity": "medium"
     },
     {
@@ -1009,9 +1087,9 @@
         "next/headers",
         "next/server"
       ],
-      "last_modified": "2025-07-01T09:40:23.312Z",
-      "size_bytes": 12382,
-      "hash": "9553a15b",
+      "last_modified": "2025-07-10T23:19:55.733Z",
+      "size_bytes": 12475,
+      "hash": "31704a4a",
       "complexity": "high"
     },
     {
@@ -1033,9 +1111,9 @@
         "next/headers",
         "../../../lib/types"
       ],
-      "last_modified": "2025-07-05T02:15:52.050Z",
-      "size_bytes": 4007,
-      "hash": "ec7512c8",
+      "last_modified": "2025-07-10T23:20:55.192Z",
+      "size_bytes": 4106,
+      "hash": "a503d1d9",
       "complexity": "medium"
     },
     {
@@ -1106,9 +1184,9 @@
         "../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-06-27T21:33:11.944Z",
-      "size_bytes": 3685,
-      "hash": "00c75143",
+      "last_modified": "2025-07-10T23:20:07.685Z",
+      "size_bytes": 3772,
+      "hash": "5fc653e0",
       "complexity": "low"
     },
     {
@@ -1374,9 +1452,9 @@
         "../../lib/supabaseServerClient",
         "../../../../../packages/agent-core/tools/UserProgressTool"
       ],
-      "last_modified": "2025-07-05T02:36:45.332Z",
-      "size_bytes": 8199,
-      "hash": "ac39be5a",
+      "last_modified": "2025-07-10T23:20:01.023Z",
+      "size_bytes": 8292,
+      "hash": "da01cbc4",
       "complexity": "medium"
     },
     {
@@ -1400,9 +1478,9 @@
         "next/headers",
         "../../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-07-05T02:15:52.050Z",
-      "size_bytes": 4323,
-      "hash": "12594c9f",
+      "last_modified": "2025-07-10T23:18:08.979Z",
+      "size_bytes": 4464,
+      "hash": "4e16c119",
       "complexity": "medium"
     },
     {
@@ -1426,9 +1504,9 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-07-06T10:32:00.887Z",
-      "size_bytes": 9370,
-      "hash": "7062f490",
+      "last_modified": "2025-07-10T23:18:15.404Z",
+      "size_bytes": 9511,
+      "hash": "0e499850",
       "complexity": "high"
     },
     {
@@ -1452,9 +1530,9 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-07-05T02:15:52.051Z",
-      "size_bytes": 5381,
-      "hash": "eae29f6b",
+      "last_modified": "2025-07-10T23:18:22.248Z",
+      "size_bytes": 5522,
+      "hash": "e7500287",
       "complexity": "medium"
     },
     {
@@ -1520,9 +1598,9 @@
         "../../../lib/supabaseServerClient",
         "next/headers"
       ],
-      "last_modified": "2025-07-02T21:09:36.786Z",
-      "size_bytes": 10198,
-      "hash": "2bd72623",
+      "last_modified": "2025-07-10T23:20:49.273Z",
+      "size_bytes": 10291,
+      "hash": "452b860d",
       "complexity": "medium"
     },
     {
@@ -1594,9 +1672,9 @@
       "exports": [
         "CopilotKitProvider"
       ],
-      "last_modified": "2025-07-08T01:29:22.009Z",
-      "size_bytes": 4449,
-      "hash": "ade33ef9",
+      "last_modified": "2025-07-11T00:18:13.579Z",
+      "size_bytes": 6306,
+      "hash": "904edfd9",
       "complexity": "medium"
     },
     {
@@ -1647,9 +1725,9 @@
         "../lib/tenantService",
         "../lib/types"
       ],
-      "last_modified": "2025-07-05T11:29:30.486Z",
-      "size_bytes": 7334,
-      "hash": "917b87b0",
+      "last_modified": "2025-07-10T23:16:50.494Z",
+      "size_bytes": 7941,
+      "hash": "988d15d8",
       "complexity": "medium"
     },
     {
@@ -1908,9 +1986,9 @@
       "exports": [
         "useUserPreferences"
       ],
-      "last_modified": "2025-07-06T10:52:02.608Z",
-      "size_bytes": 3451,
-      "hash": "be6c4f97",
+      "last_modified": "2025-07-10T12:05:42.671Z",
+      "size_bytes": 3347,
+      "hash": "7aa887c4",
       "complexity": "low"
     },
     {
@@ -1951,20 +2029,20 @@
         "TypeScript"
       ],
       "dependencies": [
+        "./lib/supabaseServerClient",
+        "next/headers",
+        "../components/SupabaseProvider",
         "./CopilotKitProvider",
         "./QueryClientProvider",
-        "../components/SupabaseProvider",
-        "next/headers",
-        "./lib/supabaseServerClient",
         "next",
         "react"
       ],
       "exports": [
         "metadata"
       ],
-      "last_modified": "2025-07-06T10:22:11.143Z",
-      "size_bytes": 2496,
-      "hash": "59027539",
+      "last_modified": "2025-07-10T23:47:06.379Z",
+      "size_bytes": 3023,
+      "hash": "ac5ac646",
       "complexity": "low"
     },
     {
@@ -2448,9 +2526,9 @@
       "exports": [
         "createSupabaseServerClient"
       ],
-      "last_modified": "2025-07-05T02:15:52.057Z",
-      "size_bytes": 4628,
-      "hash": "54ef447e",
+      "last_modified": "2025-07-10T23:17:24.550Z",
+      "size_bytes": 6405,
+      "hash": "6bca0008",
       "complexity": "medium"
     },
     {
@@ -2631,9 +2709,9 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-07-05T19:41:22.612Z",
-      "size_bytes": 6503,
-      "hash": "5d677b8b",
+      "last_modified": "2025-07-10T22:26:58.738Z",
+      "size_bytes": 7849,
+      "hash": "833f7be5",
       "complexity": "medium"
     },
     {
@@ -2651,9 +2729,9 @@
         "next/headers",
         "next/navigation"
       ],
-      "last_modified": "2025-07-05T11:42:52.293Z",
-      "size_bytes": 1596,
-      "hash": "e185dc2c",
+      "last_modified": "2025-07-10T23:19:43.923Z",
+      "size_bytes": 1711,
+      "hash": "a020664b",
       "complexity": "low"
     },
     {
@@ -2782,9 +2860,9 @@
         "../app/lib/types",
         "./SupabaseProvider"
       ],
-      "last_modified": "2025-07-09T18:33:06.534Z",
-      "size_bytes": 2722,
-      "hash": "c7dcd5b4",
+      "last_modified": "2025-07-10T23:56:48.816Z",
+      "size_bytes": 3358,
+      "hash": "c7c42dca",
       "complexity": "low"
     },
     {
@@ -3020,9 +3098,9 @@
         "react",
         "lucide-react"
       ],
-      "last_modified": "2025-07-06T21:07:07.983Z",
-      "size_bytes": 11876,
-      "hash": "13408502",
+      "last_modified": "2025-07-10T01:37:45.092Z",
+      "size_bytes": 9067,
+      "hash": "92dc311a",
       "complexity": "medium"
     },
     {
@@ -3098,7 +3176,7 @@
       "name": "SupabaseProvider.tsx",
       "directory": "apps/web/components",
       "extension": ".tsx",
-      "purpose": "Start with initialSession to prevent auth flash",
+      "purpose": "Use initialSession directly - no complex loading states",
       "tags": [
         "React",
         "TypeScript",
@@ -3114,10 +3192,10 @@
       "exports": [
         "SupabaseProvider"
       ],
-      "last_modified": "2025-07-06T10:22:11.143Z",
-      "size_bytes": 3701,
-      "hash": "ca7abbe2",
-      "complexity": "medium"
+      "last_modified": "2025-07-10T23:49:46.429Z",
+      "size_bytes": 2578,
+      "hash": "f6e5bcb8",
+      "complexity": "low"
     },
     {
       "path": "apps/web/components/ui/AuthenticationGuard.tsx",
@@ -3140,9 +3218,9 @@
       "exports": [
         "AuthenticationGuard"
       ],
-      "last_modified": "2025-07-09T17:46:00.560Z",
-      "size_bytes": 2834,
-      "hash": "b9f15a30",
+      "last_modified": "2025-07-10T23:52:24.262Z",
+      "size_bytes": 2606,
+      "hash": "c79a8a08",
       "complexity": "low"
     },
     {
@@ -3185,9 +3263,9 @@
         "../../../../packages/agent-core/types/UniversalWidgetSchema",
         "../../app/lib/widgetActionRegistry"
       ],
-      "last_modified": "2025-07-09T18:50:18.800Z",
-      "size_bytes": 12543,
-      "hash": "76f6d2cd",
+      "last_modified": "2025-07-10T10:35:05.631Z",
+      "size_bytes": 12537,
+      "hash": "d0f1f1ed",
       "complexity": "high"
     },
     {
@@ -3233,9 +3311,9 @@
         "Dialog",
         "DialogContent"
       ],
-      "last_modified": "2025-06-27T21:33:12.079Z",
-      "size_bytes": 1586,
-      "hash": "917d83a1",
+      "last_modified": "2025-07-10T02:05:04.416Z",
+      "size_bytes": 1630,
+      "hash": "b2bbe121",
       "complexity": "low"
     },
     {
@@ -3256,9 +3334,9 @@
         "./dialog",
         "lucide-react"
       ],
-      "last_modified": "2025-07-09T23:38:43.270Z",
-      "size_bytes": 18539,
-      "hash": "610d74be",
+      "last_modified": "2025-07-10T21:09:49.161Z",
+      "size_bytes": 18619,
+      "hash": "c72efa94",
       "complexity": "high"
     },
     {
@@ -3314,9 +3392,9 @@
         "hls.js",
         "@/components/ui/dialog"
       ],
-      "last_modified": "2025-06-27T21:33:12.082Z",
-      "size_bytes": 18568,
-      "hash": "3f12e648",
+      "last_modified": "2025-07-10T10:31:18.882Z",
+      "size_bytes": 18919,
+      "hash": "091bbb0a",
       "complexity": "high"
     },
     {
@@ -3419,9 +3497,9 @@
         "../../app/lib/types",
         "../../app/lib/widgetActionRegistry"
       ],
-      "last_modified": "2025-07-09T21:46:05.989Z",
-      "size_bytes": 16215,
-      "hash": "b1d4c717",
+      "last_modified": "2025-07-10T22:18:46.390Z",
+      "size_bytes": 20777,
+      "hash": "8b54c950",
       "complexity": "high"
     },
     {
@@ -3453,9 +3531,9 @@
         "./UserProfileModal",
         "./LegalTermsModal"
       ],
-      "last_modified": "2025-07-09T21:25:07.959Z",
-      "size_bytes": 22235,
-      "hash": "220e74fc",
+      "last_modified": "2025-07-10T10:06:47.317Z",
+      "size_bytes": 22646,
+      "hash": "224b09b1",
       "complexity": "high"
     },
     {
@@ -3498,9 +3576,9 @@
         "./dialog",
         "lucide-react"
       ],
-      "last_modified": "2025-07-07T14:41:25.389Z",
-      "size_bytes": 16735,
-      "hash": "613e09a6",
+      "last_modified": "2025-07-10T10:31:02.514Z",
+      "size_bytes": 17137,
+      "hash": "7c7809ee",
       "complexity": "high"
     },
     {
@@ -3573,9 +3651,9 @@
       "exports": [
         "UserPreferencesManager"
       ],
-      "last_modified": "2025-07-09T17:47:30.591Z",
-      "size_bytes": 12025,
-      "hash": "d9fd8bb9",
+      "last_modified": "2025-07-10T22:57:19.555Z",
+      "size_bytes": 3560,
+      "hash": "0e6d97a7",
       "complexity": "medium"
     },
     {
@@ -3598,9 +3676,9 @@
         "@tanstack/react-query",
         "./NavPanel"
       ],
-      "last_modified": "2025-07-05T02:15:52.059Z",
-      "size_bytes": 19347,
-      "hash": "8cdd14b7",
+      "last_modified": "2025-07-10T10:31:39.111Z",
+      "size_bytes": 19510,
+      "hash": "e8218067",
       "complexity": "high"
     },
     {
@@ -3622,9 +3700,9 @@
         "lucide-react",
         "../../lib/validation/contextSchemas"
       ],
-      "last_modified": "2025-07-09T23:37:48.673Z",
-      "size_bytes": 11011,
-      "hash": "e0ecb866",
+      "last_modified": "2025-07-10T19:04:04.202Z",
+      "size_bytes": 10922,
+      "hash": "d80628e1",
       "complexity": "medium"
     },
     {
@@ -3901,9 +3979,9 @@
         "../ui/ViewContextModal",
         "../../lib/validation/contextSchemas"
       ],
-      "last_modified": "2025-07-10T00:00:11.021Z",
-      "size_bytes": 15147,
-      "hash": "39dcb336",
+      "last_modified": "2025-07-10T21:07:01.444Z",
+      "size_bytes": 17866,
+      "hash": "bd1a059c",
       "complexity": "high"
     },
     {
@@ -4052,13 +4130,10 @@
       "dependencies": [
         "@tanstack/react-query"
       ],
-      "exports": [
-        "useAvatar"
-      ],
-      "last_modified": "2025-06-27T21:33:12.107Z",
-      "size_bytes": 2100,
-      "hash": "fb74cfc0",
-      "complexity": "low"
+      "last_modified": "2025-07-10T11:07:28.022Z",
+      "size_bytes": 3180,
+      "hash": "9747041e",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/hooks/useContextConfig.ts",
@@ -4154,9 +4229,9 @@
         "../components/ui/NavPanel",
         "@tanstack/react-query"
       ],
-      "last_modified": "2025-07-05T02:24:41.148Z",
-      "size_bytes": 6934,
-      "hash": "5ce72754",
+      "last_modified": "2025-07-10T22:17:56.718Z",
+      "size_bytes": 7827,
+      "hash": "1d2686da",
       "complexity": "medium"
     },
     {
@@ -4347,11 +4422,11 @@
       "name": "next.config.js",
       "directory": "apps/web",
       "extension": ".js",
-      "purpose": "✅ FIX: Disable source maps in development to prevent 404 errors",
+      "purpose": "Temporarily disable React Strict Mode to prevent double rendering during development",
       "tags": [],
-      "last_modified": "2025-07-06T02:47:49.262Z",
-      "size_bytes": 2501,
-      "hash": "d222fd37",
+      "last_modified": "2025-07-10T23:59:54.865Z",
+      "size_bytes": 2690,
+      "hash": "5f8740e7",
       "complexity": "low"
     },
     {
@@ -6110,9 +6185,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T23:46:38.749Z",
-      "size_bytes": 200935,
-      "hash": "43dbccca"
+      "last_modified": "2025-07-10T00:05:14.412Z",
+      "size_bytes": 201050,
+      "hash": "86483026"
     },
     {
       "path": "docs/manifest.md",
@@ -6125,9 +6200,9 @@
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-09T23:46:38.773Z",
+      "last_modified": "2025-07-10T00:05:14.420Z",
       "size_bytes": 76998,
-      "hash": "47c042c6"
+      "hash": "5deba415"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -6148,13 +6223,13 @@
       "name": "design-system.md",
       "directory": "docs/product-design",
       "extension": ".md",
-      "purpose": "React component example",
+      "purpose": "www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e\");",
       "tags": [
         "documentation"
       ],
-      "last_modified": "2025-06-27T21:33:12.257Z",
-      "size_bytes": 29556,
-      "hash": "2a51764e"
+      "last_modified": "2025-07-10T00:50:27.324Z",
+      "size_bytes": 39088,
+      "hash": "9c479baa"
     },
     {
       "path": "docs/product-design/Download i49-ui-component-specs.md",
@@ -6311,6 +6386,143 @@
       "last_modified": "2025-07-09T21:25:42.592Z",
       "size_bytes": 4910,
       "hash": "1b6e220f"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0005-context-content-loading-fix.md",
+      "name": "QA-0005-context-content-loading-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "Transform widget context to modal context format",
+      "tags": [
+        "documentation",
+        "React hooks"
+      ],
+      "last_modified": "2025-07-10T10:29:30.831Z",
+      "size_bytes": 6070,
+      "hash": "957b7ee2"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0006-context-creation-500-403-error-resolution.md",
+      "name": "QA-0006-context-creation-500-403-error-resolution.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-10T18:56:01.674Z",
+      "size_bytes": 7870,
+      "hash": "874cc409"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0007-context-content-loading-fix.md",
+      "name": "QA-0007-context-content-loading-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-10T21:07:47.611Z",
+      "size_bytes": 7360,
+      "hash": "4d90e34c"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0008-authentication-bypass-security-fix.md",
+      "name": "QA-0008-authentication-bypass-security-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "VULNERABLE CODE (FIXED)",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-10T21:13:01.655Z",
+      "size_bytes": 6368,
+      "hash": "30f91825"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0009-authentication-login-logout-cycle-fix.md",
+      "name": "QA-0009-authentication-login-logout-cycle-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "PROBLEMATIC CODE (FIXED)",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-10T22:28:53.114Z",
+      "size_bytes": 7076,
+      "hash": "435e2bef"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0010-pink-loading-page-performance-fix.md",
+      "name": "QA-0010-pink-loading-page-performance-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "PROBLEMATIC CODE (FIXED)",
+      "tags": [
+        "documentation",
+        "React hooks"
+      ],
+      "last_modified": "2025-07-10T22:59:05.583Z",
+      "size_bytes": 6591,
+      "hash": "de58c8c1"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0010-prompt-context-copilotkit-integration-audit.md",
+      "name": "QA-0010-prompt-context-copilotkit-integration-audit.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "CopilotKitProvider.tsx - Lines 60-85",
+      "tags": [
+        "documentation",
+        "AI agent",
+        "security"
+      ],
+      "last_modified": "2025-07-11T00:19:45.542Z",
+      "size_bytes": 8644,
+      "hash": "6312fe01"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0011-final-authentication-client-server-sync-fix.md",
+      "name": "QA-0011-final-authentication-client-server-sync-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "PROBLEMATIC CODE (FIXED)",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-10T23:02:45.352Z",
+      "size_bytes": 7130,
+      "hash": "0a6ac1c7"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0012-critical-authentication-bypass-security-fix.md",
+      "name": "QA-0012-critical-authentication-bypass-security-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "BEFORE (VULNERABLE)",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-10T23:05:07.061Z",
+      "size_bytes": 5372,
+      "hash": "bac0b15a"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0013-layout-compilation-authentication-flow-fix.md",
+      "name": "QA-0013-layout-compilation-authentication-flow-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "BEFORE (causing errors):",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-10T23:08:01.567Z",
+      "size_bytes": 5436,
+      "hash": "d883bc8f"
     },
     {
       "path": "docs/quality-assurance/README.md",
@@ -6494,9 +6706,9 @@
         "../services/PromptContextResolver",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-08T14:26:51.391Z",
-      "size_bytes": 9145,
-      "hash": "e08b096d",
+      "last_modified": "2025-07-10T18:58:42.742Z",
+      "size_bytes": 9207,
+      "hash": "c24240a6",
       "complexity": "high"
     },
     {

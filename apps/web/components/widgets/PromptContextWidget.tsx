@@ -58,10 +58,62 @@ export function PromptContextWidget({ data }: PromptContextWidgetProps) {
   const [fullContextData, setFullContextData] = useState<ModalPromptContext | null>(null);
   const [isLoadingFullContext, setIsLoadingFullContext] = useState(false);
 
-  const handleToggleContext = (contextId: string) => {
+  const handleToggleContext = async (contextId: string) => {
+    const contextToUpdate = contexts.find(ctx => ctx.id === contextId);
+    if (!contextToUpdate) return;
+
+    const newIsActive = !contextToUpdate.isActive;
+
+    // Optimistically update UI first
     setContexts(contexts.map(ctx =>
-      ctx.id === contextId ? { ...ctx, isActive: !ctx.isActive } : ctx
+      ctx.id === contextId ? { ...ctx, isActive: newIsActive } : ctx
     ));
+
+    try {
+      console.log(`[PromptContextWidget] Toggling context "${contextToUpdate.name}" to ${newIsActive ? 'enabled' : 'disabled'}`);
+
+      // Save preference to database
+      const response = await fetch('/api/context/preferences', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          contextId,
+          isEnabled: newIsActive
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update preference: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update context preference');
+      }
+
+      console.log(`[PromptContextWidget] ✅ Successfully ${newIsActive ? 'enabled' : 'disabled'} context "${contextToUpdate.name}"`);
+
+      // Show user notification instead of auto-refresh
+      if (response.headers.get('X-Context-Updated') === 'true') {
+        console.log('[PromptContextWidget] Context updated - changes will apply to new chat sessions');
+
+        // Optional: You could show a toast notification here
+        // For now, just log - the changes will apply to new CopilotKit sessions
+      }
+
+    } catch (error) {
+      console.error('[PromptContextWidget] ❌ Failed to update context preference:', error);
+
+      // Revert optimistic update on error
+      setContexts(contexts.map(ctx =>
+        ctx.id === contextId ? { ...ctx, isActive: !newIsActive } : ctx
+      ));
+
+      // Show error to user (you could add a toast notification here)
+      alert(`Failed to ${newIsActive ? 'enable' : 'disable'} context: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   // Transform widget context to modal context format

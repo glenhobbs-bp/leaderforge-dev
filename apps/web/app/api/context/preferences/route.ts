@@ -91,6 +91,10 @@ export async function PATCH(req: NextRequest) {
         isEnabled,
         updatedAt: new Date().toISOString()
       }
+    }, {
+      headers: {
+        'X-Context-Updated': 'true'
+      }
     });
 
   } catch (error) {
@@ -142,6 +146,10 @@ export async function PUT(req: NextRequest) {
       message: `Updated ${successCount} context preferences${failedCount > 0 ? ` (${failedCount} failed)` : ''}`,
       updatedCount: successCount,
       details: result.updatedPreferences
+    }, {
+      headers: {
+        'X-Context-Updated': 'true'
+      }
     });
 
   } catch (error) {

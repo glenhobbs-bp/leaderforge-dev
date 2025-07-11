@@ -260,13 +260,30 @@ export class ContextResolutionAgent {
   private buildSystemInstructions(resolvedContext: ResolvedContext): string {
     const baseInstructions = `You are a helpful assistant for LeaderForge, an AI-powered leadership development platform.`;
 
+    console.log('[ContextResolutionAgent] 📝 Building system instructions with contexts:', {
+      contextCount: resolvedContext.contexts.length,
+      contexts: resolvedContext.contexts.map(ctx => ({
+        name: ctx.name,
+        id: ctx.id,
+        type: ctx.context_type,
+        hasContent: !!ctx.content?.trim(),
+        contentLength: ctx.content?.length || 0
+      }))
+    });
+
     if (resolvedContext.contexts.length === 0) {
+      console.log('[ContextResolutionAgent] ⚠️ No contexts available, using base instructions only');
       return baseInstructions;
     }
 
     const contextInstructions = `\n\nAPPLIED CONTEXTS:\n${resolvedContext.contexts.map(c => `- ${c.name}: ${c.description}`).join('\n')}`;
 
-    return baseInstructions + contextInstructions + `\n\nSystem Context:\n${resolvedContext.systemMessage}`;
+    const finalInstructions = baseInstructions + contextInstructions + `\n\nSystem Context:\n${resolvedContext.systemMessage}`;
+
+    console.log('[ContextResolutionAgent] 🎯 Final instructions length:', finalInstructions.length);
+    console.log('[ContextResolutionAgent] 📋 Applied context names:', resolvedContext.contexts.map(c => c.name));
+
+    return finalInstructions;
   }
 
   /**

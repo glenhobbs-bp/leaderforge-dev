@@ -114,6 +114,8 @@ export class PromptContextResolver {
     if (availableContexts.length === 0) return [];
 
     const contextIds = availableContexts.map(ctx => ctx.id);
+    console.log('[PromptContextResolver] 🔍 Filtering contexts for user:', userId);
+    console.log('[PromptContextResolver] 📋 Available contexts:', availableContexts.map(ctx => ({ id: ctx.id, name: ctx.name, content_length: ctx.content?.length || 0 })));
 
     // Get user's preferences for these contexts
     const { data: preferences, error } = await this.supabase
@@ -129,6 +131,8 @@ export class PromptContextResolver {
       return availableContexts;
     }
 
+    console.log('[PromptContextResolver] 👤 User preferences found:', preferences);
+
     // Create preference map
     const preferenceMap = new Map<string, boolean>();
     preferences?.forEach(pref => {
@@ -136,10 +140,25 @@ export class PromptContextResolver {
     });
 
     // Filter contexts: include if enabled explicitly, or if no preference set (default enabled)
-    return availableContexts.filter(context => {
+    const enabledContexts = availableContexts.filter(context => {
       const isEnabled = preferenceMap.get(context.id);
-      return isEnabled !== false; // Include if true or undefined (default enabled)
+      const shouldInclude = isEnabled !== false; // Include if true or undefined (default enabled)
+
+      console.log(`[PromptContextResolver] 🎯 Context "${context.name}":`, {
+        id: context.id,
+        hasPreference: preferenceMap.has(context.id),
+        preferenceValue: isEnabled,
+        shouldInclude,
+        hasContent: !!context.content?.trim(),
+        contentLength: context.content?.length || 0
+      });
+
+      return shouldInclude;
     });
+
+    console.log('[PromptContextResolver] ✅ Final enabled contexts:', enabledContexts.map(ctx => ({ name: ctx.name, id: ctx.id })));
+
+    return enabledContexts;
   }
 
   /**
@@ -169,14 +188,39 @@ export class PromptContextResolver {
     systemMessage: string;
     behaviorModifiers: Record<string, unknown>;
   } {
+    console.log('[PromptContextResolver] 🔄 Merging contexts into system message:', {
+      totalContexts: orderedContexts.length,
+      contexts: orderedContexts.map(ctx => ({
+        name: ctx.name,
+        hasContent: !!ctx.content?.trim(),
+        contentLength: ctx.content?.length || 0,
+        contentPreview: ctx.content?.substring(0, 50) + '...'
+      }))
+    });
+
     // Build system message by concatenating all context content
     const systemParts = orderedContexts
-      .filter(ctx => ctx.content?.trim())
-      .map(ctx => ctx.content.trim());
+      .filter(ctx => {
+        const hasContent = !!ctx.content?.trim();
+        if (!hasContent) {
+          console.log(`[PromptContextResolver] ⚠️ Skipping context "${ctx.name}" - no content`);
+        }
+        return hasContent;
+      })
+      .map(ctx => {
+        console.log(`[PromptContextResolver] ✅ Including context "${ctx.name}" content (${ctx.content.trim().length} chars)`);
+        return ctx.content.trim();
+      });
 
     const systemMessage = systemParts.length > 0
       ? systemParts.join('\n\n')
       : 'You are a helpful AI assistant.';
+
+    console.log('[PromptContextResolver] 📝 Final system message built:', {
+      partsCount: systemParts.length,
+      totalLength: systemMessage.length,
+      includedContexts: orderedContexts.filter(ctx => !!ctx.content?.trim()).map(ctx => ctx.name)
+    });
 
     // Merge template variables (later contexts override earlier ones)
     const behaviorModifiers: Record<string, unknown> = {};
@@ -199,21 +243,51 @@ export class PromptContextResolver {
     tenantKey: string = 'leaderforge'
   ): Promise<boolean> {
     try {
-      const { error } = await this.supabase
+      // First check if preference already exists
+      const { data: existing, error: checkError } = await this.supabase
         .schema('core')
         .from('user_context_preferences')
-        .upsert({
-          user_id: userId,
-          context_id: contextId,
-          is_enabled: isEnabled,
-          tenant_key: tenantKey
-        });
+        .select('user_id, context_id, tenant_key')
+        .eq('user_id', userId)
+        .eq('context_id', contextId)
+        .eq('tenant_key', tenantKey)
+        .single();
 
-      if (error) {
-        console.error('[PromptContextResolver] Error updating preference:', error);
+      if (checkError && checkError.code !== 'PGRST116') {
+        // PGRST116 is "no rows returned" which is expected if no preference exists
+        console.error('[PromptContextResolver] Error checking existing preference:', checkError);
         return false;
       }
 
+      let result;
+      if (existing) {
+        // Update existing preference
+        result = await this.supabase
+          .schema('core')
+          .from('user_context_preferences')
+          .update({ is_enabled: isEnabled })
+          .eq('user_id', userId)
+          .eq('context_id', contextId)
+          .eq('tenant_key', tenantKey);
+      } else {
+        // Insert new preference
+        result = await this.supabase
+          .schema('core')
+          .from('user_context_preferences')
+          .insert({
+            user_id: userId,
+            context_id: contextId,
+            is_enabled: isEnabled,
+            tenant_key: tenantKey
+          });
+      }
+
+      if (result.error) {
+        console.error('[PromptContextResolver] Error updating preference:', result.error);
+        return false;
+      }
+
+      console.log(`[PromptContextResolver] ✅ Successfully ${existing ? 'updated' : 'created'} preference: ${contextId} = ${isEnabled}`);
       return true;
     } catch (error) {
       console.error('[PromptContextResolver] Exception updating preference:', error);

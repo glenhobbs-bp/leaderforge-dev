@@ -99,6 +99,14 @@ export default function PromptContextsPage() {
       const data = await response.json();
 
       if (data.success) {
+        // Show user notification instead of auto-refresh
+        if (response.headers.get('X-Context-Updated') === 'true') {
+          console.log('[PromptContextsPage] Context updated - changes will apply to new chat sessions');
+
+          // Optional: You could show a toast notification here
+          // For now, just log - the changes will apply to new CopilotKit sessions
+        }
+
         // Update local state
         setContexts(prevContexts =>
           prevContexts.map(ctx =>

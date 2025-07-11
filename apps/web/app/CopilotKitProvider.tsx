@@ -10,8 +10,9 @@
 import { CopilotKit } from "@copilotkit/react-core";
 import { CopilotPopup } from "@copilotkit/react-ui";
 import { useSupabase } from '../components/SupabaseProvider';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { EntitlementActions } from '../components/copilot/EntitlementActions';
+import { ResizableWindow } from '../components/copilot/ResizableWindow';
 
 
 export function CopilotKitProvider({
@@ -51,6 +52,16 @@ export function CopilotKitProvider({
 
   interface AgentContext {
     systemInstructions: string;
+    appliedContexts?: Array<{
+      id: string;
+      name: string;
+      scope: string;
+      enabled: boolean;
+    }>;
+    userPreferences?: Array<{
+      contextId: string;
+      enabled: boolean;
+    }>;
     metadata?: {
       contextId?: string;
       [key: string]: unknown;
@@ -61,38 +72,49 @@ export function CopilotKitProvider({
   const [agentLoading, setAgentLoading] = useState(true);
 
   // Fetch agent-generated context and instructions
-  useEffect(() => {
+  const fetchAgentContext = useCallback(async () => {
     if (!session?.user?.id) return;
 
-    const fetchAgentContext = async () => {
-      try {
-        setAgentLoading(true);
+    try {
+      setAgentLoading(true);
+      console.log('[CopilotKitProvider] 🔄 Fetching agent context for user:', session.user.id);
 
-        const response = await fetch('/api/agent/context', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            message: 'Generate CopilotKit configuration',
-            context: 'leaderforge'
-          })
-        });
+      const response = await fetch('/api/agent/context', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          userId: session.user.id,
+          tenantKey: 'leaderforge'
+        })
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          setAgentContext(data);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.context) {
+          // Update both state and ref
+          setAgentContext(data.context);
+          console.log('[CopilotKitProvider] ✅ Agent context loaded successfully');
         } else {
-          console.warn('[CopilotKitProvider] Failed to fetch agent context, using fallback');
+          console.warn('[CopilotKitProvider] ⚠️ No context returned from agent');
+          setAgentContext(null);
         }
-      } catch (error) {
-        console.warn('[CopilotKitProvider] Agent context error, using fallback:', error);
-      } finally {
-        setAgentLoading(false);
+      } else {
+        console.error('[CopilotKitProvider] ❌ Failed to fetch agent context:', response.status);
+        setAgentContext(null);
       }
-    };
-
-    fetchAgentContext();
+    } catch (error) {
+      console.error('[CopilotKitProvider] ❌ Error fetching agent context:', error);
+      setAgentContext(null);
+    } finally {
+      setAgentLoading(false);
+    }
   }, [session?.user?.id]);
+
+  // Initial context fetch when component mounts or user changes
+  useEffect(() => {
+    fetchAgentContext();
+  }, [fetchAgentContext]);
 
   // Prepare data before any conditional rendering (all hooks must come before early returns)
   const fullInstructions = agentContext?.systemInstructions ||
@@ -115,10 +137,25 @@ export function CopilotKitProvider({
   // Log the properties being sent - this hook must come before any early returns
   useEffect(() => {
     if (isReady && !loading && !agentLoading) {
-      console.log('[CopilotKitProvider] Sending user properties:', userProperties);
-      console.log('[CopilotKitProvider] Using agent instructions:', !!agentContext?.systemInstructions);
+      console.log('[CopilotKitProvider] 🚀 CopilotKit Configuration:', {
+        userId: userProperties.userId,
+        userName: userProperties.userName,
+        hasAgentContext: !!agentContext,
+        usingAgentInstructions: !!agentContext?.systemInstructions,
+        instructionsSource: agentContext?.systemInstructions ? 'agent-generated' : 'fallback',
+        instructionsLength: fullInstructions.length,
+        appliedContextsCount: agentContext?.appliedContexts?.length || 0
+      });
+      console.log('[CopilotKitProvider] 📋 Final Instructions Being Passed to CopilotKit:');
+      console.log('[CopilotKitProvider] 📝 Instructions Preview:', fullInstructions.substring(0, 300) + '...');
+
+      if (agentContext?.appliedContexts?.length > 0) {
+        console.log('[CopilotKitProvider] 🎯 Applied Contexts:', agentContext.appliedContexts);
+      } else {
+        console.log('[CopilotKitProvider] ⚠️ No contexts applied - using fallback instructions only');
+      }
     }
-  }, [isReady, loading, agentLoading, userProperties, agentContext]);
+  }, [isReady, loading, agentLoading, userProperties, agentContext, fullInstructions]);
 
   // Only render CopilotKit after ready and session is stable
   if (!isReady || loading || agentLoading) {
@@ -141,6 +178,7 @@ export function CopilotKitProvider({
         }}
         defaultOpen={false}
         clickOutsideToClose={true}
+        Window={ResizableWindow}
       />
     </CopilotKit>
   );
