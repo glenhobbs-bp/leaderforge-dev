@@ -600,6 +600,72 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   background: white;
   overflow: hidden;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Force the root CopilotKit container to fill the window */
+.resizable-window > div:first-child {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Target the main chat structure - be more specific */
+.resizable-window > div:first-child > div {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+/* CRITICAL: Keep header/title area SMALL and fixed */
+.resizable-window header,
+.resizable-window div[class*="header"],
+.resizable-window > div:first-child > div > div:first-child {
+  flex: none !important;
+  flex-shrink: 0 !important;
+  height: auto !important;
+  max-height: 60px !important;
+  min-height: auto !important;
+}
+
+/* CRITICAL: Keep input area SMALL and fixed */
+.resizable-window form,
+.resizable-window div[class*="input"],
+.resizable-window textarea,
+.resizable-window > div:first-child > div > div:last-child {
+  flex: none !important;
+  flex-shrink: 0 !important;
+  height: auto !important;
+  max-height: 120px !important;
+  min-height: auto !important;
+}
+
+/* CRITICAL: Only the MIDDLE area (messages) should be flexible */
+.resizable-window > div:first-child > div > div:not(:first-child):not(:last-child),
+.resizable-window div[class*="messages"],
+.resizable-window div[role="main"],
+.resizable-window div[class*="conversation"] {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Override any aggressive height settings */
+.resizable-window * {
+  box-sizing: border-box !important;
+}
+
+/* Remove the overly aggressive max-height override */
+.resizable-window header *,
+.resizable-window form *,
+.resizable-window div[class*="header"] *,
+.resizable-window div[class*="input"] * {
+  max-height: none !important;
 }
 
 /* Resize handles */
@@ -617,7 +683,15 @@
 .resize-handle.nw { top: 0; left: 0; width: 8px; height: 8px; cursor: nw-resize; }
 .resize-handle.ne { top: 0; right: 0; width: 8px; height: 8px; cursor: ne-resize; }
 .resize-handle.sw { bottom: 0; left: 0; width: 8px; height: 8px; cursor: sw-resize; }
-.resize-handle.se { bottom: 0; right: 0; width: 8px; height: 8px; cursor: se-resize; }
+.resize-handle.se {
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  cursor: se-resize;
+  background: rgba(0,0,0,0.1);
+  border-radius: 0 0 8px 0;
+}
 
 /* Edge handles */
 .resize-handle.n { top: 0; left: 8px; right: 8px; height: 4px; cursor: n-resize; }
@@ -642,22 +716,15 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .resizable-window {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
+    width: 100% !important;
     height: 100vh !important;
-    border-radius: 0 !important;
-    border: none !important;
+    border-radius: 0;
+    border: none;
   }
 
   .resize-handle {
-    display: none !important;
-  }
-
-  .resize-indicator {
-    display: none !important;
+    display: none;
   }
 }
