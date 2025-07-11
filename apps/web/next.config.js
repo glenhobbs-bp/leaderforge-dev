@@ -2,6 +2,9 @@ const path = require("path");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Temporarily disable React Strict Mode to prevent double rendering during development
+  // This eliminates the flashing and multiple component mounting issues
+  reactStrictMode: false,
   eslint: {
     ignoreDuringBuilds: true,
   },
