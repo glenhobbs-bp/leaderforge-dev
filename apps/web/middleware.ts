@@ -14,6 +14,7 @@ import { cookies } from 'next/headers';
 
 // Routes that require authentication
 const PROTECTED_ROUTES = [
+  '/', // Root page needs authentication to redirect properly
   '/dashboard',
   '/copilotkit',
   '/context',
