@@ -117,37 +117,47 @@ export async function restoreSession(cookieStore: ReadonlyRequestCookies, setCoo
   });
 
   try {
-    // Set the session with parsed tokens first, then get the session
-    const { data: setData, error: setError } = await supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken
-    });
+    // CRITICAL: setSession requires both tokens, but refresh tokens can be missing
+    if (refreshToken) {
+      // We have both tokens - use standard setSession
+      const { data: setData, error: setError } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      });
 
-    if (setError) {
-      console.error('[restoreSession] Session restoration failed:', setError);
-
-      // Clear invalid auth cookie if setCookies available
-      if (setCookies && (setError.message.includes('invalid') || setError.message.includes('missing'))) {
-        setCookies([{
-          name: authCookieName,
-          value: '',
-          options: { maxAge: 0, path: '/' }
-        }]);
+      if (setError) {
+        console.error('[restoreSession] Session restoration failed:', setError);
+        return { session: null, supabase, error: setError };
       }
 
-      return { session: null, supabase, error: setError };
+      console.log('[restoreSession] Session status:', {
+        hasSession: !!setData.session,
+        userId: setData.session?.user?.id
+      });
+
+      return {
+        session: setData.session,
+        supabase,
+        error: null
+      };
+    } else {
+      // Only access token available - just get current session without setting
+      console.log('[restoreSession] Missing refresh token - attempting to get existing session');
+
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('[restoreSession] Failed to get existing session:', error);
+        return { session: null, supabase, error };
+      }
+
+      console.log('[restoreSession] Existing session status:', {
+        hasSession: !!session,
+        userId: session?.user?.id
+      });
+
+      return { session, supabase, error: null };
     }
-
-    console.log('[restoreSession] Session status:', {
-      hasSession: !!setData.session,
-      userId: setData.session?.user?.id
-    });
-
-    return {
-      session: setData.session,
-      supabase,
-      error: null
-    };
   } catch (err) {
     console.error('[restoreSession] Unexpected error during session restoration:', err);
     return { session: null, supabase, error: err };
