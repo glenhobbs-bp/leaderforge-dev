@@ -25,16 +25,21 @@ export function CopilotKitProvider({
 
   // Wait for session sync to complete before making authenticated requests
   useEffect(() => {
-    // Longer delay to ensure session sync completes before we start making authenticated requests
-    // From logs, session sync can take 5-6 seconds, so we wait longer to avoid race conditions
+    // Only wait if we have a session - if no session, don't delay unnecessarily
+    if (!session?.user?.id) {
+      setIsReady(true);
+      return;
+    }
+
+    // Minimal delay for authenticated users - server logs show auth is working well
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 1500); // Increased from 300ms to 1500ms
+    }, 100); // Reduced to 100ms for faster loading
 
     return () => {
       if (timer) window.clearTimeout(timer);
     };
-  }, []);
+  }, [session?.user?.id]);
 
   // Debug logging
   useEffect(() => {
@@ -100,10 +105,10 @@ export function CopilotKitProvider({
           console.warn('[CopilotKitProvider] ⚠️ No context returned from agent');
           setAgentContext(null);
         }
-      } else if (response.status === 401 && retryCount < 5) {
-        // If we get 401, session sync is likely still in progress - wait longer for subsequent retries
-        const delay = retryCount === 0 ? 500 : retryCount === 1 ? 1000 : 2000;
-        console.log('[CopilotKitProvider] 🔄 Got 401, retrying in', delay + 'ms... (attempt', retryCount + 1, 'of 5)');
+      } else if (response.status === 401 && retryCount < 2) {
+        // If we get 401, session sync might still be in progress - quick retry only
+        const delay = 300; // Fixed short delay instead of increasing delays
+        console.log('[CopilotKitProvider] 🔄 Got 401, retrying in', delay + 'ms... (attempt', retryCount + 1, 'of 2)');
         setTimeout(() => {
           fetchAgentContext(retryCount + 1);
         }, delay);
@@ -187,7 +192,7 @@ export function CopilotKitProvider({
           title: "LeaderForge Assistant",
           initial: `Hi ${userName}! I'm your LeaderForge assistant. How can I help you today?`,
         }}
-        defaultOpen={true}
+        defaultOpen={false}
         clickOutsideToClose={false}
         Window={ResizableWindow}
       />

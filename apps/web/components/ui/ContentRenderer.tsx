@@ -4,7 +4,7 @@
 // Owner: Frontend Team
 // Tags: #content #rendering #schema #universal-widget
 
-import React, { useMemo, Suspense, lazy } from 'react';
+import React, { useMemo } from 'react';
 import { UniversalSchemaRenderer } from '../ai/UniversalSchemaRenderer';
 import { ComponentSchema } from '../../../../packages/agent-core/types/ComponentSchema';
 import { UniversalWidgetSchema } from '../../../../packages/agent-core/types/UniversalWidgetSchema';
@@ -45,23 +45,10 @@ export function ContentRenderer({
 }: ContentRendererProps) {
   // Create loading content component
   const createLoadingContent = () => (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
-        <div className="flex flex-col items-center mb-6">
-          <img src="/logos/leaderforge-icon.png" alt="LeaderForge Icon" width={40} height={40} />
-        </div>
-        <div className="flex flex-col items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#4f49cf] mb-4"></div>
-          <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Loading Content</p>
-          <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
-            Just a moment while we fetch your content...
-          </p>
-          <div className="mt-4 flex space-x-1">
-            <div className="w-2 h-2 bg-[#4f49cf] rounded-full animate-pulse"></div>
-            <div className="w-2 h-2 bg-[#6d63d4] rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-            <div className="w-2 h-2 bg-[#cf4f84] rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-          </div>
-        </div>
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="text-center p-4">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#4f49cf] mx-auto mb-3"></div>
+        <p className="text-sm text-gray-600">Loading...</p>
       </div>
     </div>
   );

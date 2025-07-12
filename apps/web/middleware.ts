@@ -177,9 +177,8 @@ export async function middleware(request: NextRequest) {
     tokens = JSON.parse(authCookie.value);
   } catch {
     console.log('[MIDDLEWARE] ❌ Invalid auth cookie format for', pathname, ':', 'invalid_auth_format');
-    const response = createAuthFailureResponse(request, 'invalid_auth_format');
-    response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
-    return response;
+    // Don't delete cookies immediately - could be temporary parsing issue
+    return createAuthFailureResponse(request, 'invalid_auth_format');
   }
 
   // Parse ADR-0031 standard format: [access_token, null, refresh_token, null, null]
@@ -189,9 +188,8 @@ export async function middleware(request: NextRequest) {
   // CRITICAL: Only require access token - refresh tokens can be short strings or missing in some flows
   if (!accessToken) {
     console.log('[MIDDLEWARE] ❌ Missing access token in auth cookie for', pathname);
-    const response = createAuthFailureResponse(request, 'missing_access_token');
-    response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
-    return response;
+    // Don't delete cookies during potential race conditions - let natural expiry handle it
+    return createAuthFailureResponse(request, 'missing_access_token');
   }
 
   // Log token details for debugging (refresh token is optional)
@@ -211,9 +209,8 @@ export async function middleware(request: NextRequest) {
   const accessTokenParts = accessToken.split('.');
   if (accessTokenParts.length !== 3) {
     console.log(`[MIDDLEWARE] ❌ Malformed access token for ${pathname}`);
-    const response = createAuthFailureResponse(request, 'malformed_token');
-    response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
-    return response;
+    // Don't delete cookies immediately - could be temporary corruption during upload
+    return createAuthFailureResponse(request, 'malformed_token');
   }
 
   // Payload validation
@@ -221,24 +218,23 @@ export async function middleware(request: NextRequest) {
     const payload = JSON.parse(Buffer.from(accessTokenParts[1], 'base64').toString('utf-8'));
     if (payload.exp && payload.exp < Date.now() / 1000) {
       console.log(`[MIDDLEWARE] ❌ Expired access token for ${pathname}`);
+      // Only clear truly expired tokens, not during race conditions
       const response = createAuthFailureResponse(request, 'expired_token');
       response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
       return response;
     }
   } catch (error) {
     console.log(`[MIDDLEWARE] ❌ Invalid JWT payload for ${pathname}:`, error);
-    const response = createAuthFailureResponse(request, 'invalid_payload');
-    response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
-    return response;
+    // Don't delete cookies for payload parsing errors - could be temporary
+    return createAuthFailureResponse(request, 'invalid_payload');
   }
 
   // Server-side validation
   const isValidWithSupabase = await validateTokenWithSupabase(accessToken);
   if (!isValidWithSupabase) {
     console.log(`[MIDDLEWARE] ❌ Token rejected by Supabase for ${pathname}`);
-    const response = createAuthFailureResponse(request, 'invalid_token');
-    response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
-    return response;
+    // Don't delete cookies immediately - could be temporary network issue or race condition
+    return createAuthFailureResponse(request, 'invalid_token');
   }
 
   console.log(`[MIDDLEWARE] ✅ Valid auth for ${pathname} - proceeding`);

@@ -20,7 +20,7 @@ export function AuthenticationGuard({ children, onAuthenticationChange }: Authen
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsHydrating(false);
-    }, 300); // Short grace period for session hydration
+    }, 50); // Minimal grace period - server logs show session restoration is reliable
 
     return () => window.clearTimeout(timer);
   }, []);

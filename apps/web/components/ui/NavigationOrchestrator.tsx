@@ -450,15 +450,9 @@ export function NavigationOrchestrator({
             nav={<NavComponent />}
             content={
               <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-xl">
-                  <div className="flex flex-col items-center mb-6">
-                    <img src="/logos/leaderforge-icon.png" alt="LeaderForge Icon" width={40} height={40} />
-                  </div>
-                  <div className="space-y-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                    <h1 className="text-xl font-bold text-gray-800">Loading Content</h1>
-                    <p className="text-sm text-gray-600">Please wait while we prepare your content...</p>
-                  </div>
+                <div className="text-center p-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-3"></div>
+                  <p className="text-sm text-gray-600">Loading...</p>
                 </div>
               </div>
             }
