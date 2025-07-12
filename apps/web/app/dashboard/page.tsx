@@ -2,7 +2,7 @@
 // Purpose: Server-side dashboard page with SSR optimization and entitlement filtering
 // Owner: Frontend team
 // Tags: Next.js page, SSR, entitlements, context management, performance
-import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
+import { restoreSession } from '@/lib/supabaseServerClient';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { Suspense } from 'react';
@@ -38,100 +38,16 @@ function DashboardLoader() {
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
-  const allCookies = cookieStore.getAll();
 
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-  if (!projectRef) {
-    console.error('[dashboard/page] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
-    redirect('/login?error=config_error');
-  }
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+  // Use standard session restoration per ADR-0031
+  const { session: finalSession, error: sessionError, supabase } = await restoreSession(cookieStore);
 
-  const supabase = createSupabaseServerClient(cookieStore);
-
-  let finalSession = null;
-
-  if (accessToken && refreshToken) {
-    try {
-      const { data, error } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-
-      if (error) {
-        console.warn('[dashboard/page] setSession error:', error);
-      } else if (data.session) {
-        console.log('[dashboard/page] Session restored successfully');
-        // Use the session from setSession directly
-        finalSession = data.session;
-      }
-    } catch (error) {
-      console.warn('[dashboard/page] Session restoration failed:', error);
-    }
-  } else {
-    console.warn('[dashboard/page] Missing access or refresh token in cookies');
+  if (sessionError || !finalSession?.user) {
+    console.warn('[dashboard/page] Authentication failed:', sessionError?.message || 'No valid session');
+    redirect('/login');
   }
 
-  // Only get session if we haven't already restored it
-  if (!finalSession) {
-    const {
-      data: { session },
-      error: sessionError
-    } = await supabase.auth.getSession();
-
-    finalSession = session;
-
-    if (sessionError) {
-      console.warn('[dashboard/page] getSession error:', sessionError);
-    }
-  }
-
-  // Add more detailed session validation
-  if (!finalSession?.user) {
-    console.warn('[dashboard/page] No user found in session, redirecting to login');
-    console.warn('[dashboard/page] Debug info:', {
-      hasAccessToken: !!accessToken,
-      hasRefreshToken: !!refreshToken,
-      sessionExists: !!finalSession,
-      userExists: !!finalSession?.user
-    });
-
-    // CRITICAL FIX: Only attempt refresh if we have valid tokens AND an explicit error
-    // Don't refresh on every missing session to prevent token corruption
-    if (accessToken && refreshToken && finalSession) {
-      // Only refresh if we have a session object but missing user (token might be expired)
-      console.warn('[dashboard/page] Session exists but no user - attempting single refresh');
-      try {
-        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession({
-          refresh_token: refreshToken,
-        });
-
-        if (refreshData?.session?.user) {
-          console.log('[dashboard/page] Session refresh successful');
-          finalSession = refreshData.session;
-        } else {
-          console.error('[dashboard/page] Session refresh failed:', refreshError?.message);
-          // Clear invalid cookies before redirect to prevent loops
-          redirect('/login?error=session_refresh_failed');
-        }
-      } catch (refreshException) {
-        console.error('[dashboard/page] Session refresh exception:', refreshException);
-        // Clear invalid cookies before redirect to prevent loops
-        redirect('/login?error=session_exception');
-      }
-    } else {
-      // No valid tokens or no session at all - redirect to login
-      console.warn('[dashboard/page] No valid session or tokens - redirecting to login');
-      redirect('/login');
-    }
-  }
-
-  // Ensure we have a valid session after refresh attempts
-  if (!finalSession?.user) {
-    console.error('[dashboard/page] No valid session after refresh attempts');
-    redirect('/login?error=no_valid_session');
-  }
+  console.log('[dashboard/page] ✅ Session restored successfully for user:', finalSession.user.id);
 
   // --- SSR: Fetch entitled context list ---
   let initialTenants: TenantConfig[] = [];

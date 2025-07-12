@@ -45,8 +45,11 @@ export function UserPreferencesManager({
         console.log('[UserPreferencesManager] Timeout reached - proceeding without user preferences');
         hasInitialized.current = true;
         onPreferencesReady();
+
+        // Try to restore default navigation option if no preferences loaded
+
       }
-    }, 2000); // Maximum 2 second wait
+    }, 10000); // Increased to 10 seconds to match API timeout
 
     // If no userId, proceed immediately
     if (!userId) {

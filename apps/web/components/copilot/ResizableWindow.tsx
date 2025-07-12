@@ -38,6 +38,9 @@ export const ResizableWindow = ({
   const windowRef = useRef<HTMLDivElement>(null);
   const { open, setOpen } = useChatContext();
 
+  // Client-side only state to avoid hydration mismatch
+  const [isClient, setIsClient] = useState(false);
+
   // Resizable state
   const [windowSize, setWindowSize] = useState({
     width: 400,
@@ -125,7 +128,7 @@ export const ResizableWindow = ({
     });
   }, [windowSize]);
 
-  const handleResizeMove = useCallback((event: MouseEvent) => {
+    const handleResizeMove = useCallback((event: MouseEvent) => {
     if (!resizeState.isResizing) return;
 
     const deltaX = event.clientX - resizeState.startX;
@@ -134,7 +137,7 @@ export const ResizableWindow = ({
     let newWidth = resizeState.startWidth;
     let newHeight = resizeState.startHeight;
 
-    // Handle different resize directions
+    // Handle different resize directions - check for all direction combinations
     if (resizeState.direction.includes('right')) {
       newWidth = Math.max(300, resizeState.startWidth + deltaX);
     }
@@ -163,7 +166,7 @@ export const ResizableWindow = ({
   const adjustForMobile = useCallback(() => {
     const copilotKitWindow = windowRef.current;
     const vv = window.visualViewport;
-    if (!copilotKitWindow || !vv) {
+    if (!copilotKitWindow || !vv || !isClient) {
       return;
     }
 
@@ -201,9 +204,12 @@ export const ResizableWindow = ({
 
       document.body.removeEventListener("touchmove", preventScroll);
     }
-  }, [open, windowSize, windowPosition]);
+  }, [open, windowSize, windowPosition, isClient]);
 
   useEffect(() => {
+    // Set client-side state to enable proper rendering
+    setIsClient(true);
+
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("mousemove", handleResizeMove);
@@ -226,11 +232,13 @@ export const ResizableWindow = ({
     };
   }, [adjustForMobile, handleClickOutside, handleKeyDown, handleResizeMove, handleResizeEnd]);
 
+  const isMobile = isClient && window.innerWidth < 640;
+
   const windowStyle: React.CSSProperties = {
-    width: window.innerWidth < 640 ? '100%' : `${windowSize.width}px`,
-    height: window.innerWidth < 640 ? '100vh' : `${windowSize.height}px`,
-    bottom: window.innerWidth < 640 ? 'auto' : `${windowPosition.bottom}px`,
-    right: window.innerWidth < 640 ? 'auto' : `${windowPosition.right}px`,
+    width: isMobile ? '100%' : `${windowSize.width}px`,
+    height: isMobile ? '100vh' : `${windowSize.height}px`,
+    bottom: isMobile ? 'auto' : `${windowPosition.bottom}px`,
+    right: isMobile ? 'auto' : `${windowPosition.right}px`,
     resize: 'none', // Disable browser default resize
     minWidth: '300px',
     minHeight: '400px',
@@ -245,57 +253,57 @@ export const ResizableWindow = ({
       style={windowStyle}
     >
       {/* Resize handles - only show on desktop */}
-      {window.innerWidth >= 640 && (
+      {isClient && !isMobile && (
         <>
           {/* Corner handles */}
           <div
-            className="resize-handle resize-handle-nw"
+            className="resize-handle nw"
             onMouseDown={(e) => handleResizeStart(e, 'top-left')}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '10px',
-              height: '10px',
+              width: '15px',
+              height: '15px',
               cursor: 'nw-resize',
               zIndex: 1000,
             }}
           />
           <div
-            className="resize-handle resize-handle-ne"
+            className="resize-handle ne"
             onMouseDown={(e) => handleResizeStart(e, 'top-right')}
             style={{
               position: 'absolute',
               top: 0,
               right: 0,
-              width: '10px',
-              height: '10px',
+              width: '15px',
+              height: '15px',
               cursor: 'ne-resize',
               zIndex: 1000,
             }}
           />
           <div
-            className="resize-handle resize-handle-sw"
+            className="resize-handle sw"
             onMouseDown={(e) => handleResizeStart(e, 'bottom-left')}
             style={{
               position: 'absolute',
               bottom: 0,
               left: 0,
-              width: '10px',
-              height: '10px',
+              width: '15px',
+              height: '15px',
               cursor: 'sw-resize',
               zIndex: 1000,
             }}
           />
           <div
-            className="resize-handle resize-handle-se"
+            className="resize-handle se"
             onMouseDown={(e) => handleResizeStart(e, 'bottom-right')}
             style={{
               position: 'absolute',
               bottom: 0,
               right: 0,
-              width: '10px',
-              height: '10px',
+              width: '15px',
+              height: '15px',
               cursor: 'se-resize',
               zIndex: 1000,
               background: 'rgba(0,0,0,0.1)',
@@ -305,53 +313,53 @@ export const ResizableWindow = ({
 
           {/* Edge handles */}
           <div
-            className="resize-handle resize-handle-top"
+            className="resize-handle n"
             onMouseDown={(e) => handleResizeStart(e, 'top')}
             style={{
               position: 'absolute',
               top: 0,
-              left: '10px',
-              right: '10px',
-              height: '5px',
+              left: '15px',
+              right: '15px',
+              height: '8px',
               cursor: 'n-resize',
               zIndex: 1000,
             }}
           />
           <div
-            className="resize-handle resize-handle-bottom"
+            className="resize-handle s"
             onMouseDown={(e) => handleResizeStart(e, 'bottom')}
             style={{
               position: 'absolute',
               bottom: 0,
-              left: '10px',
-              right: '10px',
-              height: '5px',
+              left: '15px',
+              right: '15px',
+              height: '8px',
               cursor: 's-resize',
               zIndex: 1000,
             }}
           />
           <div
-            className="resize-handle resize-handle-left"
+            className="resize-handle w"
             onMouseDown={(e) => handleResizeStart(e, 'left')}
             style={{
               position: 'absolute',
               left: 0,
-              top: '10px',
-              bottom: '10px',
-              width: '5px',
+              top: '15px',
+              bottom: '15px',
+              width: '8px',
               cursor: 'w-resize',
               zIndex: 1000,
             }}
           />
           <div
-            className="resize-handle resize-handle-right"
+            className="resize-handle e"
             onMouseDown={(e) => handleResizeStart(e, 'right')}
             style={{
               position: 'absolute',
               right: 0,
-              top: '10px',
-              bottom: '10px',
-              width: '5px',
+              top: '15px',
+              bottom: '15px',
+              width: '8px',
               cursor: 'e-resize',
               zIndex: 1000,
             }}

@@ -4,41 +4,43 @@
 // Tags: authentication, session management, cookie cleanup
 
 import { NextResponse } from 'next/server';
-
-// Get cookie names from environment variable
-const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-if (!projectRef) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
-}
-
-const accessTokenCookie = `sb-${projectRef}-auth-token`;
-const refreshTokenCookie = `sb-${projectRef}-refresh-token`;
+import { getProjectRef } from '../../../lib/supabaseServerClient';
 
 export async function POST() {
-  try {
-    const response = NextResponse.json({ success: true, message: 'Session cookies cleared' });
+  console.log('[clear-session] Clearing authentication cookies');
 
-    // Clear both auth cookies
-    response.cookies.set(accessTokenCookie, '', {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 0, // Expire immediately
-    });
+  const response = NextResponse.json({
+    success: true,
+    message: 'Authentication cookies cleared'
+  });
 
-    response.cookies.set(refreshTokenCookie, '', {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 0, // Expire immediately
-    });
+  // Clear all authentication-related cookies
+  response.cookies.set('sb-access-token', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/'
+  });
 
-    console.log('[clear-session] ✅ Cleared corrupted auth cookies');
-    return response;
-  } catch (err) {
-    console.error('[clear-session] ❌ Error clearing cookies:', err);
-    return NextResponse.json({ success: false, error: 'Failed to clear cookies' }, { status: 500 });
-  }
+  response.cookies.set('sb-refresh-token', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/'
+  });
+
+  const projectRef = getProjectRef(); // Assuming getProjectRef is imported or defined
+  const authCookieName = `sb-${projectRef}-auth-token`;
+
+  response.cookies.set(authCookieName, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/'
+  });
+
+  return response;
 }

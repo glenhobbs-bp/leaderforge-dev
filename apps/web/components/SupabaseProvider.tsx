@@ -22,7 +22,26 @@ export default function SupabaseProvider({
   const [supabase] = useState(() =>
     createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          // SECURITY FIX: Disable all browser storage for authentication
+          // This prevents session persistence in localStorage/IndexedDB that could bypass our cookie-based auth
+          storage: {
+            getItem: () => null,
+            setItem: () => {},
+            removeItem: () => {},
+          },
+          // Ensure sessions only come from server-side cookies, not client storage
+          storageKey: 'sb-session-disabled',
+          // Don't automatically refresh tokens on the client
+          autoRefreshToken: false,
+          // Don't persist sessions locally
+          persistSession: false,
+          // Disable session detection in URL to prevent auto-recovery
+          detectSessionInUrl: false,
+        },
+      }
     )
   );
 

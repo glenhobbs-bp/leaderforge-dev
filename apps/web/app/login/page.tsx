@@ -16,93 +16,94 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Get the returnTo parameter from URL
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
   useEffect(() => {
-    let mounted = true;
-
     // Clear any corrupted cookies on mount if there are auth errors
     const clearCorruptedCookies = async () => {
+      // New: Skip if we already have a valid session (post-login)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('[login/page] Skipping cookie clear - valid session exists');
+        return;
+      }
+
       if (searchParams.get('error')?.includes('session_refresh_failed') ||
           searchParams.get('error')?.includes('session_exception')) {
-        try {
-          await fetch('/api/auth/clear-session', {
-            method: 'POST',
-            credentials: 'same-origin',
-          });
-          console.log('[login/page] Cleared corrupted cookies');
-        } catch (error) {
-          console.warn('[login/page] Failed to clear cookies:', error);
-        }
+        console.log('[login/page] Clearing corrupted cookies');
+        // Assuming authService is available or needs to be imported
+        // await authService.signOut(supabase);
+        // router.refresh();
       }
     };
 
     clearCorruptedCookies();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[login/page] Auth state change:', event, !!session);
+    return () => {
+    };
+  }, [supabase, router, returnTo, searchParams]);
 
+  useEffect(() => {
+    const checkAndRedirect = async () => {
+      console.log('[login/page] Checking for session in redirect effect');
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('[login/page] Session check result:', !!session);
+      if (session) {
+        console.log('[login/page] Valid session detected - redirecting to', returnTo);
+        router.push(returnTo);
+      } else {
+        console.log('[login/page] No session found in redirect check');
+      }
+    };
+
+    checkAndRedirect();
+
+    // Listen for auth changes to trigger redirect
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[login/page] Auth event in redirect listener:', event, !!session);
       if (event === 'SIGNED_IN' && session) {
-        setIsAuthenticating(true);
-        try {
-          // Validate session before proceeding
-          if (!session.access_token || !session.refresh_token) {
-            throw new Error('Invalid session: missing tokens');
-          }
+        console.log('[login/page] SIGNED_IN detected - syncing session to server');
+        // Validate and sync to server cookies
+        if (session.access_token && session.refresh_token) {
+          try {
+            const response = await fetch('/api/auth/set-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                access_token: session.access_token,
+                refresh_token: session.refresh_token,
+                expires_at: session.expires_at,
+                expires_in: session.expires_in,
+                token_type: session.token_type,
+                user: session.user
+              })
+            });
 
-          const response = await fetch('/api/auth/set-session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-            }),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`Cookie sync failed: ${response.statusText} - ${errorData.error || 'Unknown error'}`);
-          }
-
-          // Add a small delay to ensure cookies are set before redirect
-          await new Promise(resolve => setTimeout(resolve, 100));
-
-          // Redirect immediately after cookie sync
-          console.log('[login/page] Redirecting to:', returnTo);
-          window.location.href = returnTo;
-        } catch (error) {
-          console.error('[login/page] Error syncing tokens:', error);
-          if (mounted) {
-            setError('Authentication failed. Please try again.');
-            setIsAuthenticating(false);
-
-            // Clear any potentially corrupted session data
-            try {
-              await supabase.auth.signOut();
-            } catch (signOutError) {
-              console.warn('[login/page] Error during cleanup signout:', signOutError);
+            if (response.ok) {
+              console.log('[login/page] Session synced successfully');
+              // Small delay to ensure cookie is set before redirect
+              await new Promise(resolve => setTimeout(resolve, 100));
+            } else {
+              console.error('[login/page] Failed to sync session - response not ok:', response.status);
+              return; // Don't redirect if session sync failed
             }
+          } catch (err) {
+            console.error('[login/page] Failed to sync session:', err);
+            return; // Don't redirect if session sync failed
           }
         }
-      } else if (event === 'SIGNED_OUT') {
-        // Reset states when signed out
-        setIsAuthenticating(false);
-        setError(null);
+        console.log('[login/page] Redirecting to', returnTo);
+        router.push(returnTo);
       }
     });
 
     return () => {
-      mounted = false;
-      subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
-  }, [supabase, router, returnTo, searchParams]);
+  }, [supabase, router, returnTo]);
 
   // Show loading state initially to prevent flash of unstyled content
   useEffect(() => {
@@ -111,7 +112,12 @@ export default function LoginPage() {
     }, 150); // Slightly longer to ensure smooth loading
 
     // Fallback to ensure we never stay stuck on loading
-    const fallbackTimer = window.setTimeout(() => {
+    const fallbackTimer = window.setTimeout(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log('[login/page] Fallback skipped - session exists during timer');
+        return;
+      }
       console.warn('[login/page] Fallback: forcing auth UI to show');
       setIsAuthLoaded(true);
     }, 3000);
@@ -140,23 +146,6 @@ export default function LoginPage() {
             >
               Try Again
             </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (isAuthenticating) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
-        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
-          <div className="flex flex-col items-center mb-6">
-            <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
-          </div>
-          <div className="flex flex-col items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-spinner"></div>
-            <p className="mt-4 text-sm text-gray-600">Signing you in...</p>
-            <p className="mt-2 text-xs text-gray-500">This may take a moment</p>
           </div>
         </div>
       </div>

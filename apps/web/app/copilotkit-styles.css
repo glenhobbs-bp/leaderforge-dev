@@ -655,6 +655,42 @@
   max-height: none !important;
 }
 
+/* AGGRESSIVE: Target any scrollable containers and force them to expand */
+.resizable-window div[class*="scroll"],
+.resizable-window div[style*="overflow"],
+.resizable-window div[style*="max-height"],
+.resizable-window .copilot-kit-messages,
+.resizable-window .messages-container {
+  flex: 1 !important;
+  height: 100% !important;
+  max-height: none !important;
+  min-height: 0 !important;
+}
+
+/* Force all nested divs in the middle section to be flexible */
+.resizable-window > div:first-child > div > div:not(:first-child):not(:last-child) > * {
+  flex: 1 !important;
+  height: 100% !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+}
+
+/* Target deeper nested containers */
+.resizable-window > div:first-child > div > div:not(:first-child):not(:last-child) > * > * {
+  flex: 1 !important;
+  height: 100% !important;
+  max-height: none !important;
+}
+
+/* Override any specific height constraints that might be applied inline */
+.resizable-window div[style*="height:"] {
+  height: auto !important;
+}
+
+.resizable-window div[style*="max-height:"] {
+  max-height: none !important;
+}
+
 /* Override any aggressive height settings */
 .resizable-window * {
   box-sizing: border-box !important;
@@ -679,25 +715,25 @@
   background: rgba(59, 130, 246, 0.1);
 }
 
-/* Corner handles */
-.resize-handle.nw { top: 0; left: 0; width: 8px; height: 8px; cursor: nw-resize; }
-.resize-handle.ne { top: 0; right: 0; width: 8px; height: 8px; cursor: ne-resize; }
-.resize-handle.sw { bottom: 0; left: 0; width: 8px; height: 8px; cursor: sw-resize; }
+/* Corner handles - Increased size for better interaction */
+.resize-handle.nw { top: 0; left: 0; width: 15px; height: 15px; cursor: nw-resize; }
+.resize-handle.ne { top: 0; right: 0; width: 15px; height: 15px; cursor: ne-resize; }
+.resize-handle.sw { bottom: 0; left: 0; width: 15px; height: 15px; cursor: sw-resize; }
 .resize-handle.se {
   bottom: 0;
   right: 0;
-  width: 8px;
-  height: 8px;
+  width: 15px;
+  height: 15px;
   cursor: se-resize;
   background: rgba(0,0,0,0.1);
   border-radius: 0 0 8px 0;
 }
 
-/* Edge handles */
-.resize-handle.n { top: 0; left: 8px; right: 8px; height: 4px; cursor: n-resize; }
-.resize-handle.s { bottom: 0; left: 8px; right: 8px; height: 4px; cursor: s-resize; }
-.resize-handle.w { left: 0; top: 8px; bottom: 8px; width: 4px; cursor: w-resize; }
-.resize-handle.e { right: 0; top: 8px; bottom: 8px; width: 4px; cursor: e-resize; }
+/* Edge handles - Increased thickness for better interaction */
+.resize-handle.n { top: 0; left: 15px; right: 15px; height: 8px; cursor: n-resize; }
+.resize-handle.s { bottom: 0; left: 15px; right: 15px; height: 8px; cursor: s-resize; }
+.resize-handle.w { left: 0; top: 15px; bottom: 15px; width: 8px; cursor: w-resize; }
+.resize-handle.e { right: 0; top: 15px; bottom: 15px; width: 8px; cursor: e-resize; }
 
 /* Visual resize indicator */
 .resize-indicator {

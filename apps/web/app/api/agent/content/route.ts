@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from 'next/headers';
-import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
+import { restoreSession } from '../../../lib/supabaseServerClient';
 import { ENV } from '../../../../../../packages/env';
 
 /**
@@ -14,7 +14,6 @@ import { ENV } from '../../../../../../packages/env';
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
 
     const body = await req.json();
     const { userId, tenantKey, navOptionId, intent } = body;
@@ -31,66 +30,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Robust Session Restoration with Token Refresh Handling
-    const allCookies = cookieStore.getAll();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-    if (!projectRef) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    }
-    const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-
-    let session = null;
-    let sessionError = null;
-
-    // Try to restore session if tokens are present
-    if (accessToken && refreshToken) {
-      console.log('[API/agent/content] Attempting session restoration...');
-
-      try {
-        const setSessionRes = await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-
-        if (setSessionRes.error) {
-          console.log('[API/agent/content] setSession failed:', setSessionRes.error.message);
-
-          // If JWT is invalid, try refresh
-          if (setSessionRes.error.message.includes('JWT') || setSessionRes.error.message.includes('expired')) {
-            console.log('[API/agent/content] Attempting token refresh...');
-
-            const refreshRes = await supabase.auth.refreshSession();
-            if (refreshRes.error) {
-              console.log('[API/agent/content] Token refresh failed:', refreshRes.error.message);
-              sessionError = refreshRes.error;
-            } else {
-              console.log('[API/agent/content] Token refresh successful');
-              session = refreshRes.data.session;
-            }
-          } else {
-            sessionError = setSessionRes.error;
-          }
-        } else {
-          console.log('[API/agent/content] Session restored successfully');
-          session = setSessionRes.data.session;
-        }
-      } catch (error) {
-        console.log('[API/agent/content] Session restoration threw error:', error.message);
-        sessionError = error;
-      }
-    } else {
-      console.warn('[API/agent/content] Missing access or refresh token in cookies');
-    }
-
-    // Final session check - try one more time to get current session
-    if (!session) {
-      const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
-      session = currentSession;
-      if (currentError && !sessionError) {
-        sessionError = currentError;
-      }
-    }
+    // ✅ Use restoreSession for authentication (supports single JSON cookie format)
+    const { session, supabase: authenticatedSupabase, error: sessionError } = await restoreSession(cookieStore);
 
     console.log('[API/agent/content] Final auth result:', {
       user: session?.user?.id,
@@ -103,9 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         error: 'Authentication required',
         details: {
-          error: sessionError?.message || 'No session',
-          cookieCount: allCookies.length,
-          hasTokens: !!(accessToken && refreshToken)
+          error: sessionError?.message || 'No session'
         }
       }, { status: 401 });
     }
@@ -119,8 +58,8 @@ export async function POST(req: NextRequest) {
     // ✅ LOOK UP AGENT FROM NAVIGATION OPTION
     console.log('[API/agent/content] Looking up agent for navigation option...');
 
-    // Query nav_options to get the agent_id
-    const { data: navOption, error: navError } = await supabase
+    // Query nav_options to get the agent_id (using authenticated client)
+    const { data: navOption, error: navError } = await authenticatedSupabase
       .schema('core')
       .from('nav_options')
       .select('agent_id, label, nav_key')
@@ -166,10 +105,10 @@ export async function POST(req: NextRequest) {
 
     // ✅ ARCHITECTURE COMPLIANCE: Use SSR-authenticated client, not service role
     const { createAgentService } = await import('../../../lib/agentService');
-    const agentService = createAgentService(supabase); // User-authenticated client
+    const agentService = createAgentService(authenticatedSupabase); // User-authenticated client
 
     // Set authentication headers for this request
-    if (accessToken) {
+    if (session) {
       const authHeaders: Record<string, string> = {
         'Cookie': cookieStore.getAll()
           .map(cookie => `${cookie.name}=${cookie.value}`)

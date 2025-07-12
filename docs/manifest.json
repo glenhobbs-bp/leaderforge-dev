@@ -1,25 +1,25 @@
 {
   "metadata": {
-    "generated_at": "2025-07-11T00:19:51.202Z",
+    "generated_at": "2025-07-12T10:51:36.562Z",
     "generator_version": "1.0.0",
-    "total_files": 393,
-    "total_size_bytes": 3288561,
+    "total_files": 412,
+    "total_size_bytes": 3404156,
     "file_types": {
-      ".ts": 153,
+      ".ts": 157,
       ".json": 18,
-      ".tsx": 66,
-      ".js": 10,
-      ".md": 144,
+      ".tsx": 68,
+      ".js": 9,
+      ".md": 158,
       ".sql": 2
     },
     "tags": {
-      "TypeScript": 219,
-      "API": 67,
-      "AI agent": 199,
-      "React": 66,
-      "React hooks": 55,
-      "Next.js API": 66,
-      "security": 112,
+      "TypeScript": 225,
+      "API": 70,
+      "AI agent": 203,
+      "React": 68,
+      "React hooks": 54,
+      "Next.js API": 74,
+      "security": 113,
       "authentication": 3,
       "session management": 2,
       "cookie cleanup": 1,
@@ -45,7 +45,7 @@
       "cross-invalidation": 1,
       "debouncing": 1,
       "optimistic updates": 1,
-      "utility": 38,
+      "utility": 37,
       "API client": 1,
       "error handling": 1,
       "Supabase": 2,
@@ -55,7 +55,7 @@
       "login": 1,
       "client component": 2,
       "#tenant-page #orchestration #modular #performance": 1,
-      "UI": 56,
+      "UI": 57,
       "#authentication #guard #loading #redirect": 1,
       "#content #rendering #schema #universal-widget": 1,
       "modal": 1,
@@ -81,7 +81,7 @@
       "feature-flags": 3,
       "prototyping": 1,
       "exports": 1,
-      "documentation": 148,
+      "documentation": 162,
       "comma": 1,
       "separated": 1,
       "tags (e.g.": 1,
@@ -293,9 +293,9 @@
         "../../../lib/supabaseServerClient",
         "../../../../../../packages/env"
       ],
-      "last_modified": "2025-07-10T23:19:50.190Z",
-      "size_bytes": 7440,
-      "hash": "fcad3d4c",
+      "last_modified": "2025-07-12T10:45:40.276Z",
+      "size_bytes": 5057,
+      "hash": "74d6580d",
       "complexity": "medium"
     },
     {
@@ -317,9 +317,9 @@
         "../../../lib/supabaseServerClient",
         "agent-core/agents/ContextResolutionAgent"
       ],
-      "last_modified": "2025-07-08T00:58:31.781Z",
-      "size_bytes": 3312,
-      "hash": "0dc547e6",
+      "last_modified": "2025-07-12T03:22:38.111Z",
+      "size_bytes": 5206,
+      "hash": "e9dc6c01",
       "complexity": "medium"
     },
     {
@@ -421,11 +421,12 @@
         "Next.js API"
       ],
       "dependencies": [
-        "next/server"
+        "next/server",
+        "../../../lib/supabaseServerClient"
       ],
-      "last_modified": "2025-07-10T23:17:53.920Z",
-      "size_bytes": 1455,
-      "hash": "7d992a43",
+      "last_modified": "2025-07-11T13:11:17.700Z",
+      "size_bytes": 1269,
+      "hash": "a75cdf50",
       "complexity": "low"
     },
     {
@@ -442,9 +443,9 @@
       "dependencies": [
         "next/server"
       ],
-      "last_modified": "2025-07-10T23:17:39.060Z",
-      "size_bytes": 4057,
-      "hash": "49139d8a",
+      "last_modified": "2025-07-12T03:32:47.009Z",
+      "size_bytes": 4591,
+      "hash": "70026539",
       "complexity": "medium"
     },
     {
@@ -512,9 +513,9 @@
         "../../../lib/supabaseServerClient",
         "agent-core/agents/ContextResolutionAgent"
       ],
-      "last_modified": "2025-07-09T23:14:43.929Z",
-      "size_bytes": 5083,
-      "hash": "999aac3e",
+      "last_modified": "2025-07-11T01:45:20.403Z",
+      "size_bytes": 5223,
+      "hash": "21157261",
       "complexity": "medium"
     },
     {
@@ -579,6 +580,27 @@
       "size_bytes": 12378,
       "hash": "b4c94fcc",
       "complexity": "high"
+    },
+    {
+      "path": "apps/web/app/api/debug/auth-status/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/auth-status",
+      "extension": ".ts",
+      "purpose": "Extract project reference from Supabase URL",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server",
+        "../../../lib/supabaseServerClient",
+        "next/headers"
+      ],
+      "last_modified": "2025-07-11T12:49:18.279Z",
+      "size_bytes": 2317,
+      "hash": "54e30478",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/api/debug/avatar-test/route.ts",
@@ -724,6 +746,25 @@
       "complexity": "low"
     },
     {
+      "path": "apps/web/app/api/debug/force-clear-cookies/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/force-clear-cookies",
+      "extension": ".ts",
+      "purpose": "Extract project reference from Supabase URL",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API"
+      ],
+      "dependencies": [
+        "next/server"
+      ],
+      "last_modified": "2025-07-11T12:49:18.667Z",
+      "size_bytes": 1105,
+      "hash": "c5c14fc6",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/api/debug/mockups/route.ts",
       "name": "route.ts",
       "directory": "apps/web/app/api/debug/mockups",
@@ -793,6 +834,29 @@
       "last_modified": "2025-07-10T02:03:59.494Z",
       "size_bytes": 1,
       "hash": "36a9e7f1",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/api/debug/test-context-resolution/route.ts",
+      "name": "route.ts",
+      "directory": "apps/web/app/api/debug/test-context-resolution",
+      "extension": ".ts",
+      "purpose": "File: apps/web/app/api/debug/test-context-resolution/route.ts",
+      "tags": [
+        "TypeScript",
+        "API",
+        "Next.js API",
+        "AI agent"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/headers",
+        "../../../lib/supabaseServerClient",
+        "agent-core/agents/ContextResolutionAgent"
+      ],
+      "last_modified": "2025-07-11T00:29:29.749Z",
+      "size_bytes": 3216,
+      "hash": "dde61c04",
       "complexity": "low"
     },
     {
@@ -1504,10 +1568,10 @@
         "../../../../lib/supabaseServerClient",
         "../../../../lib/types"
       ],
-      "last_modified": "2025-07-10T23:18:15.404Z",
-      "size_bytes": 9511,
-      "hash": "0e499850",
-      "complexity": "high"
+      "last_modified": "2025-07-12T10:44:30.976Z",
+      "size_bytes": 8690,
+      "hash": "4a2069da",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/api/user/[user_id]/profile/route.ts",
@@ -1604,51 +1668,91 @@
       "complexity": "medium"
     },
     {
+      "path": "apps/web/app/context/preferences/ContextPreferencesClient.tsx",
+      "name": "ContextPreferencesClient.tsx",
+      "directory": "apps/web/app/context/preferences",
+      "extension": ".tsx",
+      "purpose": "Purpose: Client component for prompt context management",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "exports": [
+        "ContextPreferencesClient"
+      ],
+      "last_modified": "2025-07-11T12:49:18.205Z",
+      "size_bytes": 1307,
+      "hash": "afa05aba",
+      "complexity": "low"
+    },
+    {
       "path": "apps/web/app/context/preferences/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/context/preferences",
       "extension": ".tsx",
-      "purpose": "Purpose: Schema-driven Prompt Context Management Page - Uses PromptContextWidget",
+      "purpose": "Purpose: Schema-driven Prompt Context Management Page - Server Protected",
       "tags": [
         "React",
         "TypeScript",
-        "React hooks",
         "AI agent"
       ],
       "dependencies": [
         "react",
-        "lucide-react",
+        "../../lib/supabaseServerClient",
+        "next/headers",
         "next/navigation",
-        "../../../components/ai/UniversalSchemaRenderer"
+        "./ContextPreferencesClient"
       ],
-      "last_modified": "2025-07-09T23:19:00.696Z",
-      "size_bytes": 4575,
-      "hash": "5eebdf74",
-      "complexity": "medium"
+      "last_modified": "2025-07-11T12:49:18.104Z",
+      "size_bytes": 1577,
+      "hash": "d91d4cd2",
+      "complexity": "low"
+    },
+    {
+      "path": "apps/web/app/copilotkit/CopilotKitClient.tsx",
+      "name": "CopilotKitClient.tsx",
+      "directory": "apps/web/app/copilotkit",
+      "extension": ".tsx",
+      "purpose": "Purpose: Client component for CopilotKit testing",
+      "tags": [
+        "React",
+        "TypeScript"
+      ],
+      "dependencies": [
+        "react"
+      ],
+      "exports": [
+        "CopilotKitClient"
+      ],
+      "last_modified": "2025-07-11T12:49:17.134Z",
+      "size_bytes": 1571,
+      "hash": "40c2e0c6",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/copilotkit/page.tsx",
       "name": "page.tsx",
       "directory": "apps/web/app/copilotkit",
       "extension": ".tsx",
-      "purpose": "🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions",
+      "purpose": "Purpose: CopilotKit test page (Server-Side Protected)",
       "tags": [
         "React",
-        "TypeScript",
-        "React hooks",
-        "AI agent"
+        "TypeScript"
       ],
       "dependencies": [
-        "@copilotkit/react-core",
-        "react"
+        "react",
+        "../lib/supabaseServerClient",
+        "next/headers",
+        "next/navigation",
+        "./CopilotKitClient"
       ],
-      "exports": [
-        "CopilotKitPage"
-      ],
-      "last_modified": "2025-06-27T21:33:11.963Z",
-      "size_bytes": 5827,
-      "hash": "2e3a961d",
-      "complexity": "medium"
+      "last_modified": "2025-07-11T12:49:18.058Z",
+      "size_bytes": 1439,
+      "hash": "f77437e5",
+      "complexity": "low"
     },
     {
       "path": "apps/web/app/CopilotKitProvider.tsx",
@@ -1667,14 +1771,15 @@
         "@copilotkit/react-ui",
         "../components/SupabaseProvider",
         "react",
-        "../components/copilot/EntitlementActions"
+        "../components/copilot/EntitlementActions",
+        "../components/copilot/ResizableWindow"
       ],
       "exports": [
         "CopilotKitProvider"
       ],
-      "last_modified": "2025-07-11T00:18:13.579Z",
-      "size_bytes": 6306,
-      "hash": "904edfd9",
+      "last_modified": "2025-07-12T03:13:04.199Z",
+      "size_bytes": 6561,
+      "hash": "2a4e53cf",
       "complexity": "medium"
     },
     {
@@ -1816,9 +1921,9 @@
       "dependencies": [
         "react"
       ],
-      "last_modified": "2025-07-09T23:18:53.284Z",
-      "size_bytes": 5231,
-      "hash": "2d680a85",
+      "last_modified": "2025-07-11T01:46:44.599Z",
+      "size_bytes": 6445,
+      "hash": "273490d8",
       "complexity": "medium"
     },
     {
@@ -2023,7 +2128,7 @@
       "name": "layout.tsx",
       "directory": "apps/web/app",
       "extension": ".tsx",
-      "purpose": "Get initial session server-side for SSR using the same restoration logic",
+      "purpose": "Extract project reference from Supabase URL (same as middleware)",
       "tags": [
         "React",
         "TypeScript"
@@ -2040,10 +2145,10 @@
       "exports": [
         "metadata"
       ],
-      "last_modified": "2025-07-10T23:47:06.379Z",
-      "size_bytes": 3023,
-      "hash": "ac5ac646",
-      "complexity": "low"
+      "last_modified": "2025-07-11T12:49:18.473Z",
+      "size_bytes": 3392,
+      "hash": "1d6f005b",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/app/lib/agentService.ts",
@@ -2468,26 +2573,6 @@
       "complexity": "medium"
     },
     {
-      "path": "apps/web/app/lib/supabaseClient.js",
-      "name": "supabaseClient.js",
-      "directory": "apps/web/app/lib",
-      "extension": ".js",
-      "purpose": "Client-side Supabase client for auth and real-time APIs",
-      "tags": [
-        "utility"
-      ],
-      "dependencies": [
-        "@supabase/ssr"
-      ],
-      "exports": [
-        "supabase"
-      ],
-      "last_modified": "2025-06-27T21:43:32.325Z",
-      "size_bytes": 457,
-      "hash": "ec3e12c1",
-      "complexity": "low"
-    },
-    {
       "path": "apps/web/app/lib/supabaseClient.ts",
       "name": "supabaseClient.ts",
       "directory": "apps/web/app/lib",
@@ -2503,9 +2588,9 @@
       "exports": [
         "supabase"
       ],
-      "last_modified": "2025-06-27T21:33:12.016Z",
-      "size_bytes": 462,
-      "hash": "4c1424bc",
+      "last_modified": "2025-07-11T20:11:16.602Z",
+      "size_bytes": 1122,
+      "hash": "079112df",
       "complexity": "low"
     },
     {
@@ -2516,19 +2601,15 @@
       "purpose": "Returns a Supabase SSR client with cookie adapter",
       "tags": [
         "TypeScript",
-        "utility",
-        "security"
+        "utility"
       ],
       "dependencies": [
         "@supabase/ssr",
         "next/dist/server/web/spec-extension/adapters/request-cookies"
       ],
-      "exports": [
-        "createSupabaseServerClient"
-      ],
-      "last_modified": "2025-07-10T23:17:24.550Z",
-      "size_bytes": 6405,
-      "hash": "6bca0008",
+      "last_modified": "2025-07-12T03:38:10.327Z",
+      "size_bytes": 4805,
+      "hash": "e53fae85",
       "complexity": "medium"
     },
     {
@@ -2709,9 +2790,9 @@
       "exports": [
         "LoginPage"
       ],
-      "last_modified": "2025-07-10T22:26:58.738Z",
-      "size_bytes": 7849,
-      "hash": "833f7be5",
+      "last_modified": "2025-07-12T03:01:20.709Z",
+      "size_bytes": 7622,
+      "hash": "23b936ce",
       "complexity": "medium"
     },
     {
@@ -2729,9 +2810,9 @@
         "next/headers",
         "next/navigation"
       ],
-      "last_modified": "2025-07-10T23:19:43.923Z",
-      "size_bytes": 1711,
-      "hash": "a020664b",
+      "last_modified": "2025-07-11T12:49:18.744Z",
+      "size_bytes": 2263,
+      "hash": "d6ec31c7",
       "complexity": "low"
     },
     {
@@ -2755,28 +2836,6 @@
       "last_modified": "2025-06-27T21:33:11.933Z",
       "size_bytes": 1051,
       "hash": "c04a4448",
-      "complexity": "low"
-    },
-    {
-      "path": "apps/web/app/test-forms/page.tsx",
-      "name": "page.tsx",
-      "directory": "apps/web/app/test-forms",
-      "extension": ".tsx",
-      "purpose": "Purpose: Test page for FormWidget component - Video Reflection Worksheet",
-      "tags": [
-        "React",
-        "TypeScript"
-      ],
-      "dependencies": [
-        "react",
-        "../../components/forms/FormWidget"
-      ],
-      "exports": [
-        "TestFormsPage"
-      ],
-      "last_modified": "2025-06-30T12:25:30.280Z",
-      "size_bytes": 1924,
-      "hash": "b5543f79",
       "complexity": "low"
     },
     {
@@ -2837,6 +2896,27 @@
       "size_bytes": 1785,
       "hash": "de4e8c74",
       "complexity": "low"
+    },
+    {
+      "path": "apps/web/components/copilot/ResizableWindow.tsx",
+      "name": "ResizableWindow.tsx",
+      "directory": "apps/web/components/copilot",
+      "extension": ".tsx",
+      "purpose": "File: apps/web/components/copilot/ResizableWindow.tsx",
+      "tags": [
+        "React",
+        "TypeScript",
+        "UI",
+        "React hooks"
+      ],
+      "dependencies": [
+        "react",
+        "@copilotkit/react-ui"
+      ],
+      "last_modified": "2025-07-11T12:49:16.309Z",
+      "size_bytes": 11664,
+      "hash": "d8df6496",
+      "complexity": "high"
     },
     {
       "path": "apps/web/components/DynamicTenantPage.tsx",
@@ -3108,7 +3188,7 @@
       "name": "PromptContextsPage.tsx",
       "directory": "apps/web/components/mockups",
       "extension": ".tsx",
-      "purpose": "Purpose: Prompt Contexts Page Wrapper - Renders the real functional page through the mockup system",
+      "purpose": "Purpose: Prompt Contexts Page Wrapper - Renders the client component through the mockup system",
       "tags": [
         "React",
         "TypeScript",
@@ -3117,14 +3197,14 @@
       ],
       "dependencies": [
         "react",
-        "../../app/context/preferences/page"
+        "../../app/context/preferences/ContextPreferencesClient"
       ],
       "exports": [
         "PromptContextsPage"
       ],
-      "last_modified": "2025-07-08T02:12:29.452Z",
-      "size_bytes": 603,
-      "hash": "914a02f4",
+      "last_modified": "2025-07-11T12:49:17.377Z",
+      "size_bytes": 706,
+      "hash": "80ecfd99",
       "complexity": "low"
     },
     {
@@ -3176,7 +3256,7 @@
       "name": "SupabaseProvider.tsx",
       "directory": "apps/web/components",
       "extension": ".tsx",
-      "purpose": "Use initialSession directly - no complex loading states",
+      "purpose": "SECURITY FIX: Disable all browser storage for authentication",
       "tags": [
         "React",
         "TypeScript",
@@ -3192,10 +3272,10 @@
       "exports": [
         "SupabaseProvider"
       ],
-      "last_modified": "2025-07-10T23:49:46.429Z",
-      "size_bytes": 2578,
-      "hash": "f6e5bcb8",
-      "complexity": "low"
+      "last_modified": "2025-07-11T20:11:34.712Z",
+      "size_bytes": 3352,
+      "hash": "e1592a01",
+      "complexity": "medium"
     },
     {
       "path": "apps/web/components/ui/AuthenticationGuard.tsx",
@@ -3497,9 +3577,9 @@
         "../../app/lib/types",
         "../../app/lib/widgetActionRegistry"
       ],
-      "last_modified": "2025-07-10T22:18:46.390Z",
-      "size_bytes": 20777,
-      "hash": "8b54c950",
+      "last_modified": "2025-07-11T12:49:17.696Z",
+      "size_bytes": 22138,
+      "hash": "02fbc1da",
       "complexity": "high"
     },
     {
@@ -3651,9 +3731,9 @@
       "exports": [
         "UserPreferencesManager"
       ],
-      "last_modified": "2025-07-10T22:57:19.555Z",
-      "size_bytes": 3560,
-      "hash": "0e6d97a7",
+      "last_modified": "2025-07-11T12:49:18.019Z",
+      "size_bytes": 3663,
+      "hash": "bfdf36cc",
       "complexity": "medium"
     },
     {
@@ -3979,9 +4059,9 @@
         "../ui/ViewContextModal",
         "../../lib/validation/contextSchemas"
       ],
-      "last_modified": "2025-07-10T21:07:01.444Z",
-      "size_bytes": 17866,
-      "hash": "bd1a059c",
+      "last_modified": "2025-07-11T08:28:11.225Z",
+      "size_bytes": 19834,
+      "hash": "5f04794c",
       "complexity": "high"
     },
     {
@@ -4401,6 +4481,28 @@
       "last_modified": "2025-07-09T23:27:33.664Z",
       "size_bytes": 4537,
       "hash": "56c68d17",
+      "complexity": "medium"
+    },
+    {
+      "path": "apps/web/middleware.ts",
+      "name": "middleware.ts",
+      "directory": "apps/web",
+      "extension": ".ts",
+      "purpose": "Purpose: Next.js Middleware - Request-level authentication and routing protection",
+      "tags": [
+        "TypeScript",
+        "Next.js API",
+        "AI agent",
+        "security"
+      ],
+      "dependencies": [
+        "next/server",
+        "next/server",
+        "next/headers"
+      ],
+      "last_modified": "2025-07-12T03:31:50.370Z",
+      "size_bytes": 6998,
+      "hash": "9dc01e39",
       "complexity": "medium"
     },
     {
@@ -5557,6 +5659,73 @@
       "hash": "544fad25"
     },
     {
+      "path": "docs/architecture/adr/0027-standard-supabase-ssr-auth-format.md",
+      "name": "0027-standard-supabase-ssr-auth-format.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T13:08:33.576Z",
+      "size_bytes": 1821,
+      "hash": "c5680e72"
+    },
+    {
+      "path": "docs/architecture/adr/0028-hybrid-auth-token-validation-fix.md",
+      "name": "0028-hybrid-auth-token-validation-fix.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T13:42:04.144Z",
+      "size_bytes": 1685,
+      "hash": "2c62a2e5"
+    },
+    {
+      "path": "docs/architecture/adr/0029-api-middleware-error-handling.md",
+      "name": "0029-api-middleware-error-handling.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T20:58:18.501Z",
+      "size_bytes": 1091,
+      "hash": "4a9986ba"
+    },
+    {
+      "path": "docs/architecture/adr/0030-relax-refresh-token-validation.md",
+      "name": "0030-relax-refresh-token-validation.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-12T01:43:05.003Z",
+      "size_bytes": 791,
+      "hash": "4e7ed2df"
+    },
+    {
+      "path": "docs/architecture/adr/0031-canonical-supabase-ssr-authentication-architecture.md",
+      "name": "0031-canonical-supabase-ssr-authentication-architecture.md",
+      "directory": "docs/architecture/adr",
+      "extension": ".md",
+      "purpose": "Define protected routes",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "security"
+      ],
+      "last_modified": "2025-07-12T10:51:28.259Z",
+      "size_bytes": 12255,
+      "hash": "46fdbb2e"
+    },
+    {
       "path": "docs/architecture/adr/adr-template.md",
       "name": "adr-template.md",
       "directory": "docs/architecture/adr",
@@ -6179,30 +6348,30 @@
       "name": "manifest.json",
       "directory": "docs",
       "extension": ".json",
-      "purpose": "docs.copilotkit.ai/guides/frontend-actions\",",
+      "purpose": "—",
       "tags": [
         "documentation",
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-10T00:05:14.412Z",
-      "size_bytes": 201050,
-      "hash": "86483026"
+      "last_modified": "2025-07-11T20:11:51.328Z",
+      "size_bytes": 215509,
+      "hash": "d60bcb49"
     },
     {
       "path": "docs/manifest.md",
       "name": "manifest.md",
       "directory": "docs",
       "extension": ".md",
-      "purpose": "docs.copilotkit.ai/guides/frontend-actions",
+      "purpose": "—",
       "tags": [
         "documentation",
         "AI agent",
         "security"
       ],
-      "last_modified": "2025-07-10T00:05:14.420Z",
-      "size_bytes": 76998,
-      "hash": "5deba415"
+      "last_modified": "2025-07-11T20:11:51.361Z",
+      "size_bytes": 82959,
+      "hash": "4ee5de65"
     },
     {
       "path": "docs/mockup-system-guide.md",
@@ -6485,6 +6654,19 @@
       "hash": "6312fe01"
     },
     {
+      "path": "docs/quality-assurance/audits/QA-0011-critical-authentication-bypass-fix.md",
+      "name": "QA-0011-critical-authentication-bypass-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "Added AuthenticationGuard to all affected pages",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T12:49:16.546Z",
+      "size_bytes": 4387,
+      "hash": "4c79a740"
+    },
+    {
       "path": "docs/quality-assurance/audits/QA-0011-final-authentication-client-server-sync-fix.md",
       "name": "QA-0011-final-authentication-client-server-sync-fix.md",
       "directory": "docs/quality-assurance/audits",
@@ -6512,6 +6694,34 @@
       "hash": "bac0b15a"
     },
     {
+      "path": "docs/quality-assurance/audits/QA-0012-critical-client-side-auth-bypass-elimination.md",
+      "name": "QA-0012-critical-client-side-auth-bypass-elimination.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "localhost:3000/test-forms",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T12:49:17.194Z",
+      "size_bytes": 6992,
+      "hash": "1c484630"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0013-fundamental-security-architecture-fix.md",
+      "name": "QA-0013-fundamental-security-architecture-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "Intercepts ALL requests before any page components render",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-11T12:49:18.124Z",
+      "size_bytes": 6721,
+      "hash": "4c3330af"
+    },
+    {
       "path": "docs/quality-assurance/audits/QA-0013-layout-compilation-authentication-flow-fix.md",
       "name": "QA-0013-layout-compilation-authentication-flow-fix.md",
       "directory": "docs/quality-assurance/audits",
@@ -6523,6 +6733,88 @@
       "last_modified": "2025-07-10T23:08:01.567Z",
       "size_bytes": 5436,
       "hash": "d883bc8f"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0014-supabase-browser-storage-security-fix.md",
+      "name": "QA-0014-supabase-browser-storage-security-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "VULNERABLE CODE in supabaseServerClient.ts",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T12:49:18.172Z",
+      "size_bytes": 4920,
+      "hash": "f029ed55"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0015-authentication-loop-resolution.md",
+      "name": "QA-0015-authentication-loop-resolution.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "... token checks ...",
+      "tags": [
+        "documentation",
+        "Next.js API",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-11T12:49:18.242Z",
+      "size_bytes": 5773,
+      "hash": "ac36c015"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0016-authentication-loop-corruption-fix.md",
+      "name": "QA-0016-authentication-loop-corruption-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "Middleware only checked basic presence and length",
+      "tags": [
+        "documentation",
+        "Next.js API"
+      ],
+      "last_modified": "2025-07-11T12:49:18.532Z",
+      "size_bytes": 6266,
+      "hash": "963d8ceb"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0017-automatic-session-creation-vulnerability.md",
+      "name": "QA-0017-automatic-session-creation-vulnerability.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "VULNERABLE CODE (FIXED)",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T12:49:18.945Z",
+      "size_bytes": 7092,
+      "hash": "73a6455d"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0018-standard-supabase-auth-format-fix.md",
+      "name": "QA-0018-standard-supabase-auth-format-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "—",
+      "tags": [
+        "documentation"
+      ],
+      "last_modified": "2025-07-11T13:09:05.100Z",
+      "size_bytes": 1390,
+      "hash": "2b48a57b"
+    },
+    {
+      "path": "docs/quality-assurance/audits/QA-0019-authentication-race-condition-fix.md",
+      "name": "QA-0019-authentication-race-condition-fix.md",
+      "directory": "docs/quality-assurance/audits",
+      "extension": ".md",
+      "purpose": "localhost:3000/api/agent/context 401 (Unauthorized)",
+      "tags": [
+        "documentation",
+        "AI agent"
+      ],
+      "last_modified": "2025-07-12T03:19:04.842Z",
+      "size_bytes": 7011,
+      "hash": "aef9d4cd"
     },
     {
       "path": "docs/quality-assurance/README.md",
@@ -6706,9 +6998,9 @@
         "../services/PromptContextResolver",
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-10T18:58:42.742Z",
-      "size_bytes": 9207,
-      "hash": "c24240a6",
+      "last_modified": "2025-07-11T00:27:08.322Z",
+      "size_bytes": 9972,
+      "hash": "faf826fd",
       "complexity": "high"
     },
     {
@@ -6865,10 +7157,10 @@
       "dependencies": [
         "@supabase/supabase-js"
       ],
-      "last_modified": "2025-07-08T14:26:51.388Z",
-      "size_bytes": 8006,
-      "hash": "1a405156",
-      "complexity": "medium"
+      "last_modified": "2025-07-11T01:57:13.949Z",
+      "size_bytes": 11100,
+      "hash": "d2c971bb",
+      "complexity": "high"
     },
     {
       "path": "packages/agent-core/tools/__tests__/ProgressAwareAgent.test.ts",

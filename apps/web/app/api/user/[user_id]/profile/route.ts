@@ -20,40 +20,16 @@ export async function GET(
     const resolvedParams = await params;
     const userId = resolvedParams.user_id;
 
-    // Fast path: Check for session existence without expensive restoration
+    // ✅ Use ADR-0031 standard session restoration
     const cookieStore = await cookies();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-    if (!projectRef) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    }
-    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    // If no tokens, immediately fail with 401
-    if (!accessToken || !refreshToken) {
+    if (sessionError || !session || session.user.id !== userId) {
       return NextResponse.json(
         { error: 'Not authenticated' },
         { status: 401 }
       );
     }
-
-    // Wrap session restoration in a shorter timeout to prevent hanging
-    const authPromise = (async () => {
-      const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
-
-      if (sessionError || !session || session.user.id !== userId) {
-        throw new Error('Authentication failed');
-      }
-
-      return { session, supabase };
-    })();
-
-    // 2-second timeout for auth operations (faster than default 3s)
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Authentication timeout')), 2000)
-    );
-
-    const { supabase } = await Promise.race([authPromise, timeoutPromise]);
 
     // Wrap database operations in timeout to prevent hanging
     const dbPromise = (async () => {

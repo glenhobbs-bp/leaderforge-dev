@@ -1,6 +1,20 @@
 import { createServerClient } from '@supabase/ssr';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
+// Extract project reference from Supabase URL
+function getProjectRef(): string {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set');
+  }
+
+  const match = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/);
+  if (!match) {
+    throw new Error('Could not extract project reference from SUPABASE_URL');
+  }
+  return match[1];
+}
+
 /**
  * Returns a Supabase SSR client with cookie adapter
  * @param cookieStore - a ReadonlyRequestCookies instance (from await cookies())
@@ -11,141 +25,122 @@ export function createSupabaseServerClient(cookieStore: ReadonlyRequestCookies, 
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing required Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    throw new Error('Missing Supabase environment variables');
   }
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      getAll: () => cookieStore.getAll(),
-      setAll: setCookies
-        ? (cookiesToSet) => setCookies(cookiesToSet.map(({ name, value, options }) => ({ name, value, options })))
-        : () => {},
-    },
+      getAll() {
+        return cookieStore.getAll().map(cookie => ({
+          name: cookie.name,
+          value: cookie.value
+        }));
+      },
+      setAll(cookiesToSet) {
+        if (setCookies) {
+          setCookies(cookiesToSet.map(cookie => ({
+            name: cookie.name,
+            value: cookie.value,
+            options: cookie.options
+          })));
+        }
+      }
+    }
   });
 }
 
 /**
- * Service role client for elevated operations (storage, admin functions)
- * ⚠️ Use sparingly - only for operations that require elevated permissions
+ * Server-side session restoration with security fixes
+ * SECURITY: Only restore sessions with valid authentication cookies
  */
-export async function createServiceRoleSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export async function restoreSession(cookieStore: ReadonlyRequestCookies, setCookies?: (cookies: { name: string, value: string, options: unknown }[]) => void) {
+  const supabase = createSupabaseServerClient(cookieStore, setCookies);
 
-  if (!supabaseUrl || !supabaseServiceRoleKey) {
-    throw new Error('Missing required Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
-  }
+  // Get project reference and auth cookie name
+  const projectRef = getProjectRef();
+  const authCookieName = `sb-${projectRef}-auth-token`;
 
-  const { createClient } = await import('@supabase/supabase-js');
-  return createClient(supabaseUrl, supabaseServiceRoleKey);
-}
-
-/**
- * Robust session restoration for API routes that handles both SSR and client-side requests
- * @param cookieStore - ReadonlyRequestCookies instance
- * @returns { session, supabase } - authenticated session and supabase client
- */
-export async function restoreSession(cookieStore: ReadonlyRequestCookies) {
-  const supabase = createSupabaseServerClient(cookieStore);
-
-  // Get all cookies for manual session restoration
+  // Debug: Log all available cookies
   const allCookies = cookieStore.getAll();
+  console.log('[restoreSession] All available cookies:', allCookies.map(c => ({ name: c.name, valueLength: c.value.length })));
 
-  // Get project ref from environment variable
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-  if (!projectRef) {
-    console.error('[restoreSession] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
-    const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
-    return { session: currentSession, supabase, error: currentError };
+  // Get authentication cookie (single JSON cookie format)
+  const authCookie = cookieStore.get(authCookieName)?.value;
+
+  console.log('[restoreSession] Token check:', {
+    projectRef,
+    authCookieName,
+    hasAuthCookie: !!authCookie,
+    authCookieLength: authCookie?.length || 0,
+    totalCookies: allCookies.length
+  });
+
+  // SECURITY FIX: Only attempt session restoration when auth cookie exists
+  if (!authCookie) {
+    console.log('[restoreSession] No authentication cookies - returning null session');
+    return { session: null, supabase, error: null };
   }
 
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
-
-  let session = null;
-  let sessionError = null;
-
-  // Quick check: if no tokens exist, skip expensive auth attempts
-  if (!accessToken || !refreshToken) {
-    const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
-    return { session: currentSession, supabase, error: currentError };
-  }
-
-  // Validate token format before attempting restoration
-  const accessTokenParts = accessToken.split('.');
-  const isValidTokenFormat = accessTokenParts.length === 3 && refreshToken.length > 10;
-
-  if (!isValidTokenFormat) {
-    console.warn('[restoreSession] Invalid token format detected, skipping restoration');
-    return { session: null, supabase, error: new Error('Invalid token format') };
-  }
-
-  // Attempt session restoration with timeout and better error handling
+  // Parse JSON cookie to extract tokens (same format as middleware)
+  let tokens;
   try {
-    const authPromise = supabase.auth.setSession({
+    tokens = JSON.parse(authCookie);
+  } catch (error) {
+    console.log('[restoreSession] Invalid auth cookie format:', error instanceof Error ? error.message : 'parse error');
+    return { session: null, supabase, error: new Error('Invalid cookie format') };
+  }
+
+  // Parse ADR-0031 standard format: [access_token, null, refresh_token, null, null]
+  const accessToken = Array.isArray(tokens) ? tokens[0] : tokens.access_token;
+  const refreshToken = Array.isArray(tokens) ? tokens[2] : tokens.refresh_token;
+
+  console.log('[restoreSession] Parsed tokens:', {
+    hasAccessToken: !!accessToken,
+    hasRefreshToken: !!refreshToken,
+    accessTokenLength: accessToken?.length || 0,
+    refreshTokenLength: refreshToken?.length || 0
+  });
+
+  // SECURITY FIX: Only attempt session restoration when both tokens exist
+  if (!accessToken || !refreshToken) {
+    console.log('[restoreSession] Missing tokens in cookie - returning null session');
+    return { session: null, supabase, error: null };
+  }
+
+  try {
+    // Set the session with parsed tokens first, then get the session
+    const { data: setData, error: setError } = await supabase.auth.setSession({
       access_token: accessToken,
-      refresh_token: refreshToken,
+      refresh_token: refreshToken
     });
 
-    // Add 3-second timeout to prevent hanging
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Auth timeout')), 3000)
-    );
+    if (setError) {
+      console.error('[restoreSession] Session restoration failed:', setError);
 
-    const setSessionRes = await Promise.race([authPromise, timeoutPromise]) as Awaited<typeof authPromise>;
-
-    if (setSessionRes.error) {
-      const errorMessage = setSessionRes.error.message || '';
-
-      // Only try refresh for specific JWT-related errors, not for all errors
-      if ((errorMessage.includes('JWT') || errorMessage.includes('expired') || errorMessage.includes('invalid')) &&
-          !errorMessage.includes('refresh_token_not_found')) {
-
-        console.log('[restoreSession] JWT expired, attempting refresh...');
-
-        const refreshPromise = supabase.auth.refreshSession({ refresh_token: refreshToken });
-        const refreshTimeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Refresh timeout')), 2000)
-        );
-
-        try {
-          const refreshRes = await Promise.race([refreshPromise, refreshTimeoutPromise]) as Awaited<typeof refreshPromise>;
-          if (!refreshRes.error && refreshRes.data?.session) {
-            session = refreshRes.data.session;
-            console.log('[restoreSession] Session refresh successful');
-          } else {
-            sessionError = refreshRes.error || new Error('Refresh failed');
-            console.warn('[restoreSession] Session refresh failed:', refreshRes.error?.message);
-          }
-        } catch (error) {
-          sessionError = error;
-          console.warn('[restoreSession] Session refresh threw error:', (error as Error).message);
-        }
-      } else {
-        sessionError = setSessionRes.error;
-        console.warn('[restoreSession] Session restoration failed:', errorMessage);
+      // Clear invalid auth cookie if setCookies available
+      if (setCookies && (setError.message.includes('invalid') || setError.message.includes('missing'))) {
+        setCookies([{
+          name: authCookieName,
+          value: '',
+          options: { maxAge: 0, path: '/' }
+        }]);
       }
-    } else {
-      session = setSessionRes.data.session;
-      console.log('[restoreSession] Session restored successfully');
-    }
-  } catch (error) {
-    sessionError = error;
-    console.warn('[restoreSession] Session restoration threw error:', (error as Error).message);
-  }
 
-  // Final fallback session check (quick) - only if no session and no critical error
-  if (!session && !sessionError) {
-    try {
-      const { data: { session: currentSession }, error: currentError } = await supabase.auth.getSession();
-      session = currentSession;
-      if (currentError) {
-        sessionError = currentError;
-      }
-    } catch (error) {
-      console.warn('[restoreSession] Final session check failed:', (error as Error).message);
+      return { session: null, supabase, error: setError };
     }
-  }
 
-  return { session, supabase, error: sessionError };
+    console.log('[restoreSession] Session status:', {
+      hasSession: !!setData.session,
+      userId: setData.session?.user?.id
+    });
+
+    return {
+      session: setData.session,
+      supabase,
+      error: null
+    };
+  } catch (err) {
+    console.error('[restoreSession] Unexpected error during session restoration:', err);
+    return { session: null, supabase, error: err };
+  }
 }

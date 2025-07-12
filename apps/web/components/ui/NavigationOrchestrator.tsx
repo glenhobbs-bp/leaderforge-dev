@@ -98,7 +98,7 @@ export function NavigationOrchestrator({
     }
   }, [userId]);
 
-  // ✅ FIX: Initialize loading state properly
+    // ✅ FIX: Initialize loading state properly
   useEffect(() => {
     if (isReady) {
       // All initialization complete, ensure loading is false
@@ -240,6 +240,35 @@ export function NavigationOrchestrator({
 
     console.log('[NavigationOrchestrator] ✅ handleNavSelect completed for navId:', navId);
   }, [loadContentForNavOption]);
+
+  // 🔄 FALLBACK: Auto-select first navigation option if none selected after timeout
+  useEffect(() => {
+    if (isReady && !selectedNavOptionId && !propSelectedNavOptionId) {
+      console.log('[NavigationOrchestrator] Setting up fallback navigation timer');
+
+      const fallbackTimer = window.setTimeout(() => {
+        if (!selectedNavOptionId && !propSelectedNavOptionId) {
+          console.log('[NavigationOrchestrator] No navigation selected - attempting fallback selection');
+
+          // Try to get first available navigation option from the tenant's nav options
+          fetch(`/api/nav/${currentTenant}`, { credentials: 'include' })
+            .then(res => res.json())
+            .then(navOptions => {
+              if (Array.isArray(navOptions) && navOptions.length > 0) {
+                const firstNavId = navOptions[0].id;
+                console.log('[NavigationOrchestrator] Selecting first available navigation option:', firstNavId);
+                handleNavSelect(firstNavId);
+              }
+            })
+            .catch(err => {
+              console.warn('[NavigationOrchestrator] Failed to get fallback navigation:', err);
+            });
+        }
+      }, 3000);
+
+      return () => window.clearTimeout(fallbackTimer);
+    }
+  }, [isReady, selectedNavOptionId, propSelectedNavOptionId, currentTenant, handleNavSelect]);
 
   // Create nav component using database-driven approach
   const NavComponent = useCallback(({ isCollapsed, onToggleCollapse }: { isCollapsed?: boolean; onToggleCollapse?: () => void }) => {

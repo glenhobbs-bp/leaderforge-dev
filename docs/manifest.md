@@ -1,34 +1,34 @@
 # LeaderForge Codebase Manifest
 
-*Generated on 7/10/2025, 8:19:51 PM*
+*Generated on 7/12/2025, 6:51:36 AM*
 
 ## Overview
 
-- **Total Files**: 393
-- **Total Size**: 3.14 MB
+- **Total Files**: 412
+- **Total Size**: 3.25 MB
 - **Generator Version**: 1.0.0
 
 ## File Types
 
-- **.ts**: 153 files
-- **.md**: 144 files
-- **.tsx**: 66 files
+- **.md**: 158 files
+- **.ts**: 157 files
+- **.tsx**: 68 files
 - **.json**: 18 files
-- **.js**: 10 files
+- **.js**: 9 files
 - **.sql**: 2 files
 
 ## Most Common Tags
 
-- **TypeScript**: 219 files
-- **AI agent**: 199 files
-- **documentation**: 148 files
-- **security**: 112 files
-- **API**: 67 files
-- **React**: 66 files
-- **Next.js API**: 66 files
-- **UI**: 56 files
-- **React hooks**: 55 files
-- **utility**: 38 files
+- **TypeScript**: 225 files
+- **AI agent**: 203 files
+- **documentation**: 162 files
+- **security**: 113 files
+- **Next.js API**: 74 files
+- **API**: 70 files
+- **React**: 68 files
+- **UI**: 57 files
+- **React hooks**: 54 files
+- **utility**: 37 files
 
 ## File Inventory
 
@@ -135,18 +135,18 @@ File: apps/web/app/api/admin/entitlements/update/route.ts
 
 Agent Content API Route
 
-**Complexity**: medium • **Size**: 7.3KB
+**Complexity**: medium • **Size**: 4.9KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 7/10/2025
+**Modified**: 7/12/2025
 
 
 ### `apps/web/app/api/agent/context/route.ts`
 
 File: apps/web/app/api/agent/context/route.ts
 
-**Complexity**: medium • **Size**: 3.2KB
+**Complexity**: medium • **Size**: 5.1KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`, `security`
-**Modified**: 7/7/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/api/assets/compositions/route.ts`
@@ -189,18 +189,18 @@ Handles Supabase auth redirect and sets cookies for SSR session access.
 
 Clear corrupted authentication cookies to prevent login loops
 
-**Owner**: Backend team • **Complexity**: low • **Size**: 1.4KB
+**Owner**: Backend team • **Complexity**: low • **Size**: 1.2KB
 **Tags**: `authentication`, `session management`, `cookie cleanup`, `TypeScript`, `API`, `Next.js API`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/api/auth/set-session/route.ts`
 
 File: apps/web/app/api/auth/set-session/route.ts
 
-**Complexity**: medium • **Size**: 4.0KB
+**Complexity**: medium • **Size**: 4.5KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/api/content/[tenant_key]/route.ts`
@@ -225,9 +225,9 @@ File: apps/web/app/api/context/[id]/route.ts
 
 File: apps/web/app/api/context/preferences/route.ts
 
-**Complexity**: medium • **Size**: 5.0KB
+**Complexity**: medium • **Size**: 5.1KB
 **Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
-**Modified**: 7/9/2025
+**Modified**: 7/10/2025
 
 
 ### `apps/web/app/api/context/route.ts`
@@ -255,6 +255,15 @@ Purpose: User Dashboard Composition API - Marcus Dashboard with real progress da
 **Complexity**: high • **Size**: 12.1KB
 **Tags**: `TypeScript`, `API`, `Next.js API`
 **Modified**: 6/28/2025
+
+
+### `apps/web/app/api/debug/auth-status/route.ts`
+
+Extract project reference from Supabase URL
+
+**Complexity**: low • **Size**: 2.3KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/api/debug/avatar-test/route.ts`
@@ -320,6 +329,15 @@ Check all Supabase-related environment variables
 **Modified**: 6/28/2025
 
 
+### `apps/web/app/api/debug/force-clear-cookies/route.ts`
+
+Extract project reference from Supabase URL
+
+**Complexity**: low • **Size**: 1.1KB
+**Tags**: `TypeScript`, `API`, `Next.js API`
+**Modified**: 7/11/2025
+
+
 ### `apps/web/app/api/debug/mockups/route.ts`
 
 Debug Mockups API Route
@@ -354,6 +372,15 @@ Debug Mockups API Route
 **Complexity**: low • **Size**: 0.0KB
 **Tags**: `TypeScript`, `API`
 **Modified**: 7/9/2025
+
+
+### `apps/web/app/api/debug/test-context-resolution/route.ts`
+
+File: apps/web/app/api/debug/test-context-resolution/route.ts
+
+**Complexity**: low • **Size**: 3.1KB
+**Tags**: `TypeScript`, `API`, `Next.js API`, `AI agent`
+**Modified**: 7/10/2025
 
 
 ### `apps/web/app/api/dev/apply-entitlements/route.ts`
@@ -639,9 +666,9 @@ API endpoint for updating user navigation state with SSR authentication
 
 SSR-compliant user preferences API with proper authentication
 
-**Owner**: Backend team • **Complexity**: high • **Size**: 9.3KB
+**Owner**: Backend team • **Complexity**: medium • **Size**: 8.5KB
 **Tags**: `API`, `user management`, `preferences`, `SSR auth`, `TypeScript`, `Next.js API`
-**Modified**: 7/10/2025
+**Modified**: 7/12/2025
 
 
 ### `apps/web/app/api/user/[user_id]/profile/route.ts`
@@ -680,31 +707,49 @@ Create service role Supabase client for backend operations
 **Modified**: 7/10/2025
 
 
+### `apps/web/app/context/preferences/ContextPreferencesClient.tsx`
+
+Purpose: Client component for prompt context management
+
+**Complexity**: low • **Size**: 1.3KB
+**Tags**: `React`, `TypeScript`
+**Modified**: 7/11/2025
+
+
 ### `apps/web/app/context/preferences/page.tsx`
 
-Purpose: Schema-driven Prompt Context Management Page - Uses PromptContextWidget
+Purpose: Schema-driven Prompt Context Management Page - Server Protected
 
-**Complexity**: medium • **Size**: 4.5KB
-**Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 7/9/2025
+**Complexity**: low • **Size**: 1.5KB
+**Tags**: `React`, `TypeScript`, `AI agent`
+**Modified**: 7/11/2025
+
+
+### `apps/web/app/copilotkit/CopilotKitClient.tsx`
+
+Purpose: Client component for CopilotKit testing
+
+**Complexity**: low • **Size**: 1.5KB
+**Tags**: `React`, `TypeScript`
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/copilotkit/page.tsx`
 
-🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions
+Purpose: CopilotKit test page (Server-Side Protected)
 
-**Complexity**: medium • **Size**: 5.7KB
-**Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 6/27/2025
+**Complexity**: low • **Size**: 1.4KB
+**Tags**: `React`, `TypeScript`
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/CopilotKitProvider.tsx`
 
 File: apps/web/app/CopilotKitProvider.tsx
 
-**Complexity**: medium • **Size**: 6.2KB
+**Complexity**: medium • **Size**: 6.4KB
 **Tags**: `React`, `TypeScript`, `React hooks`, `AI agent`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/dashboard/marcus/page.tsx`
@@ -756,9 +801,9 @@ React Query hook for fetching context config.
 
 File: apps/web/app/hooks/useContextPreferences.ts
 
-**Complexity**: medium • **Size**: 5.1KB
+**Complexity**: medium • **Size**: 6.3KB
 **Tags**: `TypeScript`, `hooks`, `React hooks`
-**Modified**: 7/9/2025
+**Modified**: 7/10/2025
 
 
 ### `apps/web/app/hooks/useNavForContext.ts`
@@ -835,11 +880,11 @@ React hook for video progress tracking with optimistic updates
 
 ### `apps/web/app/layout.tsx`
 
-Get initial session server-side for SSR using the same restoration logic
+Extract project reference from Supabase URL (same as middleware)
 
-**Complexity**: low • **Size**: 3.0KB
+**Complexity**: medium • **Size**: 3.3KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/lib/agentService.ts`
@@ -1031,31 +1076,22 @@ Request deduplication system to prevent multiple identical API calls.
 **Modified**: 6/27/2025
 
 
-### `apps/web/app/lib/supabaseClient.js`
-
-Client-side Supabase client for auth and real-time APIs
-
-**Complexity**: low • **Size**: 0.4KB
-**Tags**: `utility`
-**Modified**: 6/27/2025
-
-
 ### `apps/web/app/lib/supabaseClient.ts`
 
 Client-side Supabase client for auth and real-time APIs
 
-**Complexity**: low • **Size**: 0.5KB
+**Complexity**: low • **Size**: 1.1KB
 **Tags**: `TypeScript`, `utility`
-**Modified**: 6/27/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/lib/supabaseServerClient.ts`
 
 Returns a Supabase SSR client with cookie adapter
 
-**Complexity**: medium • **Size**: 6.3KB
-**Tags**: `TypeScript`, `utility`, `security`
-**Modified**: 7/10/2025
+**Complexity**: medium • **Size**: 4.7KB
+**Tags**: `TypeScript`, `utility`
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/lib/tenantService.ts`
@@ -1134,18 +1170,18 @@ File: apps/web/app/lib/widgetActionRegistry.ts
 
 Public login page with styled Supabase Auth UI and token synchronization
 
-**Owner**: Frontend team • **Complexity**: medium • **Size**: 7.7KB
+**Owner**: Frontend team • **Complexity**: medium • **Size**: 7.4KB
 **Tags**: `authentication`, `Supabase Auth UI`, `login`, `client component`, `React`, `TypeScript`, `React hooks`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/page.tsx`
 
 SSR Root page that redirects based on session status
 
-**Complexity**: low • **Size**: 1.7KB
+**Complexity**: low • **Size**: 2.2KB
 **Tags**: `React`, `TypeScript`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/app/QueryClientProvider.tsx`
@@ -1155,15 +1191,6 @@ SSR Root page that redirects based on session status
 **Complexity**: low • **Size**: 1.0KB
 **Tags**: `React`, `TypeScript`, `React hooks`
 **Modified**: 6/27/2025
-
-
-### `apps/web/app/test-forms/page.tsx`
-
-Purpose: Test page for FormWidget component - Video Reflection Worksheet
-
-**Complexity**: low • **Size**: 1.9KB
-**Tags**: `React`, `TypeScript`
-**Modified**: 6/30/2025
 
 
 ### `apps/web/components.json`
@@ -1191,6 +1218,15 @@ File: apps/web/components/copilot/EntitlementActions.tsx
 **Complexity**: low • **Size**: 1.7KB
 **Tags**: `React`, `TypeScript`, `UI`, `security`
 **Modified**: 7/5/2025
+
+
+### `apps/web/components/copilot/ResizableWindow.tsx`
+
+File: apps/web/components/copilot/ResizableWindow.tsx
+
+**Complexity**: high • **Size**: 11.4KB
+**Tags**: `React`, `TypeScript`, `UI`, `React hooks`
+**Modified**: 7/11/2025
 
 
 ### `apps/web/components/DynamicTenantPage.tsx`
@@ -1303,11 +1339,11 @@ Purpose: Prompt Context Management Mockup - Agent-native mockup component for UX
 
 ### `apps/web/components/mockups/PromptContextsPage.tsx`
 
-Purpose: Prompt Contexts Page Wrapper - Renders the real functional page through the mockup system
+Purpose: Prompt Contexts Page Wrapper - Renders the client component through the mockup system
 
-**Complexity**: low • **Size**: 0.6KB
+**Complexity**: low • **Size**: 0.7KB
 **Tags**: `React`, `TypeScript`, `UI`, `AI agent`
-**Modified**: 7/7/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/components/mockups/PromptLibraryMockup.tsx`
@@ -1330,11 +1366,11 @@ Purpose: Team Leader Dashboard Mockup - Agent-native mockup component for stakeh
 
 ### `apps/web/components/SupabaseProvider.tsx`
 
-Use initialSession directly - no complex loading states
+SECURITY FIX: Disable all browser storage for authentication
 
-**Complexity**: low • **Size**: 2.5KB
+**Complexity**: medium • **Size**: 3.3KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/components/ui/AuthenticationGuard.tsx`
@@ -1440,9 +1476,9 @@ Manages video and worksheet modals with dynamic loading and proper state managem
 
 Orchestrates navigation, agent calls, and layout management for the main tenant page
 
-**Owner**: Frontend Team • **Complexity**: high • **Size**: 20.3KB
+**Owner**: Frontend Team • **Complexity**: high • **Size**: 21.6KB
 **Tags**: `#navigation #agent-orchestration #layout #tenant-management`, `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/components/ui/NavPanel.tsx`
@@ -1494,9 +1530,9 @@ Three-panel layout component with theme context and collapsible navigation
 
 Manages user preferences, tenant restoration, and navigation state management
 
-**Owner**: Frontend Team • **Complexity**: medium • **Size**: 3.5KB
+**Owner**: Frontend Team • **Complexity**: medium • **Size**: 3.6KB
 **Tags**: `#user-preferences #tenant-restoration #navigation #state-management`, `React`, `TypeScript`, `UI`, `React hooks`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/components/ui/UserProfileModal.tsx`
@@ -1620,9 +1656,9 @@ File: apps/web/components/widgets/Panel.tsx
 
 File: apps/web/components/widgets/PromptContextWidget.tsx
 
-**Complexity**: high • **Size**: 17.4KB
+**Complexity**: high • **Size**: 19.4KB
 **Tags**: `React`, `TypeScript`, `UI`, `React hooks`, `AI agent`
-**Modified**: 7/10/2025
+**Modified**: 7/11/2025
 
 
 ### `apps/web/components/widgets/StatCard.tsx`
@@ -1785,6 +1821,15 @@ File: apps/web/lib/validation/contextSchemas.ts
 **Complexity**: medium • **Size**: 4.4KB
 **Tags**: `TypeScript`, `utility`
 **Modified**: 7/9/2025
+
+
+### `apps/web/middleware.ts`
+
+Purpose: Next.js Middleware - Request-level authentication and routing protection
+
+**Complexity**: medium • **Size**: 6.8KB
+**Tags**: `TypeScript`, `Next.js API`, `AI agent`, `security`
+**Modified**: 7/11/2025
 
 
 ### `apps/web/next-env.d.ts`
@@ -2525,6 +2570,51 @@ GET: Simple data retrieval (no business logic, idempotent)
 **Modified**: 7/9/2025
 
 
+### `docs/architecture/adr/0027-standard-supabase-ssr-auth-format.md`
+
+—
+
+**Size**: 1.8KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/architecture/adr/0028-hybrid-auth-token-validation-fix.md`
+
+—
+
+**Size**: 1.6KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/architecture/adr/0029-api-middleware-error-handling.md`
+
+—
+
+**Size**: 1.1KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/architecture/adr/0030-relax-refresh-token-validation.md`
+
+—
+
+**Size**: 0.8KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/architecture/adr/0031-canonical-supabase-ssr-authentication-architecture.md`
+
+Define protected routes
+
+**Size**: 12.0KB
+**Tags**: `documentation`, `Next.js API`, `security`
+**Modified**: 7/12/2025
+
+
 ### `docs/architecture/adr/adr-template.md`
 
 —
@@ -2905,20 +2995,20 @@ First update Firestore
 
 ### `docs/manifest.json`
 
-docs.copilotkit.ai/guides/frontend-actions",
+—
 
-**Size**: 196.3KB
+**Size**: 210.5KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/9/2025
+**Modified**: 7/11/2025
 
 
 ### `docs/manifest.md`
 
-docs.copilotkit.ai/guides/frontend-actions
+—
 
-**Size**: 75.2KB
+**Size**: 81.0KB
 **Tags**: `documentation`, `AI agent`, `security`
-**Modified**: 7/9/2025
+**Modified**: 7/11/2025
 
 
 ### `docs/mockup-system-guide.md`
@@ -3101,6 +3191,15 @@ CopilotKitProvider.tsx - Lines 60-85
 **Modified**: 7/10/2025
 
 
+### `docs/quality-assurance/audits/QA-0011-critical-authentication-bypass-fix.md`
+
+Added AuthenticationGuard to all affected pages
+
+**Size**: 4.3KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
 ### `docs/quality-assurance/audits/QA-0011-final-authentication-client-server-sync-fix.md`
 
 PROBLEMATIC CODE (FIXED)
@@ -3119,6 +3218,24 @@ BEFORE (VULNERABLE)
 **Modified**: 7/10/2025
 
 
+### `docs/quality-assurance/audits/QA-0012-critical-client-side-auth-bypass-elimination.md`
+
+localhost:3000/test-forms
+
+**Size**: 6.8KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/quality-assurance/audits/QA-0013-fundamental-security-architecture-fix.md`
+
+Intercepts ALL requests before any page components render
+
+**Size**: 6.6KB
+**Tags**: `documentation`, `Next.js API`, `AI agent`
+**Modified**: 7/11/2025
+
+
 ### `docs/quality-assurance/audits/QA-0013-layout-compilation-authentication-flow-fix.md`
 
 BEFORE (causing errors):
@@ -3126,6 +3243,60 @@ BEFORE (causing errors):
 **Size**: 5.3KB
 **Tags**: `documentation`
 **Modified**: 7/10/2025
+
+
+### `docs/quality-assurance/audits/QA-0014-supabase-browser-storage-security-fix.md`
+
+VULNERABLE CODE in supabaseServerClient.ts
+
+**Size**: 4.8KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/quality-assurance/audits/QA-0015-authentication-loop-resolution.md`
+
+... token checks ...
+
+**Size**: 5.6KB
+**Tags**: `documentation`, `Next.js API`, `AI agent`
+**Modified**: 7/11/2025
+
+
+### `docs/quality-assurance/audits/QA-0016-authentication-loop-corruption-fix.md`
+
+Middleware only checked basic presence and length
+
+**Size**: 6.1KB
+**Tags**: `documentation`, `Next.js API`
+**Modified**: 7/11/2025
+
+
+### `docs/quality-assurance/audits/QA-0017-automatic-session-creation-vulnerability.md`
+
+VULNERABLE CODE (FIXED)
+
+**Size**: 6.9KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/quality-assurance/audits/QA-0018-standard-supabase-auth-format-fix.md`
+
+—
+
+**Size**: 1.4KB
+**Tags**: `documentation`
+**Modified**: 7/11/2025
+
+
+### `docs/quality-assurance/audits/QA-0019-authentication-race-condition-fix.md`
+
+localhost:3000/api/agent/context 401 (Unauthorized)
+
+**Size**: 6.8KB
+**Tags**: `documentation`, `AI agent`
+**Modified**: 7/11/2025
 
 
 ### `docs/quality-assurance/README.md`
@@ -3231,7 +3402,7 @@ ContentSyncAgent: Syncs TribeSocial content into modules.content for a given con
 
 File: packages/agent-core/agents/ContextResolutionAgent.ts
 
-**Complexity**: high • **Size**: 9.0KB
+**Complexity**: high • **Size**: 9.7KB
 **Tags**: `TypeScript`, `AI agent`, `security`
 **Modified**: 7/10/2025
 
@@ -3312,9 +3483,9 @@ File: packages/agent-core/services/AnthropicContextService.ts
 
 File: packages/agent-core/services/PromptContextResolver.ts
 
-**Complexity**: medium • **Size**: 7.8KB
+**Complexity**: high • **Size**: 10.8KB
 **Tags**: `TypeScript`, `AI agent`, `security`
-**Modified**: 7/8/2025
+**Modified**: 7/10/2025
 
 
 ### `packages/agent-core/tools/__tests__/ProgressAwareAgent.test.ts`

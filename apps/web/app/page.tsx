@@ -5,15 +5,25 @@ import { createSupabaseServerClient } from '@/lib/supabaseServerClient';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+// Extract project reference from Supabase URL (same as middleware)
+function getProjectRef(): string | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return null;
+
+  const match = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : null;
+}
+
 export default async function HomePage() {
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
 
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  const projectRef = getProjectRef();
   if (!projectRef) {
-    console.error('[page] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+    console.error('[page] Failed to extract project reference from SUPABASE_URL');
     redirect('/login?error=config_error');
   }
+
   const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
   const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
 
@@ -21,7 +31,8 @@ export default async function HomePage() {
 
   let finalSession = null;
 
-  // Use the same session restoration logic as dashboard
+  // SECURITY FIX: Only attempt session restoration with valid authentication cookies
+  // This prevents automatic session creation without proper authentication
   if (accessToken && refreshToken) {
     try {
       const { data, error } = await supabase.auth.setSession({
@@ -40,12 +51,12 @@ export default async function HomePage() {
     }
   }
 
-  // Only get session if we haven't already restored it
+  // SECURITY FIX: Never call getSession() without authentication cookies
+  // This was automatically creating sessions and bypassing authentication
+  // If no valid cookies exist, redirect to login immediately
   if (!finalSession) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    finalSession = session;
+    console.log('[page] No authentication cookies found - redirecting to login');
+    redirect('/login');
   }
 
   if (finalSession?.user) {

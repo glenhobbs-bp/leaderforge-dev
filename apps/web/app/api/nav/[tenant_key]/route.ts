@@ -3,7 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { navService } from '../../../lib/navService';
-import { createSupabaseServerClient } from '../../../lib/supabaseServerClient';
+import { restoreSession } from '../../../lib/supabaseServerClient';
 import { cookies } from 'next/headers';
 import type { NavOption } from '../../../lib/types';
 
@@ -25,36 +25,15 @@ export async function GET(req: NextRequest, context: { params: { tenant_key: str
   }
 
   try {
+    // ✅ Use ADR-0031 standard session restoration
     const cookieStore = await cookies();
-    const supabase = createSupabaseServerClient(cookieStore);
+    const { session, supabase, error: sessionError } = await restoreSession(cookieStore);
 
-    // Simplified auth: try to get session directly first
-    const { data: { session } } = await supabase.auth.getSession();
-
-    // If no session, try manual hydration once
-    if (!session?.user?.id) {
-      const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-      if (!projectRef) {
-        return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-      }
-      const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
-      const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
-
-      if (accessToken && refreshToken) {
-        await supabase.auth.setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        });
-      }
-    }
-
-    // Final session check
-    const { data: { session: finalSession } } = await supabase.auth.getSession();
-    const userId = finalSession?.user?.id;
-
-    if (!userId) {
+    if (sessionError || !session?.user?.id) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
+
+    const userId = session.user.id;
 
     // Check cache first
     const cacheKey = `${tenant_key}:${userId}`;

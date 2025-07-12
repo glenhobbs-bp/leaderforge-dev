@@ -14,6 +14,18 @@ export const metadata: Metadata = {
   description: 'AI-powered leadership development platform',
 };
 
+// Extract project reference from Supabase URL (same as middleware)
+function getProjectRef(): string | null {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) {
+    console.error('[layout] NEXT_PUBLIC_SUPABASE_URL is not set');
+    return null;
+  }
+
+  const match = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/);
+  return match ? match[1] : null;
+}
+
 export default async function RootLayout({
   children
 }: {
@@ -23,9 +35,9 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const allCookies = cookieStore.getAll();
 
-  const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+  const projectRef = getProjectRef();
   if (!projectRef) {
-    console.error('[layout] NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
+    console.error('[layout] Failed to extract project reference from SUPABASE_URL');
     return (
       <html lang="en">
         <body>

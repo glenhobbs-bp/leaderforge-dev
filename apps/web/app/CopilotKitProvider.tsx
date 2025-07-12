@@ -23,12 +23,13 @@ export function CopilotKitProvider({
   const { session, loading } = useSupabase();
   const [isReady, setIsReady] = useState(false);
 
-  // Simple readiness check - wait for session to stabilize
+  // Wait for session sync to complete before making authenticated requests
   useEffect(() => {
-    // Small delay to ensure session is fully loaded
+    // Longer delay to ensure session sync completes before we start making authenticated requests
+    // From logs, session sync can take 5-6 seconds, so we wait longer to avoid race conditions
     const timer = setTimeout(() => {
       setIsReady(true);
-    }, 100);
+    }, 1500); // Increased from 300ms to 1500ms
 
     return () => {
       if (timer) window.clearTimeout(timer);
@@ -72,7 +73,7 @@ export function CopilotKitProvider({
   const [agentLoading, setAgentLoading] = useState(true);
 
   // Fetch agent-generated context and instructions
-  const fetchAgentContext = useCallback(async () => {
+  const fetchAgentContext = useCallback(async (retryCount = 0) => {
     if (!session?.user?.id) return;
 
     try {
@@ -99,6 +100,14 @@ export function CopilotKitProvider({
           console.warn('[CopilotKitProvider] ⚠️ No context returned from agent');
           setAgentContext(null);
         }
+      } else if (response.status === 401 && retryCount < 5) {
+        // If we get 401, session sync is likely still in progress - wait longer for subsequent retries
+        const delay = retryCount === 0 ? 500 : retryCount === 1 ? 1000 : 2000;
+        console.log('[CopilotKitProvider] 🔄 Got 401, retrying in', delay + 'ms... (attempt', retryCount + 1, 'of 5)');
+        setTimeout(() => {
+          fetchAgentContext(retryCount + 1);
+        }, delay);
+        return; // Don't set loading to false yet
       } else {
         console.error('[CopilotKitProvider] ❌ Failed to fetch agent context:', response.status);
         setAgentContext(null);
@@ -111,10 +120,18 @@ export function CopilotKitProvider({
     }
   }, [session?.user?.id]);
 
-  // Initial context fetch when component mounts or user changes
+  // Initial context fetch when component mounts or user changes - but only if ready
   useEffect(() => {
-    fetchAgentContext();
-  }, [fetchAgentContext]);
+    if (isReady && session?.user?.id) {
+      // Additional check: don't fetch if we're still on login page (session sync may be in progress)
+      if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+        console.log('[CopilotKitProvider] ⏳ Skipping context fetch - still on login page');
+        return;
+      }
+
+      fetchAgentContext();
+    }
+  }, [fetchAgentContext, isReady, session?.user?.id]);
 
   // Prepare data before any conditional rendering (all hooks must come before early returns)
   const fullInstructions = agentContext?.systemInstructions ||

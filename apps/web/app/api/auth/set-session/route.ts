@@ -1,18 +1,11 @@
 // File: apps/web/app/api/auth/set-session/route.ts
 'use server';
 
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
 // Get cookie names from environment variable
-const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-if (!projectRef) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_PROJECT_REF is not set');
-}
+// Note: projectRef check moved inside POST
 
-const accessTokenCookie = `sb-${projectRef}-auth-token`;
-const refreshTokenCookie = `sb-${projectRef}-refresh-token`;
-
-// CORS headers for Vercel production deployment
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -20,7 +13,6 @@ const corsHeaders = {
   'Access-Control-Allow-Credentials': 'true',
 };
 
-// Handle CORS preflight requests
 export async function OPTIONS() {
   return new Response(null, {
     status: 200,
@@ -28,98 +20,105 @@ export async function OPTIONS() {
   });
 }
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
+    if (!projectRef) {
+      return NextResponse.json({ error: 'Project reference not found' }, { status: 500 });
+    }
 
-    const access_token = Array.isArray(body.access_token)
-      ? body.access_token[0]
-      : body.access_token;
+    const accessTokenCookie = `sb-${projectRef}-auth-token`;
+    const refreshTokenCookie = `sb-${projectRef}-refresh-token`;
 
-    const refresh_token = Array.isArray(body.refresh_token)
-      ? body.refresh_token[0]
-      : body.refresh_token;
+    const { access_token, refresh_token, user } = await request.json();
 
-    const response = NextResponse.json({ success: true });
+    // Debug token details
+    console.log('[set-session] Token debug: access length', access_token?.length, 'refresh length', refresh_token?.length);
+    console.log('[set-session] Access token parts:', access_token ? access_token.split('.').length : 0);
+    console.log('[set-session] Refresh token parts:', refresh_token ? refresh_token.split('.').length : 0);
 
-    // Add CORS headers to response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      response.headers.set(key, value);
-    });
-
-    // Handle logout - clear cookies when session is null
-    if (body.session === null) {
-      response.cookies.set(accessTokenCookie, '', {
+    // Handle logout - clear cookies when user is null
+    if (user === null) {
+      const response = NextResponse.json({ success: true });
+      const isProduction = process.env.NODE_ENV === 'production';
+      const clearCookieOptions = {
         path: '/',
         httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 0, // Expire immediately
-      });
+        secure: isProduction,
+        sameSite: 'strict' as const,
+        maxAge: 0
+      };
 
-      response.cookies.set(refreshTokenCookie, '', {
-        path: '/',
-        httpOnly: true,
-        sameSite: 'lax',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 0, // Expire immediately
-      });
-
+      response.cookies.set(accessTokenCookie, '', clearCookieOptions);
+      response.cookies.set(refreshTokenCookie, '', clearCookieOptions);
       console.log('[set-session] ✅ Cleared auth cookies for logout');
       return response;
     }
 
-    // Validate tokens before setting cookies
     if (!access_token || !refresh_token) {
-      console.error('[set-session] ❌ Missing required tokens');
-      const errorResponse = NextResponse.json({ success: false, error: 'Missing tokens' }, { status: 400 });
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
+      console.log('[set-session] Missing access_token or refresh_token');
+      return NextResponse.json({ error: 'Missing tokens' }, { status: 400 });
     }
 
-    // Basic token format validation (JWT should have 3 parts separated by dots)
-    const accessTokenParts = access_token.split('.');
-    const refreshTokenValid = refresh_token && refresh_token.length > 10; // Basic length check
-
-    if (accessTokenParts.length !== 3 || !refreshTokenValid) {
-      console.error('[set-session] ❌ Invalid token format');
-      const errorResponse = NextResponse.json({ success: false, error: 'Invalid token format' }, { status: 400 });
-      Object.entries(corsHeaders).forEach(([key, value]) => {
-        errorResponse.headers.set(key, value);
-      });
-      return errorResponse;
+    // Relaxed validation: access must be JWT, refresh just non-empty
+    const isValidJWT = (token: string) => token.split('.').length === 3;
+    if (!isValidJWT(access_token) || typeof refresh_token !== 'string' || refresh_token.length === 0) {
+      console.log('[set-session] Invalid token format');
+      return NextResponse.json({ error: 'Invalid token format' }, { status: 400 });
     }
 
-    // Handle login - set cookies with validated tokens
-    response.cookies.set(accessTokenCookie, access_token, {
+    const authCookieName = `sb-${projectRef}-auth-token`;
+    // Use standard Supabase format per ADR-0031: [access_token, null, refresh_token, null, null]
+    const cookieValue = JSON.stringify([access_token, null, refresh_token, null, null]);
+
+    console.log('[set-session] Setting cookie:', authCookieName);
+    console.log('[set-session] Cookie value length:', cookieValue.length);
+    console.log('[set-session] User ID:', user?.id);
+    console.log('[set-session] Using standard Supabase array format per ADR-0031');
+
+        const response = NextResponse.json({ success: true });
+
+        // Cookie configuration for development reliability
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions: {
+      path: string;
+      httpOnly: boolean;
+      secure: boolean;
+      sameSite: 'lax' | 'strict' | 'none';
+      maxAge: number;
+    } = {
       path: '/',
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      secure: isProduction, // Only secure in production (requires HTTPS)
+      sameSite: 'strict', // Use strict for development reliability
+      maxAge: 60 * 60 // 1 hour
+    };
+
+    console.log('[set-session] Cookie configuration:', {
+      name: authCookieName,
+      secure: cookieOptions.secure,
+      sameSite: cookieOptions.sameSite,
+      httpOnly: cookieOptions.httpOnly,
+      path: cookieOptions.path,
+      maxAge: cookieOptions.maxAge
     });
 
-    response.cookies.set(refreshTokenCookie, refresh_token, {
+    response.cookies.set(authCookieName, cookieValue, cookieOptions);
+
+    // CRITICAL: Clear the sb-session-disabled cookie that Supabase client sets
+    // This cookie can interfere with our authentication flow
+    response.cookies.set('sb-session-disabled', '', {
       path: '/',
       httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      secure: isProduction,
+      sameSite: 'strict',
+      maxAge: 0  // Delete it
     });
 
-    console.log('[set-session] ✅ Successfully set auth cookies');
+    console.log('[set-session] ✅ Successfully set auth cookies and cleared sb-session-disabled');
     return response;
-  } catch (err) {
-    console.error('[set-session] ❌ Error setting cookies:', err);
-    const errorResponse = NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
-
-    // Add CORS headers to error response
-    Object.entries(corsHeaders).forEach(([key, value]) => {
-      errorResponse.headers.set(key, value);
-    });
-
-    return errorResponse;
+  } catch (error) {
+    console.error('[set-session] ❌ Error setting session:', error);
+    return NextResponse.json({ error: 'Failed to set session' }, { status: 500 });
   }
 }

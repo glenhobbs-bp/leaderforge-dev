@@ -35,32 +35,8 @@ export async function GET(
       console.log('[PREFERENCES API] 📋 User ID:', user_id);
     }
 
-    // Fast path: Check for session existence without expensive restoration
+    // Use restoreSession for authentication (supports single JSON cookie format)
     const cookieStore = await cookies();
-    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_PROJECT_REF;
-    if (!projectRef) {
-      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
-    }
-    const accessToken = cookieStore.get(`sb-${projectRef}-auth-token`)?.value;
-    const refreshToken = cookieStore.get(`sb-${projectRef}-refresh-token`)?.value;
-
-    if (isDev) {
-      console.log('[PREFERENCES API] 🍪 Tokens check:', {
-        hasAccessToken: !!accessToken,
-        hasRefreshToken: !!refreshToken
-      });
-    }
-
-    // If no tokens, immediately fail with 401
-    if (!accessToken || !refreshToken) {
-      if (isDev) {
-        console.log('[PREFERENCES API] ❌ No tokens found, returning 401');
-      }
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
-    }
 
     // Wrap session restoration in a shorter timeout to prevent hanging
     const authPromise = (async () => {
