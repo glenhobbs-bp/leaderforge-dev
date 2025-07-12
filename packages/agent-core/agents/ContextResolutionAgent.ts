@@ -68,6 +68,7 @@ export class ContextResolutionAgent {
 
   /**
    * Main orchestration method - resolves contexts and preferences for a user
+   * PERFORMANCE OPTIMIZED: Reuses data from PromptContextResolver instead of duplicating queries
    */
   async resolveUserContexts(request: ContextResolutionRequest): Promise<ContextResolutionResponse> {
     const { userId, tenantKey, includePreferences = true } = request;
@@ -76,10 +77,10 @@ export class ContextResolutionAgent {
       // 1. Agent Decision: Resolve user's active contexts with preferences
       const resolvedContext = await this.contextResolver.resolveUserContexts(userId, tenantKey);
 
-      // 2. Agent Decision: Get user preferences for UI if requested
+      // 2. OPTIMIZED: Build UI preferences from already-resolved data instead of re-querying
       let userPreferences: ContextResolutionResponse['userPreferences'] = [];
       if (includePreferences) {
-        userPreferences = await this.getUserPreferencesForUI(userId, tenantKey);
+        userPreferences = this.buildUserPreferencesFromResolvedContext(resolvedContext);
       }
 
       // 3. Agent Decision: Build system instructions
@@ -198,8 +199,34 @@ export class ContextResolutionAgent {
     }
   }
 
+    /**
+   * PERFORMANCE OPTIMIZED: Build UI preferences from already-resolved context data
+   * This eliminates redundant database queries by reusing data from PromptContextResolver
+   */
+  private buildUserPreferencesFromResolvedContext(
+    resolvedContext: ResolvedContext
+  ): ContextResolutionResponse['userPreferences'] {
+    try {
+      // Use the contexts that were already fetched by PromptContextResolver
+      return resolvedContext.contexts.map(context => ({
+        id: context.id,
+        name: context.name,
+        description: context.description,
+        scope: context.context_type.charAt(0).toUpperCase() + context.context_type.slice(1),
+        priority: context.priority,
+        isEnabled: resolvedContext.appliedContextIds.includes(context.id), // If it's applied, it's enabled
+        canEdit: true, // TODO: Check permissions
+        requiresLicense: false // TODO: Check entitlements
+      }));
+    } catch (error) {
+      console.error('[ContextResolutionAgent] Error building preferences from resolved context:', error);
+      return [];
+    }
+  }
+
   /**
-   * Get user preferences formatted for UI consumption
+   * DEPRECATED: Get user preferences formatted for UI consumption
+   * This method is kept for fallback but should not be used in normal flow
    */
   private async getUserPreferencesForUI(userId: string, tenantKey: string): Promise<ContextResolutionResponse['userPreferences']> {
     try {
@@ -256,20 +283,12 @@ export class ContextResolutionAgent {
 
     /**
    * Agent decision logic for building system instructions
+   * PERFORMANCE OPTIMIZED: Minimal logging
    */
   private buildSystemInstructions(resolvedContext: ResolvedContext): string {
     const baseInstructions = `You are a helpful assistant for LeaderForge, an AI-powered leadership development platform.`;
 
-    console.log('[ContextResolutionAgent] 📝 Building system instructions with contexts:', {
-      contextCount: resolvedContext.contexts.length,
-      contexts: resolvedContext.contexts.map(ctx => ({
-        name: ctx.name,
-        id: ctx.id,
-        type: ctx.context_type,
-        hasContent: !!ctx.content?.trim(),
-        contentLength: ctx.content?.length || 0
-      }))
-    });
+    console.log(`[ContextResolutionAgent] 📝 Building system instructions with ${resolvedContext.contexts.length} contexts`);
 
     if (resolvedContext.contexts.length === 0) {
       console.log('[ContextResolutionAgent] ⚠️ No contexts available, using base instructions only');
@@ -280,8 +299,7 @@ export class ContextResolutionAgent {
 
     const finalInstructions = baseInstructions + contextInstructions + `\n\nSystem Context:\n${resolvedContext.systemMessage}`;
 
-    console.log('[ContextResolutionAgent] 🎯 Final instructions length:', finalInstructions.length);
-    console.log('[ContextResolutionAgent] 📋 Applied context names:', resolvedContext.contexts.map(c => c.name));
+    console.log(`[ContextResolutionAgent] ✅ System instructions built: ${finalInstructions.length} chars`);
 
     return finalInstructions;
   }

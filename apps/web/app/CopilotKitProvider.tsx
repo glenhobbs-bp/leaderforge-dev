@@ -13,6 +13,7 @@ import { useSupabase } from '../components/SupabaseProvider';
 import { useEffect, useState, useCallback } from 'react';
 import { EntitlementActions } from '../components/copilot/EntitlementActions';
 import { ResizableWindow } from '../components/copilot/ResizableWindow';
+import { authCoordinator } from './lib/authCoordinator';
 
 
 export function CopilotKitProvider({
@@ -83,6 +84,11 @@ export function CopilotKitProvider({
 
     try {
       setAgentLoading(true);
+
+      // Wait for session sync to complete before making authenticated calls
+      console.log('[CopilotKitProvider] 🔄 Checking session sync status...');
+      await authCoordinator.waitForSessionReady();
+
       console.log('[CopilotKitProvider] 🔄 Fetching agent context for user:', session.user.id);
 
       const response = await fetch('/api/agent/context', {
@@ -106,8 +112,8 @@ export function CopilotKitProvider({
           setAgentContext(null);
         }
       } else if (response.status === 401 && retryCount < 2) {
-        // If we get 401, session sync might still be in progress - quick retry only
-        const delay = 300; // Fixed short delay instead of increasing delays
+        // If we get 401, session sync might still be in progress - longer delay for post-login cookie propagation
+        const delay = retryCount === 0 ? 500 : 300; // First retry waits longer for cookie propagation
         console.log('[CopilotKitProvider] 🔄 Got 401, retrying in', delay + 'ms... (attempt', retryCount + 1, 'of 2)');
         setTimeout(() => {
           fetchAgentContext(retryCount + 1);

@@ -32,10 +32,7 @@ export async function POST(request: NextRequest) {
 
     const { access_token, refresh_token, user } = await request.json();
 
-    // Debug token details
-    console.log('[set-session] Token debug: access length', access_token?.length, 'refresh length', refresh_token?.length);
-    console.log('[set-session] Access token parts:', access_token ? access_token.split('.').length : 0);
-    console.log('[set-session] Refresh token parts:', refresh_token ? refresh_token.split('.').length : 0);
+    // Reduced debug logging for performance
 
     // Handle logout - clear cookies when user is null
     if (user === null) {
@@ -71,10 +68,7 @@ export async function POST(request: NextRequest) {
     // Use standard Supabase format per ADR-0031: [access_token, null, refresh_token, null, null]
     const cookieValue = JSON.stringify([access_token, null, refresh_token, null, null]);
 
-    console.log('[set-session] Setting cookie:', authCookieName);
-    console.log('[set-session] Cookie value length:', cookieValue.length);
-    console.log('[set-session] User ID:', user?.id);
-    console.log('[set-session] Using standard Supabase array format per ADR-0031');
+    console.log('[set-session] Setting cookie for user:', user?.id);
 
         const response = NextResponse.json({ success: true });
 
@@ -94,55 +88,27 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 // 1 hour
     };
 
-    console.log('[set-session] Cookie configuration:', {
-      name: authCookieName,
-      secure: cookieOptions.secure,
-      sameSite: cookieOptions.sameSite,
-      httpOnly: cookieOptions.httpOnly,
-      path: cookieOptions.path,
-      maxAge: cookieOptions.maxAge
-    });
+    // Reduced cookie logging for performance
 
     response.cookies.set(authCookieName, cookieValue, cookieOptions);
 
-    // CRITICAL: Clear ALL potential Supabase interference cookies
-    // Supabase client can set multiple variants that interfere with our auth flow
+    // Clear only the most common interference cookies for performance
     const cookiesToClear = [
       'sb-session-disabled',
       `sb-${projectRef}-session-disabled`,
-      `sb-${projectRef}-refresh-token`, // Clear any separate refresh token cookie
-      'supabase-auth-token', // Legacy format
-      'supabase.auth.token', // Another variant
     ];
 
     cookiesToClear.forEach(cookieName => {
-      // Clear with multiple path variants to ensure complete removal
-      ['/'].forEach(path => {
-        response.cookies.set(cookieName, '', {
-          path,
-          httpOnly: false, // Some Supabase cookies might be client-side
-          secure: isProduction,
-          sameSite: 'strict',
-          maxAge: 0
-        });
-        // Also clear with httpOnly true variant
-        response.cookies.set(cookieName, '', {
-          path,
-          httpOnly: true,
-          secure: isProduction,
-          sameSite: 'strict',
-          maxAge: 0
-        });
+      response.cookies.set(cookieName, '', {
+        path: '/',
+        httpOnly: false,
+        secure: isProduction,
+        sameSite: 'strict',
+        maxAge: 0
       });
     });
 
-    // Debug: Log what cookies we're actually setting/clearing
-    console.log('[set-session] ✅ Successfully set auth cookies and cleared interference cookies:', cookiesToClear);
-    console.log('[set-session] 🍪 Final cookie operations:', {
-      set: authCookieName,
-      cleared: cookiesToClear.length,
-      cookieValueLength: cookieValue.length
-    });
+    console.log('[set-session] ✅ Session set successfully');
 
     return response;
   } catch (error) {

@@ -2,10 +2,60 @@
  * File: packages/agent-core/services/PromptContextResolver.ts
  * Purpose: Resolves prompt contexts hierarchically with user preference respect
  * Owner: Engineering Team
- * Tags: #prompt-context #resolver #hierarchy
+ * Tags: #prompt-context #resolver #hierarchy #performance-optimized
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+// Simple in-memory cache for performance
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  userId?: string;
+}
+
+class SimpleCache<T> {
+  private cache = new Map<string, CacheEntry<T>>();
+  private ttl: number;
+
+  constructor(ttlMs: number = 30000) { // 30 second TTL
+    this.ttl = ttlMs;
+  }
+
+  get(key: string, userId?: string): T | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    // Check if expired
+    if (Date.now() - entry.timestamp > this.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    // Check user isolation for security
+    if (userId && entry.userId && entry.userId !== userId) {
+      return null;
+    }
+
+    return entry.data;
+  }
+
+  set(key: string, data: T, userId?: string): void {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      userId
+    });
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+// Global cache instances
+const contextsCache = new SimpleCache<PromptContext[]>();
+const preferencesCache = new SimpleCache<UserContextPreference[]>();
 
 export interface PromptContext {
   id: string;
@@ -47,14 +97,18 @@ export class PromptContextResolver {
 
   /**
    * Main method: Resolve all active contexts for a user with hierarchy and toggles
+   * PERFORMANCE OPTIMIZED: Parallel queries + caching
    */
   async resolveUserContexts(userId: string, tenantKey: string = 'leaderforge'): Promise<ResolvedContext> {
     try {
-      // 1. Get all available contexts for this user (based on permissions)
-      const availableContexts = await this.getAvailableContexts(userId, tenantKey);
+      // OPTIMIZATION: Run context and preference queries in parallel instead of sequential
+      const [availableContexts, allUserPreferences] = await Promise.all([
+        this.getAvailableContexts(userId, tenantKey),
+        this.getAllUserPreferences(userId, tenantKey)
+      ]);
 
       // 2. Filter by user's toggle preferences (only enabled contexts)
-      const enabledContexts = await this.getEnabledUserContexts(userId, availableContexts);
+      const enabledContexts = this.getEnabledUserContextsSync(userId, availableContexts, allUserPreferences);
 
       // 3. Apply hierarchical ordering (global → org → team → personal)
       const orderedContexts = this.applyHierarchicalOrdering(enabledContexts);
@@ -85,8 +139,17 @@ export class PromptContextResolver {
 
   /**
    * Get all contexts available to a user based on their permissions and entitlements
+   * PERFORMANCE OPTIMIZED: Added caching
    */
   private async getAvailableContexts(userId: string, tenantKey: string): Promise<PromptContext[]> {
+    const cacheKey = `contexts:${tenantKey}`;
+
+    // Check cache first
+    const cached = contextsCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     // TODO: Add entitlement checking - for now get all active contexts
     const { data: contexts, error } = await this.supabase
       .schema('core')
@@ -101,41 +164,69 @@ export class PromptContextResolver {
       return [];
     }
 
-    return contexts || [];
+    const result = contexts || [];
+
+    // Cache the result (not user-specific, so no userId)
+    contextsCache.set(cacheKey, result);
+
+    return result;
   }
 
   /**
-   * Filter contexts by user's toggle preferences (enabled/disabled)
+   * Get ALL user preferences in one query for better performance
+   * PERFORMANCE OPTIMIZED: Single query instead of multiple
    */
-  private async getEnabledUserContexts(
-    userId: string,
-    availableContexts: PromptContext[]
-  ): Promise<PromptContext[]> {
-    if (availableContexts.length === 0) return [];
+  private async getAllUserPreferences(userId: string, tenantKey: string): Promise<UserContextPreference[]> {
+    const cacheKey = `prefs:${userId}:${tenantKey}`;
 
-    const contextIds = availableContexts.map(ctx => ctx.id);
-    console.log('[PromptContextResolver] 🔍 Filtering contexts for user:', userId);
-    console.log('[PromptContextResolver] 📋 Available contexts:', availableContexts.map(ctx => ({ id: ctx.id, name: ctx.name, content_length: ctx.content?.length || 0 })));
+    // Check cache first
+    const cached = preferencesCache.get(cacheKey, userId);
+    if (cached) {
+      return cached;
+    }
 
-    // Get user's preferences for these contexts
+    // Get ALL user preferences for this tenant in one query
     const { data: preferences, error } = await this.supabase
       .schema('core')
       .from('user_context_preferences')
       .select('context_id, is_enabled')
       .eq('user_id', userId)
-      .in('context_id', contextIds);
+      .eq('tenant_key', tenantKey);
 
     if (error) {
-      console.error('[PromptContextResolver] Error fetching preferences:', error);
-      // Default to all contexts enabled if preference lookup fails
-      return availableContexts;
+      console.error('[PromptContextResolver] Error fetching all preferences:', error);
+      return [];
     }
 
-    console.log('[PromptContextResolver] 👤 User preferences found:', preferences);
+    const result = preferences?.map(p => ({
+      user_id: userId,
+      context_id: p.context_id,
+      is_enabled: p.is_enabled,
+      tenant_key: tenantKey
+    })) || [];
 
-    // Create preference map
+    // Cache with user isolation
+    preferencesCache.set(cacheKey, result, userId);
+
+    return result;
+  }
+
+  /**
+   * Filter contexts by user's toggle preferences (enabled/disabled)
+   * PERFORMANCE OPTIMIZED: Synchronous processing with pre-fetched data
+   */
+  private getEnabledUserContextsSync(
+    userId: string,
+    availableContexts: PromptContext[],
+    userPreferences: UserContextPreference[]
+  ): PromptContext[] {
+    if (availableContexts.length === 0) return [];
+
+    console.log(`[PromptContextResolver] 🔍 Filtering ${availableContexts.length} contexts for user: ${userId}`);
+
+    // Create preference map for fast lookup
     const preferenceMap = new Map<string, boolean>();
-    preferences?.forEach(pref => {
+    userPreferences.forEach(pref => {
       preferenceMap.set(pref.context_id, pref.is_enabled);
     });
 
@@ -144,19 +235,15 @@ export class PromptContextResolver {
       const isEnabled = preferenceMap.get(context.id);
       const shouldInclude = isEnabled !== false; // Include if true or undefined (default enabled)
 
-      console.log(`[PromptContextResolver] 🎯 Context "${context.name}":`, {
-        id: context.id,
-        hasPreference: preferenceMap.has(context.id),
-        preferenceValue: isEnabled,
-        shouldInclude,
-        hasContent: !!context.content?.trim(),
-        contentLength: context.content?.length || 0
-      });
+      // Light logging only for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[PromptContextResolver] 🎯 "${context.name}": ${shouldInclude ? 'enabled' : 'disabled'}`);
+      }
 
       return shouldInclude;
     });
 
-    console.log('[PromptContextResolver] ✅ Final enabled contexts:', enabledContexts.map(ctx => ({ name: ctx.name, id: ctx.id })));
+    console.log(`[PromptContextResolver] ✅ ${enabledContexts.length} contexts enabled`);
 
     return enabledContexts;
   }
@@ -183,44 +270,24 @@ export class PromptContextResolver {
 
   /**
    * Merge contexts into final system message and template variables
+   * PERFORMANCE OPTIMIZED: Minimal logging
    */
   private mergeContexts(orderedContexts: PromptContext[]): {
     systemMessage: string;
     behaviorModifiers: Record<string, unknown>;
   } {
-    console.log('[PromptContextResolver] 🔄 Merging contexts into system message:', {
-      totalContexts: orderedContexts.length,
-      contexts: orderedContexts.map(ctx => ({
-        name: ctx.name,
-        hasContent: !!ctx.content?.trim(),
-        contentLength: ctx.content?.length || 0,
-        contentPreview: ctx.content?.substring(0, 50) + '...'
-      }))
-    });
+    console.log(`[PromptContextResolver] 🔄 Merging ${orderedContexts.length} contexts into system message`);
 
     // Build system message by concatenating all context content
     const systemParts = orderedContexts
-      .filter(ctx => {
-        const hasContent = !!ctx.content?.trim();
-        if (!hasContent) {
-          console.log(`[PromptContextResolver] ⚠️ Skipping context "${ctx.name}" - no content`);
-        }
-        return hasContent;
-      })
-      .map(ctx => {
-        console.log(`[PromptContextResolver] ✅ Including context "${ctx.name}" content (${ctx.content.trim().length} chars)`);
-        return ctx.content.trim();
-      });
+      .filter(ctx => !!ctx.content?.trim())
+      .map(ctx => ctx.content.trim());
 
     const systemMessage = systemParts.length > 0
       ? systemParts.join('\n\n')
       : 'You are a helpful AI assistant.';
 
-    console.log('[PromptContextResolver] 📝 Final system message built:', {
-      partsCount: systemParts.length,
-      totalLength: systemMessage.length,
-      includedContexts: orderedContexts.filter(ctx => !!ctx.content?.trim()).map(ctx => ctx.name)
-    });
+    console.log(`[PromptContextResolver] ✅ System message built: ${systemMessage.length} chars from ${systemParts.length} contexts`);
 
     // Merge template variables (later contexts override earlier ones)
     const behaviorModifiers: Record<string, unknown> = {};
@@ -286,6 +353,10 @@ export class PromptContextResolver {
         console.error('[PromptContextResolver] Error updating preference:', result.error);
         return false;
       }
+
+      // PERFORMANCE: Clear cache when preferences are updated
+      const cacheKey = `prefs:${userId}:${tenantKey}`;
+      preferencesCache.set(cacheKey, [], userId); // Clear cache by setting empty array
 
       console.log(`[PromptContextResolver] ✅ Successfully ${existing ? 'updated' : 'created'} preference: ${contextId} = ${isEnabled}`);
       return true;

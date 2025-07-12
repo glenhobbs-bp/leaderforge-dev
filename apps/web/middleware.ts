@@ -48,27 +48,8 @@ function getProjectRef(): string | null {
   return match ? match[1] : null;
 }
 
-// Quick validation with Supabase server to catch 403 tokens
-async function validateTokenWithSupabase(accessToken: string): Promise<boolean> {
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!supabaseUrl) return false;
-
-    const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-      }
-    });
-
-    // If we get 403, the token is invalid despite passing JWT checks
-    return response.status !== 403;
-  } catch (error) {
-    console.log('[MIDDLEWARE] Token validation error:', (error as Error).message);
-    return false;
-  }
-}
+// Removed expensive validateTokenWithSupabase - middleware should be fast
+// Individual API endpoints will handle detailed token validation when needed
 
 export function createAuthFailureResponse(
   request: NextRequest,
@@ -87,8 +68,6 @@ export function createAuthFailureResponse(
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  console.log(`[MIDDLEWARE] ${request.method} ${pathname}`);
 
   // Special handling for login page - redirect authenticated users
   if (pathname.startsWith('/login')) {
@@ -158,18 +137,14 @@ export async function middleware(request: NextRequest) {
 
   const authCookie = cookies().get(`sb-${projectRef}-auth-token`);
 
-  // Debug: List all cookies with detailed info
-  const allCookies = cookies().getAll();
-  console.log('[MIDDLEWARE] All cookies:', allCookies.map(c => c.name).join(', '));
-  console.log('[MIDDLEWARE] Looking for cookie:', `sb-${projectRef}-auth-token`);
-  console.log('[MIDDLEWARE] Cookie details:', allCookies.map(c => ({
-    name: c.name,
-    valueLength: c.value?.length || 0,
-    hasValue: !!c.value
-  })));
+  // Reduced debug logging for performance
 
   if (!authCookie) {
     console.log('[MIDDLEWARE] ❌ Missing auth cookie for', pathname);
+    // Don't add error parameters for normal redirects from root page
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
     return createAuthFailureResponse(request, 'missing_auth');
   }
   let tokens;
@@ -183,7 +158,6 @@ export async function middleware(request: NextRequest) {
 
   // Parse ADR-0031 standard format: [access_token, null, refresh_token, null, null]
   const accessToken = Array.isArray(tokens) ? tokens[0] : tokens.access_token;
-  const refreshToken = Array.isArray(tokens) ? tokens[2] : tokens.refresh_token;
 
   // CRITICAL: Only require access token - refresh tokens can be short strings or missing in some flows
   if (!accessToken) {
@@ -192,18 +166,7 @@ export async function middleware(request: NextRequest) {
     return createAuthFailureResponse(request, 'missing_access_token');
   }
 
-  // Log token details for debugging (refresh token is optional)
-  console.log('[MIDDLEWARE] Token debug for', pathname, ':', {
-    accessTokenLength: accessToken?.length || 0,
-    refreshTokenLength: refreshToken?.length || 0,
-    hasRefreshToken: !!refreshToken
-  });
-
-  console.log('[MIDDLEWARE] Token check for', pathname, ':', {
-    project: projectRef,
-    access: accessToken ? `${accessToken.length} chars` : 'missing',
-    refresh: refreshToken ? `${refreshToken.length} chars` : 'missing'
-  });
+  // Token validation (reduced logging for performance)
 
   // Basic JWT structure validation
   const accessTokenParts = accessToken.split('.');
@@ -229,13 +192,8 @@ export async function middleware(request: NextRequest) {
     return createAuthFailureResponse(request, 'invalid_payload');
   }
 
-  // Server-side validation
-  const isValidWithSupabase = await validateTokenWithSupabase(accessToken);
-  if (!isValidWithSupabase) {
-    console.log(`[MIDDLEWARE] ❌ Token rejected by Supabase for ${pathname}`);
-    // Don't delete cookies immediately - could be temporary network issue or race condition
-    return createAuthFailureResponse(request, 'invalid_token');
-  }
+  // Skip expensive server validation in middleware - API endpoints will validate when needed
+  // This prevents race conditions and improves performance
 
   console.log(`[MIDDLEWARE] ✅ Valid auth for ${pathname} - proceeding`);
   return NextResponse.next();

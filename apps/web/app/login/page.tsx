@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSupabase } from '../../components/SupabaseProvider';
+import { authCoordinator } from '../lib/authCoordinator';
 
 export default function LoginPage() {
   const { supabase, session } = useSupabase();
@@ -87,35 +88,44 @@ export default function LoginPage() {
 
       console.log('[login/page] Auth event in redirect listener:', event, !!authSession);
       if (event === 'SIGNED_IN' && authSession) {
-        console.log('[login/page] SIGNED_IN detected - syncing session to server');
+        console.log('[login/page] SIGNED_IN detected - starting coordinated session sync');
         setHasCompletedAuth(true);
 
         if (authSession.access_token && authSession.refresh_token) {
           try {
+            // Start coordinated session sync - notifies other components to wait
+            authCoordinator.startSessionSync();
+
             const response = await fetch('/api/auth/set-session', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 access_token: authSession.access_token,
                 refresh_token: authSession.refresh_token,
-                expires_at: authSession.expires_at,
-                expires_in: authSession.expires_in,
-                token_type: authSession.token_type,
-                user: authSession.user
+                user: { id: authSession.user?.id } // Only send minimal user data
               })
             });
 
             if (response.ok) {
               console.log('[login/page] Session synced successfully');
-              await new Promise(resolve => setTimeout(resolve, 100));
+              // Extra delay to ensure cookies are available for subsequent API calls
+              await new Promise(resolve => setTimeout(resolve, 250));
+
+              // Notify coordinator that session sync is complete
+              authCoordinator.finishSessionSync();
             } else {
               console.error('[login/page] Failed to sync session - response not ok:', response.status);
+              authCoordinator.failSessionSync();
               return;
             }
           } catch (err) {
             console.error('[login/page] Failed to sync session:', err);
+            authCoordinator.failSessionSync();
             return;
           }
+        } else {
+          // No tokens available, fail the sync
+          authCoordinator.failSessionSync();
         }
         console.log('[login/page] Redirecting to', returnTo);
         window.location.href = returnTo;

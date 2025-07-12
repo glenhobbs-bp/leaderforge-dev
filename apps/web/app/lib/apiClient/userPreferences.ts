@@ -4,6 +4,7 @@
 // Tags: API client, user preferences, caching, error handling
 
 import type { User } from '../types';
+import { authCoordinator } from '../authCoordinator';
 
 /**
  * Fetches user preferences from the API.
@@ -34,6 +35,9 @@ export async function fetchUserPreferences(userId: string): Promise<User['prefer
   }, timeout);
 
   try {
+    // Wait for session sync to complete before making authenticated calls
+    await authCoordinator.waitForSessionReady();
+
     if (isDev) {
       console.log('[USER PREFS CLIENT] 📡 Making API request...');
     }

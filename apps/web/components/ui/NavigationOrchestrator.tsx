@@ -11,6 +11,7 @@ import { ContentRenderer } from './ContentRenderer';
 import { ModalManager } from './ModalManager';
 import type { TenantConfig } from '../../app/lib/types';
 import { initializeDefaultHandlers, type ActionData } from '../../app/lib/widgetActionRegistry';
+import { authCoordinator } from '../../app/lib/authCoordinator';
 
 interface AgentSchema {
   type: 'content_schema' | 'no_agent' | 'error' | 'mockup' | 'direct_route' | 'static_page';
@@ -113,19 +114,25 @@ export function NavigationOrchestrator({
       console.log('[NavigationOrchestrator] 🔄 Prop selectedNavOptionId changed:', propSelectedNavOptionId, 'current ref:', currentNavIdRef.current);
       currentNavIdRef.current = propSelectedNavOptionId;
       setSelectedNavOptionId(propSelectedNavOptionId);
-      // Use a flag to prevent saving state during prop-driven navigation
-      loadContentForNavOption(propSelectedNavOptionId, false, true);
+
+      // Add small delay for post-login coordination (navigation restoration often happens right after login)
+      setTimeout(() => {
+        loadContentForNavOption(propSelectedNavOptionId, false, true);
+      }, 300); // Small delay to coordinate with login cookie propagation
     }
   }, [propSelectedNavOptionId, isReady, userId]); // Using ref instead of state to prevent race condition
 
   // 🤖 AGENT-NATIVE: Fetch agent schema for navigation option
-  const fetchAgentSchema = useCallback(async (navId: string) => {
+  const fetchAgentSchema = useCallback(async (navId: string, retryCount = 0) => {
     if (!userId) {
       console.error('[NavigationOrchestrator] No user session - cannot fetch agent schema');
       return;
     }
 
     try {
+      // Wait for session sync to complete before making authenticated calls
+      await authCoordinator.waitForSessionReady();
+
       console.log('[NavigationOrchestrator] 🔧 Fetching agent schema for navId:', navId, 'tenant:', currentTenant);
       setContentLoading(true);
       setError(null);
@@ -149,6 +156,16 @@ export function NavigationOrchestrator({
       console.log('[NavigationOrchestrator] Agent response status:', response.status, response.statusText);
 
       if (!response.ok) {
+        // Handle post-login authentication race condition
+        if (response.status === 401 && retryCount < 2) {
+          const delay = retryCount === 0 ? 600 : 400; // Longer first delay for post-login cookie propagation
+          console.log('[NavigationOrchestrator] 🔄 Got 401, retrying in', delay + 'ms... (attempt', retryCount + 1, 'of 2)');
+          setTimeout(() => {
+            fetchAgentSchema(navId, retryCount + 1);
+          }, delay);
+          return; // Don't set loading to false yet
+        }
+
         const errorText = await response.text();
         console.error('[NavigationOrchestrator] Agent response error:', {
           status: response.status,

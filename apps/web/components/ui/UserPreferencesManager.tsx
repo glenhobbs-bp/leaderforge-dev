@@ -25,6 +25,10 @@ export function UserPreferencesManager({
 }: UserPreferencesManagerProps) {
   // Core state - simplified approach
   const hasInitialized = useRef(false);
+  const callbacksRef = useRef({ onTenantChange, onNavOptionSelect, onPreferencesReady });
+
+  // Keep callbacks up to date without triggering re-renders
+  callbacksRef.current = { onTenantChange, onNavOptionSelect, onPreferencesReady };
 
   // Fetch user preferences with shorter timeout
   const { data: userPrefs, error: userPrefsError, isLoading: userPrefsLoading } = useUserPreferences(
@@ -32,7 +36,7 @@ export function UserPreferencesManager({
     { enabled: !!userId }
   );
 
-  // Single effect to handle initialization
+  // Single effect to handle initialization - STABLE DEPENDENCIES ONLY
   useEffect(() => {
     // Prevent multiple initializations
     if (hasInitialized.current) {
@@ -44,17 +48,14 @@ export function UserPreferencesManager({
       if (!hasInitialized.current) {
         console.log('[UserPreferencesManager] Timeout reached - proceeding without user preferences');
         hasInitialized.current = true;
-        onPreferencesReady();
-
-        // Try to restore default navigation option if no preferences loaded
-
+        callbacksRef.current.onPreferencesReady();
       }
-    }, 10000); // Increased to 10 seconds to match API timeout
+    }, 3000); // Reduced to 3 seconds for better performance
 
     // If no userId, proceed immediately
     if (!userId) {
       hasInitialized.current = true;
-      onPreferencesReady();
+      callbacksRef.current.onPreferencesReady();
       window.clearTimeout(initializationTimeout);
       return;
     }
@@ -63,7 +64,7 @@ export function UserPreferencesManager({
     if (userPrefsError) {
       console.warn('[UserPreferencesManager] User preferences error - proceeding without them:', userPrefsError);
       hasInitialized.current = true;
-      onPreferencesReady();
+      callbacksRef.current.onPreferencesReady();
       window.clearTimeout(initializationTimeout);
       return;
     }
@@ -77,19 +78,18 @@ export function UserPreferencesManager({
       const lastTenant = navigationState?.lastTenant;
       if (lastTenant && lastTenant !== currentTenant) {
         console.log('[UserPreferencesManager] Restoring saved tenant:', lastTenant);
-        onTenantChange(lastTenant);
+        callbacksRef.current.onTenantChange(lastTenant);
       }
 
       // Restore navigation option if in correct tenant
       const lastNavOption = navigationState?.lastNavOption;
       if (lastNavOption && (lastTenant === currentTenant || !lastTenant)) {
         console.log('[UserPreferencesManager] Restoring saved navigation option:', lastNavOption);
-        // Use immediate callback instead of timeout
-        onNavOptionSelect(lastNavOption);
+        callbacksRef.current.onNavOptionSelect(lastNavOption);
       }
 
       hasInitialized.current = true;
-      onPreferencesReady();
+      callbacksRef.current.onPreferencesReady();
       window.clearTimeout(initializationTimeout);
       return;
     }
@@ -98,7 +98,7 @@ export function UserPreferencesManager({
     return () => {
       window.clearTimeout(initializationTimeout);
     };
-  }, [userId, userPrefs, userPrefsError, userPrefsLoading, currentTenant, onTenantChange, onNavOptionSelect, onPreferencesReady]);
+  }, [userId, userPrefs, userPrefsError, userPrefsLoading, currentTenant]); // Removed callback dependencies
 
   // This component doesn't render anything - it's just for state management
   return null;

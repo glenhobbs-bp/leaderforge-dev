@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
 const path = require("path");
 
 /** @type {import('next').NextConfig} */
@@ -11,7 +13,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  productionBrowserSourceMaps: false,
+  // ✅ PERFORMANCE: Enable source maps only when needed
+  productionBrowserSourceMaps: process.env.ENABLE_SOURCE_MAPS === 'true',
   // ✅ FIX: Disable source maps in development to prevent 404 errors
   devIndicators: {
     buildActivity: false,
@@ -20,8 +23,21 @@ const nextConfig = {
     return 'build-' + Date.now();
   },
   experimental: {
-    optimizePackageImports: ['lucide-react'],
-    serverComponentsExternalPackages: ['@supabase/supabase-js']
+    optimizePackageImports: [
+      'lucide-react',
+      '@copilotkit/react-core',
+      '@copilotkit/react-ui',
+      '@radix-ui/react-icons'
+    ],
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+    // ✅ PERFORMANCE: Enable concurrent features
+    serverMinification: true,
+    // ✅ PERFORMANCE: Optimize CSS
+    optimizeCss: true
+  },
+  // ✅ PERFORMANCE: Production optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   // Enable development features when NODE_ENV is development
   ...(process.env.NODE_ENV === 'development' && {
@@ -30,10 +46,10 @@ const nextConfig = {
         fullUrl: true,
       },
     },
-    // Enable source maps in development builds
-    productionBrowserSourceMaps: true,
-    // Disable minification for better debugging
-    swcMinify: false,
+    // Enable source maps in development builds only if explicitly requested
+    productionBrowserSourceMaps: process.env.DEV_SOURCE_MAPS === 'true',
+    // Enable minification for better performance even in dev
+    swcMinify: true,
   }),
   // Force development mode if VERCEL_ENV is preview and FORCE_DEV is set
   ...(process.env.VERCEL_ENV === 'preview' && process.env.FORCE_DEV === 'true' && {
@@ -45,9 +61,42 @@ const nextConfig = {
     productionBrowserSourceMaps: true,
     swcMinify: false,
   }),
-      webpack: (config) => {
-    // ✅ FIX: Remove devtool override to prevent performance warnings
-    // Source maps are handled by Next.js automatically
+  webpack: (config, { isServer, dev }) => {
+    // ✅ PERFORMANCE: Bundle optimizations
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: 10,
+              reuseExistingChunk: true,
+            },
+            copilotkit: {
+              test: /[\\/]node_modules[\\/]@copilotkit[\\/]/,
+              name: 'copilotkit',
+              priority: 20,
+              reuseExistingChunk: true,
+            },
+            supabase: {
+              test: /[\\/]node_modules[\\/]@supabase[\\/]/,
+              name: 'supabase',
+              priority: 20,
+              reuseExistingChunk: true,
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              priority: 5,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      };
+    }
 
     // ✅ FIX: Minimal webpack config to prevent rebuild issues
     config.resolve.alias = {

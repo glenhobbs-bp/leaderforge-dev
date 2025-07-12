@@ -5,9 +5,9 @@
 
 import useSWR from 'swr';
 
-// Fetch function with credentials and timeout - Fixed memory leak issues
+// Fetch function with credentials and timeout - Optimized for performance
 const fetchWithCredentials = (url: string) => {
-  // 15-second timeout to accommodate slow entitlement queries
+  // 5-second timeout (reduced from 15s for better performance)
   const controller = new AbortController();
   let timeoutId: number | undefined;
 
@@ -22,7 +22,7 @@ const fetchWithCredentials = (url: string) => {
   timeoutId = window.setTimeout(() => {
     cleanup();
     controller.abort();
-  }, 15000);
+  }, 5000);
 
   return fetch(url, {
     credentials: 'include',
@@ -36,7 +36,7 @@ const fetchWithCredentials = (url: string) => {
   }).catch((error) => {
     cleanup(); // Clear timeout on error
     if (error.name === 'AbortError') {
-      console.warn('[useNavOptions] Navigation API request timed out');
+      console.warn('[useNavOptions] Navigation API request timed out after 5s');
       throw new Error('Navigation request timeout');
     }
     throw error;
@@ -50,15 +50,15 @@ export function useNavOptions(tenantKey: string, initialData?: unknown) {
     fetchWithCredentials,
     {
       fallbackData: initialData,
-      // Aggressive caching for performance
+      // Optimized caching for performance
       revalidateOnMount: !initialData,
       revalidateOnFocus: false, // Don't refetch on window focus
       revalidateOnReconnect: false, // Don't refetch on reconnect
       dedupingInterval: 10 * 60 * 1000, // 10 minutes deduping
       focusThrottleInterval: 5 * 60 * 1000, // 5 minutes focus throttle
-      // Cache for 10 minutes
-      errorRetryInterval: 30 * 1000, // 30 seconds retry on error
-      errorRetryCount: 2, // Only retry twice
+      // Improved error handling for better performance
+      errorRetryInterval: 5 * 1000, // 5 seconds retry (reduced from 30s)
+      errorRetryCount: 1, // Only retry once (reduced from 2)
     }
   );
 
