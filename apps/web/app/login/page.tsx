@@ -17,6 +17,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasCompletedAuth, setHasCompletedAuth] = useState(false);
 
   // Get the returnTo parameter from URL
   const returnTo = searchParams.get('returnTo') || '/dashboard';
@@ -46,13 +47,17 @@ export default function LoginPage() {
     };
   }, [supabase, router, returnTo, searchParams]);
 
+    // Initial session check - runs only once
   useEffect(() => {
+    if (hasCompletedAuth) return; // Skip if already completed
+
     const checkAndRedirect = async () => {
       console.log('[login/page] Checking for session in redirect effect');
       const { data: { session } } = await supabase.auth.getSession();
       console.log('[login/page] Session check result:', !!session);
       if (session) {
         console.log('[login/page] Valid session detected - redirecting to', returnTo);
+        setHasCompletedAuth(true);
         router.push(returnTo);
       } else {
         console.log('[login/page] No session found in redirect check');
@@ -60,12 +65,27 @@ export default function LoginPage() {
     };
 
     checkAndRedirect();
+  }, [supabase, router, returnTo, hasCompletedAuth]);
 
-    // Listen for auth changes to trigger redirect
+    // Auth state listener - runs once and stays active
+  useEffect(() => {
+    if (hasCompletedAuth) {
+      console.log('[login/page] Skipping auth listener setup - authentication already completed');
+      return;
+    }
+
     const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Skip processing if auth already completed
+      if (hasCompletedAuth) {
+        console.log('[login/page] Skipping auth event processing - already completed');
+        return;
+      }
+
       console.log('[login/page] Auth event in redirect listener:', event, !!session);
       if (event === 'SIGNED_IN' && session) {
         console.log('[login/page] SIGNED_IN detected - syncing session to server');
+        setHasCompletedAuth(true); // Prevent further session checks
+
         // Validate and sync to server cookies
         if (session.access_token && session.refresh_token) {
           try {
@@ -88,10 +108,12 @@ export default function LoginPage() {
               await new Promise(resolve => setTimeout(resolve, 100));
             } else {
               console.error('[login/page] Failed to sync session - response not ok:', response.status);
+              // Don't reset hasCompletedAuth to prevent infinite loops
               return; // Don't redirect if session sync failed
             }
           } catch (err) {
             console.error('[login/page] Failed to sync session:', err);
+            // Don't reset hasCompletedAuth to prevent infinite loops
             return; // Don't redirect if session sync failed
           }
         }
@@ -103,16 +125,29 @@ export default function LoginPage() {
     return () => {
       listener.subscription.unsubscribe();
     };
-  }, [supabase, router, returnTo]);
+  }, [supabase, router, returnTo, hasCompletedAuth]);
 
-  // Show loading state initially to prevent flash of unstyled content
+    // Show loading state initially to prevent flash of unstyled content
   useEffect(() => {
+    if (hasCompletedAuth) {
+      console.log('[login/page] Skipping loading setup - auth already completed');
+      return;
+    }
+
     const timer = window.setTimeout(() => {
-      setIsAuthLoaded(true);
+      if (!hasCompletedAuth) {
+        setIsAuthLoaded(true);
+      }
     }, 150); // Slightly longer to ensure smooth loading
 
     // Fallback to ensure we never stay stuck on loading
     const fallbackTimer = window.setTimeout(async () => {
+      // Don't run fallback if auth has already completed
+      if (hasCompletedAuth) {
+        console.log('[login/page] Fallback skipped - auth already completed');
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         console.log('[login/page] Fallback skipped - session exists during timer');
@@ -126,7 +161,25 @@ export default function LoginPage() {
       window.clearTimeout(timer);
       window.clearTimeout(fallbackTimer);
     };
-  }, []);
+  }, [hasCompletedAuth]);
+
+  // Early return if authentication completed - prevent any further rendering
+  if (hasCompletedAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
+        <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center mb-6">
+            <img src="/logos/leaderforge-logo.png" alt="LeaderForge" width={120} height={40} />
+          </div>
+          <div className="flex flex-col items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+            <h3 className="mt-4 text-lg font-semibold text-gray-900">Authentication Successful!</h3>
+            <p className="mt-2 text-sm text-gray-600">Redirecting to dashboard...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (

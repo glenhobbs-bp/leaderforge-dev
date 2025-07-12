@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 // Extract project reference from Supabase URL
-function getProjectRef(): string {
+export function getProjectRef(): string {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!supabaseUrl) {
     throw new Error('NEXT_PUBLIC_SUPABASE_URL is not set');
@@ -101,11 +101,20 @@ export async function restoreSession(cookieStore: ReadonlyRequestCookies, setCoo
     refreshTokenLength: refreshToken?.length || 0
   });
 
-  // SECURITY FIX: Only attempt session restoration when both tokens exist
-  if (!accessToken || !refreshToken) {
-    console.log('[restoreSession] Missing tokens in cookie - returning null session');
+  // SECURITY FIX: Only require access token - refresh tokens can be short strings or missing
+  if (!accessToken) {
+    console.log('[restoreSession] Missing access token in cookie - returning null session');
     return { session: null, supabase, error: null };
   }
+
+  // Log token validation details
+  console.log('[restoreSession] Token validation:', {
+    hasAccessToken: !!accessToken,
+    hasRefreshToken: !!refreshToken,
+    accessTokenLength: accessToken?.length || 0,
+    refreshTokenLength: refreshToken?.length || 0,
+    willAttemptRestore: !!accessToken
+  });
 
   try {
     // Set the session with parsed tokens first, then get the session

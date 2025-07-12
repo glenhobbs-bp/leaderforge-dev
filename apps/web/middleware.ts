@@ -146,12 +146,21 @@ export async function middleware(request: NextRequest) {
   // Parse ADR-0031 standard format: [access_token, null, refresh_token, null, null]
   const accessToken = Array.isArray(tokens) ? tokens[0] : tokens.access_token;
   const refreshToken = Array.isArray(tokens) ? tokens[2] : tokens.refresh_token;
-  if (!accessToken || !refreshToken) {
-    console.log('[MIDDLEWARE] ❌ Missing tokens in auth cookie for', pathname);
-    const response = createAuthFailureResponse(request, 'invalid_auth_format');
+
+  // CRITICAL: Only require access token - refresh tokens can be short strings or missing in some flows
+  if (!accessToken) {
+    console.log('[MIDDLEWARE] ❌ Missing access token in auth cookie for', pathname);
+    const response = createAuthFailureResponse(request, 'missing_access_token');
     response.cookies.set(`sb-${projectRef}-auth-token`, '', { maxAge: 0, path: '/' });
     return response;
   }
+
+  // Log token details for debugging (refresh token is optional)
+  console.log('[MIDDLEWARE] Token debug for', pathname, ':', {
+    accessTokenLength: accessToken?.length || 0,
+    refreshTokenLength: refreshToken?.length || 0,
+    hasRefreshToken: !!refreshToken
+  });
 
   console.log('[MIDDLEWARE] Token check for', pathname, ':', {
     project: projectRef,
