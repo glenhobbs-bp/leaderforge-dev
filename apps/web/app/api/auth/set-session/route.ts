@@ -105,17 +105,45 @@ export async function POST(request: NextRequest) {
 
     response.cookies.set(authCookieName, cookieValue, cookieOptions);
 
-    // CRITICAL: Clear the sb-session-disabled cookie that Supabase client sets
-    // This cookie can interfere with our authentication flow
-    response.cookies.set('sb-session-disabled', '', {
-      path: '/',
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'strict',
-      maxAge: 0  // Delete it
+    // CRITICAL: Clear ALL potential Supabase interference cookies
+    // Supabase client can set multiple variants that interfere with our auth flow
+    const cookiesToClear = [
+      'sb-session-disabled',
+      `sb-${projectRef}-session-disabled`,
+      `sb-${projectRef}-refresh-token`, // Clear any separate refresh token cookie
+      'supabase-auth-token', // Legacy format
+      'supabase.auth.token', // Another variant
+    ];
+
+    cookiesToClear.forEach(cookieName => {
+      // Clear with multiple path variants to ensure complete removal
+      ['/'].forEach(path => {
+        response.cookies.set(cookieName, '', {
+          path,
+          httpOnly: false, // Some Supabase cookies might be client-side
+          secure: isProduction,
+          sameSite: 'strict',
+          maxAge: 0
+        });
+        // Also clear with httpOnly true variant
+        response.cookies.set(cookieName, '', {
+          path,
+          httpOnly: true,
+          secure: isProduction,
+          sameSite: 'strict',
+          maxAge: 0
+        });
+      });
     });
 
-    console.log('[set-session] ✅ Successfully set auth cookies and cleared sb-session-disabled');
+    // Debug: Log what cookies we're actually setting/clearing
+    console.log('[set-session] ✅ Successfully set auth cookies and cleared interference cookies:', cookiesToClear);
+    console.log('[set-session] 🍪 Final cookie operations:', {
+      set: authCookieName,
+      cleared: cookiesToClear.length,
+      cookieValueLength: cookieValue.length
+    });
+
     return response;
   } catch (error) {
     console.error('[set-session] ❌ Error setting session:', error);
