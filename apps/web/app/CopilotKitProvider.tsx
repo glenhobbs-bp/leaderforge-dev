@@ -123,12 +123,6 @@ export function CopilotKitProvider({
   // Initial context fetch when component mounts or user changes - but only if ready
   useEffect(() => {
     if (isReady && session?.user?.id) {
-      // Additional check: don't fetch if we're still on login page (session sync may be in progress)
-      if (typeof window !== 'undefined' && window.location.pathname === '/login') {
-        console.log('[CopilotKitProvider] ⏳ Skipping context fetch - still on login page');
-        return;
-      }
-
       fetchAgentContext();
     }
   }, [fetchAgentContext, isReady, session?.user?.id]);
@@ -193,8 +187,8 @@ export function CopilotKitProvider({
           title: "LeaderForge Assistant",
           initial: `Hi ${userName}! I'm your LeaderForge assistant. How can I help you today?`,
         }}
-        defaultOpen={false}
-        clickOutsideToClose={true}
+        defaultOpen={true}
+        clickOutsideToClose={false}
         Window={ResizableWindow}
       />
     </CopilotKit>

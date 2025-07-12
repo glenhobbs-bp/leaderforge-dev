@@ -81,6 +81,40 @@
 }
 
 /* ========================================
+   COPILOTKIT TRIGGER BUTTON STYLING
+   ======================================== */
+
+/* Ensure CopilotKit trigger button is visible and well-positioned */
+.copilotKitTriggerButton {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(30, 64, 175, 0.3) !important;
+  cursor: pointer !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
+}
+
+.copilotKitTriggerButton:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 12px 32px rgba(30, 64, 175, 0.4) !important;
+}
+
+.copilotKitTriggerButton svg {
+  color: white !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* ========================================
    COPILOTKIT WINDOW & POPUP STYLING
    ======================================== */
 

@@ -6,150 +6,148 @@
 // Tags: authentication, Supabase Auth UI, login, client component
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useSupabase } from '../../components/SupabaseProvider';
 
 export default function LoginPage() {
-  const { supabase } = useSupabase();
-  const router = useRouter();
+  const { supabase, session } = useSupabase();
   const searchParams = useSearchParams();
   const [isAuthLoaded, setIsAuthLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasCompletedAuth, setHasCompletedAuth] = useState(false);
-
-  // Get the returnTo parameter from URL
   const returnTo = searchParams.get('returnTo') || '/dashboard';
 
+  // Clear potentially corrupted cookies on mount
   useEffect(() => {
-    // Clear any corrupted cookies on mount if there are auth errors
     const clearCorruptedCookies = async () => {
-      // New: Skip if we already have a valid session (post-login)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      if (session?.user?.id) {
         console.log('[login/page] Skipping cookie clear - valid session exists');
         return;
       }
 
-      if (searchParams.get('error')?.includes('session_refresh_failed') ||
-          searchParams.get('error')?.includes('session_exception')) {
-        console.log('[login/page] Clearing corrupted cookies');
-        // Assuming authService is available or needs to be imported
-        // await authService.signOut(supabase);
-        // router.refresh();
+      try {
+        const response = await fetch('/api/auth/clear-session', {
+          method: 'POST'
+        });
+        if (!response.ok) {
+          console.warn('[login/page] Failed to clear potentially corrupted session');
+        }
+      } catch (err) {
+        console.warn('[login/page] Error clearing potentially corrupted session:', err);
       }
     };
 
     clearCorruptedCookies();
+  }, [session?.user?.id]);
 
-    return () => {
-    };
-  }, [supabase, router, returnTo, searchParams]);
-
-    // Initial session check - runs only once
+  // Server-side auth check - redirect immediately if user is already authenticated
   useEffect(() => {
-    if (hasCompletedAuth) return; // Skip if already completed
+    if (session?.user?.id && !hasCompletedAuth) {
+      console.log('[login/page] 🔄 User already authenticated, redirecting to:', returnTo);
+      setHasCompletedAuth(true);
+      window.location.href = returnTo; // Force complete page redirect
+      return;
+    }
+  }, [session?.user?.id, returnTo, hasCompletedAuth]);
+
+  // Initial session check for unauthenticated users only
+  useEffect(() => {
+    if (hasCompletedAuth || session?.user?.id) return;
 
     const checkAndRedirect = async () => {
       console.log('[login/page] Checking for session in redirect effect');
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('[login/page] Session check result:', !!session);
-      if (session) {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      console.log('[login/page] Session check result:', !!currentSession);
+      if (currentSession) {
         console.log('[login/page] Valid session detected - redirecting to', returnTo);
         setHasCompletedAuth(true);
-        router.push(returnTo);
+        window.location.href = returnTo;
       } else {
         console.log('[login/page] No session found in redirect check');
       }
     };
 
     checkAndRedirect();
-  }, [supabase, router, returnTo, hasCompletedAuth]);
+  }, [supabase, returnTo, hasCompletedAuth, session?.user?.id]);
 
-    // Auth state listener - runs once and stays active
+  // Auth state listener for unauthenticated users only
   useEffect(() => {
-    if (hasCompletedAuth) {
+    if (hasCompletedAuth || session?.user?.id) {
       console.log('[login/page] Skipping auth listener setup - authentication already completed');
       return;
     }
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Skip processing if auth already completed
-      if (hasCompletedAuth) {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, authSession) => {
+      if (hasCompletedAuth || session?.user?.id) {
         console.log('[login/page] Skipping auth event processing - already completed');
         return;
       }
 
-      console.log('[login/page] Auth event in redirect listener:', event, !!session);
-      if (event === 'SIGNED_IN' && session) {
+      console.log('[login/page] Auth event in redirect listener:', event, !!authSession);
+      if (event === 'SIGNED_IN' && authSession) {
         console.log('[login/page] SIGNED_IN detected - syncing session to server');
-        setHasCompletedAuth(true); // Prevent further session checks
+        setHasCompletedAuth(true);
 
-        // Validate and sync to server cookies
-        if (session.access_token && session.refresh_token) {
+        if (authSession.access_token && authSession.refresh_token) {
           try {
             const response = await fetch('/api/auth/set-session', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                access_token: session.access_token,
-                refresh_token: session.refresh_token,
-                expires_at: session.expires_at,
-                expires_in: session.expires_in,
-                token_type: session.token_type,
-                user: session.user
+                access_token: authSession.access_token,
+                refresh_token: authSession.refresh_token,
+                expires_at: authSession.expires_at,
+                expires_in: authSession.expires_in,
+                token_type: authSession.token_type,
+                user: authSession.user
               })
             });
 
             if (response.ok) {
               console.log('[login/page] Session synced successfully');
-              // Small delay to ensure cookie is set before redirect
               await new Promise(resolve => setTimeout(resolve, 100));
             } else {
               console.error('[login/page] Failed to sync session - response not ok:', response.status);
-              // Don't reset hasCompletedAuth to prevent infinite loops
-              return; // Don't redirect if session sync failed
+              return;
             }
           } catch (err) {
             console.error('[login/page] Failed to sync session:', err);
-            // Don't reset hasCompletedAuth to prevent infinite loops
-            return; // Don't redirect if session sync failed
+            return;
           }
         }
         console.log('[login/page] Redirecting to', returnTo);
-        router.push(returnTo);
+        window.location.href = returnTo;
       }
     });
 
     return () => {
       listener.subscription.unsubscribe();
     };
-  }, [supabase, router, returnTo, hasCompletedAuth]);
+  }, [supabase, returnTo, hasCompletedAuth, session?.user?.id]);
 
-    // Show loading state initially to prevent flash of unstyled content
+  // Loading state management
   useEffect(() => {
-    if (hasCompletedAuth) {
+    if (hasCompletedAuth || session?.user?.id) {
       console.log('[login/page] Skipping loading setup - auth already completed');
       return;
     }
 
-    const timer = window.setTimeout(() => {
-      if (!hasCompletedAuth) {
+    const timer = setTimeout(() => {
+      if (!hasCompletedAuth && !session?.user?.id) {
         setIsAuthLoaded(true);
       }
-    }, 150); // Slightly longer to ensure smooth loading
+    }, 150);
 
-    // Fallback to ensure we never stay stuck on loading
-    const fallbackTimer = window.setTimeout(async () => {
-      // Don't run fallback if auth has already completed
-      if (hasCompletedAuth) {
+    const fallbackTimer = setTimeout(async () => {
+      if (hasCompletedAuth || session?.user?.id) {
         console.log('[login/page] Fallback skipped - auth already completed');
         return;
       }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (currentSession) {
         console.log('[login/page] Fallback skipped - session exists during timer');
         return;
       }
@@ -161,10 +159,10 @@ export default function LoginPage() {
       window.clearTimeout(timer);
       window.clearTimeout(fallbackTimer);
     };
-  }, [hasCompletedAuth]);
+  }, [hasCompletedAuth, supabase, session?.user?.id]);
 
-  // Early return if authentication completed - prevent any further rendering
-  if (hasCompletedAuth) {
+  // Early return AFTER all hooks - prevents Rules of Hooks violation
+  if (hasCompletedAuth || session?.user?.id) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ background: '#f3f4f6' }}>
         <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">

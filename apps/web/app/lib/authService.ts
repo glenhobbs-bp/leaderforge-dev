@@ -53,7 +53,7 @@ export const authService = {
         await Promise.race([
           fetch('/api/auth/set-session', {
             method: 'POST',
-            body: JSON.stringify({ session: null }),
+            body: JSON.stringify({ user: null }),
             headers: { 'Content-Type': 'application/json' },
           }),
           timeoutPromise

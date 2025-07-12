@@ -90,7 +90,46 @@ export async function middleware(request: NextRequest) {
 
   console.log(`[MIDDLEWARE] ${request.method} ${pathname}`);
 
-  // Allow public routes
+  // Special handling for login page - redirect authenticated users
+  if (pathname.startsWith('/login')) {
+    const projectRef = getProjectRef();
+    if (projectRef) {
+      const authCookie = cookies().get(`sb-${projectRef}-auth-token`);
+
+      if (authCookie) {
+        try {
+          const tokens = JSON.parse(authCookie.value);
+          const accessToken = Array.isArray(tokens) ? tokens[0] : tokens.access_token;
+
+          if (accessToken) {
+            // Basic JWT validation
+            const accessTokenParts = accessToken.split('.');
+            if (accessTokenParts.length === 3) {
+              try {
+                const payload = JSON.parse(Buffer.from(accessTokenParts[1], 'base64').toString('utf-8'));
+                const isNotExpired = !payload.exp || payload.exp > Date.now() / 1000;
+
+                if (isNotExpired) {
+                  console.log('[MIDDLEWARE] 🔄 Authenticated user accessing /login - redirecting to /dashboard');
+                  return NextResponse.redirect(new URL('/dashboard', request.url));
+                }
+                             } catch (error) {
+                 console.log('[MIDDLEWARE] JWT payload parsing failed for login redirect check:', (error as Error).message);
+               }
+            }
+          }
+                 } catch (error) {
+           console.log('[MIDDLEWARE] Auth cookie parsing failed for login redirect check:', (error as Error).message);
+         }
+      }
+    }
+
+    // Allow unauthenticated users to access login page
+    console.log('[MIDDLEWARE] 👤 Unauthenticated user accessing /login - allowing access');
+    return NextResponse.next();
+  }
+
+  // Allow other public routes
   if (PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
     return NextResponse.next();
   }
