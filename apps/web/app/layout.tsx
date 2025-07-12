@@ -47,39 +47,53 @@ export default async function RootLayout({
     );
   }
 
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+  // Use ADR-0031 standard format: [access_token, null, refresh_token, null, null]
+  const authCookieName = `sb-${projectRef}-auth-token`;
+  const authCookie = allCookies.find(c => c.name === authCookieName);
+
+  console.log('[layout] Cookie check: {authCookieName: %s, hasCookie: %s, cookieLength: %s}',
+    authCookieName, !!authCookie, authCookie?.value?.length || 0);
 
   const supabase = createSupabaseServerClient(cookieStore);
   let initialSession = null;
 
-  // Simplified token validation - if both tokens exist and have reasonable lengths, attempt restoration
-  if (accessToken && refreshToken && accessToken.length > 10 && refreshToken.length > 3) {
+  if (authCookie?.value) {
     try {
-      console.log('[layout] Attempting session restoration with tokens (access: %d chars, refresh: %d chars)',
-        accessToken.length, refreshToken.length);
+      // Parse ADR-0031 standard format: [access_token, null, refresh_token, null, null]
+      const tokens = JSON.parse(authCookie.value);
+      const accessToken = Array.isArray(tokens) ? tokens[0] : tokens.access_token;
+      const refreshToken = Array.isArray(tokens) ? tokens[2] : tokens.refresh_token;
 
-      const { data, error } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+      console.log('[layout] Parsed tokens: {hasAccessToken: %s, hasRefreshToken: %s, accessTokenLength: %s, refreshTokenLength: %s}',
+        !!accessToken, !!refreshToken, accessToken?.length || 0, refreshToken?.length || 0);
 
-      if (error) {
-        console.warn('[layout] Session restoration failed:', error.message);
-      } else if (data.session?.user?.id) {
-        console.log('[layout] ✅ Session restored successfully for user:', data.session.user.id);
-        initialSession = data.session;
+            // CRITICAL: Only require access token, but setSession needs both tokens
+      if (accessToken && refreshToken) {
+        console.log('[layout] Attempting session restoration with tokens (access: %d chars, refresh: %d chars)',
+          accessToken.length, refreshToken.length);
+
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (error) {
+          console.warn('[layout] Session restoration failed:', error.message);
+        } else if (data.session?.user?.id) {
+          console.log('[layout] ✅ Session restored successfully for user:', data.session.user.id);
+          initialSession = data.session;
+        } else {
+          console.warn('[layout] Session restoration returned no user');
+        }
       } else {
-        console.warn('[layout] Session restoration returned no user');
+        console.log('[layout] No session restoration - missing required tokens (access: %s, refresh: %s)',
+          !!accessToken, !!refreshToken);
       }
     } catch (error) {
-      console.error('[layout] Session restoration exception:', error);
+      console.error('[layout] Failed to parse auth cookie or restore session:', error);
     }
   } else {
-    console.log('[layout] No session restoration - missing or invalid tokens (access: %s, refresh: %s)',
-      accessToken ? `${accessToken.length} chars` : 'missing',
-      refreshToken ? `${refreshToken.length} chars` : 'missing'
-    );
+    console.log('[layout] No session restoration - missing auth cookie');
   }
 
   return (
