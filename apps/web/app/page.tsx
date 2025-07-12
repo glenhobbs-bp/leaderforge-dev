@@ -24,8 +24,7 @@ export default async function HomePage() {
     redirect('/login?error=config_error');
   }
 
-  const accessToken = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
-  const refreshToken = allCookies.find(c => c.name === `sb-${projectRef}-refresh-token`)?.value;
+  const authCookie = allCookies.find(c => c.name === `sb-${projectRef}-auth-token`)?.value;
 
   const supabase = createSupabaseServerClient(cookieStore);
 
@@ -33,18 +32,27 @@ export default async function HomePage() {
 
   // SECURITY FIX: Only attempt session restoration with valid authentication cookies
   // This prevents automatic session creation without proper authentication
-  if (accessToken && refreshToken) {
+  if (authCookie) {
     try {
-      const { data, error } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+      // Parse the cookie value - it's in JSON array format: [access_token, null, refresh_token, null, null]
+      const tokens = JSON.parse(authCookie);
+      const accessToken = Array.isArray(tokens) ? tokens[0] : tokens.access_token;
+      const refreshToken = Array.isArray(tokens) ? tokens[2] : tokens.refresh_token;
 
-      if (error) {
-        console.warn('[page] setSession error:', error);
-      } else if (data.session) {
-        console.log('[page] Session restored successfully');
-        finalSession = data.session;
+      if (accessToken && refreshToken) {
+        const { data, error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        if (error) {
+          console.warn('[page] setSession error:', error);
+        } else if (data.session) {
+          console.log('[page] Session restored successfully');
+          finalSession = data.session;
+        }
+      } else {
+        console.warn('[page] Invalid tokens in auth cookie');
       }
     } catch (error) {
       console.warn('[page] Session restoration failed:', error);
@@ -53,9 +61,9 @@ export default async function HomePage() {
 
   // SECURITY FIX: Never call getSession() without authentication cookies
   // This was automatically creating sessions and bypassing authentication
-  // If no valid cookies exist, redirect to login immediately
+  // If no valid authentication cookie exists, redirect to login immediately
   if (!finalSession) {
-    console.log('[page] No authentication cookies found - redirecting to login');
+    console.log('[page] No valid authentication session found - redirecting to login');
     redirect('/login');
   }
 
