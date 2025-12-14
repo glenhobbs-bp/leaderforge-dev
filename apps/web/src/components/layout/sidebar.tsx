@@ -7,8 +7,10 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useTenantTheme } from '@/components/providers/tenant-theme-provider';
 import {
   Home,
   BookOpen,
@@ -54,24 +56,41 @@ const adminNavigation = [
 export function Sidebar({ className, userContext }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = ['admin', 'owner'].includes(userContext.role);
+  const { theme } = useTenantTheme();
+
+  // Use dark logo for sidebar (navy background needs white text)
+  const logoUrl = theme?.logo_dark_url || theme?.logo_url || '/logos/LF_White_Text_Blue_Dots.png';
 
   return (
     <nav className={cn('flex flex-col bg-sidebar', className)}>
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-bold text-sm">
-            {(userContext.tenant?.displayName || 'LF').slice(0, 2).toUpperCase()}
-          </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">
-            {userContext.tenant?.displayName || 'LeaderForge'}
-          </span>
+      <div className="h-16 flex items-center px-4 border-b border-sidebar-border">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          {logoUrl ? (
+            <Image
+              src={logoUrl}
+              alt={userContext.tenant?.displayName || 'LeaderForge'}
+              width={160}
+              height={40}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+          ) : (
+            <>
+              <div className="w-8 h-8 bg-secondary rounded-md flex items-center justify-center text-white font-bold text-sm">
+                {(userContext.tenant?.displayName || 'LF').slice(0, 2).toUpperCase()}
+              </div>
+              <span className="text-lg font-semibold text-sidebar-foreground">
+                {userContext.tenant?.displayName || 'LeaderForge'}
+              </span>
+            </>
+          )}
         </Link>
       </div>
 
       {/* Organization Name */}
       {userContext.organization && (
-        <div className="px-6 py-3 border-b border-sidebar-border">
+        <div className="px-4 py-3 border-b border-sidebar-border">
           <p className="text-xs text-sidebar-foreground/60 uppercase tracking-wider">
             Organization
           </p>
@@ -152,7 +171,7 @@ function NavItem({ item, isActive }: NavItemProps) {
         'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
         isActive
           ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-          : 'text-sidebar-foreground hover:bg-sidebar-accent/50'
+          : 'text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
       )}
     >
       <item.icon className="h-4 w-4" />
@@ -160,4 +179,3 @@ function NavItem({ item, isActive }: NavItemProps) {
     </Link>
   );
 }
-

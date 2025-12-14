@@ -7,7 +7,8 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, TrendingUp, Trophy, Flame } from 'lucide-react';
+import { BookOpen, TrendingUp, Trophy, Flame, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -48,7 +49,7 @@ export default async function DashboardPage() {
     <div className="space-y-8 animate-page-enter">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold">Welcome back!</h1>
+        <h1 className="text-3xl font-bold text-foreground">Welcome back!</h1>
         <p className="text-muted-foreground mt-1">
           Continue your learning journey
         </p>
@@ -61,64 +62,72 @@ export default async function DashboardPage() {
           value={totalItems}
           description={`${completedItems} completed`}
           icon={BookOpen}
+          iconBg="bg-blue-50"
+          iconColor="text-blue-600"
         />
         <StatsCard
           title="In Progress"
           value={inProgressItems}
           description="Continue learning"
           icon={TrendingUp}
+          iconBg="bg-green-50"
+          iconColor="text-green-600"
         />
         <StatsCard
           title="Current Streak"
           value={streak?.current_streak || 0}
           description="Days in a row"
           icon={Flame}
-          iconClassName="text-streak"
+          iconBg="bg-orange-50"
+          iconColor="text-orange-500"
         />
         <StatsCard
           title="Total Points"
           value={totalPoints}
           description="Keep earning!"
           icon={Trophy}
-          iconClassName="text-gold"
+          iconBg="bg-amber-50"
+          iconColor="text-amber-500"
         />
       </div>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle>Continue Learning</CardTitle>
+            <CardTitle className="text-lg font-semibold">Continue Learning</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-sm mb-4">
               {inProgressItems > 0
                 ? `You have ${inProgressItems} item${inProgressItems > 1 ? 's' : ''} in progress.`
                 : 'Start your learning journey by exploring the content library.'}
             </p>
-            <a
+            <Link
               href="/content"
-              className="mt-4 inline-flex items-center text-primary hover:underline text-sm"
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
             >
-              Browse content →
-            </a>
+              Browse content
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle>Leaderboard</CardTitle>
+            <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-sm mb-4">
               See how you rank against your teammates.
             </p>
-            <a
+            <Link
               href="/leaderboard"
-              className="mt-4 inline-flex items-center text-primary hover:underline text-sm"
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
             >
-              View leaderboard →
-            </a>
+              View leaderboard
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </CardContent>
         </Card>
       </div>
@@ -131,21 +140,22 @@ interface StatsCardProps {
   value: number;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  iconClassName?: string;
+  iconBg: string;
+  iconColor: string;
 }
 
-function StatsCard({ title, value, description, icon: Icon, iconClassName }: StatsCardProps) {
+function StatsCard({ title, value, description, icon: Icon, iconBg, iconColor }: StatsCardProps) {
   return (
-    <Card>
+    <Card className="border border-border bg-card hover:shadow-md transition-shadow">
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold">{value}</p>
+            <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
             <p className="text-xs text-muted-foreground mt-1">{description}</p>
           </div>
-          <div className={`p-3 bg-muted rounded-full ${iconClassName || ''}`}>
-            <Icon className="h-5 w-5" />
+          <div className={`p-3 rounded-xl ${iconBg}`}>
+            <Icon className={`h-6 w-6 ${iconColor}`} />
           </div>
         </div>
       </CardContent>

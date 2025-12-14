@@ -6,6 +6,8 @@
 
 export interface TenantTheme {
   logo_url: string | null;
+  logo_dark_url?: string | null;
+  logo_icon_url?: string | null;
   favicon_url: string | null;
   primary: string;
   secondary: string;
@@ -65,6 +67,22 @@ export function hexToHSL(hex: string): string {
 }
 
 /**
+ * Lighten a hex color by a percentage
+ */
+function lightenHex(hex: string, percent: number): string {
+  hex = hex.replace(/^#/, '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  
+  const newR = Math.min(255, Math.round(r + (255 - r) * percent));
+  const newG = Math.min(255, Math.round(g + (255 - g) * percent));
+  const newB = Math.min(255, Math.round(b + (255 - b) * percent));
+  
+  return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+}
+
+/**
  * Generate CSS variables from tenant theme
  */
 export function generateThemeCSS(
@@ -89,14 +107,35 @@ export function generateThemeCSS(
     }
   }
 
+  // Generate sidebar accent color (lighter version of primary)
+  const sidebarAccent = lightenHex(primary, 0.9);
+
   // Generate CSS variables
   const variables: Record<string, string> = {
+    // Core colors
     '--primary': hexToHSL(primary),
+    '--primary-foreground': '0 0% 100%', // White text on primary
     '--secondary': hexToHSL(tenantTheme.secondary),
     '--accent': hexToHSL(tenantTheme.accent),
     '--background': hexToHSL(tenantTheme.background),
     '--foreground': hexToHSL(tenantTheme.text_primary),
     '--muted-foreground': hexToHSL(tenantTheme.text_secondary),
+    '--card': hexToHSL(tenantTheme.background),
+    '--card-foreground': hexToHSL(tenantTheme.text_primary),
+    
+    // Sidebar - use primary color as sidebar background
+    '--sidebar-background': hexToHSL(primary),
+    '--sidebar-foreground': '0 0% 100%', // White text
+    '--sidebar-primary': hexToHSL(tenantTheme.secondary),
+    '--sidebar-primary-foreground': '0 0% 100%',
+    '--sidebar-accent': hexToHSL(sidebarAccent),
+    '--sidebar-accent-foreground': hexToHSL(primary),
+    '--sidebar-border': `${hexToHSL(primary).split(' ')[0]} 50% 40%`, // Slightly lighter border
+    
+    // Ring/focus color
+    '--ring': hexToHSL(tenantTheme.secondary),
+    
+    // Border radius
     '--radius': tenantTheme.border_radius,
   };
 
@@ -120,6 +159,15 @@ export function getLogoUrl(
 }
 
 /**
+ * Get logo icon URL (for small spaces like sidebar)
+ */
+export function getLogoIconUrl(
+  tenantTheme: TenantTheme | null
+): string | null {
+  return tenantTheme?.logo_icon_url || tenantTheme?.logo_url || null;
+}
+
+/**
  * Get effective display name considering org override
  */
 export function getDisplayName(
@@ -131,4 +179,3 @@ export function getDisplayName(
   }
   return tenantName;
 }
-
