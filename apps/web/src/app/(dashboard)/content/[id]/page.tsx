@@ -29,10 +29,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ContentDetailPage({ params }: PageProps) {
   const { id } = await params;
+  
+  console.log('[ContentDetailPage] Fetching content ID:', id);
   const content = await fetchContentById(id);
+  console.log('[ContentDetailPage] Content result:', content ? 'found' : 'not found');
 
   if (!content) {
-    notFound();
+    // Instead of notFound(), show a helpful message
+    return (
+      <div className="space-y-6 animate-page-enter">
+        <div>
+          <Link href="/content">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Library
+            </Button>
+          </Link>
+        </div>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+            <Play className="h-8 w-8 text-muted-foreground/50" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Content Not Found</h1>
+          <p className="text-muted-foreground max-w-md">
+            This content may have been removed or is temporarily unavailable.
+            Please try again later or browse our content library.
+          </p>
+          <Link href="/content" className="mt-6">
+            <Button>Browse Content Library</Button>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   const formatDuration = (seconds: number | null) => {

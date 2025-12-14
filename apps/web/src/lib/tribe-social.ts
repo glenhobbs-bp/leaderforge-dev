@@ -147,20 +147,28 @@ export async function fetchContentCollection(collectionId: number = LEADERFORGE_
  * We fetch from the collection and find the item, as single-item API may have different structure
  */
 export async function fetchContentById(contentId: string): Promise<ContentItem | null> {
+  console.log('[fetchContentById] Looking for content ID:', contentId);
+  
   if (!TRIBE_TOKEN) {
-    console.error('TRIBE_SOCIAL_TOKEN not configured');
+    console.error('[fetchContentById] TRIBE_SOCIAL_TOKEN not configured');
     return null;
   }
 
   try {
     // Fetch collection and find item by ID (more reliable than single-item endpoint)
     const items = await fetchContentCollection();
+    console.log('[fetchContentById] Collection has', items.length, 'items');
+    console.log('[fetchContentById] Available IDs:', items.map(i => i.id).join(', '));
+    
     const item = items.find(i => i.id === contentId);
     
     if (item) {
+      console.log('[fetchContentById] Found item:', item.title);
       return item;
     }
 
+    console.log('[fetchContentById] Item not found in collection, trying direct API');
+    
     // Fallback: try direct API call
     const url = `${TRIBE_API_URL}/content/${contentId}`;
     const response = await fetch(url, {
@@ -173,14 +181,15 @@ export async function fetchContentById(contentId: string): Promise<ContentItem |
     });
 
     if (!response.ok) {
-      console.error(`Tribe API error: ${response.status}`);
+      console.error(`[fetchContentById] Tribe API error: ${response.status}`);
       return null;
     }
 
     const data: TribeContentItem = await response.json();
+    console.log('[fetchContentById] Got item from direct API:', data.title);
     return transformContent(data);
   } catch (error) {
-    console.error('Failed to fetch content item:', error);
+    console.error('[fetchContentById] Failed to fetch content item:', error);
     return null;
   }
 }
