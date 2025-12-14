@@ -1,14 +1,27 @@
 /**
  * File: src/components/content/content-card.tsx
- * Purpose: Content item card with video and worksheet status
+ * Purpose: Content item card with 4-step progress indicators
  * Owner: Core Team
+ * 
+ * 4-Step Visual Layout:
+ * ┌─────────────────────────┐
+ * │ [Video]      [✓ Video] │  ← Top corners: Type + Video status
+ * │                        │
+ * │      [Progress/✓]      │  ← Center: Overall progress or complete
+ * │                        │
+ * │ [Check-in]    [Bold]   │  ← Bottom corners: Check-in + Bold Action
+ * │            [17:21]     │  ← Duration (bottom right, below Bold)
+ * └─────────────────────────┘
  */
 
 'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Play, FileText, ExternalLink, CheckCircle, Video } from 'lucide-react';
+import { 
+  Play, FileText, ExternalLink, CheckCircle, Video, 
+  Users, Zap, Circle, Clock
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
 
@@ -17,6 +30,8 @@ interface ContentCardProps {
   videoProgress?: number;
   videoCompleted?: boolean;
   worksheetCompleted?: boolean;
+  checkinStatus?: 'none' | 'pending' | 'scheduled' | 'completed';
+  boldActionStatus?: 'none' | 'pending' | 'completed' | 'signed_off';
 }
 
 export function ContentCard({ 
@@ -24,6 +39,8 @@ export function ContentCard({
   videoProgress = 0, 
   videoCompleted = false,
   worksheetCompleted = false,
+  checkinStatus = 'none',
+  boldActionStatus = 'none',
 }: ContentCardProps) {
   const typeIcon = {
     video: Play,
@@ -32,18 +49,58 @@ export function ContentCard({
   };
   const Icon = typeIcon[item.type];
 
-  // Calculate overall progress (50% video + 50% worksheet)
-  const overallProgress = Math.round(
-    (videoCompleted ? 50 : (videoProgress / 2)) + 
-    (worksheetCompleted ? 50 : 0)
-  );
-  const isFullyCompleted = videoCompleted && worksheetCompleted;
+  // Calculate 4-step completion
+  const step1Complete = videoCompleted;
+  const step2Complete = worksheetCompleted;
+  const step3Complete = checkinStatus === 'completed';
+  const step4Complete = boldActionStatus === 'signed_off';
+  
+  const completedSteps = [step1Complete, step2Complete, step3Complete, step4Complete].filter(Boolean).length;
+  const overallProgress = (completedSteps / 4) * 100;
+  const isFullyCompleted = completedSteps === 4;
+  const isInProgress = completedSteps > 0 && !isFullyCompleted;
 
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return null;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Status badge colors and icons
+  const getStepBadge = (
+    complete: boolean, 
+    inProgress: boolean, 
+    icon: React.ReactNode, 
+    label: string,
+    position: 'tl' | 'tr' | 'bl' | 'br'
+  ) => {
+    const positionClasses = {
+      tl: 'top-2 left-2',
+      tr: 'top-2 right-2',
+      bl: 'bottom-2 left-2',
+      br: 'bottom-8 right-2', // Leave room for duration
+    };
+
+    if (complete) {
+      return (
+        <div className={`absolute ${positionClasses[position]} px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1`}>
+          <CheckCircle className="h-3 w-3" />
+          {label}
+        </div>
+      );
+    }
+    
+    if (inProgress) {
+      return (
+        <div className={`absolute ${positionClasses[position]} px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1`}>
+          {icon}
+          {label}
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -65,42 +122,120 @@ export function ContentCard({
             </div>
           )}
           
-          {/* Play overlay for videos */}
-          {item.type === 'video' && !isFullyCompleted && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
-              <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                <Play className="h-6 w-6 text-primary ml-1" fill="currentColor" />
-              </div>
-            </div>
-          )}
-
-          {/* Completed overlay */}
-          {isFullyCompleted && (
+          {/* Center overlay - Progress ring or completion check */}
+          {isFullyCompleted ? (
+            // Fully completed - big green check
             <div className="absolute inset-0 flex items-center justify-center bg-black/40">
               <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
                 <CheckCircle className="h-8 w-8 text-white" />
               </div>
             </div>
-          )}
-
-          {/* Duration badge */}
-          {item.duration && (
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/75 text-white text-xs font-medium rounded">
-              {formatDuration(item.duration)}
+          ) : isInProgress ? (
+            // In progress - show progress ring
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+              <div className="relative w-14 h-14">
+                {/* Background ring */}
+                <svg className="w-14 h-14 transform -rotate-90">
+                  <circle
+                    cx="28"
+                    cy="28"
+                    r="24"
+                    fill="white"
+                    stroke="#e5e7eb"
+                    strokeWidth="4"
+                  />
+                  <circle
+                    cx="28"
+                    cy="28"
+                    r="24"
+                    fill="transparent"
+                    stroke="#22c55e"
+                    strokeWidth="4"
+                    strokeDasharray={`${overallProgress * 1.5} 150`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                {/* Center text */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm font-bold text-gray-700">{completedSteps}/4</span>
+                </div>
+              </div>
             </div>
+          ) : (
+            // Not started - play overlay on hover
+            item.type === 'video' && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
+                <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <Play className="h-6 w-6 text-primary ml-1" fill="currentColor" />
+                </div>
+              </div>
+            )
           )}
 
-          {/* Type badge */}
+          {/* TOP LEFT - Type badge (always shown) */}
           <div className="absolute top-2 left-2 px-2 py-1 bg-primary text-primary-foreground text-xs font-medium rounded capitalize flex items-center gap-1">
             <Icon className="h-3 w-3" />
             {item.type}
           </div>
 
-          {/* Completed badge */}
-          {isFullyCompleted && (
+          {/* TOP RIGHT - Video/Worksheet status */}
+          {step1Complete && step2Complete ? (
             <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
               <CheckCircle className="h-3 w-3" />
               Done
+            </div>
+          ) : step1Complete ? (
+            <div className="absolute top-2 right-2 px-2 py-1 bg-green-500/80 text-white text-xs font-medium rounded flex items-center gap-1">
+              <Video className="h-3 w-3" />
+              Watched
+            </div>
+          ) : videoProgress > 0 ? (
+            <div className="absolute top-2 right-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {Math.round(videoProgress)}%
+            </div>
+          ) : null}
+
+          {/* BOTTOM LEFT - Check-in status */}
+          {checkinStatus === 'completed' ? (
+            <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <CheckCircle className="h-3 w-3" />
+              Met
+            </div>
+          ) : checkinStatus === 'scheduled' ? (
+            <div className="absolute bottom-2 left-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              Scheduled
+            </div>
+          ) : checkinStatus === 'pending' ? (
+            <div className="absolute bottom-2 left-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <Users className="h-3 w-3" />
+              Requested
+            </div>
+          ) : null}
+
+          {/* BOTTOM RIGHT - Bold Action status */}
+          {boldActionStatus === 'signed_off' ? (
+            <div className="absolute bottom-8 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <CheckCircle className="h-3 w-3" />
+              Signed
+            </div>
+          ) : boldActionStatus === 'completed' ? (
+            <div className="absolute bottom-8 right-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <Zap className="h-3 w-3" />
+              Done
+            </div>
+          ) : boldActionStatus === 'pending' ? (
+            <div className="absolute bottom-8 right-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <Zap className="h-3 w-3" />
+              Active
+            </div>
+          ) : null}
+
+          {/* Duration badge - always bottom right */}
+          {item.duration && (
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/75 text-white text-xs font-medium rounded">
+              {formatDuration(item.duration)}
             </div>
           )}
         </div>
@@ -116,42 +251,17 @@ export function ContentCard({
             </p>
           )}
 
-          {/* Progress Section */}
-          {(videoProgress > 0 || worksheetCompleted) && !isFullyCompleted && (
-            <div className="mt-3 space-y-2">
-              {/* Overall Progress Bar */}
-              <div>
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>Progress</span>
-                  <span>{overallProgress}%</span>
-                </div>
-                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-secondary rounded-full transition-all"
-                    style={{ width: `${overallProgress}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Status indicators */}
-              <div className="flex items-center gap-3 text-xs">
-                <span className={`flex items-center gap-1 ${videoCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
-                  {videoCompleted ? (
-                    <CheckCircle className="h-3 w-3" />
-                  ) : (
-                    <Video className="h-3 w-3" />
-                  )}
-                  Video
-                </span>
-                <span className={`flex items-center gap-1 ${worksheetCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
-                  {worksheetCompleted ? (
-                    <CheckCircle className="h-3 w-3" />
-                  ) : (
-                    <FileText className="h-3 w-3" />
-                  )}
-                  Worksheet
-                </span>
-              </div>
+          {/* 4-Step Progress indicators (below title) */}
+          {isInProgress && (
+            <div className="mt-3 flex items-center gap-1">
+              {/* Step 1: Video */}
+              <div className={`flex-1 h-1.5 rounded-full ${step1Complete ? 'bg-green-500' : 'bg-muted'}`} title="Video" />
+              {/* Step 2: Worksheet */}
+              <div className={`flex-1 h-1.5 rounded-full ${step2Complete ? 'bg-green-500' : 'bg-muted'}`} title="Worksheet" />
+              {/* Step 3: Check-in */}
+              <div className={`flex-1 h-1.5 rounded-full ${step3Complete ? 'bg-green-500' : checkinStatus !== 'none' ? 'bg-amber-400' : 'bg-muted'}`} title="Check-in" />
+              {/* Step 4: Bold Action */}
+              <div className={`flex-1 h-1.5 rounded-full ${step4Complete ? 'bg-green-500' : boldActionStatus !== 'none' ? 'bg-amber-400' : 'bg-muted'}`} title="Bold Action" />
             </div>
           )}
         </CardContent>

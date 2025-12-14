@@ -18,6 +18,8 @@ interface ProgressData {
   videoProgress: number;
   videoCompleted: boolean;
   worksheetCompleted: boolean;
+  checkinStatus: 'none' | 'pending' | 'scheduled' | 'completed';
+  boldActionStatus: 'none' | 'pending' | 'completed' | 'signed_off';
 }
 
 export default async function ContentPage() {
@@ -29,7 +31,7 @@ export default async function ContentPage() {
   // Get current user
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch user progress (video + worksheet)
+  // Fetch user progress (all 4 steps)
   let progressMap: Record<string, ProgressData> = {};
   
   if (user) {
@@ -45,29 +47,49 @@ export default async function ContentPage() {
       .select('content_id')
       .eq('user_id', user.id);
 
-    // Build worksheet lookup
+    // Get check-in requests
+    const { data: checkinRequests } = await supabase
+      .from('checkin_requests')
+      .select('content_id, status')
+      .eq('user_id', user.id);
+
+    // Get bold actions
+    const { data: boldActions } = await supabase
+      .from('bold_actions')
+      .select('content_id, status')
+      .eq('user_id', user.id);
+
+    // Build lookup maps
     const worksheetSet = new Set(
       worksheetSubmissions?.map(w => w.content_id) || []
     );
+    
+    const checkinMap = new Map<string, 'pending' | 'scheduled' | 'completed'>(
+      checkinRequests?.map(c => [c.content_id, c.status as 'pending' | 'scheduled' | 'completed']) || []
+    );
+    
+    const boldActionMap = new Map<string, 'pending' | 'completed' | 'signed_off'>(
+      boldActions?.map(b => [b.content_id, b.status as 'pending' | 'completed' | 'signed_off']) || []
+    );
 
-    // Combine into progress map
-    for (const item of videoProgress || []) {
-      progressMap[item.content_id] = {
-        videoProgress: item.progress_percentage || 0,
-        videoCompleted: item.progress_percentage >= 90,
-        worksheetCompleted: worksheetSet.has(item.content_id),
+    // Get all content IDs that have any progress
+    const allContentIds = new Set([
+      ...(videoProgress?.map(v => v.content_id) || []),
+      ...worksheetSet,
+      ...checkinMap.keys(),
+      ...boldActionMap.keys(),
+    ]);
+
+    // Build progress map for all items
+    for (const contentId of allContentIds) {
+      const video = videoProgress?.find(v => v.content_id === contentId);
+      progressMap[contentId] = {
+        videoProgress: video?.progress_percentage || 0,
+        videoCompleted: (video?.progress_percentage || 0) >= 90,
+        worksheetCompleted: worksheetSet.has(contentId),
+        checkinStatus: checkinMap.get(contentId) || 'none',
+        boldActionStatus: boldActionMap.get(contentId) || 'none',
       };
-    }
-
-    // Add worksheet-only completions (if user completed worksheet but no video progress yet)
-    for (const contentId of worksheetSet) {
-      if (!progressMap[contentId]) {
-        progressMap[contentId] = {
-          videoProgress: 0,
-          videoCompleted: false,
-          worksheetCompleted: true,
-        };
-      }
     }
   }
 

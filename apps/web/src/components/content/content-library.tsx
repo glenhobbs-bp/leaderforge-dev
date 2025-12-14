@@ -1,6 +1,6 @@
 /**
  * File: src/components/content/content-library.tsx
- * Purpose: Content library with progress integration
+ * Purpose: Content library with 4-step progress integration
  * Owner: Core Team
  */
 
@@ -13,6 +13,8 @@ interface ProgressData {
   videoProgress: number;
   videoCompleted: boolean;
   worksheetCompleted: boolean;
+  checkinStatus: 'none' | 'pending' | 'scheduled' | 'completed';
+  boldActionStatus: 'none' | 'pending' | 'completed' | 'signed_off';
 }
 
 interface ContentLibraryProps {
@@ -32,6 +34,8 @@ export function ContentLibrary({ items, progressMap }: ContentLibraryProps) {
             videoProgress={itemProgress?.videoProgress || 0}
             videoCompleted={itemProgress?.videoCompleted || false}
             worksheetCompleted={itemProgress?.worksheetCompleted || false}
+            checkinStatus={itemProgress?.checkinStatus || 'none'}
+            boldActionStatus={itemProgress?.boldActionStatus || 'none'}
           />
         );
       })}
