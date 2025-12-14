@@ -33,6 +33,10 @@ export default async function DashboardLayout({
   if (userError) {
     console.error('Error fetching user:', userError);
   }
+  
+  // Debug logging
+  console.log('Auth user ID:', user.id);
+  console.log('User data from core.users:', JSON.stringify(userData, null, 2));
 
   // Fetch tenant separately (foreign key joins don't work well with .schema())
   let tenant: { tenant_key: string; display_name: string; theme: TenantTheme } | null = null;
@@ -47,6 +51,7 @@ export default async function DashboardLayout({
     if (tenantError) {
       console.error('Error fetching tenant:', tenantError);
     } else {
+      console.log('Tenant data:', JSON.stringify(tenantData, null, 2));
       tenant = tenantData as { tenant_key: string; display_name: string; theme: TenantTheme };
     }
   }
@@ -96,6 +101,8 @@ export default async function DashboardLayout({
       name: organization.name,
     } : null,
   };
+  
+  console.log('Final userContext:', JSON.stringify(userContext, null, 2));
 
   return (
     <TenantThemeProvider
