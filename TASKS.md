@@ -31,9 +31,9 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 4. Build - Content | 4.4 | Worksheet functionality |
 | ✅ | 4. Build - Content | 4.5 | Bold action capture & tracking |
 | ✅ | 4. Build - Content | 4.6 | Check-in request system |
-| 🔄 | 4. Build - Content | 4.7 | Bold action signoff UI |
-| ⬜ | 5. Build - Progress | 5.1 | 4-step progress calculation |
-| ⬜ | 5. Build - Progress | 5.2 | Team leader dashboard |
+| ✅ | 4. Build - Content | 4.7 | Bold action signoff UI |
+| ✅ | 5. Build - Progress | 5.1 | 4-step progress calculation |
+| 🔄 | 5. Build - Progress | 5.2 | Team leader dashboard |
 | ⬜ | 5. Build - Progress | 5.3 | Org admin progress dashboard |
 | ⬜ | 5. Build - AI | 5.4 | **AI Check-in Cheat Sheet** (first AI feature!) |
 | ⬜ | 5. Build - Gamification | 5.5 | Gamification backend (streaks, points) |
@@ -67,7 +67,7 @@ Each learning module follows a 4-step completion sequence:
 | 1 | **Watch Video** | User | 25% | ✅ Implemented |
 | 2 | **Complete Worksheet** | User | 50% | ✅ Implemented |
 | 3 | **Team Leader Check-in** | User + Leader | 75% | ✅ Implemented |
-| 4 | **Bold Action Signoff** | User OR Leader | 100% | 🔄 In Progress |
+| 4 | **Bold Action Signoff** | User OR Leader | 100% | ✅ Implemented |
 
 **Key Design Decisions:**
 - Team Leader = User's manager (with future coach override option)
@@ -530,56 +530,66 @@ Video progress implemented:
 ---
 
 #### 4.4 Worksheet Functionality
-**Status:** 🔄 In Progress
+**Status:** ✅ Completed
 
-Worksheet capture started:
+Worksheet modal with bold action capture:
 - ✅ Database table created (`progress.worksheet_submissions`)
-- ✅ Worksheet API routes
-- ✅ Basic worksheet modal UI
-- ⬜ Bold action field in worksheet
-- ⬜ Submit & Request Check-in flow
+- ✅ Worksheet API routes (GET/POST)
+- ✅ Worksheet modal UI with key takeaways + bold action fields
+- ✅ Required field validation
+- ✅ Auto-creates bold action on submit
 
 ---
 
 #### 4.5 Bold Action Capture & Tracking
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-- ⬜ Add bold action field to worksheet
-- ⬜ Create bold_actions table
-- ⬜ Bold action API routes
-- ⬜ Bold action status tracking
+Bold action tracking implemented:
+- ✅ Bold action field in worksheet (required)
+- ✅ `progress.bold_actions` table created
+- ✅ Bold action API routes (GET/PUT)
+- ✅ Status tracking (pending → completed → signed_off)
+- ✅ Visual status on content cards
 
 ---
 
 #### 4.6 Check-in Request System
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-- ⬜ Create checkin_requests table
-- ⬜ Request check-in after worksheet
-- ⬜ Team leader notification (email)
-- ⬜ Schedule/complete check-in flow
+Team leader check-in system:
+- ✅ `progress.checkin_requests` table with RLS
+- ✅ `manager_id` added to memberships
+- ✅ Request check-in API (POST /api/checkins/[contentId])
+- ✅ Self-certification option
+- ✅ Pending check-ins API for leaders
+- ✅ Visual status on content cards (Requested/Scheduled/Met)
 
 ---
 
 #### 4.7 Bold Action Signoff
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-- ⬜ Self-certification flow
-- ⬜ Leader approval flow (if configured)
-- ⬜ Signoff confirmation
+Self-certification and signoff:
+- ✅ Self-certification flow (skip check-in)
+- ✅ Mark bold action as completed
+- ✅ Visual completion status on cards
+- ✅ 4-corner visual indicators on content cards
 
 ---
 
 ### Phase 5: Build - Progress
 
 #### 5.1 4-Step Progress Calculation
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-Calculate overall module progress:
-- 25% for video completion
-- 50% for worksheet submission
-- 75% for check-in completion
-- 100% for bold action signoff
+Overall module progress calculated and displayed:
+- ✅ 25% for video completion (≥90% watched)
+- ✅ 50% for worksheet submission + bold action
+- ✅ 75% for check-in completion
+- ✅ 100% for bold action signoff
+- ✅ Progress ring on content cards (X/4)
+- ✅ 4-segment progress bar below card title
+- ✅ Full green checkmark when all 4 steps complete
 
 ---
 
@@ -816,4 +826,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-14
-**Current Phase:** 4. Build - Content (4.4 In Progress)
+**Current Phase:** 5. Build - Progress (5.2 Team Leader Dashboard)
