@@ -165,8 +165,8 @@ export function TeamDashboard({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left Column - Pending Check-ins */}
-      <div className="lg:col-span-2 space-y-4">
+      {/* Left Column - Pending Check-ins (1/3 width) */}
+      <div className="lg:col-span-1 space-y-4">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -272,6 +272,68 @@ export function TeamDashboard({
           </CardContent>
         </Card>
 
+      </div>
+
+      {/* Right Column - Team Members + Module Progress (2/3 width) */}
+      <div className="lg:col-span-2 space-y-4">
+        {/* Team Members */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Team Members
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                ({teamMembers.length})
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {teamMembers.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                <Users className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No team members assigned yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {teamMembers.map((member) => (
+                  <button
+                    key={member.user?.id}
+                    onClick={() => setSelectedMember(member)}
+                    className="flex items-center gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                  >
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={member.user?.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                        {getInitials(member.user?.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">
+                        {member.user?.full_name || 'Unknown'}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span title="Videos completed">
+                          📹 {member.stats.videosCompleted}/{member.stats.totalModules}
+                        </span>
+                        <span title="Worksheets completed">
+                          📝 {member.stats.worksheetsCompleted}/{member.stats.totalModules}
+                        </span>
+                        <span title="Check-ins completed">
+                          🤝 {member.stats.checkinsCompleted}/{member.stats.totalModules}
+                        </span>
+                        <span title="Bold actions completed">
+                          ⚡ {member.stats.boldActionsCompleted}/{member.stats.totalModules}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Module Progress */}
         <Card>
           <CardHeader>
@@ -322,66 +384,6 @@ export function TeamDashboard({
                       {module.boldActions.completed}/{module.boldActions.total}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Right Column - Team Overview */}
-      <div className="space-y-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Team Members
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                ({teamMembers.length})
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {teamMembers.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground">
-                <Users className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No team members assigned yet.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {teamMembers.map((member) => (
-                  <button
-                    key={member.user?.id}
-                    onClick={() => setSelectedMember(member)}
-                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
-                  >
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={member.user?.avatar_url || undefined} />
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                        {getInitials(member.user?.full_name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">
-                        {member.user?.full_name || 'Unknown'}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span title="Videos completed">
-                          📹 {member.stats.videosCompleted}/{member.stats.totalModules}
-                        </span>
-                        <span title="Worksheets completed">
-                          📝 {member.stats.worksheetsCompleted}/{member.stats.totalModules}
-                        </span>
-                        <span title="Check-ins completed">
-                          🤝 {member.stats.checkinsCompleted}/{member.stats.totalModules}
-                        </span>
-                        <span title="Bold actions completed">
-                          ⚡ {member.stats.boldActionsCompleted}/{member.stats.totalModules}
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </button>
                 ))}
               </div>
             )}
