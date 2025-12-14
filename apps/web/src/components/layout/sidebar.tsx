@@ -20,10 +20,12 @@ import {
   Users,
   Building,
   ScrollText,
+  Handshake,
 } from 'lucide-react';
 
 interface UserContext {
   role: string;
+  isTeamLeader?: boolean;
   tenant: {
     tenantKey: string;
     displayName: string;
@@ -46,6 +48,10 @@ const mainNavigation = [
   { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
 ];
 
+const leaderNavigation = [
+  { name: 'My Team', href: '/team', icon: Handshake },
+];
+
 const adminNavigation = [
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Teams', href: '/admin/teams', icon: Users },
@@ -56,6 +62,7 @@ const adminNavigation = [
 export function Sidebar({ className, userContext }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = ['admin', 'owner'].includes(userContext.role);
+  const isTeamLeader = userContext.isTeamLeader || isAdmin; // Admins can also see team view
   const { theme } = useTenantTheme();
 
   // Use dark logo for sidebar (navy background needs white text)
@@ -103,6 +110,14 @@ export function Sidebar({ className, userContext }: SidebarProps) {
       {/* Main Navigation */}
       <div className="flex-1 py-4 overflow-y-auto">
         <NavSection title="Menu" items={mainNavigation} pathname={pathname} />
+
+        {isTeamLeader && (
+          <NavSection
+            title="Leadership"
+            items={leaderNavigation}
+            pathname={pathname}
+          />
+        )}
 
         {isAdmin && (
           <NavSection

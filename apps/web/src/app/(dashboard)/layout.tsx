@@ -77,12 +77,22 @@ export default async function DashboardLayout({
     }
   }
 
+  // Check if user is a team leader (has team members assigned to them)
+  const { data: teamMembersCount } = await supabase
+    .from('memberships')
+    .select('id', { count: 'exact', head: true })
+    .eq('manager_id', user.id)
+    .eq('is_active', true);
+
+  const isTeamLeader = (teamMembersCount as unknown as number) > 0;
+
   const userContext = {
     id: userData?.id || user.id,
     email: userData?.email || user.email || '',
     fullName: userData?.full_name || null,
     avatarUrl: userData?.avatar_url || null,
     role: membership?.role || 'member',
+    isTeamLeader,
     tenant: tenant ? {
       tenantKey: tenant.tenant_key,
       displayName: tenant.display_name,
