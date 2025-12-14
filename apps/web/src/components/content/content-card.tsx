@@ -20,7 +20,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   Play, FileText, ExternalLink, CheckCircle, Video, 
-  Users, Zap, Circle, Clock
+  Users, Zap, Clock, Target
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
@@ -53,7 +53,8 @@ export function ContentCard({
   const step1Complete = videoCompleted;
   const step2Complete = worksheetCompleted;
   const step3Complete = checkinStatus === 'completed';
-  const step4Complete = boldActionStatus === 'signed_off';
+  // Step 4 is complete if bold action is 'completed' OR 'signed_off'
+  const step4Complete = boldActionStatus === 'completed' || boldActionStatus === 'signed_off';
   
   const completedSteps = [step1Complete, step2Complete, step3Complete, step4Complete].filter(Boolean).length;
   const overallProgress = (completedSteps / 4) * 100;
@@ -178,11 +179,11 @@ export function ContentCard({
             {item.type}
           </div>
 
-          {/* TOP RIGHT - Video/Worksheet status */}
+          {/* TOP RIGHT - Video/Worksheet (Goal) status */}
           {step1Complete && step2Complete ? (
             <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              Done
+              <Target className="h-3 w-3" />
+              Goal
             </div>
           ) : step1Complete ? (
             <div className="absolute top-2 right-2 px-2 py-1 bg-green-500/80 text-white text-xs font-medium rounded flex items-center gap-1">
@@ -216,25 +217,25 @@ export function ContentCard({
 
           {/* BOTTOM RIGHT - Bold Action status */}
           {boldActionStatus === 'signed_off' ? (
-            <div className="absolute bottom-8 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
               <CheckCircle className="h-3 w-3" />
               Signed
             </div>
           ) : boldActionStatus === 'completed' ? (
-            <div className="absolute bottom-8 right-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
               <Zap className="h-3 w-3" />
               Done
             </div>
           ) : boldActionStatus === 'pending' ? (
-            <div className="absolute bottom-8 right-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
               <Zap className="h-3 w-3" />
               Active
             </div>
           ) : null}
 
-          {/* Duration badge - always bottom right */}
+          {/* Duration badge - bottom center */}
           {item.duration && (
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/75 text-white text-xs font-medium rounded">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/75 text-white text-xs font-medium rounded">
               {formatDuration(item.duration)}
             </div>
           )}
