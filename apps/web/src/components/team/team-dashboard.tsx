@@ -10,13 +10,14 @@ import { useState } from 'react';
 import { 
   Users, CheckCircle, Clock, Video, FileText, 
   Handshake, Zap, ChevronRight, ChevronDown, Loader2, X,
-  BookOpen, Lightbulb, Target, HelpCircle, MessageSquare
+  BookOpen, Lightbulb, Target, HelpCircle, MessageSquare, Sparkles
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/use-toast';
+import { CheatSheetModal } from './cheat-sheet-modal';
 
 interface CheckinRequest {
   id: string;
@@ -118,6 +119,7 @@ export function TeamDashboard({
   const [localCheckins, setLocalCheckins] = useState(pendingCheckins);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [cheatSheetCheckin, setCheatSheetCheckin] = useState<CheckinRequest | null>(null);
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => {
@@ -278,6 +280,14 @@ export function TeamDashboard({
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setCheatSheetCheckin(checkin)}
+                        className="border-secondary text-secondary hover:bg-secondary/10"
+                      >
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        AI Cheat Sheet
+                      </Button>
                       <Button
                         onClick={() => handleCompleteCheckin(checkin)}
                         disabled={completingId === checkin.id}
@@ -699,6 +709,17 @@ export function TeamDashboard({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* AI Cheat Sheet Modal */}
+      {cheatSheetCheckin && (
+        <CheatSheetModal
+          isOpen={!!cheatSheetCheckin}
+          onClose={() => setCheatSheetCheckin(null)}
+          checkinId={cheatSheetCheckin.id}
+          userName={cheatSheetCheckin.requester?.full_name || 'Team Member'}
+          moduleTitle={`Module ${cheatSheetCheckin.content_id}`}
+        />
+      )}
     </div>
   );
 }
