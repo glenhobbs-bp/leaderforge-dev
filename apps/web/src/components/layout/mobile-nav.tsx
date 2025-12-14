@@ -63,9 +63,14 @@ export function MobileNav({ open, onClose, userContext }: MobileNavProps) {
       <div className="fixed inset-y-0 left-0 w-64 bg-sidebar z-50 lg:hidden animate-slide-in-from-left">
         {/* Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
-          <span className="text-lg font-bold text-sidebar-primary">
-            {userContext.tenant?.displayName || 'LeaderForge'}
-          </span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-bold text-sm">
+              {(userContext.tenant?.displayName || 'LF').slice(0, 2).toUpperCase()}
+            </div>
+            <span className="text-lg font-semibold text-sidebar-foreground">
+              {userContext.tenant?.displayName || 'LeaderForge'}
+            </span>
+          </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>

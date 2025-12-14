@@ -59,8 +59,11 @@ export function Sidebar({ className, userContext }: SidebarProps) {
     <nav className={cn('flex flex-col bg-sidebar', className)}>
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-sidebar-primary">
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground font-bold text-sm">
+            {(userContext.tenant?.displayName || 'LF').slice(0, 2).toUpperCase()}
+          </div>
+          <span className="text-lg font-semibold text-sidebar-foreground">
             {userContext.tenant?.displayName || 'LeaderForge'}
           </span>
         </Link>

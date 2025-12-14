@@ -1,12 +1,14 @@
 /**
  * File: src/app/(dashboard)/layout.tsx
- * Purpose: Dashboard layout with sidebar navigation
+ * Purpose: Dashboard layout with sidebar navigation and tenant theming
  * Owner: Core Team
  */
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { AppShell } from '@/components/layout/app-shell';
+import { TenantThemeProvider } from '@/components/providers/tenant-theme-provider';
+import type { TenantTheme, OrgBranding } from '@/lib/theme';
 
 export default async function DashboardLayout({
   children,
@@ -38,6 +40,7 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single();
 
+  // Fetch membership with organization branding
   const { data: membership } = await supabase
     .from('memberships')
     .select(`
@@ -46,7 +49,8 @@ export default async function DashboardLayout({
       role,
       organizations:organization_id (
         id,
-        name
+        name,
+        branding
       )
     `)
     .eq('user_id', user.id)
@@ -54,8 +58,17 @@ export default async function DashboardLayout({
     .single();
 
   // Type assertions - Supabase returns single objects for foreign key joins
-  const tenant = userData?.tenants as unknown as { tenant_key: string; display_name: string; theme: Record<string, string> } | null;
-  const organization = membership?.organizations as unknown as { id: string; name: string } | null;
+  const tenant = userData?.tenants as unknown as { 
+    tenant_key: string; 
+    display_name: string; 
+    theme: TenantTheme;
+  } | null;
+  
+  const organization = membership?.organizations as unknown as { 
+    id: string; 
+    name: string;
+    branding: OrgBranding;
+  } | null;
 
   const userContext = {
     id: userData?.id || user.id,
@@ -74,9 +87,15 @@ export default async function DashboardLayout({
   };
 
   return (
-    <AppShell userContext={userContext}>
-      {children}
-    </AppShell>
+    <TenantThemeProvider
+      tenantKey={tenant?.tenant_key || 'default'}
+      tenantName={tenant?.display_name || 'LeaderForge'}
+      theme={tenant?.theme || null}
+      orgBranding={organization?.branding || null}
+    >
+      <AppShell userContext={userContext}>
+        {children}
+      </AppShell>
+    </TenantThemeProvider>
   );
 }
-
