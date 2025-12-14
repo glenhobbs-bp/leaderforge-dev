@@ -1,6 +1,6 @@
 /**
  * File: src/components/team/team-dashboard.tsx
- * Purpose: Team leader dashboard with check-ins and team progress
+ * Purpose: Team leader dashboard with check-ins, module progress, and team overview
  * Owner: Core Team
  */
 
@@ -9,11 +9,13 @@
 import { useState } from 'react';
 import { 
   Users, CheckCircle, Clock, Video, FileText, 
-  Handshake, Zap, ChevronRight, Loader2
+  Handshake, Zap, ChevronRight, Loader2, X,
+  BookOpen
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/use-toast';
 
 interface CheckinRequest {
@@ -45,6 +47,18 @@ interface CheckinRequest {
   } | null;
 }
 
+interface ModuleProgressItem {
+  moduleId: string;
+  moduleTitle: string;
+  videoCompleted: boolean;
+  videoProgress: number;
+  worksheetCompleted: boolean;
+  checkinCompleted: boolean;
+  checkinStatus: string;
+  boldActionCompleted: boolean;
+  boldActionStatus: string;
+}
+
 interface TeamMember {
   user: {
     id: string;
@@ -57,22 +71,39 @@ interface TeamMember {
     worksheetsCompleted: number;
     checkinsCompleted: number;
     boldActionsCompleted: number;
+    totalModules: number;
   };
+  moduleProgress: ModuleProgressItem[];
+}
+
+interface ModuleProgress {
+  id: string;
+  title: string;
+  thumbnailUrl: string | null;
+  videos: { completed: number; total: number };
+  worksheets: { completed: number; total: number };
+  checkins: { completed: number; total: number };
+  boldActions: { completed: number; total: number };
 }
 
 interface TeamDashboardProps {
   pendingCheckins: CheckinRequest[];
   teamMembers: TeamMember[];
+  moduleProgress: ModuleProgress[];
+  teamSize: number;
   currentUserId: string;
 }
 
 export function TeamDashboard({ 
   pendingCheckins, 
   teamMembers,
+  moduleProgress,
+  teamSize,
   currentUserId 
 }: TeamDashboardProps) {
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [localCheckins, setLocalCheckins] = useState(pendingCheckins);
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
   const handleCompleteCheckin = async (checkin: CheckinRequest) => {
     setCompletingId(checkin.id);
@@ -90,7 +121,6 @@ export function TeamDashboard({
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Remove from local list
         setLocalCheckins(prev => prev.filter(c => c.id !== checkin.id));
         toast({
           title: 'Check-in Completed',
@@ -125,6 +155,14 @@ export function TeamDashboard({
     });
   };
 
+  const getProgressColor = (completed: number, total: number) => {
+    if (total === 0) return 'text-muted-foreground';
+    const pct = (completed / total) * 100;
+    if (pct === 100) return 'text-green-600';
+    if (pct >= 50) return 'text-amber-600';
+    return 'text-red-500';
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left Column - Pending Check-ins */}
@@ -155,7 +193,6 @@ export function TeamDashboard({
                     key={checkin.id}
                     className="border rounded-lg p-4 hover:bg-muted/30 transition-colors"
                   >
-                    {/* Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-10 w-10">
@@ -180,7 +217,6 @@ export function TeamDashboard({
                       </span>
                     </div>
 
-                    {/* Bold Action */}
                     {checkin.bold_action && (
                       <div className="mb-3 p-3 bg-secondary/10 rounded-lg">
                         <p className="text-xs font-medium text-secondary mb-1 flex items-center gap-1">
@@ -191,19 +227,13 @@ export function TeamDashboard({
                       </div>
                     )}
 
-                    {/* Key Takeaways */}
                     {checkin.worksheet?.responses?.keyTakeaways && (
                       <div className="mb-3 p-3 bg-muted/50 rounded-lg">
-                        <p className="text-xs font-medium text-muted-foreground mb-1">
-                          Key Takeaways
-                        </p>
-                        <p className="text-sm line-clamp-2">
-                          {checkin.worksheet.responses.keyTakeaways}
-                        </p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Key Takeaways</p>
+                        <p className="text-sm line-clamp-2">{checkin.worksheet.responses.keyTakeaways}</p>
                       </div>
                     )}
 
-                    {/* Progress indicators */}
                     <div className="flex items-center gap-4 mb-3 text-sm">
                       <span className={`flex items-center gap-1 ${
                         checkin.progress?.progress_percentage && checkin.progress.progress_percentage >= 90
@@ -221,7 +251,6 @@ export function TeamDashboard({
                       </span>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         onClick={() => handleCompleteCheckin(checkin)}
@@ -235,6 +264,62 @@ export function TeamDashboard({
                         )}
                         Complete Check-in
                       </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Module Progress */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              Module Progress
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                (Team of {teamSize})
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {moduleProgress.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                <BookOpen className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No modules available.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Header */}
+                <div className="grid grid-cols-5 gap-2 text-xs font-medium text-muted-foreground pb-2 border-b">
+                  <div className="col-span-1">Module</div>
+                  <div className="text-center">📹 Video</div>
+                  <div className="text-center">📝 Worksheet</div>
+                  <div className="text-center">🤝 Check-in</div>
+                  <div className="text-center">⚡ Bold Action</div>
+                </div>
+                
+                {/* Module Rows */}
+                {moduleProgress.map((module) => (
+                  <div 
+                    key={module.id}
+                    className="grid grid-cols-5 gap-2 py-2 hover:bg-muted/30 rounded-lg transition-colors"
+                  >
+                    <div className="col-span-1 font-medium text-sm truncate pr-2" title={module.title}>
+                      {module.title}
+                    </div>
+                    <div className={`text-center text-sm font-medium ${getProgressColor(module.videos.completed, module.videos.total)}`}>
+                      {module.videos.completed}/{module.videos.total}
+                    </div>
+                    <div className={`text-center text-sm font-medium ${getProgressColor(module.worksheets.completed, module.worksheets.total)}`}>
+                      {module.worksheets.completed}/{module.worksheets.total}
+                    </div>
+                    <div className={`text-center text-sm font-medium ${getProgressColor(module.checkins.completed, module.checkins.total)}`}>
+                      {module.checkins.completed}/{module.checkins.total}
+                    </div>
+                    <div className={`text-center text-sm font-medium ${getProgressColor(module.boldActions.completed, module.boldActions.total)}`}>
+                      {module.boldActions.completed}/{module.boldActions.total}
                     </div>
                   </div>
                 ))}
@@ -265,9 +350,10 @@ export function TeamDashboard({
             ) : (
               <div className="space-y-3">
                 {teamMembers.map((member) => (
-                  <div 
+                  <button
                     key={member.user?.id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    onClick={() => setSelectedMember(member)}
+                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
                   >
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={member.user?.avatar_url || undefined} />
@@ -281,63 +367,178 @@ export function TeamDashboard({
                       </p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span title="Videos completed">
-                          📹 {member.stats.videosCompleted}
+                          📹 {member.stats.videosCompleted}/{member.stats.totalModules}
                         </span>
                         <span title="Worksheets completed">
-                          📝 {member.stats.worksheetsCompleted}
+                          📝 {member.stats.worksheetsCompleted}/{member.stats.totalModules}
                         </span>
                         <span title="Check-ins completed">
-                          🤝 {member.stats.checkinsCompleted}
+                          🤝 {member.stats.checkinsCompleted}/{member.stats.totalModules}
                         </span>
                         <span title="Bold actions completed">
-                          ⚡ {member.stats.boldActionsCompleted}
+                          ⚡ {member.stats.boldActionsCompleted}/{member.stats.totalModules}
                         </span>
                       </div>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
+      </div>
 
-        {/* Quick Stats */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Team Stats</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
-                <p className="text-2xl font-bold text-primary">
-                  {teamMembers.reduce((sum, m) => sum + m.stats.videosCompleted, 0)}
+      {/* Team Member Drill-down Modal */}
+      <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={selectedMember?.user?.avatar_url || undefined} />
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  {getInitials(selectedMember?.user?.full_name)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p>{selectedMember?.user?.full_name || 'Unknown'}</p>
+                <p className="text-sm font-normal text-muted-foreground">
+                  {selectedMember?.user?.email}
                 </p>
-                <p className="text-xs text-muted-foreground">Videos Watched</p>
               </div>
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
-                <p className="text-2xl font-bold text-secondary">
-                  {teamMembers.reduce((sum, m) => sum + m.stats.worksheetsCompleted, 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">Worksheets Done</p>
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedMember && (
+            <div className="space-y-4 mt-4">
+              {/* Summary Stats */}
+              <div className="grid grid-cols-4 gap-2">
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <p className="text-lg font-bold text-primary">
+                    {selectedMember.stats.videosCompleted}/{selectedMember.stats.totalModules}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Videos</p>
+                </div>
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <p className="text-lg font-bold text-secondary">
+                    {selectedMember.stats.worksheetsCompleted}/{selectedMember.stats.totalModules}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Worksheets</p>
+                </div>
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <p className="text-lg font-bold text-green-600">
+                    {selectedMember.stats.checkinsCompleted}/{selectedMember.stats.totalModules}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Check-ins</p>
+                </div>
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <p className="text-lg font-bold text-amber-600">
+                    {selectedMember.stats.boldActionsCompleted}/{selectedMember.stats.totalModules}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Bold Actions</p>
+                </div>
               </div>
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">
-                  {teamMembers.reduce((sum, m) => sum + m.stats.checkinsCompleted, 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">Check-ins Done</p>
-              </div>
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
-                <p className="text-2xl font-bold text-amber-600">
-                  {teamMembers.reduce((sum, m) => sum + m.stats.boldActionsCompleted, 0)}
-                </p>
-                <p className="text-xs text-muted-foreground">Bold Actions</p>
+
+              {/* Per-Module Progress */}
+              <div>
+                <h4 className="font-semibold mb-3">Module Progress</h4>
+                <div className="space-y-2">
+                  {selectedMember.moduleProgress.map((module) => {
+                    const stepsCompleted = [
+                      module.videoCompleted,
+                      module.worksheetCompleted,
+                      module.checkinCompleted,
+                      module.boldActionCompleted,
+                    ].filter(Boolean).length;
+
+                    return (
+                      <div 
+                        key={module.moduleId}
+                        className="border rounded-lg p-3"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-medium text-sm">{module.moduleTitle}</p>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                            stepsCompleted === 4 
+                              ? 'bg-green-100 text-green-700'
+                              : stepsCompleted > 0 
+                                ? 'bg-amber-100 text-amber-700'
+                                : 'bg-muted text-muted-foreground'
+                          }`}>
+                            {stepsCompleted}/4 steps
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {/* Video */}
+                          <div className={`flex items-center gap-1 text-xs ${
+                            module.videoCompleted ? 'text-green-600' : 'text-muted-foreground'
+                          }`}>
+                            {module.videoCompleted ? (
+                              <CheckCircle className="h-3 w-3" />
+                            ) : (
+                              <Video className="h-3 w-3" />
+                            )}
+                            Video
+                          </div>
+                          {/* Worksheet */}
+                          <div className={`flex items-center gap-1 text-xs ${
+                            module.worksheetCompleted ? 'text-green-600' : 'text-muted-foreground'
+                          }`}>
+                            {module.worksheetCompleted ? (
+                              <CheckCircle className="h-3 w-3" />
+                            ) : (
+                              <FileText className="h-3 w-3" />
+                            )}
+                            Worksheet
+                          </div>
+                          {/* Check-in */}
+                          <div className={`flex items-center gap-1 text-xs ${
+                            module.checkinCompleted 
+                              ? 'text-green-600' 
+                              : module.checkinStatus === 'pending' 
+                                ? 'text-amber-600' 
+                                : 'text-muted-foreground'
+                          }`}>
+                            {module.checkinCompleted ? (
+                              <CheckCircle className="h-3 w-3" />
+                            ) : (
+                              <Handshake className="h-3 w-3" />
+                            )}
+                            {module.checkinCompleted 
+                              ? 'Met' 
+                              : module.checkinStatus === 'pending' 
+                                ? 'Requested' 
+                                : 'Check-in'}
+                          </div>
+                          {/* Bold Action */}
+                          <div className={`flex items-center gap-1 text-xs ${
+                            module.boldActionCompleted 
+                              ? 'text-green-600' 
+                              : module.boldActionStatus === 'pending' 
+                                ? 'text-amber-600' 
+                                : 'text-muted-foreground'
+                          }`}>
+                            {module.boldActionCompleted ? (
+                              <CheckCircle className="h-3 w-3" />
+                            ) : (
+                              <Zap className="h-3 w-3" />
+                            )}
+                            {module.boldActionCompleted 
+                              ? 'Done' 
+                              : module.boldActionStatus === 'pending' 
+                                ? 'Active' 
+                                : 'Bold Action'}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-

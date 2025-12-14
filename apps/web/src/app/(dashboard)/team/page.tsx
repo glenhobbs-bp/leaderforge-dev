@@ -7,6 +7,7 @@
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { fetchContentCollection } from '@/lib/tribe-social';
 import { TeamDashboard } from '@/components/team/team-dashboard';
 
 export const metadata: Metadata = {
@@ -38,14 +39,12 @@ export default async function TeamPage() {
   // Enrich check-ins with user details
   const enrichedCheckins = await Promise.all(
     (pendingCheckins || []).map(async (checkin) => {
-      // Get requester info
       const { data: requester } = await supabase
         .from('users')
         .select('id, full_name, email, avatar_url')
         .eq('id', checkin.user_id)
         .single();
 
-      // Get bold action if exists
       let boldAction = null;
       if (checkin.bold_action_id) {
         const { data } = await supabase
@@ -56,7 +55,6 @@ export default async function TeamPage() {
         boldAction = data;
       }
 
-      // Get user's progress for this content
       const { data: progress } = await supabase
         .from('user_progress')
         .select('progress_percentage, completed_at')
@@ -64,7 +62,6 @@ export default async function TeamPage() {
         .eq('content_id', checkin.content_id)
         .single();
 
-      // Get worksheet
       const { data: worksheet } = await supabase
         .from('worksheet_submissions')
         .select('responses')
@@ -90,8 +87,64 @@ export default async function TeamPage() {
     .eq('is_active', true);
 
   const teamMemberIds = teamMembers?.map(m => m.user_id) || [];
+  const teamSize = teamMemberIds.length;
 
-  // Get team member details with their overall progress
+  // Fetch all content modules
+  const contentModules = await fetchContentCollection();
+
+  // Get all progress data for team members
+  const { data: allProgress } = await supabase
+    .from('user_progress')
+    .select('user_id, content_id, progress_percentage')
+    .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
+
+  const { data: allWorksheets } = await supabase
+    .from('worksheet_submissions')
+    .select('user_id, content_id')
+    .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
+
+  const { data: allCheckins } = await supabase
+    .from('checkin_requests')
+    .select('user_id, content_id, status')
+    .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
+
+  const { data: allBoldActions } = await supabase
+    .from('bold_actions')
+    .select('user_id, content_id, status')
+    .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
+
+  // Build module progress data
+  const moduleProgress = contentModules.map(module => {
+    const moduleId = module.id;
+    
+    const videosCompleted = allProgress?.filter(
+      p => p.content_id === moduleId && p.progress_percentage >= 90
+    ).length || 0;
+    
+    const worksheetsCompleted = allWorksheets?.filter(
+      w => w.content_id === moduleId
+    ).length || 0;
+    
+    const checkinsCompleted = allCheckins?.filter(
+      c => c.content_id === moduleId && c.status === 'completed'
+    ).length || 0;
+    
+    const boldActionsCompleted = allBoldActions?.filter(
+      b => b.content_id === moduleId && (b.status === 'completed' || b.status === 'signed_off')
+    ).length || 0;
+
+    return {
+      id: moduleId,
+      title: module.title,
+      thumbnailUrl: module.thumbnailUrl,
+      videos: { completed: videosCompleted, total: teamSize },
+      worksheets: { completed: worksheetsCompleted, total: teamSize },
+      checkins: { completed: checkinsCompleted, total: teamSize },
+      boldActions: { completed: boldActionsCompleted, total: teamSize },
+    };
+  });
+
+  // Get team member details with their per-module progress
   const teamMemberDetails = await Promise.all(
     teamMemberIds.map(async (memberId) => {
       const { data: memberUser } = await supabase
@@ -100,38 +153,49 @@ export default async function TeamPage() {
         .eq('id', memberId)
         .single();
 
-      // Get their progress records
-      const { data: progressRecords } = await supabase
-        .from('user_progress')
-        .select('content_id, progress_percentage')
-        .eq('user_id', memberId);
+      // Build per-module progress for this user
+      const memberModuleProgress = contentModules.map(module => {
+        const moduleId = module.id;
+        
+        const videoProgress = allProgress?.find(
+          p => p.user_id === memberId && p.content_id === moduleId
+        );
+        const hasWorksheet = allWorksheets?.some(
+          w => w.user_id === memberId && w.content_id === moduleId
+        );
+        const checkinRecord = allCheckins?.find(
+          c => c.user_id === memberId && c.content_id === moduleId
+        );
+        const boldActionRecord = allBoldActions?.find(
+          b => b.user_id === memberId && b.content_id === moduleId
+        );
 
-      // Get their worksheet submissions
-      const { data: worksheets } = await supabase
-        .from('worksheet_submissions')
-        .select('content_id')
-        .eq('user_id', memberId);
+        return {
+          moduleId,
+          moduleTitle: module.title,
+          videoCompleted: (videoProgress?.progress_percentage || 0) >= 90,
+          videoProgress: videoProgress?.progress_percentage || 0,
+          worksheetCompleted: !!hasWorksheet,
+          checkinCompleted: checkinRecord?.status === 'completed',
+          checkinStatus: checkinRecord?.status || 'none',
+          boldActionCompleted: boldActionRecord?.status === 'completed' || boldActionRecord?.status === 'signed_off',
+          boldActionStatus: boldActionRecord?.status || 'none',
+        };
+      });
 
-      // Get their check-ins
-      const { data: checkins } = await supabase
-        .from('checkin_requests')
-        .select('content_id, status')
-        .eq('user_id', memberId);
-
-      // Get their bold actions
-      const { data: boldActions } = await supabase
-        .from('bold_actions')
-        .select('content_id, status')
-        .eq('user_id', memberId);
+      // Calculate totals
+      const stats = {
+        videosCompleted: memberModuleProgress.filter(m => m.videoCompleted).length,
+        worksheetsCompleted: memberModuleProgress.filter(m => m.worksheetCompleted).length,
+        checkinsCompleted: memberModuleProgress.filter(m => m.checkinCompleted).length,
+        boldActionsCompleted: memberModuleProgress.filter(m => m.boldActionCompleted).length,
+        totalModules: contentModules.length,
+      };
 
       return {
         user: memberUser,
-        stats: {
-          videosCompleted: progressRecords?.filter(p => p.progress_percentage >= 90).length || 0,
-          worksheetsCompleted: worksheets?.length || 0,
-          checkinsCompleted: checkins?.filter(c => c.status === 'completed').length || 0,
-          boldActionsCompleted: boldActions?.filter(b => b.status === 'completed' || b.status === 'signed_off').length || 0,
-        },
+        stats,
+        moduleProgress: memberModuleProgress,
       };
     })
   );
@@ -142,16 +206,17 @@ export default async function TeamPage() {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Team Dashboard</h1>
         <p className="text-muted-foreground mt-1">
-          View your team's progress and manage check-in requests
+          View your team&apos;s progress and manage check-in requests
         </p>
       </div>
 
       <TeamDashboard 
         pendingCheckins={enrichedCheckins}
         teamMembers={teamMemberDetails}
+        moduleProgress={moduleProgress}
+        teamSize={teamSize}
         currentUserId={user.id}
       />
     </div>
   );
 }
-
