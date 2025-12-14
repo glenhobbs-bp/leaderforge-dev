@@ -22,9 +22,8 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  // Fetch user from core schema
+  // Fetch user (using public views that reference core schema)
   const { data: userData, error: userError } = await supabase
-    .schema('core')
     .from('users')
     .select('id, email, full_name, avatar_url, tenant_id')
     .eq('id', user.id)
@@ -33,16 +32,11 @@ export default async function DashboardLayout({
   if (userError) {
     console.error('Error fetching user:', userError);
   }
-  
-  // Debug logging
-  console.log('Auth user ID:', user.id);
-  console.log('User data from core.users:', JSON.stringify(userData, null, 2));
 
-  // Fetch tenant separately (foreign key joins don't work well with .schema())
+  // Fetch tenant separately
   let tenant: { tenant_key: string; display_name: string; theme: TenantTheme } | null = null;
   if (userData?.tenant_id) {
     const { data: tenantData, error: tenantError } = await supabase
-      .schema('core')
       .from('tenants')
       .select('tenant_key, display_name, theme')
       .eq('id', userData.tenant_id)
@@ -51,14 +45,12 @@ export default async function DashboardLayout({
     if (tenantError) {
       console.error('Error fetching tenant:', tenantError);
     } else {
-      console.log('Tenant data:', JSON.stringify(tenantData, null, 2));
       tenant = tenantData as { tenant_key: string; display_name: string; theme: TenantTheme };
     }
   }
 
   // Fetch membership
   const { data: membership, error: membershipError } = await supabase
-    .schema('core')
     .from('memberships')
     .select('organization_id, team_id, role')
     .eq('user_id', user.id)
@@ -73,7 +65,6 @@ export default async function DashboardLayout({
   let organization: { id: string; name: string; branding: OrgBranding } | null = null;
   if (membership?.organization_id) {
     const { data: orgData, error: orgError } = await supabase
-      .schema('core')
       .from('organizations')
       .select('id, name, branding')
       .eq('id', membership.organization_id)
@@ -101,8 +92,6 @@ export default async function DashboardLayout({
       name: organization.name,
     } : null,
   };
-  
-  console.log('Final userContext:', JSON.stringify(userContext, null, 2));
 
   return (
     <TenantThemeProvider

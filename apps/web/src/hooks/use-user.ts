@@ -42,9 +42,8 @@ async function fetchUserContext(): Promise<UserContext | null> {
     return null;
   }
 
-  // Fetch user from core schema
+  // Fetch user (using public views)
   const { data: userData, error: userError } = await supabase
-    .schema('core')
     .from('users')
     .select('id, email, full_name, avatar_url, tenant_id')
     .eq('id', user.id)
@@ -59,7 +58,6 @@ async function fetchUserContext(): Promise<UserContext | null> {
   let tenant: { tenant_key: string; display_name: string; theme: Record<string, string> } | null = null;
   if (userData.tenant_id) {
     const { data: tenantData } = await supabase
-      .schema('core')
       .from('tenants')
       .select('tenant_key, display_name, theme')
       .eq('id', userData.tenant_id)
@@ -72,7 +70,6 @@ async function fetchUserContext(): Promise<UserContext | null> {
 
   // Fetch membership
   const { data: membership } = await supabase
-    .schema('core')
     .from('memberships')
     .select('organization_id, team_id, role')
     .eq('user_id', user.id)
@@ -83,7 +80,6 @@ async function fetchUserContext(): Promise<UserContext | null> {
   let organization: { id: string; name: string; branding: Record<string, unknown> } | null = null;
   if (membership?.organization_id) {
     const { data: orgData } = await supabase
-      .schema('core')
       .from('organizations')
       .select('id, name, branding')
       .eq('id', membership.organization_id)
