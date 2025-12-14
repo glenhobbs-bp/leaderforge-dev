@@ -32,6 +32,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 4. Build - Content | 4.5 | Bold action capture & tracking |
 | ✅ | 4. Build - Content | 4.6 | Check-in request system |
 | ✅ | 4. Build - Content | 4.7 | Bold action signoff UI |
+| ⬜ | 4. Build - Content | 4.8 | **Bold Action Completion Reflection** (closes learning loop) |
 | ✅ | 5. Build - Progress | 5.1 | 4-step progress calculation |
 | 🔄 | 5. Build - Progress | 5.2 | Team leader dashboard |
 | ⬜ | 5. Build - Progress | 5.3 | Org admin progress dashboard |
@@ -48,6 +49,9 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ⬜ | 7. Future | 7.2 | Manager/coach assignment override |
 | ⬜ | 7. Future | 7.3 | AI Organization Diagnostic |
 | ⬜ | 7. Future | 7.4 | AI-recommended content sequence |
+| ⬜ | 7. Future | 7.5 | **AI-Enhanced Reflection Prompts** (context-aware questions) |
+| ⬜ | 7. Future | 7.6 | Voice input for reflections (mobile-friendly) |
+| ⬜ | 7. Future | 7.7 | Reflection pattern recognition & insights |
 | ⬜ | 8. Polish | 8.1 | Testing and QA |
 | ⬜ | 8. Polish | 8.2 | Documentation |
 

@@ -119,6 +119,80 @@ Confirmation that bold action was completed:
 - No time limit on bold action completion
 - Honor system with visibility
 
+#### Bold Action Completion Reflection (MVP Feature)
+
+When marking a bold action complete, users complete a brief reflection to close the learning loop:
+
+**Required:**
+- **Completion Status**: Fully completed / Partially completed / Blocked/Unable to complete
+
+**Optional (but encouraged):**
+- **Reflection**: Quick reflection on what was learned (1-2 sentences)
+- **Challenge Level**: 😌 Easy → 💪 Moderate → 🔥 Hard → 🌋 Very Hard
+- **Would Repeat**: 👍 Yes, valuable / 🤷 Maybe / 👎 Not worth it
+
+**UI Mockup:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  🎯 Complete Bold Action                                        │
+│                                                                 │
+│  Your commitment:                                               │
+│  "Block 2 hours of focus time on calendar for next week"       │
+│                                                                 │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                 │
+│  How did it go? *                                               │
+│  ○ ✅ Fully completed                                           │
+│  ○ 🔄 Partially completed                                       │
+│  ○ ❌ Blocked/Unable to complete                                │
+│                                                                 │
+│  Quick reflection (optional):                                   │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ What did you learn from doing this?                     │   │
+│  │                                                         │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│  Challenge level:  😌  💪  🔥  🌋                               │
+│                                                                 │
+│  Would you do this again?  👍  🤷  👎                           │
+│                                                                 │
+│                    [Cancel]  [Mark Complete →]                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Why This Matters:**
+- Closes the learning loop with reflection
+- Provides data for AI calibration insights
+- Helps team leaders understand what's working
+- Creates accountability without friction (only 1 required field)
+- Enables pattern recognition over time
+
+**Data Captured:**
+```sql
+-- Add to progress.bold_actions or new table:
+completion_status TEXT, -- 'fully', 'partially', 'blocked'
+reflection_text TEXT,
+challenge_level INT, -- 1-4
+would_repeat TEXT, -- 'yes', 'maybe', 'no'
+```
+
+#### AI-Enhanced Reflection Prompts (Phase 2)
+
+After MVP, enhance with AI-generated reflection prompts:
+
+- **Context-Aware Questions**: AI generates specific questions based on the bold action and module content
+- **Voice Input**: Allow voice recording → transcription for mobile users
+- **Sentiment Analysis**: Track engagement and identify struggling users
+- **Pattern Recognition**: AI identifies:
+  - What types of actions this user succeeds at
+  - Common blockers
+  - Optimal challenge level for growth
+
+**Example AI-Generated Prompts:**
+> "You committed to blocking focus time. Did you find 2 hours was enough, or would more/less work better?"
+
+> "This was your 3rd consecutive bold action on time management. What's the biggest change you've noticed?"
+
 ## User Stories
 
 ### As a Learner
@@ -355,13 +429,14 @@ progress = (video_complete ? 25 : video_progress/4) +
 ## Implementation Phases
 
 ### MVP (Phase 1)
-- [ ] Video progress (existing)
-- [ ] Worksheet with bold action capture
-- [ ] Check-in request (manual scheduling)
-- [ ] Bold action signoff (self-certify)
-- [ ] Basic progress display
+- [x] Video progress (existing)
+- [x] Worksheet with bold action capture
+- [x] Check-in request (manual scheduling)
+- [x] Bold action signoff (self-certify)
+- [x] Basic progress display
+- [ ] **Bold Action Completion Reflection** (closes learning loop)
 - [ ] **AI Check-in Cheat Sheet** (first AI feature)
-- [ ] Team leader dashboard (basic)
+- [x] Team leader dashboard (basic)
 - [ ] Org admin dashboard (basic)
 
 ### Phase 2
@@ -369,6 +444,8 @@ progress = (video_complete ? 25 : video_progress/4) +
 - [ ] Email notifications
 - [ ] Enhanced AI insights
 - [ ] Cheat sheet feedback loop (was it helpful?)
+- [ ] **AI-Enhanced Reflection Prompts** (context-aware questions)
+- [ ] Voice input for reflection (mobile-friendly)
 
 ### Phase 3
 - [ ] Calendar integration (Google)
@@ -376,6 +453,7 @@ progress = (video_complete ? 25 : video_progress/4) +
 - [ ] Progress analytics
 - [ ] Gamification integration (points for completion)
 - [ ] AI-powered nudges based on patterns
+- [ ] Reflection pattern recognition & insights
 
 ## Acceptance Criteria
 
