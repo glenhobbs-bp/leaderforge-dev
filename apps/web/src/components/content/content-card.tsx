@@ -20,7 +20,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   Play, FileText, ExternalLink, CheckCircle, Video, 
-  Users, Zap, Clock, Target
+  Handshake, Zap, Clock, Target, CalendarCheck
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
@@ -173,9 +173,13 @@ export function ContentCard({
             )
           )}
 
-          {/* TOP LEFT - Type badge (always shown) */}
-          <div className="absolute top-2 left-2 px-2 py-1 bg-primary text-primary-foreground text-xs font-medium rounded capitalize flex items-center gap-1">
-            <Icon className="h-3 w-3" />
+          {/* TOP LEFT - Type badge (green when video watched) */}
+          <div className={`absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded capitalize flex items-center gap-1 ${
+            step1Complete 
+              ? 'bg-green-500 text-white' 
+              : 'bg-primary text-primary-foreground'
+          }`}>
+            {step1Complete ? <CheckCircle className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
             {item.type}
           </div>
 
@@ -200,17 +204,17 @@ export function ContentCard({
           {/* BOTTOM LEFT - Check-in status */}
           {checkinStatus === 'completed' ? (
             <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
+              <Handshake className="h-3 w-3" />
               Met
             </div>
           ) : checkinStatus === 'scheduled' ? (
             <div className="absolute bottom-2 left-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Users className="h-3 w-3" />
+              <CalendarCheck className="h-3 w-3" />
               Scheduled
             </div>
           ) : checkinStatus === 'pending' ? (
             <div className="absolute bottom-2 left-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Users className="h-3 w-3" />
+              <CalendarCheck className="h-3 w-3" />
               Requested
             </div>
           ) : null}
@@ -222,8 +226,8 @@ export function ContentCard({
               Signed
             </div>
           ) : boldActionStatus === 'completed' ? (
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Zap className="h-3 w-3" />
+            <div className="absolute bottom-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <CheckCircle className="h-3 w-3" />
               Done
             </div>
           ) : boldActionStatus === 'pending' ? (
