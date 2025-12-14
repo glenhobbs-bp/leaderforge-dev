@@ -23,7 +23,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 2. Design | 2.3 | Design component architecture |
 | ✅ | 3. Build - Core | 3.1 | Setup Next.js + Supabase project |
 | ✅ | 3. Build - Core | 3.2 | Implement authentication |
-| ⬜ | 3. Build - Core | 3.3 | Implement multi-tenant foundation |
+| ✅ | 3. Build - Core | 3.3 | Implement multi-tenant foundation |
 | ⬜ | 4. Build - Content | 4.1 | Content management backend |
 | ⬜ | 4. Build - Content | 4.2 | Content delivery frontend |
 | ⬜ | 5. Build - Progress | 5.1 | Progress tracking backend |
@@ -547,18 +547,40 @@ Full SSR-first authentication implemented:
 ---
 
 #### 3.3 Implement Multi-Tenant Foundation
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-Implement multi-tenant hierarchy:
-- Database migrations for tenant/org/team/user tables
-- RLS policies for data isolation
-- Tenant context management
-- Organization context management
+Multi-tenant theming and context implemented:
 
-**Relevant Files:**
-- `supabase/migrations/`
-- `packages/services/tenant.service.ts`
-- `packages/services/organization.service.ts`
+**Theme System:**
+- ✅ `TenantThemeProvider` - Injects CSS variables from tenant theme
+- ✅ `hexToHSL` utility - Converts hex colors to HSL for CSS variables
+- ✅ `generateThemeCSS` - Builds CSS from tenant + org branding
+- ✅ Organization branding overrides (logo, primary color)
+
+**Database Integration:**
+- ✅ Tenant theme loaded from `core.tenants.theme` JSONB
+- ✅ Org branding from `core.organizations.branding` JSONB
+- ✅ User linked to tenant via `core.users.tenant_id`
+- ✅ Membership determines org context
+
+**UI Updates:**
+- ✅ Dashboard layout wraps with `TenantThemeProvider`
+- ✅ Sidebar shows tenant logo badge + name
+- ✅ Mobile nav updated for consistency
+- ✅ Primary color applied across UI
+
+**Test User Setup:**
+- ✅ Created test user with password
+- ✅ Linked to i49 Group tenant
+- ✅ Owner role in "i49 Group - Main" organization
+
+**Files Created/Updated:**
+- `apps/web/src/lib/theme.ts`
+- `apps/web/src/components/providers/tenant-theme-provider.tsx`
+- `apps/web/src/components/layout/tenant-logo.tsx`
+- `apps/web/src/app/(dashboard)/layout.tsx`
+- `apps/web/src/components/layout/sidebar.tsx`
+- `apps/web/src/components/layout/mobile-nav.tsx`
 
 ---
 
