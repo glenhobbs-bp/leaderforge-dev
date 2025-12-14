@@ -144,6 +144,7 @@ export async function fetchContentCollection(collectionId: number = LEADERFORGE_
 
 /**
  * Fetch single content item by ID
+ * We fetch from the collection and find the item, as single-item API may have different structure
  */
 export async function fetchContentById(contentId: string): Promise<ContentItem | null> {
   if (!TRIBE_TOKEN) {
@@ -151,16 +152,24 @@ export async function fetchContentById(contentId: string): Promise<ContentItem |
     return null;
   }
 
-  const url = `${TRIBE_API_URL}/content/${contentId}`;
-  
   try {
+    // Fetch collection and find item by ID (more reliable than single-item endpoint)
+    const items = await fetchContentCollection();
+    const item = items.find(i => i.id === contentId);
+    
+    if (item) {
+      return item;
+    }
+
+    // Fallback: try direct API call
+    const url = `${TRIBE_API_URL}/content/${contentId}`;
     const response = await fetch(url, {
       headers: {
         'Accept': 'application/json',
         'Cookie': `token=${TRIBE_TOKEN}`,
         'User-Agent': 'LeaderForge/1.0',
       },
-      next: { revalidate: 60 }, // Cache for 1 minute
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) {
