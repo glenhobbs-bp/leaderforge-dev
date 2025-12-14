@@ -9,6 +9,17 @@
 | **Priority** | P0 (MVP Required) |
 | **Owner** | Platform Team |
 | **Dependencies** | PRD-001, PRD-002 |
+| **Related** | PRD-008 (4-Step Module Completion Workflow) |
+
+## Important: 4-Step Completion Model
+
+**This PRD covers the foundational progress tracking system. For the full module completion workflow (Video → Worksheet → Check-in → Bold Action Signoff), see PRD-008.**
+
+Progress tracking is **Step 1** of the 4-step module completion sequence:
+1. **Watch Video** (this PRD) - 25% of module completion
+2. **Complete Worksheet** (PRD-008) - 50% cumulative
+3. **Team Leader Check-in** (PRD-008) - 75% cumulative  
+4. **Bold Action Signoff** (PRD-008) - 100% complete
 
 ## Problem Statement
 
@@ -19,6 +30,7 @@ Users need to track their learning progress across content items. The system mus
 - Persist progress across sessions
 - Enable users to resume where they left off
 - Provide progress visibility to users and managers
+- **Feed into the 4-step module completion workflow**
 
 ## User Stories
 

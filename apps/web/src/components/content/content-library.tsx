@@ -10,8 +10,9 @@ import { ContentCard } from './content-card';
 import type { ContentItem } from '@/lib/tribe-social';
 
 interface ProgressData {
-  progress: number;
-  completed: boolean;
+  videoProgress: number;
+  videoCompleted: boolean;
+  worksheetCompleted: boolean;
 }
 
 interface ContentLibraryProps {
@@ -28,12 +29,12 @@ export function ContentLibrary({ items, progressMap }: ContentLibraryProps) {
           <ContentCard 
             key={item.id} 
             item={item} 
-            progress={itemProgress?.progress || 0}
-            completed={itemProgress?.completed || false}
+            videoProgress={itemProgress?.videoProgress || 0}
+            videoCompleted={itemProgress?.videoCompleted || false}
+            worksheetCompleted={itemProgress?.worksheetCompleted || false}
           />
         );
       })}
     </div>
   );
 }
-

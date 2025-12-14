@@ -6,16 +6,44 @@ This directory contains product documentation for LeaderForge LMS, including Pro
 
 ## MVP Scope
 
-LeaderForge MVP focuses on three core capabilities:
+LeaderForge MVP focuses on four core capabilities:
 
 1. **Content Delivery** - Video and document content library
-2. **Progress Tracking** - User progress and completion tracking
-3. **Organization Admin** - Team and user management
+2. **4-Step Module Completion** - Structured learning workflow (Video → Worksheet → Check-in → Signoff)
+3. **Progress Tracking** - User progress and completion tracking with team/org visibility
+4. **Organization Admin** - Team and user management
 
 All features are built on a **Multi-Tenant Foundation** that supports:
 - Platform > Tenant > Organization > Team > User hierarchy
 - Tenant-level theming with organization overrides
 - Role-based access control
+
+### 4-Step Module Completion Model
+
+Each learning module follows a structured completion sequence:
+
+| Step | Action | Owner |
+|------|--------|-------|
+| 1 | Watch Video | User |
+| 2 | Complete Worksheet (Key Takeaways + Bold Action) | User |
+| 3 | Team Leader Check-in (5 min) | User + Leader |
+| 4 | Bold Action Signoff | User (self-certify) or Leader (configurable) |
+
+**Design Principles:**
+- Accountability without micromanaging
+- Self-certification preferred (leader approval optional)
+- Check-ins are supportive, not policing
+- Bold actions should be appropriately challenging
+
+### First AI Feature: Check-in Cheat Sheet
+
+Before each 5-minute check-in, team leaders receive an AI-generated "cheat sheet" that includes:
+- Progress snapshot
+- Bold action calibration (under/over-stretched?)
+- Completion history patterns
+- Activation tips (conversation starters)
+
+**Goal:** Help leaders maximize the value of every check-in conversation.
 
 ## PRD Index
 
@@ -28,6 +56,8 @@ All features are built on a **Multi-Tenant Foundation** that supports:
 | [PRD-005](./prds/005-content-marketplace.md) | Content Marketplace & Licensing | Draft | P1 (Phased) |
 | [PRD-006](./prds/006-ai-analytics.md) | AI & Analytics Platform | Draft | P1 (Post-MVP) |
 | [PRD-007](./prds/007-gamification.md) | Gamification & Engagement | Draft | P0 (MVP) |
+| [PRD-008](./prds/008-module-completion-workflow.md) | 4-Step Module Completion | Draft | P0 (MVP) |
+| [PRD-009](./prds/009-content-sequencing.md) | Content Sequencing & Unlocking | Draft | P0 (MVP) |
 
 ## Feature Priority
 

@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   description: 'Browse available learning content',
 };
 
+interface ProgressData {
+  videoProgress: number;
+  videoCompleted: boolean;
+  worksheetCompleted: boolean;
+}
+
 export default async function ContentPage() {
   const [content, supabase] = await Promise.all([
     fetchContentCollection(),
@@ -23,20 +29,45 @@ export default async function ContentPage() {
   // Get current user
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch user progress
-  let progressMap: Record<string, { progress: number; completed: boolean }> = {};
+  // Fetch user progress (video + worksheet)
+  let progressMap: Record<string, ProgressData> = {};
   
   if (user) {
-    const { data: progress } = await supabase
+    // Get video progress
+    const { data: videoProgress } = await supabase
       .from('user_progress')
       .select('content_id, progress_percentage, completed_at')
       .eq('user_id', user.id);
 
-    for (const item of progress || []) {
+    // Get worksheet submissions
+    const { data: worksheetSubmissions } = await supabase
+      .from('worksheet_submissions')
+      .select('content_id')
+      .eq('user_id', user.id);
+
+    // Build worksheet lookup
+    const worksheetSet = new Set(
+      worksheetSubmissions?.map(w => w.content_id) || []
+    );
+
+    // Combine into progress map
+    for (const item of videoProgress || []) {
       progressMap[item.content_id] = {
-        progress: item.progress_percentage || 0,
-        completed: !!item.completed_at,
+        videoProgress: item.progress_percentage || 0,
+        videoCompleted: item.progress_percentage >= 90,
+        worksheetCompleted: worksheetSet.has(item.content_id),
       };
+    }
+
+    // Add worksheet-only completions (if user completed worksheet but no video progress yet)
+    for (const contentId of worksheetSet) {
+      if (!progressMap[contentId]) {
+        progressMap[contentId] = {
+          videoProgress: 0,
+          videoCompleted: false,
+          worksheetCompleted: true,
+        };
+      }
     }
   }
 

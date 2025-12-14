@@ -757,6 +757,181 @@ Execute migrations in this order:
 
 ---
 
+## 4-Step Module Completion Schema (PRD-008)
+
+The following tables support the 4-step module completion workflow:
+Video → Worksheet → Check-in → Bold Action Signoff
+
+### core.memberships (Updated)
+
+Add manager/coach relationships for check-in workflow:
+
+```sql
+ALTER TABLE core.memberships ADD COLUMN manager_id UUID REFERENCES core.users(id);
+ALTER TABLE core.memberships ADD COLUMN coach_id UUID REFERENCES core.users(id);
+
+-- manager_id: User's direct manager (default team leader)
+-- coach_id: Optional explicit coach override
+
+CREATE INDEX idx_memberships_manager ON core.memberships(manager_id);
+```
+
+### core.organizations (Settings Extension)
+
+```sql
+-- Add to organizations.settings JSONB:
+{
+  "bold_action_signoff": "self",  -- 'self' (default) or 'leader'
+  "checkin_duration_minutes": 5    -- Default check-in duration
+}
+```
+
+### progress.worksheet_submissions
+
+Worksheet responses including Bold Action commitments.
+
+```sql
+CREATE TABLE progress.worksheet_submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES core.tenants(id),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  content_id TEXT NOT NULL,
+  
+  -- Worksheet responses
+  responses JSONB NOT NULL DEFAULT '{}',
+  /*
+    responses: {
+      key_takeaways: "...",
+      bold_action: "...",
+      questions: "..."
+    }
+  */
+  
+  submitted_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  CONSTRAINT unique_user_worksheet UNIQUE (user_id, content_id)
+);
+
+CREATE INDEX idx_worksheet_user_content ON progress.worksheet_submissions(user_id, content_id);
+```
+
+### progress.bold_actions
+
+Bold Action commitments and completion tracking.
+
+```sql
+CREATE TABLE progress.bold_actions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES core.tenants(id),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  content_id TEXT NOT NULL,
+  
+  -- The committed action (copied from worksheet for tracking)
+  action_description TEXT NOT NULL,
+  
+  -- Status tracking
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'completed', 'cancelled')),
+  
+  -- Timestamps
+  committed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  completed_at TIMESTAMPTZ,
+  
+  -- Signoff tracking
+  signoff_type TEXT CHECK (signoff_type IN ('self', 'leader')),
+  signed_off_by UUID REFERENCES auth.users(id),
+  signed_off_at TIMESTAMPTZ,
+  
+  -- Optional notes
+  completion_notes TEXT,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  CONSTRAINT unique_user_bold_action UNIQUE (user_id, content_id)
+);
+
+CREATE INDEX idx_bold_actions_user ON progress.bold_actions(user_id);
+CREATE INDEX idx_bold_actions_status ON progress.bold_actions(status);
+CREATE INDEX idx_bold_actions_leader ON progress.bold_actions(signed_off_by);
+```
+
+### progress.checkin_requests
+
+Team leader check-in requests with calendar integration.
+
+```sql
+CREATE TABLE progress.checkin_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES core.tenants(id),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  leader_id UUID NOT NULL REFERENCES auth.users(id),
+  content_id TEXT NOT NULL,
+  
+  -- Status
+  status TEXT NOT NULL DEFAULT 'requested'
+    CHECK (status IN ('requested', 'scheduled', 'completed', 'cancelled')),
+  
+  -- Timestamps
+  requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  scheduled_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  
+  -- Calendar integration (Phase 2)
+  calendar_event_id TEXT,
+  calendar_provider TEXT CHECK (calendar_provider IN ('google', 'outlook')),
+  
+  -- Notes
+  leader_notes TEXT,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  
+  CONSTRAINT unique_user_checkin UNIQUE (user_id, content_id)
+);
+
+CREATE INDEX idx_checkins_user ON progress.checkin_requests(user_id);
+CREATE INDEX idx_checkins_leader ON progress.checkin_requests(leader_id);
+CREATE INDEX idx_checkins_status ON progress.checkin_requests(status);
+```
+
+### RLS Policies for 4-Step Workflow
+
+```sql
+-- Worksheet submissions
+ALTER TABLE progress.worksheet_submissions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage own worksheets" ON progress.worksheet_submissions
+  FOR ALL USING (user_id = auth.uid());
+
+-- Bold actions - users can view, managers can also view their reports
+ALTER TABLE progress.bold_actions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage own bold actions" ON progress.bold_actions
+  FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "Leaders can view team bold actions" ON progress.bold_actions
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM core.memberships m
+      WHERE m.manager_id = auth.uid()
+      AND m.user_id = progress.bold_actions.user_id
+    )
+  );
+
+-- Check-in requests
+ALTER TABLE progress.checkin_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage own checkin requests" ON progress.checkin_requests
+  FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "Leaders can manage checkins as leader" ON progress.checkin_requests
+  FOR ALL USING (leader_id = auth.uid());
+```
+
+---
+
 ## Notes
 
 ### MVP Scope
@@ -764,6 +939,8 @@ Execute migrations in this order:
 - `content.licenses` table exists but unused until Phase 3
 - `owner_type` always 'platform' in MVP
 - `visibility` always 'private' in MVP
+- **4-Step Workflow MVP**: Video, Worksheet, Check-in (manual), Self-Signoff
+- **4-Step Workflow Phase 2**: Leader dashboards, calendar integration
 
 ### Cherry-Picked from Archive
 - Progress schema based on `_archive/sql/create_universal_progress_table.sql`

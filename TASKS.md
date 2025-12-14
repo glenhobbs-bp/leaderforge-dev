@@ -4,7 +4,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 
 **Decision:** Start fresh with clean architecture, archiving existing ANA (Agent-Native Architecture) codebase for reference/cherry-picking.
 
-**MVP Scope:** Content Delivery → User Progress Tracking → Organization Admin Features → Gamification (Streaks + Leaderboards)
+**MVP Scope:** Content Delivery → User Progress Tracking → 4-Step Module Completion → Organization Admin Features → Gamification (Streaks + Leaderboards)
 
 ---
 
@@ -24,21 +24,60 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 3. Build - Core | 3.1 | Setup Next.js + Supabase project |
 | ✅ | 3. Build - Core | 3.2 | Implement authentication |
 | ✅ | 3. Build - Core | 3.3 | Implement multi-tenant foundation |
-| ⬜ | 4. Build - Content | 4.1 | Content management backend |
-| ⬜ | 4. Build - Content | 4.2 | Content delivery frontend |
-| ⬜ | 5. Build - Progress | 5.1 | Progress tracking backend |
-| ⬜ | 5. Build - Progress | 5.2 | Progress tracking frontend |
-| ⬜ | 5. Build - Progress | 5.3 | Gamification backend (streaks, points) |
-| ⬜ | 5. Build - Progress | 5.4 | Gamification frontend (leaderboards) |
+| ✅ | 3. Build - Core | 3.4 | Polish dashboard UI/styling |
+| ✅ | 4. Build - Content | 4.1 | Content management backend (Tribe Social) |
+| ✅ | 4. Build - Content | 4.2 | Content delivery frontend |
+| ✅ | 4. Build - Content | 4.3 | Video progress tracking |
+| 🔄 | 4. Build - Content | 4.4 | Worksheet functionality (partial) |
+| ⬜ | 4. Build - Content | 4.5 | Bold action capture & tracking |
+| ⬜ | 4. Build - Content | 4.6 | Check-in request system |
+| ⬜ | 4. Build - Content | 4.7 | Bold action signoff |
+| ⬜ | 5. Build - Progress | 5.1 | 4-step progress calculation |
+| ⬜ | 5. Build - Progress | 5.2 | Team leader dashboard |
+| ⬜ | 5. Build - Progress | 5.3 | Org admin progress dashboard |
+| ⬜ | 5. Build - AI | 5.4 | **AI Check-in Cheat Sheet** (first AI feature!) |
+| ⬜ | 5. Build - Gamification | 5.5 | Gamification backend (streaks, points) |
+| ⬜ | 5. Build - Gamification | 5.6 | Gamification frontend (leaderboards) |
 | ⬜ | 6. Build - Admin | 6.1 | Organization admin backend |
 | ⬜ | 6. Build - Admin | 6.2 | Organization admin frontend |
-| ⬜ | 7. Polish | 7.1 | Testing and QA |
-| ⬜ | 7. Polish | 7.2 | Documentation |
+| ⬜ | 6. Build - Admin | 6.3 | Signoff mode configuration |
+| ⬜ | 6. Build - Admin | 6.4 | Content sequencing backend |
+| ⬜ | 6. Build - Admin | 6.5 | Learning path configuration UI |
+| ⬜ | 6. Build - Admin | 6.6 | Unlock mode settings |
+| ⬜ | 7. Future | 7.1 | Calendar integration (Google/Outlook) |
+| ⬜ | 7. Future | 7.2 | Manager/coach assignment override |
+| ⬜ | 7. Future | 7.3 | AI Organization Diagnostic |
+| ⬜ | 7. Future | 7.4 | AI-recommended content sequence |
+| ⬜ | 8. Polish | 8.1 | Testing and QA |
+| ⬜ | 8. Polish | 8.2 | Documentation |
 
 **Legend:**
 - ✅ = Completed
 - 🔄 = In Progress
 - ⬜ = Not Started
+
+---
+
+## 📋 4-Step Module Completion Model (NEW)
+
+Each learning module follows a 4-step completion sequence:
+
+| Step | Action | Owner | Progress | Status |
+|------|--------|-------|----------|--------|
+| 1 | **Watch Video** | User | 25% | ✅ Implemented |
+| 2 | **Complete Worksheet** | User | 50% | 🔄 Partial |
+| 3 | **Team Leader Check-in** | User + Leader | 75% | ⬜ Pending |
+| 4 | **Bold Action Signoff** | User OR Leader | 100% | ⬜ Pending |
+
+**Key Design Decisions:**
+- Team Leader = User's manager (with future coach override option)
+- Calendar integration for check-ins (Phase 2: Google/Outlook)
+- Self-certification preferred (accountability without policing)
+- Check-in purpose: calibrate bold action difficulty, review past actions
+- Leader dashboard for team visibility
+- Admin dashboard for org-wide visibility
+
+**See:** PRD-008 for full specification
 
 ---
 
@@ -241,6 +280,7 @@ Created comprehensive Product Requirements Documents for MVP features:
    - Universal progress schema (cherry-picked from archive)
    - Progress display and dashboard
    - Team/org progress views
+   - **Updated:** Now references 4-step workflow (PRD-008)
 
 4. ✅ **PRD-004: Organization Admin**
    - User management and invitation
@@ -267,6 +307,21 @@ Created comprehensive Product Requirements Documents for MVP features:
    - Points system with configurable values
    - Achievements/badges (post-MVP)
 
+8. ✅ **PRD-008: Module Completion Workflow** (NEW)
+   - 4-step completion: Video → Worksheet → Check-in → Signoff
+   - Bold Action commitment capture
+   - Team leader check-in requests
+   - Self-certify vs leader approval (org configurable)
+   - Team leader dashboard
+   - Org admin dashboard
+
+9. ✅ **PRD-009: Content Sequencing & Unlocking** (NEW)
+   - Learning paths with ordered modules
+   - Three unlock modes: Time-based, Completion-based, Hybrid
+   - Org admin controls sequence and pacing
+   - Locked content visibility with unlock dates
+   - Future: AI-powered org diagnostic for optimal sequence
+
 **Additional Documentation:**
 - Product README with MVP scope and user personas
 - Feature priority definitions (P0/P1/P2)
@@ -282,6 +337,7 @@ Created comprehensive Product Requirements Documents for MVP features:
 - `docs/product/prds/005-content-marketplace.md`
 - `docs/product/prds/006-ai-analytics.md`
 - `docs/product/prds/007-gamification.md`
+- `docs/product/prds/008-module-completion-workflow.md` (NEW)
 
 ---
 
@@ -297,7 +353,7 @@ Designed comprehensive database schema with multi-tenant hierarchy:
 - ✅ `core.organizations` - Customer organizations with branding overrides
 - ✅ `core.teams` - Teams within organizations
 - ✅ `core.users` - Platform users (extends auth.users)
-- ✅ `core.memberships` - User-org-team relationships with roles
+- ✅ `core.memberships` - User-org-team relationships with roles + manager_id
 - ✅ `core.invitations` - User invitation system
 - ✅ `core.audit_log` - Admin action audit trail
 
@@ -311,12 +367,15 @@ Designed comprehensive database schema with multi-tenant hierarchy:
 - ✅ `content.transcripts` - Video transcripts for AI search (future)
 - ✅ `content.transcript_chunks` - Timestamped segments with embeddings (future)
 
-**Progress Schema (5 tables):**
+**Progress Schema (8 tables):**
 - ✅ `progress.user_progress` - Universal progress tracking with type-specific metadata
 - ✅ `progress.user_streaks` - Daily/weekly streak tracking (MVP gamification)
 - ✅ `progress.points_ledger` - Points earning history (MVP gamification)
 - ✅ `progress.leaderboard_cache` - Materialized leaderboard for fast queries
 - ✅ `progress.points_config` - Configurable point values per activity
+- ✅ `progress.worksheet_submissions` - Worksheet responses (NEW)
+- ✅ `progress.bold_actions` - Bold action tracking (NEW - schema ready)
+- ✅ `progress.checkin_requests` - Check-in requests (NEW - schema ready)
 
 **Key Design Decisions:**
 - All tables have `tenant_id` for multi-tenant isolation
@@ -324,19 +383,7 @@ Designed comprehensive database schema with multi-tenant hierarchy:
 - Service role bypass for system operations
 - Future-proofed for content marketplace (Phase 3)
 - Triggers for auto-timestamp updates and user creation
-
-**Migration Files Created (19 files):**
-- `001_create_schemas.sql` - Create schemas
-- `002_core_tenants.sql` through `008_core_audit_log.sql` - Core tables
-- `009_content_items.sql` through `011_content_licenses.sql` - Content tables
-- `012_progress.sql` - Progress table
-- `013_rls_policies.sql` - All RLS policies
-- `014_triggers.sql` - Triggers and helper functions
-- `015_seed_data.sql` - Development seed data
-- `016_gamification_streaks.sql` - Streak tracking table
-- `017_gamification_points.sql` - Points and leaderboard tables
-- `018_ai_transcripts_placeholder.sql` - Transcript tables (future AI)
-- `019_gamification_functions.sql` - Helper functions and config
+- **Manager relationship** via `memberships.manager_id` for check-in workflow
 
 **Database Applied:** ✅ Migrations executed via Supabase MCP
 - Existing schemas dropped (core, content, progress, modules)
@@ -346,11 +393,11 @@ Designed comprehensive database schema with multi-tenant hierarchy:
 - Gamification tables added (streaks, points, leaderboards)
 - AI-ready tables added (transcripts, chunks)
 - TypeScript types generated
+- **NEW:** worksheet_submissions table added
 
 **Relevant Files:**
 - `docs/architecture/schemas/database-schema.md` - Full schema documentation
-- `supabase/migrations/` - 15 migration files
-- `supabase/config.toml` - Supabase configuration
+- `supabase/migrations/` - Migration files
 
 ---
 
@@ -370,6 +417,9 @@ Comprehensive API contracts defined for all MVP endpoints:
 - ✅ **Progress API** - Progress tracking, team progress
 - ✅ **Gamification API** - Streaks, leaderboards, points
 - ✅ **Audit API** - Admin audit log
+- 🔄 **Worksheet API** - Worksheet submissions (NEW)
+- ⬜ **Bold Action API** - Bold action tracking (NEW)
+- ⬜ **Check-in API** - Check-in requests (NEW)
 
 **Key Patterns Documented:**
 - Consistent response format (`ApiResponse<T>`)
@@ -377,21 +427,6 @@ Comprehensive API contracts defined for all MVP endpoints:
 - Service layer delegation pattern
 - Rate limiting guidelines
 - TypeScript types for all entities
-
-**Endpoint Summary:**
-| Category | Endpoints |
-|----------|-----------|
-| Auth | 6 |
-| Tenant | 1 |
-| Organization | 3 |
-| Team | 5 |
-| User | 5 |
-| Invitation | 4 |
-| Content | 3 |
-| Progress | 4 |
-| Gamification | 3 |
-| Audit | 1 |
-| **Total** | **35 endpoints** |
 
 **Relevant Files:**
 - `docs/architecture/api-contracts.md` - Full API documentation
@@ -407,6 +442,7 @@ Comprehensive component architecture designed:
 - ✅ Auth routes: `/login`, `/register`, `/forgot-password`, `/reset-password`, `/invite/[token]`
 - ✅ Dashboard routes: `/`, `/content`, `/content/[id]`, `/progress`, `/leaderboard`, `/settings`
 - ✅ Admin routes: `/admin`, `/admin/users`, `/admin/teams`, `/admin/organization`, `/admin/audit`
+- ⬜ Team leader routes: `/team/progress`, `/team/checkins` (NEW)
 
 **Layout Components:**
 - ✅ `AppShell` - Main app container with sidebar
@@ -415,22 +451,13 @@ Comprehensive component architecture designed:
 - ✅ `MobileNav` - Responsive navigation
 
 **Feature Components:**
-- ✅ **Content**: `ContentGrid`, `ContentCard`, `VideoPlayer`, `DocumentViewer`, `ContentProgress`
-- ✅ **Progress**: `ProgressDashboard`, `ProgressCard`, `ProgressChart`, `RecentActivity`
-- ✅ **Gamification**: `StreakWidget`, `LeaderboardWidget`, `LeaderboardTable`, `PointsDisplay`
-- ✅ **Admin**: `UserTable`, `TeamCard`, `InviteModal`, `RoleSelector`, `AuditLog`
-
-**Hooks Defined:**
-- `useUser`, `useOrganization`, `useProgress`, `useStreak`, `useContent`
-- `useProgressMutation` for saving progress with streak/points updates
-
-**UI Components (shadcn):**
-- Button, Card, Input, Modal, Avatar, Badge, Progress, Skeleton, Toast, Tabs, Table, etc.
-
-**State Management:**
-- TanStack Query for server state
-- React Context for auth/theme
-- URL state for filters/pagination
+- ✅ **Content**: `ContentGrid`, `ContentCard`, `VideoPlayer`, `ContentViewer`
+- ✅ **Progress**: `ProgressDashboard`, `ProgressCard`
+- 🔄 **Worksheet**: `WorksheetModal` (partial)
+- ⬜ **Check-in**: `CheckinRequestButton`, `CheckinPendingList`
+- ⬜ **Bold Action**: `BoldActionCard`, `SignoffButton`
+- ⬜ **Gamification**: `StreakWidget`, `LeaderboardWidget`, `LeaderboardTable`, `PointsDisplay`
+- ⬜ **Admin**: `UserTable`, `TeamCard`, `InviteModal`, `RoleSelector`, `AuditLog`
 
 **Relevant Files:**
 - `docs/architecture/component-architecture.md` - Full component documentation
@@ -442,251 +469,177 @@ Comprehensive component architecture designed:
 #### 3.1 Setup Next.js + Supabase Project
 **Status:** ✅ Completed
 
-Fresh Next.js 15 project initialized with full stack setup:
-
-**Monorepo Configuration:**
-- ✅ Root `package.json` with pnpm workspaces
-- ✅ `pnpm-workspace.yaml` for apps/* and packages/*
-- ✅ `turbo.json` for build orchestration
-- ✅ Root `tsconfig.json` base configuration
-
-**Next.js App (`apps/web/`):**
-- ✅ Next.js 15.1.0 with App Router + Turbopack
-- ✅ TypeScript 5.7 strict mode
-- ✅ Tailwind CSS 3.4 with design tokens
-- ✅ React 19 + React Query
-- ✅ shadcn/ui configuration (`components.json`)
-- ✅ Core UI components: Button, Card, Input, Label, Progress, Avatar, Badge, Skeleton
-
-**Supabase Setup:**
-- ✅ `@supabase/ssr` for SSR-first auth
-- ✅ Server client (`src/lib/supabase/server.ts`)
-- ✅ Browser client (`src/lib/supabase/client.ts`)
-- ✅ Middleware for session refresh (`src/middleware.ts`)
-
-**Providers & Layouts:**
-- ✅ Root layout with providers
-- ✅ ThemeProvider (next-themes)
-- ✅ QueryClient provider
-- ✅ Global styles with CSS variables
-
-**Packages:**
-- ✅ `@leaderforge/database` - Database types
-- ✅ `@leaderforge/services` - All service layer (auth, user, org, team, content, progress, gamification)
-- ✅ `@leaderforge/ui` - Shared UI utilities
-
-**Files Created:**
-- `apps/web/package.json`
-- `apps/web/tsconfig.json`
-- `apps/web/next.config.ts`
-- `apps/web/tailwind.config.ts`
-- `apps/web/components.json`
-- `apps/web/src/app/layout.tsx`
-- `apps/web/src/app/page.tsx`
-- `apps/web/src/styles/globals.css`
-- `apps/web/src/lib/supabase/*.ts`
-- `apps/web/src/middleware.ts`
-- `apps/web/src/components/ui/*.tsx`
-- `packages/database/src/*.ts`
-- `packages/services/src/*.ts`
-- `packages/ui/src/*.ts`
+Fresh Next.js 16 project initialized with full stack setup.
 
 ---
 
 #### 3.2 Implement Authentication
 **Status:** ✅ Completed
 
-Full SSR-first authentication implemented:
-
-**Auth Pages Created:**
-- ✅ Login page with form validation
-- ✅ Register page with password confirmation
-- ✅ Forgot password page
-- ✅ Reset password page
-- ✅ Invitation acceptance page (`/invite/[token]`)
-
-**Auth Infrastructure:**
-- ✅ Auth callback route (`/auth/callback`)
-- ✅ Middleware for session refresh
-- ✅ Protected route redirects
-- ✅ Auth layout (centered card design)
-
-**Dashboard Layout:**
-- ✅ AppShell component (main layout container)
-- ✅ Sidebar navigation (desktop)
-- ✅ Mobile navigation drawer
-- ✅ Header with user menu
-- ✅ Theme toggle (light/dark)
-- ✅ Logout functionality
-
-**Hooks:**
-- ✅ `useUser` hook for client-side user context
-- ✅ `hasRole` utility for role checks
-
-**Files Created:**
-- `apps/web/src/app/(auth)/layout.tsx`
-- `apps/web/src/app/(auth)/login/page.tsx`
-- `apps/web/src/app/(auth)/login/login-form.tsx`
-- `apps/web/src/app/(auth)/register/page.tsx`
-- `apps/web/src/app/(auth)/register/register-form.tsx`
-- `apps/web/src/app/(auth)/forgot-password/page.tsx`
-- `apps/web/src/app/(auth)/forgot-password/forgot-password-form.tsx`
-- `apps/web/src/app/(auth)/reset-password/page.tsx`
-- `apps/web/src/app/(auth)/reset-password/reset-password-form.tsx`
-- `apps/web/src/app/(auth)/invite/[token]/page.tsx`
-- `apps/web/src/app/(auth)/invite/[token]/invite-form.tsx`
-- `apps/web/src/app/auth/callback/route.ts`
-- `apps/web/src/app/(dashboard)/layout.tsx`
-- `apps/web/src/app/(dashboard)/dashboard/page.tsx`
-- `apps/web/src/components/layout/app-shell.tsx`
-- `apps/web/src/components/layout/sidebar.tsx`
-- `apps/web/src/components/layout/header.tsx`
-- `apps/web/src/components/layout/mobile-nav.tsx`
-- `apps/web/src/hooks/use-user.ts`
+Full SSR-first authentication implemented with login, register, password reset, and invitation flows.
 
 ---
 
 #### 3.3 Implement Multi-Tenant Foundation
 **Status:** ✅ Completed
 
-Multi-tenant theming and context implemented:
+Multi-tenant theming and context implemented with CSS custom properties.
 
-**Theme System:**
-- ✅ `TenantThemeProvider` - Injects CSS variables from tenant theme
-- ✅ `hexToHSL` utility - Converts hex colors to HSL for CSS variables
-- ✅ `generateThemeCSS` - Builds CSS from tenant + org branding
-- ✅ Organization branding overrides (logo, primary color)
+---
 
-**Database Integration:**
-- ✅ Tenant theme loaded from `core.tenants.theme` JSONB
-- ✅ Org branding from `core.organizations.branding` JSONB
-- ✅ User linked to tenant via `core.users.tenant_id`
-- ✅ Membership determines org context
+#### 3.4 Polish Dashboard UI/Styling
+**Status:** ✅ Completed
 
-**UI Updates:**
-- ✅ Dashboard layout wraps with `TenantThemeProvider`
-- ✅ Sidebar shows tenant logo badge + name
-- ✅ Mobile nav updated for consistency
-- ✅ Primary color applied across UI
-
-**Test User Setup:**
-- ✅ Created test user with password
-- ✅ Linked to i49 Group tenant
-- ✅ Owner role in "i49 Group - Main" organization
-
-**Files Created/Updated:**
-- `apps/web/src/lib/theme.ts`
-- `apps/web/src/components/providers/tenant-theme-provider.tsx`
-- `apps/web/src/components/layout/tenant-logo.tsx`
-- `apps/web/src/app/(dashboard)/layout.tsx`
-- `apps/web/src/components/layout/sidebar.tsx`
-- `apps/web/src/components/layout/mobile-nav.tsx`
+Dashboard UI improved with i49 Group branding, proper logos, and refined styling.
 
 ---
 
 ### Phase 4: Build - Content
 
 #### 4.1 Content Management Backend
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-Implement content management:
-- Content CRUD operations
-- Course/module organization
-- Entitlement management
-- Content access control
-
-**Relevant Files:**
-- `packages/services/content.service.ts`
-- `apps/web/app/api/content/`
+Tribe Social integration complete:
+- ✅ Content collection fetch from Tribe API
+- ✅ Individual content item fetch
+- ✅ API route proxying
+- ✅ HLS video URL extraction
 
 ---
 
 #### 4.2 Content Delivery Frontend
+**Status:** ✅ Completed
+
+Content UI implemented:
+- ✅ Content library page with grid layout
+- ✅ Content cards with thumbnails and metadata
+- ✅ Content detail page
+- ✅ Video player with HLS.js support
+
+---
+
+#### 4.3 Video Progress Tracking
+**Status:** ✅ Completed
+
+Video progress implemented:
+- ✅ Progress API routes (GET/POST)
+- ✅ Progress saves as video plays (debounced)
+- ✅ Progress bars on content cards
+- ✅ Completion badges
+
+---
+
+#### 4.4 Worksheet Functionality
+**Status:** 🔄 In Progress
+
+Worksheet capture started:
+- ✅ Database table created (`progress.worksheet_submissions`)
+- ✅ Worksheet API routes
+- ✅ Basic worksheet modal UI
+- ⬜ Bold action field in worksheet
+- ⬜ Submit & Request Check-in flow
+
+---
+
+#### 4.5 Bold Action Capture & Tracking
 **Status:** ⬜ Not Started
 
-Implement content UI:
-- Content library page
-- Content detail/player page
-- Course navigation
-- Video player component
+- ⬜ Add bold action field to worksheet
+- ⬜ Create bold_actions table
+- ⬜ Bold action API routes
+- ⬜ Bold action status tracking
 
-**Relevant Files:**
-- `apps/web/app/(dashboard)/content/`
-- `packages/ui/content/`
+---
+
+#### 4.6 Check-in Request System
+**Status:** ⬜ Not Started
+
+- ⬜ Create checkin_requests table
+- ⬜ Request check-in after worksheet
+- ⬜ Team leader notification (email)
+- ⬜ Schedule/complete check-in flow
+
+---
+
+#### 4.7 Bold Action Signoff
+**Status:** ⬜ Not Started
+
+- ⬜ Self-certification flow
+- ⬜ Leader approval flow (if configured)
+- ⬜ Signoff confirmation
 
 ---
 
 ### Phase 5: Build - Progress
 
-#### 5.1 Progress Tracking Backend
+#### 5.1 4-Step Progress Calculation
 **Status:** ⬜ Not Started
 
-Implement progress tracking:
-- Progress recording API
-- Completion tracking
-- Progress queries
-
-**Cherry-pick from archive:**
-- `_archive/create_universal_progress_table.sql` (schema design)
-- `_archive/packages/agent-core/tools/UserProgressTool.ts` (logic patterns)
-
-**Relevant Files:**
-- `packages/services/progress.service.ts`
-- `apps/web/app/api/progress/`
+Calculate overall module progress:
+- 25% for video completion
+- 50% for worksheet submission
+- 75% for check-in completion
+- 100% for bold action signoff
 
 ---
 
-#### 5.2 Progress Tracking Frontend
+#### 5.2 Team Leader Dashboard
 **Status:** ⬜ Not Started
 
-Implement progress UI:
-- Progress dashboard
-- Course completion status
-- Video progress indicators
-
-**Relevant Files:**
-- `apps/web/app/(dashboard)/progress/`
-- `packages/ui/progress/`
+Dashboard for team leaders:
+- Pending check-in requests
+- Team member progress by step
+- Bold actions pending signoff (if configured)
 
 ---
 
-#### 5.3 Gamification Backend
+#### 5.3 Org Admin Progress Dashboard
 **Status:** ⬜ Not Started
 
-Implement gamification services:
-- Streak tracking service (daily/weekly)
-- Points awarding on content completion
-- Leaderboard calculation and caching
-- Points configuration per tenant
-
-**Database Tables (already created):**
-- `progress.user_streaks`
-- `progress.points_ledger`
-- `progress.leaderboard_cache`
-- `progress.points_config`
-
-**Helper Functions (already created):**
-- `update_streak()` - Update streak on activity
-- `award_points()` - Award points for actions
-
-**Relevant Files:**
-- `packages/services/gamification.service.ts`
-- `apps/web/app/api/gamification/`
+Organization-wide progress view:
+- Progress by team
+- Progress by individual
+- Bottleneck identification
+- Completion trends
 
 ---
 
-#### 5.4 Gamification Frontend
+#### 5.4 AI Check-in Cheat Sheet (First AI Feature!)
 **Status:** ⬜ Not Started
 
-Implement gamification UI:
-- Streak widget (current streak, best streak)
-- Leaderboard widget (team/org rankings)
+AI-powered preparation tool for team leaders:
+- Generate context-aware cheat sheet before each 5-min check-in
+- Include progress snapshot, bold action calibration, history, activation tips
+- Uses Claude API (Anthropic)
+- Cached for 1 hour to avoid regeneration
+
+**Components:**
+- [ ] Cheat sheet data aggregation service
+- [ ] Claude API integration
+- [ ] Prompt engineering for coaching tone
+- [ ] API endpoint (`GET /api/checkins/:id/cheat-sheet`)
+- [ ] Cheat sheet display component in leader dashboard
+- [ ] Caching layer
+
+**See:** PRD-006 and PRD-008 for full specification
+
+---
+
+#### 5.5 Gamification Backend
+**Status:** ⬜ Not Started
+
+- Streak tracking service
+- Points awarding on completion
+- Leaderboard calculation
+
+---
+
+#### 5.5 Gamification Frontend
+**Status:** ⬜ Not Started
+
+- Streak widget
+- Leaderboard display
 - Points display
-- Streak milestone celebrations
-
-**Relevant Files:**
-- `apps/web/app/(dashboard)/` - Dashboard widgets
-- `packages/ui/gamification/` - Streak, leaderboard components
 
 ---
 
@@ -695,60 +648,115 @@ Implement gamification UI:
 #### 6.1 Organization Admin Backend
 **Status:** ⬜ Not Started
 
-Implement org admin features:
-- Organization settings API
-- Team management API
-- User invitation/management API
-- Role management
-
-**Relevant Files:**
-- `packages/services/admin.service.ts`
-- `apps/web/app/api/organizations/`
-
 ---
 
 #### 6.2 Organization Admin Frontend
 **Status:** ⬜ Not Started
 
-Implement admin UI:
-- Organization settings page
-- Team management page
-- User management page
-- Invitation flow
+---
 
-**Relevant Files:**
-- `apps/web/app/(dashboard)/organization/`
-- `packages/ui/admin/`
+#### 6.3 Signoff Mode Configuration
+**Status:** ⬜ Not Started
+
+- Org setting: self-certify vs leader approval
+- Admin UI to toggle setting
 
 ---
 
-### Phase 7: Polish
-
-#### 7.1 Testing and QA
+#### 6.4 Content Sequencing Backend
 **Status:** ⬜ Not Started
 
-Implement testing:
-- Unit tests for services
-- Integration tests for API
-- E2E tests for critical flows
+- Learning path data model
+- Module sequence assignment
+- Unlock status calculation
 
-**Relevant Files:**
-- `apps/web/__tests__/`
-- `packages/services/__tests__/`
+**Database Tables:**
+- [ ] `content.learning_paths` - Path configuration per org
+- [ ] `content.learning_path_items` - Ordered modules in path
+- [ ] Unlock status view/function
+
+**See:** PRD-009 for full specification
 
 ---
 
-#### 7.2 Documentation
+#### 6.5 Learning Path Configuration UI
 **Status:** ⬜ Not Started
 
-Finalize documentation:
-- README with setup instructions
-- API documentation
-- Deployment guide
+Admin interface for:
+- Creating/editing learning paths
+- Drag-and-drop module reordering
+- Setting unlock mode and timing
 
-**Relevant Files:**
-- `README.md`
-- `docs/`
+---
+
+#### 6.6 Unlock Mode Settings
+**Status:** ⬜ Not Started
+
+**Decisions Made:**
+- Sequencing is **Organization-wide** (all users follow same sequence)
+- Time is **relative to org enrollment** (Week 1, Week 2, etc.)
+- Default mode is **Hybrid** (time schedule + completion required)
+- Locked modules are **visible (grayed out)** with unlock info
+
+Three unlock modes:
+- **Time-based (Cohort)**: Modules unlock on schedule for everyone
+- **Completion-based (Self-paced)**: Complete Module N to unlock N+1
+- **Hybrid** (default): Time schedule + completion requirement
+
+---
+
+### Phase 7: Future Enhancements
+
+#### 7.1 Calendar Integration
+**Status:** ⬜ Future
+
+- Google Calendar integration
+- Outlook Calendar integration
+- Auto-create check-in events
+
+---
+
+#### 7.2 Manager/Coach Assignment Override
+**Status:** ⬜ Future
+
+- Add coach_id to memberships
+- UI for assigning coaches
+- Coach dashboard access
+
+---
+
+#### 7.3 AI Organization Diagnostic
+**Status:** ⬜ Future
+
+AI-powered assessment to recommend optimal training sequence:
+- Survey questions about org culture, challenges, goals
+- AI analysis of gaps and priorities
+- Recommended module sequence
+- Suggested pacing based on team size
+
+**See:** PRD-006 and PRD-009 for full specification
+
+---
+
+#### 7.4 AI-Recommended Content Sequence
+**Status:** ⬜ Future
+
+Output of org diagnostic:
+- Prioritized module order
+- Expected outcomes
+- Launch talking points
+
+---
+
+### Phase 8: Polish
+
+#### 8.1 Testing and QA
+**Status:** ⬜ Not Started
+
+---
+
+#### 8.2 Documentation
+**Status:** ⬜ Not Started
 
 ---
 
@@ -765,6 +773,7 @@ Finalize documentation:
 | Progress Schema | `create_universal_progress_table.sql` | `supabase/migrations/` |
 | Type Patterns | `apps/web/app/lib/types.ts` | `packages/database/types/` |
 | RLS Patterns | `*.sql` (various) | `supabase/migrations/` |
+| Worksheet Pattern | `apps/web/components/ui/legacy_training_library.tsx` | `apps/web/components/content/` |
 
 ### Key Architectural Decisions
 
@@ -775,6 +784,11 @@ Finalize documentation:
 5. **Supabase as Future CMS** - Architecture ready for migration
 6. **AI-Ready Schema** - Transcripts and embeddings tables pre-created
 7. **Gamification in MVP** - Streaks and leaderboards from day 1
+8. **4-Step Module Completion** - Video → Worksheet → Check-in → Signoff
+9. **Self-Certification Preferred** - Accountability without micromanaging
+10. **AI Check-in Cheat Sheet** - First AI feature, activating team leaders
+11. **Content Sequencing** - Org admin controls module order and unlock pacing
+12. **Three Unlock Modes** - Time-based, Completion-based, Hybrid
 
 ### Tribe Social CMS (MVP)
 
@@ -791,16 +805,15 @@ TRIBE_SOCIAL_API_URL=https://edge.tribesocial.io
 TRIBE_SOCIAL_TOKEN=<token>
 ```
 
-### Database Summary (20 Tables)
+### Database Summary (23+ Tables)
 
 | Schema | Tables | Purpose |
 |--------|--------|---------|
 | `core` | 7 | Tenants, orgs, teams, users, memberships |
 | `content` | 8 | Items, entitlements, licenses, transcripts |
-| `progress` | 5 | Progress, streaks, points, leaderboards |
+| `progress` | 8 | Progress, streaks, points, worksheets, bold actions, check-ins |
 
 ---
 
 **Last Updated:** 2024-12-14
-**Current Phase:** 2. Design (2.1 Complete)
-
+**Current Phase:** 4. Build - Content (4.4 In Progress)

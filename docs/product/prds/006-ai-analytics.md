@@ -6,27 +6,277 @@
 |-------|-------|
 | **Feature** | AI-Powered Analytics & Intelligence |
 | **Status** | Draft |
-| **Priority** | P1 (Post-MVP, Early) |
+| **Priority** | P0 (MVP) for Check-in Cheat Sheet, P1 for others |
 | **Owner** | Platform Team |
-| **Dependencies** | PRD-003 (Progress Tracking) |
+| **Dependencies** | PRD-003 (Progress Tracking), PRD-008 (Module Completion) |
 
 ## Executive Summary
 
 LeaderForge will leverage AI to provide intelligent insights, natural language querying, deep content search, and adaptive learning experiences. This PRD defines the AI capabilities in phases.
 
+**First AI Feature (MVP):** AI-powered Check-in Cheat Sheets for team leaders.
+
 ## Implementation Phases
 
 | Phase | Feature | Timeline |
 |-------|---------|----------|
+| **MVP** | **Check-in Cheat Sheet** (first AI feature!) | Phase 4 Build |
 | **MVP** | Schema foundation (tables ready) | Phase 3 Build |
 | **Phase 1** | NL Analytics ("Who's stuck?") | Post-MVP |
+| **Phase 1** | **Organization Diagnostic** | Post-MVP |
 | **Phase 2** | Deep Search (transcripts + embeddings) | Post-MVP |
 | **Phase 3** | Proactive Nudges | Future |
 | **Phase 4** | Adaptive Learning | Future |
 
 ---
 
-## Phase 1: Natural Language Analytics
+## MVP: AI Check-in Cheat Sheet
+
+> **This is the FIRST AI feature in LeaderForge MVP.**
+> See PRD-008 for full 4-step module completion workflow.
+
+### Problem Statement
+
+Team leaders have 5 minutes to conduct meaningful check-ins with their team members. Without preparation, these conversations become superficial. Leaders need quick, actionable context to maximize the value of each check-in.
+
+### User Story
+
+- As a **Team Leader**, I want an AI-generated cheat sheet before each check-in so I can have a more effective 5-minute conversation that activates and supports my team member.
+
+### What the Cheat Sheet Provides
+
+| Section | Content | Data Source |
+|---------|---------|-------------|
+| **Progress Snapshot** | Module status, streak, last activity | user_progress, user_streaks |
+| **Bold Action Review** | Current commitment, calibration | bold_actions, worksheet_submissions |
+| **Stretch Analysis** | Under/over-stretched assessment | AI inference from history |
+| **Completion History** | Success rate, patterns | historical bold_actions |
+| **Activation Tips** | Conversation starters | AI-generated coaching prompts |
+
+### Example Output
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 📋 CHECK-IN CHEAT SHEET: John Smith                         │
+│ Module: 3.1 Deep Work                                       │
+├─────────────────────────────────────────────────────────────┤
+│ 📊 PROGRESS SNAPSHOT                                        │
+│ • Overall: 68% complete (12 of 18 modules)                  │
+│ • Current streak: 5 days                                    │
+│ • Last activity: Yesterday                                  │
+│                                                             │
+│ 🎯 BOLD ACTION                                              │
+│ "Block 2 hours of focus time on calendar for next week"     │
+│                                                             │
+│ ⚖️ CALIBRATION: Slightly Under-Stretched                    │
+│ John has completed 4/4 recent bold actions. This one        │
+│ seems achievable given his track record. Consider           │
+│ encouraging something more challenging.                     │
+│                                                             │
+│ 📈 HISTORY                                                  │
+│ • 4/5 bold actions completed (80%)                          │
+│ • Tends to set safe goals                                   │
+│ • Strong on follow-through when committed                   │
+│                                                             │
+│ 💡 ACTIVATION TIPS                                          │
+│ • "What would make this bold action feel more exciting?"    │
+│ • "What's something you've been avoiding that this          │
+│    module made you think about?"                            │
+│ • "How did blocking focus time work out last time?"         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Technical Implementation
+
+**Stack:**
+- Claude API (Anthropic) for generation
+- Server-side API route (`/api/checkins/:id/cheat-sheet`)
+- Supabase for data retrieval
+
+**Data Collected for AI Context:**
+```typescript
+interface CheatSheetContext {
+  // User info
+  user: { name: string; joinedAt: string };
+  
+  // Current module
+  currentModule: { title: string; description: string };
+  
+  // Progress data
+  progress: {
+    overall: number;
+    completedModules: number;
+    totalModules: number;
+    currentStreak: number;
+    lastActivity: string;
+  };
+  
+  // Bold action history
+  boldActions: Array<{
+    description: string;
+    status: 'completed' | 'pending' | 'cancelled';
+    moduleTitle: string;
+    date: string;
+  }>;
+  
+  // Current bold action
+  currentBoldAction: {
+    description: string;
+    committedAt: string;
+  };
+}
+```
+
+**Prompt Engineering:**
+- Coaching tone, not judgmental
+- Focused on activation and support
+- Specific, actionable tips
+- Brief (readable in < 30 seconds)
+
+### API Endpoint
+
+```
+GET /api/checkins/:id/cheat-sheet
+
+Response:
+{
+  "success": true,
+  "data": {
+    "userId": "uuid",
+    "userName": "John Smith",
+    "moduleTitle": "3.1 Deep Work",
+    "progressSnapshot": { ... },
+    "boldAction": { ... },
+    "calibration": {
+      "assessment": "under-stretched",
+      "reasoning": "..."
+    },
+    "history": { ... },
+    "activationTips": [
+      "What would make this bold action feel more exciting?",
+      ...
+    ],
+    "generatedAt": "2024-12-14T...",
+    "cachedUntil": "2024-12-14T..." // 1 hour cache
+  }
+}
+```
+
+### Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Generation time | < 3 seconds |
+| Leader satisfaction | > 4/5 |
+| Check-in quality improvement | Survey feedback |
+| Cheat sheet usage rate | > 80% of check-ins |
+
+### Privacy Considerations
+
+- Only leader can access their team member's cheat sheet
+- Data stays within tenant boundary
+- No personal data sent to AI without context
+- Cheat sheet content not permanently stored (cached only)
+
+---
+
+## Phase 1a: Organization Diagnostic
+
+> **Supports PRD-009 (Content Sequencing)**
+
+### Problem Statement
+
+Org admins don't know the optimal sequence of training content for their organization. They need guidance on:
+- Which modules address their organization's gaps
+- What order maximizes learning impact
+- What pace is appropriate for their team size
+
+### User Story
+
+- As an **Org Admin**, I want an AI-powered diagnostic that assesses my organization's needs and recommends the optimal training sequence.
+
+### How It Works
+
+**Step 1: Assessment Survey**
+- Org admin answers 10-15 questions about their organization
+- Topics: culture, challenges, goals, team dynamics, previous training
+- Optional: Aggregate team survey responses
+
+**Step 2: AI Analysis**
+- Analyzes responses against training content catalog
+- Identifies gaps and development priorities
+- Maps content to organizational needs
+
+**Step 3: Recommendations**
+- Prioritized module sequence
+- Suggested pacing based on team size
+- Talking points for program launch
+- Expected outcomes
+
+### Example Output
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 🔍 ORGANIZATION DIAGNOSTIC RESULTS                          │
+│ Acme Corp - Completed Dec 14, 2024                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│ KEY FINDINGS:                                               │
+│ • Strong individual contributor culture                     │
+│ • Delegation is a significant gap (7 mentions)              │
+│ • Feedback skills need development                          │
+│ • Team collaboration could improve                          │
+│                                                             │
+│ RECOMMENDED SEQUENCE:                                       │
+│ 1. Self-Awareness (foundation for all growth)               │
+│ 2. Delegation ⭐ (addresses primary gap)                    │
+│ 3. Feedback ⭐ (complements delegation skills)              │
+│ 4. Communication (builds on feedback)                       │
+│ 5. Deep Work (individual effectiveness)                     │
+│ 6. Team Building (capstone module)                          │
+│                                                             │
+│ SUGGESTED PACING:                                           │
+│ Weekly unlocks (team of 25 can maintain this pace)          │
+│                                                             │
+│ LAUNCH TALKING POINTS:                                      │
+│ • "We identified delegation as our biggest opportunity"     │
+│ • "This sequence builds skills progressively"               │
+│ • "We'll learn together, one module per week"               │
+│                                                             │
+│            [Apply This Sequence] [Customize]                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Technical Approach
+
+**Stack:**
+- Claude API for analysis and recommendations
+- Survey questions stored in database
+- Content catalog with tags/categories for matching
+
+**AI Context:**
+```typescript
+interface DiagnosticContext {
+  organization: { name, size, industry };
+  surveyResponses: Array<{ question, answer }>;
+  contentCatalog: Array<{ 
+    id, title, description, 
+    tags: string[], // e.g., ['delegation', 'leadership', 'communication']
+    prerequisites: string[] 
+  }>;
+}
+```
+
+### Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Admin satisfaction with recommendations | > 4/5 |
+| Sequence adoption rate | > 70% |
+| Time to launch program | < 30 minutes |
+
+---
+
+## Phase 1b: Natural Language Analytics
 
 ### Problem Statement
 
@@ -310,9 +560,21 @@ progress.review_schedule
 
 | Phase | Feature | MVP Impact |
 |-------|---------|------------|
+| **MVP** | **Check-in Cheat Sheet** | ✅ First AI feature! |
 | Schema | Tables ready for future | ✅ Include |
 | Phase 1 | NL Analytics | Quick win post-MVP |
 | Phase 2 | Deep Search | Differentiator |
 | Phase 3 | Nudges | Engagement boost |
 | Phase 4 | Adaptive | Long-term value |
+
+---
+
+## Why Check-in Cheat Sheet is the Perfect First AI Feature
+
+1. **Bounded scope** - One user, one context, clear input/output
+2. **High value** - Directly improves a core workflow
+3. **Low risk** - Advisory only, doesn't make decisions
+4. **Quick feedback loop** - Leaders can tell us if it's helpful
+5. **Demonstrates AI value** - Shows what AI can do for LeaderForge
+6. **Data already available** - Uses existing progress/action data
 

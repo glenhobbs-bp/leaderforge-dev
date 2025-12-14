@@ -1,15 +1,25 @@
 /**
  * File: src/components/content/content-viewer.tsx
- * Purpose: Client-side content viewer with interactive video controls
+ * Purpose: Client-side content viewer with 4-step module completion
  * Owner: Core Team
+ * 
+ * 4-Step Module Completion:
+ * 1. Watch Video (25%)
+ * 2. Complete Worksheet + Bold Action (50%)
+ * 3. Team Leader Check-in (75%)
+ * 4. Bold Action Signoff (100%)
  */
 
 'use client';
 
 import { useRef, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Play, Clock, Calendar, CheckCircle, Loader2 } from 'lucide-react';
+import { 
+  ArrowLeft, Play, Clock, Calendar, CheckCircle, Loader2, 
+  FileText, Video, Users, Zap, Circle
+} from 'lucide-react';
 import { VideoPlayer } from './video-player';
+import { WorksheetModal } from './worksheet-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
@@ -21,29 +31,77 @@ interface ContentViewerProps {
 interface ProgressData {
   progress_percentage: number;
   completed_at: string | null;
-  started_at: string | null;
+}
+
+interface BoldActionData {
+  status: 'pending' | 'completed' | 'cancelled';
+  action_description: string;
+  completed_at: string | null;
 }
 
 export function ContentViewer({ content }: ContentViewerProps) {
-  const [progress, setProgress] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
+  // Video progress state
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [isVideoCompleted, setIsVideoCompleted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const lastSavedProgress = useRef(0);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Worksheet state
+  const [isWorksheetOpen, setIsWorksheetOpen] = useState(false);
+  const [isWorksheetCompleted, setIsWorksheetCompleted] = useState(false);
+
+  // Bold Action state
+  const [boldAction, setBoldAction] = useState<BoldActionData | null>(null);
+
+  // Check-in state (placeholder for now)
+  const [isCheckinCompleted, setIsCheckinCompleted] = useState(false);
+
+  // Calculate step completion
+  const step1Complete = isVideoCompleted;
+  const step2Complete = isWorksheetCompleted && !!boldAction;
+  const step3Complete = isCheckinCompleted;
+  const step4Complete = boldAction?.status === 'completed';
+
+  // Calculate overall progress (25% per step)
+  const overallProgress = 
+    (step1Complete ? 25 : Math.round(videoProgress / 4)) +
+    (step2Complete ? 25 : 0) +
+    (step3Complete ? 25 : 0) +
+    (step4Complete ? 25 : 0);
+
+  const isFullyCompleted = step1Complete && step2Complete && step3Complete && step4Complete;
+
   // Load existing progress on mount
   useEffect(() => {
     const loadProgress = async () => {
       try {
-        const response = await fetch(`/api/progress/${content.id}`);
-        const result = await response.json();
+        // Load video progress
+        const progressResponse = await fetch(`/api/progress/${content.id}`);
+        const progressResult = await progressResponse.json();
         
-        if (result.success && result.data) {
-          const data: ProgressData = result.data;
-          setProgress(data.progress_percentage || 0);
-          setIsCompleted(!!data.completed_at);
+        if (progressResult.success && progressResult.data) {
+          const data: ProgressData = progressResult.data;
+          setVideoProgress(data.progress_percentage || 0);
+          setIsVideoCompleted(data.progress_percentage >= 90);
           lastSavedProgress.current = data.progress_percentage || 0;
+        }
+
+        // Load worksheet status
+        const worksheetResponse = await fetch(`/api/worksheet/${content.id}`);
+        const worksheetResult = await worksheetResponse.json();
+        
+        if (worksheetResult.success && worksheetResult.data) {
+          setIsWorksheetCompleted(true);
+        }
+
+        // Load bold action status
+        const boldActionResponse = await fetch(`/api/bold-actions/${content.id}`);
+        const boldActionResult = await boldActionResponse.json();
+        
+        if (boldActionResult.success && boldActionResult.data) {
+          setBoldAction(boldActionResult.data);
         }
       } catch (error) {
         console.error('Failed to load progress:', error);
@@ -55,9 +113,8 @@ export function ContentViewer({ content }: ContentViewerProps) {
     loadProgress();
   }, [content.id]);
 
-  // Save progress to database (debounced)
+  // Save video progress to database (debounced)
   const saveProgress = useCallback(async (progressPercent: number, completed: boolean) => {
-    // Only save if progress increased significantly (5% increments) or completed
     const shouldSave = 
       completed || 
       progressPercent >= 100 ||
@@ -86,14 +143,13 @@ export function ContentViewer({ content }: ContentViewerProps) {
     }
   }, [content.id]);
 
-  // Debounced save
   const debouncedSave = useCallback((progressPercent: number, completed: boolean) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
     saveTimeoutRef.current = setTimeout(() => {
       saveProgress(progressPercent, completed);
-    }, 1000); // Save after 1 second of no updates
+    }, 1000);
   }, [saveProgress]);
 
   const formatDuration = (seconds: number | null) => {
@@ -111,34 +167,53 @@ export function ContentViewer({ content }: ContentViewerProps) {
     });
   };
 
-  const handleProgress = useCallback((newProgress: number) => {
-    setProgress(newProgress);
+  const handleVideoProgress = useCallback((newProgress: number) => {
+    setVideoProgress(newProgress);
+    if (newProgress >= 90) {
+      setIsVideoCompleted(true);
+    }
     debouncedSave(newProgress, newProgress >= 90);
   }, [debouncedSave]);
 
-  const handleComplete = useCallback(() => {
-    setIsCompleted(true);
-    // Save immediately on completion
+  const handleVideoComplete = useCallback(() => {
+    setIsVideoCompleted(true);
     saveProgress(100, true);
   }, [saveProgress]);
 
+  const handleWorksheetSubmit = (boldActionText: string) => {
+    setIsWorksheetCompleted(true);
+    setBoldAction({
+      status: 'pending',
+      action_description: boldActionText,
+      completed_at: null,
+    });
+  };
+
+  const handleCompleteBoldAction = async () => {
+    try {
+      const response = await fetch(`/api/bold-actions/${content.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed' }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setBoldAction(result.data);
+      }
+    } catch (error) {
+      console.error('Failed to complete bold action:', error);
+    }
+  };
+
   const handleStartLearning = () => {
-    // Scroll to video and play
     const videoContainer = document.querySelector('video');
     if (videoContainer) {
       videoContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => {
-        videoContainer.play().catch(() => {
-          // Autoplay might be blocked
-        });
+        videoContainer.play().catch(() => {});
       }, 300);
     }
-  };
-
-  const getProgressText = () => {
-    if (isCompleted) return 'Completed!';
-    if (progress === 0) return 'Not started';
-    return `${progress}% complete`;
   };
 
   // Cleanup timeout on unmount
@@ -149,6 +224,41 @@ export function ContentViewer({ content }: ContentViewerProps) {
       }
     };
   }, []);
+
+  // Step indicator component
+  const StepIndicator = ({ 
+    step, 
+    title, 
+    isComplete, 
+    isCurrent,
+    icon: Icon 
+  }: { 
+    step: number; 
+    title: string; 
+    isComplete: boolean; 
+    isCurrent: boolean;
+    icon: React.ElementType;
+  }) => (
+    <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+      isComplete ? 'bg-green-50' : isCurrent ? 'bg-secondary/10' : 'bg-muted/30'
+    }`}>
+      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+        isComplete ? 'bg-green-500 text-white' : isCurrent ? 'bg-secondary text-white' : 'bg-muted text-muted-foreground'
+      }`}>
+        {isComplete ? (
+          <CheckCircle className="h-5 w-5" />
+        ) : (
+          <span className="text-sm font-bold">{step}</span>
+        )}
+      </div>
+      <div className="flex-1">
+        <div className={`text-sm font-medium ${isComplete ? 'text-green-700' : isCurrent ? 'text-foreground' : 'text-muted-foreground'}`}>
+          {title}
+        </div>
+      </div>
+      <Icon className={`h-4 w-4 ${isComplete ? 'text-green-500' : isCurrent ? 'text-secondary' : 'text-muted-foreground'}`} />
+    </div>
+  );
 
   return (
     <div className="space-y-6 animate-page-enter">
@@ -169,8 +279,8 @@ export function ContentViewer({ content }: ContentViewerProps) {
             src={content.videoUrl} 
             poster={content.thumbnailUrl || undefined}
             title={content.title}
-            onProgress={handleProgress}
-            onComplete={handleComplete}
+            onProgress={handleVideoProgress}
+            onComplete={handleVideoComplete}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
@@ -220,15 +330,35 @@ export function ContentViewer({ content }: ContentViewerProps) {
               </CardContent>
             </Card>
           )}
+
+          {/* Bold Action Display */}
+          {boldAction && (
+            <Card className="border-secondary/30">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <Zap className={`h-5 w-5 mt-0.5 ${boldAction.status === 'completed' ? 'text-green-500' : 'text-secondary'}`} />
+                  <div className="flex-1">
+                    <h3 className="font-semibold mb-1">Your Bold Action</h3>
+                    <p className="text-muted-foreground">{boldAction.action_description}</p>
+                    {boldAction.status === 'completed' && boldAction.completed_at && (
+                      <p className="text-sm text-green-600 mt-2">
+                        ✓ Completed on {formatDate(boldAction.completed_at)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        {/* Sidebar */}
+        {/* Sidebar - 4-Step Progress */}
         <div className="space-y-4">
           {/* Progress Card */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Your Progress</h3>
+                <h3 className="font-semibold">Module Progress</h3>
                 {isSaving && (
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -236,41 +366,136 @@ export function ContentViewer({ content }: ContentViewerProps) {
                   </span>
                 )}
               </div>
-              <div className="space-y-3">
-                {isLoading ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                  </div>
-                ) : (
-                  <>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Overall Progress Bar */}
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Overall</span>
+                      <span className="font-bold">{overallProgress}%</span>
+                    </div>
+                    <div className="h-3 bg-muted rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-secondary rounded-full transition-all duration-300"
-                        style={{ width: `${progress}%` }}
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isFullyCompleted ? 'bg-green-500' : 'bg-secondary'
+                        }`}
+                        style={{ width: `${overallProgress}%` }}
                       />
                     </div>
-                    <p className="text-sm text-muted-foreground flex items-center gap-2">
-                      {isCompleted && <CheckCircle className="h-4 w-4 text-green-500" />}
-                      {getProgressText()}
-                    </p>
-                    {content.videoUrl && (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        onClick={handleStartLearning}
-                        variant={isCompleted ? 'outline' : 'default'}
-                      >
+                  </div>
+
+                  {/* 4 Steps */}
+                  <div className="space-y-2 pt-2">
+                    <StepIndicator 
+                      step={1} 
+                      title="Watch Video" 
+                      isComplete={step1Complete}
+                      isCurrent={!step1Complete}
+                      icon={Video}
+                    />
+                    <StepIndicator 
+                      step={2} 
+                      title="Complete Worksheet" 
+                      isComplete={step2Complete}
+                      isCurrent={step1Complete && !step2Complete}
+                      icon={FileText}
+                    />
+                    <StepIndicator 
+                      step={3} 
+                      title="Team Leader Check-in" 
+                      isComplete={step3Complete}
+                      isCurrent={step2Complete && !step3Complete}
+                      icon={Users}
+                    />
+                    <StepIndicator 
+                      step={4} 
+                      title="Bold Action Signoff" 
+                      isComplete={step4Complete}
+                      isCurrent={step3Complete && !step4Complete}
+                      icon={Zap}
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="space-y-2 pt-4 border-t">
+                    {/* Step 1: Watch Video */}
+                    {!step1Complete && content.videoUrl && (
+                      <Button className="w-full" onClick={handleStartLearning}>
                         <Play className="h-4 w-4 mr-2" />
-                        {isCompleted ? 'Watch Again' : progress > 0 ? 'Continue' : 'Start Learning'}
+                        {videoProgress > 0 ? 'Continue Watching' : 'Start Video'}
                       </Button>
                     )}
-                  </>
-                )}
-              </div>
+
+                    {/* Step 2: Worksheet */}
+                    {step1Complete && !step2Complete && (
+                      <Button 
+                        className="w-full bg-secondary hover:bg-secondary/90" 
+                        onClick={() => setIsWorksheetOpen(true)}
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Complete Worksheet
+                      </Button>
+                    )}
+
+                    {/* Step 3: Request Check-in */}
+                    {step2Complete && !step3Complete && (
+                      <Button className="w-full" variant="outline" disabled>
+                        <Users className="h-4 w-4 mr-2" />
+                        Request Check-in (Coming Soon)
+                      </Button>
+                    )}
+
+                    {/* Step 4: Complete Bold Action */}
+                    {step3Complete && !step4Complete && boldAction && (
+                      <Button 
+                        className="w-full bg-green-600 hover:bg-green-700" 
+                        onClick={handleCompleteBoldAction}
+                      >
+                        <Zap className="h-4 w-4 mr-2" />
+                        Mark Bold Action Complete
+                      </Button>
+                    )}
+
+                    {/* Already completed worksheet - can update */}
+                    {step2Complete && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="w-full text-muted-foreground"
+                        onClick={() => setIsWorksheetOpen(true)}
+                      >
+                        Edit Worksheet
+                      </Button>
+                    )}
+
+                    {/* Completed state */}
+                    {isFullyCompleted && (
+                      <div className="text-center py-2">
+                        <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                        <p className="text-green-600 font-medium">Module Complete!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Worksheet Modal */}
+      <WorksheetModal
+        isOpen={isWorksheetOpen}
+        onClose={() => setIsWorksheetOpen(false)}
+        contentId={content.id}
+        contentTitle={content.title}
+        onSubmit={handleWorksheetSubmit}
+      />
     </div>
   );
 }
