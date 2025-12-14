@@ -9,8 +9,8 @@
 import { useState } from 'react';
 import { 
   Users, CheckCircle, Clock, Video, FileText, 
-  Handshake, Zap, ChevronRight, Loader2, X,
-  BookOpen
+  Handshake, Zap, ChevronRight, ChevronDown, Loader2, X,
+  BookOpen, Lightbulb, Target, HelpCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -53,10 +53,16 @@ interface ModuleProgressItem {
   videoCompleted: boolean;
   videoProgress: number;
   worksheetCompleted: boolean;
+  worksheetResponses: {
+    keyTakeaways?: string;
+    boldAction?: string;
+    questions?: string;
+  } | null;
   checkinCompleted: boolean;
   checkinStatus: string;
   boldActionCompleted: boolean;
   boldActionStatus: string;
+  boldActionText: string | null;
 }
 
 interface TeamMember {
@@ -104,6 +110,19 @@ export function TeamDashboard({
   const [completingId, setCompletingId] = useState<string | null>(null);
   const [localCheckins, setLocalCheckins] = useState(pendingCheckins);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+
+  const toggleModule = (moduleId: string) => {
+    setExpandedModules(prev => {
+      const next = new Set(prev);
+      if (next.has(moduleId)) {
+        next.delete(moduleId);
+      } else {
+        next.add(moduleId);
+      }
+      return next;
+    });
+  };
 
   const handleCompleteCheckin = async (checkin: CheckinRequest) => {
     setCompletingId(checkin.id);
@@ -444,6 +463,9 @@ export function TeamDashboard({
               {/* Per-Module Progress */}
               <div>
                 <h4 className="font-semibold mb-3">Module Progress</h4>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Click a module to see worksheet details
+                </p>
                 <div className="space-y-2">
                   {selectedMember.moduleProgress.map((module) => {
                     const stepsCompleted = [
@@ -452,86 +474,144 @@ export function TeamDashboard({
                       module.checkinCompleted,
                       module.boldActionCompleted,
                     ].filter(Boolean).length;
+                    const isExpanded = expandedModules.has(module.moduleId);
+                    const hasDetails = module.worksheetResponses || module.boldActionText;
 
                     return (
                       <div 
                         key={module.moduleId}
-                        className="border rounded-lg p-3"
+                        className="border rounded-lg overflow-hidden"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="font-medium text-sm">{module.moduleTitle}</p>
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-                            stepsCompleted === 4 
-                              ? 'bg-green-100 text-green-700'
-                              : stepsCompleted > 0 
-                                ? 'bg-amber-100 text-amber-700'
-                                : 'bg-muted text-muted-foreground'
-                          }`}>
-                            {stepsCompleted}/4 steps
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {/* Video */}
-                          <div className={`flex items-center gap-1 text-xs ${
-                            module.videoCompleted ? 'text-green-600' : 'text-muted-foreground'
-                          }`}>
-                            {module.videoCompleted ? (
-                              <CheckCircle className="h-3 w-3" />
-                            ) : (
-                              <Video className="h-3 w-3" />
-                            )}
-                            Video
+                        {/* Module Header - Clickable */}
+                        <button
+                          onClick={() => hasDetails && toggleModule(module.moduleId)}
+                          className={`w-full p-3 text-left ${hasDetails ? 'hover:bg-muted/30 cursor-pointer' : ''} transition-colors`}
+                          disabled={!hasDetails}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              {hasDetails && (
+                                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isExpanded ? '' : '-rotate-90'}`} />
+                              )}
+                              <p className="font-medium text-sm">{module.moduleTitle}</p>
+                            </div>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                              stepsCompleted === 4 
+                                ? 'bg-green-100 text-green-700'
+                                : stepsCompleted > 0 
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-muted text-muted-foreground'
+                            }`}>
+                              {stepsCompleted}/4 steps
+                            </span>
                           </div>
-                          {/* Worksheet */}
-                          <div className={`flex items-center gap-1 text-xs ${
-                            module.worksheetCompleted ? 'text-green-600' : 'text-muted-foreground'
-                          }`}>
-                            {module.worksheetCompleted ? (
-                              <CheckCircle className="h-3 w-3" />
-                            ) : (
-                              <FileText className="h-3 w-3" />
-                            )}
-                            Worksheet
+                          <div className="flex items-center gap-3">
+                            {/* Video */}
+                            <div className={`flex items-center gap-1 text-xs ${
+                              module.videoCompleted ? 'text-green-600' : 'text-muted-foreground'
+                            }`}>
+                              {module.videoCompleted ? (
+                                <CheckCircle className="h-3 w-3" />
+                              ) : (
+                                <Video className="h-3 w-3" />
+                              )}
+                              Video
+                            </div>
+                            {/* Worksheet */}
+                            <div className={`flex items-center gap-1 text-xs ${
+                              module.worksheetCompleted ? 'text-green-600' : 'text-muted-foreground'
+                            }`}>
+                              {module.worksheetCompleted ? (
+                                <CheckCircle className="h-3 w-3" />
+                              ) : (
+                                <FileText className="h-3 w-3" />
+                              )}
+                              Worksheet
+                            </div>
+                            {/* Check-in */}
+                            <div className={`flex items-center gap-1 text-xs ${
+                              module.checkinCompleted 
+                                ? 'text-green-600' 
+                                : module.checkinStatus === 'pending' 
+                                  ? 'text-amber-600' 
+                                  : 'text-muted-foreground'
+                            }`}>
+                              {module.checkinCompleted ? (
+                                <CheckCircle className="h-3 w-3" />
+                              ) : (
+                                <Handshake className="h-3 w-3" />
+                              )}
+                              {module.checkinCompleted 
+                                ? 'Met' 
+                                : module.checkinStatus === 'pending' 
+                                  ? 'Requested' 
+                                  : 'Check-in'}
+                            </div>
+                            {/* Bold Action */}
+                            <div className={`flex items-center gap-1 text-xs ${
+                              module.boldActionCompleted 
+                                ? 'text-green-600' 
+                                : module.boldActionStatus === 'pending' 
+                                  ? 'text-amber-600' 
+                                  : 'text-muted-foreground'
+                            }`}>
+                              {module.boldActionCompleted ? (
+                                <CheckCircle className="h-3 w-3" />
+                              ) : (
+                                <Zap className="h-3 w-3" />
+                              )}
+                              {module.boldActionCompleted 
+                                ? 'Done' 
+                                : module.boldActionStatus === 'pending' 
+                                  ? 'Active' 
+                                  : 'Bold Action'}
+                            </div>
                           </div>
-                          {/* Check-in */}
-                          <div className={`flex items-center gap-1 text-xs ${
-                            module.checkinCompleted 
-                              ? 'text-green-600' 
-                              : module.checkinStatus === 'pending' 
-                                ? 'text-amber-600' 
-                                : 'text-muted-foreground'
-                          }`}>
-                            {module.checkinCompleted ? (
-                              <CheckCircle className="h-3 w-3" />
-                            ) : (
-                              <Handshake className="h-3 w-3" />
+                        </button>
+
+                        {/* Expanded Details */}
+                        {isExpanded && hasDetails && (
+                          <div className="border-t bg-muted/20 p-3 space-y-3">
+                            {/* Key Takeaways */}
+                            {module.worksheetResponses?.keyTakeaways && (
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                                  <Lightbulb className="h-3 w-3 text-yellow-500" />
+                                  Key Takeaways
+                                </p>
+                                <p className="text-sm bg-white/50 p-2 rounded">
+                                  {module.worksheetResponses.keyTakeaways}
+                                </p>
+                              </div>
                             )}
-                            {module.checkinCompleted 
-                              ? 'Met' 
-                              : module.checkinStatus === 'pending' 
-                                ? 'Requested' 
-                                : 'Check-in'}
-                          </div>
-                          {/* Bold Action */}
-                          <div className={`flex items-center gap-1 text-xs ${
-                            module.boldActionCompleted 
-                              ? 'text-green-600' 
-                              : module.boldActionStatus === 'pending' 
-                                ? 'text-amber-600' 
-                                : 'text-muted-foreground'
-                          }`}>
-                            {module.boldActionCompleted ? (
-                              <CheckCircle className="h-3 w-3" />
-                            ) : (
-                              <Zap className="h-3 w-3" />
+
+                            {/* Bold Action */}
+                            {(module.worksheetResponses?.boldAction || module.boldActionText) && (
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                                  <Target className="h-3 w-3 text-primary" />
+                                  Bold Action Commitment
+                                </p>
+                                <p className="text-sm bg-primary/5 p-2 rounded border-l-2 border-primary">
+                                  &quot;{module.boldActionText || module.worksheetResponses?.boldAction}&quot;
+                                </p>
+                              </div>
                             )}
-                            {module.boldActionCompleted 
-                              ? 'Done' 
-                              : module.boldActionStatus === 'pending' 
-                                ? 'Active' 
-                                : 'Bold Action'}
+
+                            {/* Questions */}
+                            {module.worksheetResponses?.questions && (
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                                  <HelpCircle className="h-3 w-3 text-blue-500" />
+                                  Questions
+                                </p>
+                                <p className="text-sm bg-white/50 p-2 rounded">
+                                  {module.worksheetResponses.questions}
+                                </p>
+                              </div>
+                            )}
                           </div>
-                        </div>
+                        )}
                       </div>
                     );
                   })}

@@ -100,7 +100,7 @@ export default async function TeamPage() {
 
   const { data: allWorksheets } = await supabase
     .from('worksheet_submissions')
-    .select('user_id, content_id')
+    .select('user_id, content_id, responses')
     .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
 
   const { data: allCheckins } = await supabase
@@ -110,7 +110,7 @@ export default async function TeamPage() {
 
   const { data: allBoldActions } = await supabase
     .from('bold_actions')
-    .select('user_id, content_id, status')
+    .select('user_id, content_id, status, action_text')
     .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
 
   // Build module progress data
@@ -160,7 +160,7 @@ export default async function TeamPage() {
         const videoProgress = allProgress?.find(
           p => p.user_id === memberId && p.content_id === moduleId
         );
-        const hasWorksheet = allWorksheets?.some(
+        const worksheetRecord = allWorksheets?.find(
           w => w.user_id === memberId && w.content_id === moduleId
         );
         const checkinRecord = allCheckins?.find(
@@ -175,11 +175,17 @@ export default async function TeamPage() {
           moduleTitle: module.title,
           videoCompleted: (videoProgress?.progress_percentage || 0) >= 90,
           videoProgress: videoProgress?.progress_percentage || 0,
-          worksheetCompleted: !!hasWorksheet,
+          worksheetCompleted: !!worksheetRecord,
+          worksheetResponses: worksheetRecord?.responses as {
+            keyTakeaways?: string;
+            boldAction?: string;
+            questions?: string;
+          } | null,
           checkinCompleted: checkinRecord?.status === 'completed',
           checkinStatus: checkinRecord?.status || 'none',
           boldActionCompleted: boldActionRecord?.status === 'completed' || boldActionRecord?.status === 'signed_off',
           boldActionStatus: boldActionRecord?.status || 'none',
+          boldActionText: boldActionRecord?.action_text || null,
         };
       });
 
