@@ -39,6 +39,18 @@ interface BoldActionData {
   completed_at: string | null;
 }
 
+interface CheckinData {
+  id: string;
+  status: 'pending' | 'scheduled' | 'completed' | 'cancelled';
+  scheduled_at: string | null;
+  completed_at: string | null;
+  leader: {
+    id: string;
+    full_name: string;
+    email: string;
+  } | null;
+}
+
 export function ContentViewer({ content }: ContentViewerProps) {
   // Video progress state
   const [videoProgress, setVideoProgress] = useState(0);
@@ -55,8 +67,13 @@ export function ContentViewer({ content }: ContentViewerProps) {
   // Bold Action state
   const [boldAction, setBoldAction] = useState<BoldActionData | null>(null);
 
-  // Check-in state (placeholder for now)
-  const [isCheckinCompleted, setIsCheckinCompleted] = useState(false);
+  // Check-in state
+  const [checkin, setCheckin] = useState<CheckinData | null>(null);
+  const [isRequestingCheckin, setIsRequestingCheckin] = useState(false);
+  const [checkinError, setCheckinError] = useState<string | null>(null);
+
+  // Computed check-in completed state
+  const isCheckinCompleted = checkin?.status === 'completed';
 
   // Calculate step completion
   const step1Complete = isVideoCompleted;
@@ -102,6 +119,14 @@ export function ContentViewer({ content }: ContentViewerProps) {
         
         if (boldActionResult.success && boldActionResult.data) {
           setBoldAction(boldActionResult.data);
+        }
+
+        // Load check-in status
+        const checkinResponse = await fetch(`/api/checkins/${content.id}`);
+        const checkinResult = await checkinResponse.json();
+        
+        if (checkinResult.success && checkinResult.data) {
+          setCheckin(checkinResult.data);
         }
       } catch (error) {
         console.error('Failed to load progress:', error);
@@ -203,6 +228,54 @@ export function ContentViewer({ content }: ContentViewerProps) {
       }
     } catch (error) {
       console.error('Failed to complete bold action:', error);
+    }
+  };
+
+  const handleRequestCheckin = async () => {
+    setIsRequestingCheckin(true);
+    setCheckinError(null);
+    
+    try {
+      const response = await fetch(`/api/checkins/${content.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setCheckin(result.data);
+      } else {
+        setCheckinError(result.error || 'Failed to request check-in');
+      }
+    } catch (error) {
+      console.error('Failed to request check-in:', error);
+      setCheckinError('Failed to request check-in. Please try again.');
+    } finally {
+      setIsRequestingCheckin(false);
+    }
+  };
+
+  const handleSelfCertifyCheckin = async () => {
+    setIsRequestingCheckin(true);
+    
+    try {
+      const response = await fetch(`/api/checkins/${content.id}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ selfCertify: true }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setCheckin(prev => prev ? { ...prev, status: 'completed', completed_at: new Date().toISOString() } : null);
+      }
+    } catch (error) {
+      console.error('Failed to self-certify check-in:', error);
+    } finally {
+      setIsRequestingCheckin(false);
     }
   };
 
@@ -443,11 +516,66 @@ export function ContentViewer({ content }: ContentViewerProps) {
                     )}
 
                     {/* Step 3: Request Check-in */}
-                    {step2Complete && !step3Complete && (
-                      <Button className="w-full" variant="outline" disabled>
-                        <Users className="h-4 w-4 mr-2" />
-                        Request Check-in (Coming Soon)
-                      </Button>
+                    {step2Complete && !step3Complete && !checkin && (
+                      <div className="space-y-2">
+                        <Button 
+                          className="w-full" 
+                          onClick={handleRequestCheckin}
+                          disabled={isRequestingCheckin}
+                        >
+                          {isRequestingCheckin ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Users className="h-4 w-4 mr-2" />
+                          )}
+                          Request Team Leader Check-in
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="w-full text-sm"
+                          onClick={handleSelfCertifyCheckin}
+                          disabled={isRequestingCheckin}
+                        >
+                          <Circle className="h-3 w-3 mr-2" />
+                          Self-Certify (Skip Check-in)
+                        </Button>
+                        {checkinError && (
+                          <p className="text-sm text-red-500 text-center">{checkinError}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Check-in Pending */}
+                    {step2Complete && checkin && checkin.status === 'pending' && (
+                      <div className="space-y-2">
+                        <div className="p-3 bg-amber-50 rounded-lg">
+                          <p className="text-sm text-amber-700 font-medium">Check-in Requested</p>
+                          <p className="text-xs text-amber-600 mt-1">
+                            Waiting for {checkin.leader?.full_name || 'your team leader'}
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-xs"
+                          onClick={handleSelfCertifyCheckin}
+                          disabled={isRequestingCheckin}
+                        >
+                          Self-Certify Instead
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Check-in Scheduled */}
+                    {step2Complete && checkin && checkin.status === 'scheduled' && (
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-700 font-medium">Check-in Scheduled</p>
+                        {checkin.scheduled_at && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            {new Date(checkin.scheduled_at).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
                     )}
 
                     {/* Step 4: Complete Bold Action */}
