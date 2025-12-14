@@ -1,84 +1,78 @@
-# Turborepo starter
+# LeaderForge LMS
 
-This Turborepo starter is maintained by the Turborepo core team.
+A multi-tenant Learning Management System for leadership development.
 
-## Using this example
+## Architecture
 
-Run the following command:
-
-```sh
-npx create-turbo@latest
+**Multi-Tenant Hierarchy:**
+```
+Platform (LeaderForge)
+└── Tenant (e.g., i49 Group)
+    └── Organization (Customer Company)
+        └── Team (Department/Group)
+            └── User (Employee)
 ```
 
-## What's inside?
+## Tech Stack
 
-This Turborepo includes the following packages/apps:
+- **Frontend:** Next.js 15 (App Router), React, TypeScript, Tailwind CSS
+- **Backend:** Supabase (PostgreSQL, Auth, RLS)
+- **UI Components:** shadcn/ui
+- **Package Manager:** pnpm
 
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Project Structure
 
 ```
-cd my-turborepo
-pnpm build
+leaderforge-dev/
+├── .cursor/rules/       # Cursor AI rules
+├── docs/                # Documentation
+│   ├── architecture/    # Architecture docs & ADRs
+│   ├── product/         # PRDs
+│   └── design-system/   # Design system
+├── apps/
+│   └── web/             # Next.js application
+├── packages/
+│   ├── database/        # Supabase types & utilities
+│   ├── ui/              # Shared UI components
+│   └── services/        # Business logic
+├── supabase/
+│   └── migrations/      # Database migrations
+├── _archive/            # Archived previous codebase (reference)
+└── TASKS.md             # Implementation task list
 ```
 
-### Develop
+## Getting Started
 
-To develop all apps and packages, run the following command:
+> 🚧 **Work in Progress** - See `TASKS.md` for implementation status.
 
-```
-cd my-turborepo
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start development server
 pnpm dev
 ```
 
-### Remote Caching
+## Documentation
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- [Task List](./TASKS.md) - Implementation progress
+- [Architecture](./docs/architecture/) - Architecture decisions
+- [PRDs](./docs/product/prds/) - Product requirements
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## Archive Reference
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+The `_archive/` directory contains the previous Agent-Native Architecture (ANA) codebase. Key patterns to reference:
 
-```
-cd my-turborepo
-npx turbo login
-```
+| Pattern | Location |
+|---------|----------|
+| SSR Authentication | `_archive/apps/web/app/lib/supabaseServerClient.ts` |
+| RLS Policies | `_archive/sql/` |
+| Progress Tracking | `_archive/sql/create_universal_progress_table.sql` |
+| Type Definitions | `_archive/apps/web/app/lib/types.ts` |
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+---
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+**Status:** Foundation Phase - See [TASKS.md](./TASKS.md)
 
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)

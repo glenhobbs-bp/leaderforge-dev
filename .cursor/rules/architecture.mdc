@@ -1,0 +1,151 @@
+---
+description: LeaderForge LMS Architecture Principles
+globs:
+alwaysApply: true
+---
+# LeaderForge LMS Architecture Principles
+
+## Overview
+
+LeaderForge is a multi-tenant Learning Management System with the following hierarchy:
+
+```
+Platform (LeaderForge)
+└── Tenant (e.g., i49 Group)
+    └── Organization (Customer Company)
+        └── Team (Department/Group)
+            └── User (Employee)
+```
+
+## Core Architecture Principles
+
+### 1. Multi-Tenant Data Isolation
+- **All data is tenant-scoped** - Every table includes `tenant_id`
+- **RLS enforces boundaries** - Row Level Security on all user-facing tables
+- **Organization isolation within tenants** - Users only see their org's data
+- **Team-level access** - Fine-grained access within organizations
+
+### 2. Theming & Branding (Option 2)
+- **Tenant-level theming** - Full control (colors, logo, fonts)
+- **Organization-level override** - Partial (logo, primary color only)
+- **CSS custom properties** - All theming via `var(--primary)`, etc.
+- **Extensible schema** - Database supports full org theming for future expansion
+
+### 3. SSR-First Authentication
+- **All auth in Server Components** - Never use `auth.getUser()` client-side
+- **Pass user context as props** - Server fetches, client receives
+- **Service role for system ops only** - Never for user operations
+- **Supabase SSR patterns** - Use `createServerClient` from `@supabase/ssr`
+
+### 4. Service Layer Architecture
+- **UI → Service → Database** - Never skip the service layer
+- **Business logic in services** - Not in UI components or API routes
+- **Thin API routes** - Routes call services, return responses
+- **Type-safe responses** - Consistent response format across APIs
+
+### 5. Modular Monolith Structure
+- **Single deployment** - All code deploys together
+- **Clear module boundaries** - Organized by domain, not technical layer
+- **Shared database** - Single Supabase instance with schemas
+- **No cross-module imports** - Modules communicate via database
+
+## Module Structure
+
+```
+packages/
+├── database/     # Supabase types, utilities, migrations
+├── services/     # Business logic services
+│   ├── auth/
+│   ├── tenant/
+│   ├── organization/
+│   ├── team/
+│   ├── user/
+│   ├── content/
+│   └── progress/
+└── ui/           # Shared UI components (no business logic)
+
+apps/web/
+├── app/
+│   ├── (auth)/        # Auth routes
+│   ├── (dashboard)/   # Main app routes
+│   └── api/           # API routes (thin)
+└── lib/               # App-specific utilities
+```
+
+## Database Schema Principles
+
+### Multi-Tenant Tables
+```sql
+-- All user-facing tables follow this pattern
+CREATE TABLE content.items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES core.tenants(id),
+  organization_id UUID REFERENCES core.organizations(id),
+  -- ... other columns
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS enforces tenant isolation
+ALTER TABLE content.items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "tenant_isolation" ON content.items
+  FOR ALL USING (
+    tenant_id IN (
+      SELECT tenant_id FROM core.memberships
+      WHERE user_id = auth.uid()
+    )
+  );
+```
+
+### Schema Organization
+- `core` - Tenants, organizations, teams, users, memberships
+- `content` - Learning content, courses, modules
+- `progress` - User progress, completions, milestones
+- `auth` - Supabase auth extensions if needed
+
+## API Design
+
+### Response Format
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+```
+
+### Route Structure
+```
+/api/
+├── auth/           # Authentication endpoints
+├── tenants/        # Tenant management (admin)
+├── organizations/  # Organization management
+├── teams/          # Team management
+├── users/          # User management
+├── content/        # Content delivery
+└── progress/       # Progress tracking
+```
+
+## Validation Checklist
+
+Before any implementation:
+
+- [ ] **Multi-tenant**: Does this respect tenant boundaries?
+- [ ] **SSR Auth**: Is authentication server-side only?
+- [ ] **Service Layer**: Is business logic in services?
+- [ ] **RLS**: Are database policies in place?
+- [ ] **Type Safety**: Are TypeScript types correct?
+- [ ] **Error Handling**: Are errors handled gracefully?
+
+## Anti-Patterns (NEVER DO)
+
+❌ Client-side `auth.getUser()` calls
+❌ Direct database access from UI components
+❌ Business logic in API routes
+❌ Cross-tenant data access without explicit admin check
+❌ Hardcoded tenant/org IDs
+❌ Skipping RLS policies on new tables

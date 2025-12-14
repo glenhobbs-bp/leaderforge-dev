@@ -1,149 +1,162 @@
-# Architecture Documentation
-
-**File:** docs/architecture/README.md
-**Purpose:** System architecture overview and decision documentation
-**Owner:** Senior Architect
-**Tags:** architecture, decisions, patterns, integrations
-**Last Updated:** 2024-01-15
+# LeaderForge LMS Architecture
 
 ## Overview
 
-This section contains all system architecture documentation including high-level overviews, detailed Architecture Decision Records (ADRs), design patterns, and integration guides.
+LeaderForge is a multi-tenant Learning Management System designed for leadership development and employee training. The platform supports a hierarchical structure where training providers (tenants) can onboard multiple customer organizations, each with their own teams and users.
 
-## Structure
+## Multi-Tenant Hierarchy
 
-### 📋 [Overview](overview/) - High-Level Architecture
-Core architectural documentation and technology overviews:
-- **[Agent-Native Composition Architecture](overview/agent-native-composition-architecture.md)** - Complete system overview
-- **Technology Stack** - Languages, frameworks, and tools
-- **System Context** - How LeaderForge fits into the larger ecosystem
-- **Quality Attributes** - Performance, security, scalability requirements
+```
+Platform (LeaderForge)
+└── Tenant (e.g., i49 Group - Training Provider)
+    └── Organization (Customer Company)
+        └── Team (Department/Group)
+            └── User (Employee)
+```
 
-### 📝 [ADRs](adr/) - Architecture Decision Records
-Complete record of all architectural decisions with context and rationale:
-- **[ADR Index](adr/README.md)** - All decisions with status and relationships
-- **[ADR Template](adr/adr-template.md)** - Standard template for new decisions
-- **Current ADRs**: 7 foundational decisions covering core architecture
+### Entity Descriptions
 
-### 🏗️ [Patterns](patterns/) - Reusable Architecture Patterns
-Documented patterns for common architectural challenges:
-- **Data Access Patterns** - Repository, unit of work, CQRS
-- **Communication Patterns** - Event-driven, message queues, APIs
-- **Security Patterns** - Authentication, authorization, encryption
-- **Performance Patterns** - Caching, optimization, monitoring
+| Entity | Description | Example |
+|--------|-------------|---------|
+| **Platform** | LeaderForge itself | LeaderForge LMS |
+| **Tenant** | Training provider or reseller with full platform access | i49 Group |
+| **Organization** | Customer company purchasing training | Acme Corp |
+| **Team** | Group within an organization | Sales Team |
+| **User** | Individual learner | John Smith |
 
-### 🔌 [Integrations](integrations/) - External Service Integration
-Documentation for all external service integrations:
-- **Supabase** - Database, auth, storage integration
-- **Tribe Social** - Content management and video platform
-- **OpenAI/Anthropic** - AI model integrations
-- **Third-Party Services** - Analytics, monitoring, etc.
+## Core Architecture Principles
 
-## Key Architectural Decisions
+### 1. Multi-Tenant Data Isolation
+All data is scoped by tenant and organization. Row Level Security (RLS) policies enforce boundaries at the database level, ensuring users can only access data within their tenant and organization.
 
-### Core System Design
-1. **[Agent-Native Composition](adr/0001-agent-native-composition-system.md)** - AI agents compose UIs dynamically
-2. **[Modular Monolith](adr/0002-modular-monolith-architecture.md)** - Single codebase with clear module boundaries
-3. **[Separate Asset Registries](adr/0003-separate-asset-registries.md)** - Distinct registries for widgets and tools
+### 2. Theming & Branding (Option 2)
+- **Tenant-level**: Full theme control (colors, logo, typography)
+- **Organization-level**: Partial override (logo, primary color)
+- **Extensible**: Database schema supports full org theming for future expansion
 
-### Data & Communication
-4. **[Database-Backed Compositions](adr/0004-database-backed-compositions.md)** - PostgreSQL with Redis caching
-5. **[Hybrid Communication](adr/0005-hybrid-communication-pattern.md)** - HTTP + message queue architecture
-6. **[BullMQ Message Queue](adr/0006-bullmq-message-queue.md)** - Redis-based async processing
+### 3. SSR-First Authentication
+All authentication happens server-side using Supabase Auth. Client components receive user context as props from Server Components. This ensures security and enables proper SEO.
 
-### API Design
-7. **[API Route Organization](adr/0007-api-route-organization.md)** - Purpose-based route structure
+### 4. Service Layer Architecture
+Business logic resides in service modules, not in UI components or API routes:
+```
+UI Components → API Routes → Services → Database
+```
 
-## Architecture Principles
+### 5. Modular Monolith
+Single deployment with clear module boundaries. Modules are organized by domain (auth, content, progress) rather than technical layer.
 
-### Agent-Native Design
-- **All business logic orchestrated by AI agents** - No hardcoded workflows
-- **Schema-driven UI composition** - Agents define what UI renders
-- **Conversation-first interaction** - Everything accessible via chat
-- **Context-aware responses** - Agents understand user state and history
+## Technology Stack
 
-### Modular Monolith
-- **Clear module boundaries** - Each module owns its data and logic
-- **Event-driven communication** - Modules communicate via events
-- **Shared infrastructure** - Common database, auth, monitoring
-- **Independent deployment** - Modules can evolve independently
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Next.js 15 (App Router), React 19, TypeScript |
+| **Styling** | Tailwind CSS, shadcn/ui |
+| **Backend** | Supabase (PostgreSQL, Auth, Storage) |
+| **Hosting** | Vercel (recommended) |
+| **Package Manager** | pnpm |
 
-### Quality Attributes
-- **Performance**: <100ms UI composition, <50ms asset discovery
-- **Scalability**: Horizontal scaling of stateless components
-- **Security**: Zero-trust architecture with comprehensive authorization
-- **Maintainability**: Clear separation of concerns and documentation
+## Project Structure
 
-## Making Architecture Decisions
+```
+leaderforge-dev/
+├── .cursor/rules/       # AI assistant rules
+├── docs/
+│   ├── architecture/    # This directory
+│   │   ├── adr/         # Architecture Decision Records
+│   │   └── schemas/     # Database schema docs
+│   ├── product/         # PRDs and requirements
+│   └── design-system/   # Design system docs
+├── apps/
+│   └── web/             # Next.js application
+│       ├── app/         # App Router pages
+│       │   ├── (auth)/  # Auth route group
+│       │   ├── (dashboard)/ # Main app routes
+│       │   └── api/     # API routes
+│       └── lib/         # App utilities
+├── packages/
+│   ├── database/        # Supabase types & utilities
+│   ├── services/        # Business logic
+│   └── ui/              # Shared UI components
+├── supabase/
+│   └── migrations/      # Database migrations
+└── _archive/            # Previous codebase (reference)
+```
 
-### Decision Process
-1. **Identify Problem**: Clearly define the architectural challenge
-2. **Research Options**: Gather at least 3 viable alternatives
-3. **Analyze Trade-offs**: Document pros, cons, and implications
-4. **Create ADR**: Use the [ADR template](adr/adr-template.md)
-5. **Get Approval**: Follow [Senior Architect Rule](../governance/senior-architect-rule.md)
-6. **Communicate**: Share decision with relevant teams
-7. **Monitor**: Track implementation and impact
+## Database Architecture
 
-### Decision Criteria
-- **Alignment**: Does it support our agent-native vision?
-- **Scalability**: Can it handle our growth projections?
-- **Maintainability**: Does it reduce or increase complexity?
-- **Security**: Does it maintain our security posture?
-- **Cost**: What are the financial implications?
-- **Risk**: What could go wrong and how do we mitigate?
+### Schema Organization
 
-### Escalation
-- **Technical Disputes**: Senior Architect makes final decision
-- **Business Impact**: Escalate to product leadership
-- **Security Concerns**: Include security team in review
-- **Major Changes**: Architecture review board approval required
+| Schema | Purpose | Tables |
+|--------|---------|--------|
+| `core` | Platform fundamentals | tenants, organizations, teams, users, memberships |
+| `content` | Learning content | items, courses, modules, entitlements |
+| `progress` | User tracking | user_progress, completions, milestones |
 
-## Compliance & Reviews
+### Key Design Patterns
 
-### 🔍 **Architecture Governance**
-- **[Architecture Compliance Checklist](./architecture-compliance-checklist.md)** - Comprehensive checklist for periodic architectural review and compliance verification
+1. **Tenant Scoping**: All tables include `tenant_id` foreign key
+2. **RLS Policies**: Every user-facing table has row-level security
+3. **Soft Deletes**: Use `deleted_at` timestamp instead of hard deletes
+4. **Audit Fields**: All tables have `created_at`, `updated_at`
 
-### Documentation Requirements
-- **All major decisions** must have ADRs
-- **External integrations** must be documented
-- **Security changes** require security impact assessment
-- **Performance changes** require benchmarking
+## API Design
 
-### Review Schedule
-- **Weekly**: Development compliance review using checklist
-- **Monthly**: Review pending ADRs and architectural health
-- **Quarterly**: Assess architecture health and tech debt
-- **Semi-Annual**: Review architectural principles and patterns
-- **Annual**: Comprehensive architecture assessment
+### Response Format
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+```
 
-### Quality Gates
-- **Design Review**: All ADRs reviewed before implementation
-- **Code Review**: Implementation checked against architecture
-- **Security Review**: Security implications assessed
-- **Performance Review**: Performance impact measured
-- **Compliance Review**: Weekly checklist verification
+### Route Organization
+```
+/api/
+├── auth/           # Authentication
+├── tenants/        # Tenant management (admin)
+├── organizations/  # Organization management
+├── teams/          # Team management
+├── users/          # User management
+├── content/        # Content delivery
+└── progress/       # Progress tracking
+```
 
-## Getting Started
+## Security Model
 
-### For Architects
-1. Review the [architectural overview](overview/agent-native-composition-architecture.md)
-2. Read all current [ADRs](adr/README.md) to understand decisions
-3. Familiarize yourself with [patterns](patterns/) and [integrations](integrations/)
-4. Review the [Senior Architect Rule](../governance/senior-architect-rule.md)
+### Authentication
+- Supabase Auth with SSR patterns
+- JWT tokens with secure cookie storage
+- Session refresh handling
 
-### For Engineers
-1. Understand the [modular monolith pattern](adr/0002-modular-monolith-architecture.md)
-2. Review [API organization](adr/0007-api-route-organization.md) for endpoint creation
-3. Check [integration guides](integrations/) for external services
-4. Follow [patterns](patterns/) for common implementation challenges
+### Authorization
+- Role-based access control (RBAC)
+- Tenant isolation via RLS
+- Organization and team scoping
 
-### For Product Teams
-1. Understand [agent-native principles](adr/0001-agent-native-composition-system.md)
-2. Review [performance requirements](overview/agent-native-composition-architecture.md#performance-requirements)
-3. Check [integration capabilities](integrations/) when planning features
-4. Consider architecture implications in feature requirements
+### Data Protection
+- All data encrypted at rest (Supabase default)
+- HTTPS for all connections
+- No PII in application logs
 
----
+## Related Documentation
 
-**Remember**: Architecture decisions have long-term impact. When in doubt, create an ADR and get appropriate review before proceeding.
+- [Architecture Decision Records](./adr/) - Key decisions and rationale
+- [Database Schemas](./schemas/) - Detailed schema documentation
+- [Design System](../design-system/) - UI/UX standards
+- [Product Requirements](../product/prds/) - Feature specifications
+
+## Reference
+
+The `_archive/` directory contains the previous Agent-Native Architecture (ANA) codebase. Useful patterns to reference:
+
+| Pattern | Location |
+|---------|----------|
+| SSR Authentication | `_archive/apps/web/app/lib/supabaseServerClient.ts` |
+| RLS Policies | `_archive/sql/` |
+| Progress Tracking | `_archive/sql/create_universal_progress_table.sql` |
+| Type Definitions | `_archive/apps/web/app/lib/types.ts` |

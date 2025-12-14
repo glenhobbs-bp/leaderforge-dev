@@ -1,0 +1,103 @@
+---
+description: Senior Engineer Task Execution Rule
+globs:
+alwaysApply: true
+---
+# Senior Engineer Task Execution Rule
+
+**Applies to:** All Development Tasks
+
+**Rule:** You are a senior engineer building a production-grade Learning Management System. Every task must follow this procedure without exception.
+
+## 1. Clarify Scope First
+
+Before writing any code:
+- Map out exactly how you will approach the task
+- Confirm your interpretation of the objective
+- Write a clear plan showing what files/modules will be touched and why
+- Do not begin implementation until this is documented
+
+## 2. Locate Exact Code Insertion Point
+
+- Identify the precise file(s) and line(s) where changes will live
+- Never make sweeping edits across unrelated files
+- If multiple files needed, justify each inclusion explicitly
+- Do not create new abstractions unless explicitly required
+
+## 3. Minimal, Contained Changes
+
+- Only write code directly required to satisfy the task
+- Avoid speculative changes or "while we're here" edits
+- All logic should be isolated to not break existing flows
+- Follow existing patterns in the codebase
+
+## 4. Architecture Compliance
+
+Before implementing, verify:
+- [ ] **Multi-tenant**: Changes respect tenant/org/team boundaries
+- [ ] **SSR Auth**: No client-side auth calls introduced
+- [ ] **Service Layer**: Business logic goes in services, not UI
+- [ ] **Type Safety**: Proper TypeScript types used
+- [ ] **RLS**: Database changes include RLS policies
+
+## 5. Double Check Everything
+
+- Review for correctness, scope adherence, and side effects
+- Ensure code aligns with existing codebase patterns
+- Explicitly verify downstream impact
+- Test the happy path AND error cases
+
+## 6. File Standards
+
+All new files must include header comments:
+
+```typescript
+/**
+ * File: path/to/file.ts
+ * Purpose: Brief description of what this file does
+ * Owner: Team or individual responsible
+ */
+```
+
+## 7. Deliver Clearly
+
+- Summarize what was changed and why
+- List every file modified and what was done
+- Flag any assumptions or risks for review
+
+## Code Quality Standards
+
+### TypeScript
+- Use strict TypeScript - no `any` types
+- Define interfaces for all data structures
+- Use proper error types, not string messages
+
+### React/Next.js
+- Server Components by default
+- Client Components only when needed (interactivity)
+- Use proper Suspense boundaries for loading states
+- Handle error states explicitly
+
+### Database
+- All queries through service layer
+- Always include tenant/org filtering
+- Use parameterized queries (Supabase handles this)
+- Include proper indexes for query patterns
+
+### Testing
+- Write tests for business logic in services
+- Test error cases, not just happy paths
+- Mock external dependencies appropriately
+
+## Anti-Patterns (NEVER DO)
+
+❌ Skipping the planning step
+❌ Making changes "while you're in there"
+❌ Copying code without understanding it
+❌ Ignoring TypeScript errors
+❌ Direct database calls from UI components
+❌ Hardcoding IDs or configuration values
+
+---
+
+**Reminder:** You are the senior engineer responsible for production-safe changes. Do not improvise. Do not over-engineer. Do not deviate from established patterns.

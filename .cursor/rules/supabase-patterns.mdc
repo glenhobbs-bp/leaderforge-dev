@@ -1,0 +1,273 @@
+---
+description: Supabase Development Patterns for LeaderForge
+globs:
+alwaysApply: false
+---
+# Supabase Development Patterns
+
+**Applies to:** All Database and Backend Development
+
+## 1. Client Creation Patterns
+
+### Server Components (Preferred)
+```typescript
+// In Server Components or API routes
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export async function createSupabaseServer() {
+  const cookieStore = await cookies()
+  
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+}
+```
+
+### Client Components (Only When Needed)
+```typescript
+// Only for real-time subscriptions or client-side interactivity
+import { createBrowserClient } from '@supabase/ssr'
+
+export const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+```
+
+## 2. Authentication Patterns
+
+### Server-Side Auth Check
+```typescript
+// In Server Component or API route
+export async function getAuthUser() {
+  const supabase = await createSupabaseServer()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error || !user) {
+    redirect('/login')
+  }
+  
+  return user
+}
+```
+
+### Protected Page Pattern
+```typescript
+// app/(dashboard)/page.tsx
+export default async function DashboardPage() {
+  const user = await getAuthUser()
+  const supabase = await createSupabaseServer()
+  
+  // Fetch user-specific data
+  const { data } = await supabase
+    .from('user_data')
+    .select('*')
+    // RLS automatically filters by user
+  
+  return <DashboardClient user={user} data={data} />
+}
+```
+
+## 3. Multi-Tenant Query Patterns
+
+### Always Include Tenant Context
+```typescript
+// Service layer function
+export async function getOrganizations(supabase: SupabaseClient, tenantId: string) {
+  const { data, error } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('tenant_id', tenantId)  // Always filter by tenant
+    .order('name')
+  
+  if (error) throw error
+  return data
+}
+```
+
+### Organization-Scoped Queries
+```typescript
+export async function getTeams(
+  supabase: SupabaseClient, 
+  tenantId: string, 
+  organizationId: string
+) {
+  const { data, error } = await supabase
+    .from('teams')
+    .select('*')
+    .eq('tenant_id', tenantId)
+    .eq('organization_id', organizationId)
+    .order('name')
+  
+  if (error) throw error
+  return data
+}
+```
+
+## 4. Row Level Security Patterns
+
+### Basic Tenant Isolation
+```sql
+-- Users can only see data from their tenant
+CREATE POLICY "tenant_isolation" ON table_name
+  FOR ALL USING (
+    tenant_id IN (
+      SELECT tenant_id FROM core.memberships
+      WHERE user_id = auth.uid()
+    )
+  );
+```
+
+### Organization Isolation
+```sql
+-- Users can only see their organization's data
+CREATE POLICY "organization_isolation" ON table_name
+  FOR ALL USING (
+    organization_id IN (
+      SELECT organization_id FROM core.memberships
+      WHERE user_id = auth.uid()
+    )
+  );
+```
+
+### Service Role Bypass
+```sql
+-- Service role can access all data (for admin operations)
+CREATE POLICY "service_role_access" ON table_name
+  FOR ALL TO service_role
+  USING (true);
+```
+
+## 5. Migration Patterns
+
+### Migration File Structure
+```sql
+-- supabase/migrations/YYYYMMDDHHMMSS_description.sql
+
+-- 1. Create tables
+CREATE TABLE IF NOT EXISTS schema.table_name (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES core.tenants(id),
+  -- columns
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 2. Create indexes
+CREATE INDEX idx_table_tenant ON schema.table_name(tenant_id);
+
+-- 3. Enable RLS
+ALTER TABLE schema.table_name ENABLE ROW LEVEL SECURITY;
+
+-- 4. Create policies
+CREATE POLICY "tenant_isolation" ON schema.table_name
+  FOR ALL USING (/* policy */);
+
+-- 5. Create triggers (if needed)
+CREATE TRIGGER update_timestamp
+  BEFORE UPDATE ON schema.table_name
+  FOR EACH ROW
+  EXECUTE FUNCTION update_modified_column();
+```
+
+## 6. Error Handling
+
+### Service Layer Error Handling
+```typescript
+export async function fetchData(supabase: SupabaseClient) {
+  const { data, error } = await supabase
+    .from('table')
+    .select('*')
+  
+  if (error) {
+    console.error('Database error:', error)
+    throw new Error(`Failed to fetch data: ${error.message}`)
+  }
+  
+  return data
+}
+```
+
+### API Route Error Handling
+```typescript
+export async function GET(request: Request) {
+  try {
+    const supabase = await createSupabaseServer()
+    const data = await fetchData(supabase)
+    
+    return Response.json({ success: true, data })
+  } catch (error) {
+    console.error('API error:', error)
+    return Response.json(
+      { success: false, error: { message: 'Internal server error' } },
+      { status: 500 }
+    )
+  }
+}
+```
+
+## 7. Type Generation
+
+### Generate Types from Schema
+```bash
+# Generate TypeScript types from your Supabase schema
+npx supabase gen types typescript --project-id YOUR_PROJECT_ID > packages/database/types.ts
+```
+
+### Use Generated Types
+```typescript
+import { Database } from '@/packages/database/types'
+
+type Organization = Database['core']['Tables']['organizations']['Row']
+type InsertOrganization = Database['core']['Tables']['organizations']['Insert']
+```
+
+## 8. Real-Time Patterns (When Needed)
+
+```typescript
+// Only use in Client Components when real-time is required
+'use client'
+
+import { useEffect } from 'react'
+import { supabase } from '@/lib/supabase-client'
+
+export function useRealtimeUpdates(table: string, onUpdate: (payload: any) => void) {
+  useEffect(() => {
+    const channel = supabase
+      .channel(`${table}_changes`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table },
+        onUpdate
+      )
+      .subscribe()
+    
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [table, onUpdate])
+}
+```
+
+## Anti-Patterns (NEVER DO)
+
+❌ Creating Supabase client in UI components for data fetching
+❌ Skipping RLS policies on new tables
+❌ Using service role key in client-side code
+❌ Hardcoding tenant/org IDs in queries
+❌ Direct database calls without tenant filtering
+❌ Ignoring Supabase errors

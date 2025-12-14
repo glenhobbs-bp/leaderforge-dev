@@ -1,0 +1,234 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Task List Management
+
+Guidelines for creating and managing task lists in markdown files to track project progress
+
+## Task List Creation
+
+1. Create task lists in a markdown file (in the project root):
+   - Use `TASKS.md` or a descriptive name relevant to the feature (e.g., `ASSISTANT_CHAT.md`)
+   - Include a clear title and description of the feature being implemented
+
+2. Structure the file with a **Tracking Table** followed by **Detailed Sections**:
+
+   ```markdown
+   # Feature Name Implementation
+
+   Brief description of the feature and its purpose.
+
+   ## 📊 Progress Tracking Table
+
+   | ✅ | Phase | Step | Description |
+   |---|-------|------|-------------|
+   | ✅ | 1. Setup | 1.1 | Project structure and configuration |
+   | ✅ | 1. Setup | 1.2 | Database schema design |
+   | ⬜ | 2. Backend | 2.1 | API endpoint implementation |
+   | ⬜ | 2. Backend | 2.2 | Service layer and business logic |
+   | ⬜ | 3. Frontend | 3.1 | UI components creation |
+   | ⬜ | 3. Frontend | 3.2 | Integration with backend |
+   | ⬜ | 4. Testing | 4.1 | Unit tests |
+   | ⬜ | 4. Testing | 4.2 | Integration tests |
+
+   **Legend:**
+   - ✅ = Completed
+   - ⬜ = Not started / In progress
+
+   ---
+
+   ## 📋 Detailed Task Information
+
+   ### Phase 1: Setup
+
+   #### 1.1 Project Structure and Configuration
+   **Status:** ✅ Completed
+
+   - Set up project directory structure
+   - Configure environment variables
+   - Initialize required dependencies
+
+   **Relevant Files:**
+   - `path/to/config.ts` - Configuration file
+   - `path/to/structure/` - Project structure
+
+   ---
+
+   #### 1.2 Database Schema Design
+   **Status:** ✅ Completed
+
+   - Design tables and relationships
+   - Create migration files
+   - Implement RLS policies
+
+   **Relevant Files:**
+   - `supabase/migrations/xxx_feature.sql` - Migration file
+
+   ---
+
+   ### Phase 2: Backend
+
+   #### 2.1 API Endpoint Implementation
+   **Status:** ⬜ Not Started
+
+   - Create API routes
+   - Implement request handlers
+   - Add validation
+
+   **Relevant Files:**
+   - `app/api/feature/route.ts` - API endpoint
+
+   ---
+
+   #### 2.2 Service Layer and Business Logic
+   **Status:** ⬜ Not Started
+
+   - Implement service methods
+   - Add business logic
+   - Handle edge cases
+
+   **Relevant Files:**
+   - `modules/feature/services/feature.service.ts` - Service layer
+
+   ---
+
+   ### Phase 3: Frontend
+
+   #### 3.1 UI Components Creation
+   **Status:** ⬜ Not Started
+
+   - Design component structure
+   - Implement UI components
+   - Add styling
+
+   **Relevant Files:**
+   - `modules/feature/ui/Component.tsx` - UI component
+
+   ---
+
+   #### 3.2 Integration with Backend
+   **Status:** ⬜ Not Started
+
+   - Connect components to API
+   - Implement data fetching
+   - Handle loading and error states
+
+   **Relevant Files:**
+   - `modules/feature/ui/Container.tsx` - Container component
+
+   ---
+
+   ### Phase 4: Testing
+
+   #### 4.1 Unit Tests
+   **Status:** ⬜ Not Started
+
+   - Write service tests
+   - Test business logic
+   - Achieve code coverage
+
+   **Relevant Files:**
+   - `__tests__/feature.test.ts` - Test file
+
+   ---
+
+   #### 4.2 Integration Tests
+   **Status:** ⬜ Not Started
+
+   - Test API endpoints
+   - Test full user flows
+   - Validate database operations
+
+   **Relevant Files:**
+   - `tests/integration/feature.test.ts` - Integration test file
+
+   ```
+
+## Task List Maintenance
+
+1. **Update the Tracking Table:**
+   - Change ⬜ to ✅ in the first column when a step is completed
+   - Keep the table at the top for quick visual reference
+   - Use consistent phase numbering (1, 2, 3, etc.)
+   - Use consistent step numbering within phases (1.1, 1.2, 2.1, 2.2, etc.)
+
+2. **Update Detailed Sections:**
+   - Change status from "⬜ Not Started" to "✅ Completed" (or "🔄 In Progress")
+   - Keep "Relevant Files" section updated with actual file paths
+   - Add implementation notes and decisions
+   - Document any blockers or dependencies
+
+3. **Add Implementation Details:**
+   - Architecture decisions made
+   - Data flow descriptions
+   - Technical components created
+   - Environment configuration changes
+   - Any deviations from the original plan
+
+## AI Instructions
+
+When working with task lists, the AI should:
+
+1. **Always check the tracking table first** to see which step to work on next
+2. **Update both the tracking table AND detailed section** when completing a task:
+   - Change ⬜ to ✅ in the tracking table
+   - Update the status in the detailed section
+   - Add relevant file paths and implementation notes
+3. **Maintain consistency** between the tracking table and detailed sections
+4. **Add new tasks** to both the tracking table and detailed sections when discovered
+5. **Document implementation details** in the detailed sections, especially:
+   - Files created or modified
+   - Architecture decisions
+   - Technical challenges and solutions
+6. **Keep the tracking table clean and scannable** - detailed information goes in the sections below
+7. **Use clear phase organization** to group related tasks together
+
+## Example Task Update
+
+When completing a task, update BOTH locations:
+
+**Before:**
+```markdown
+## 📊 Progress Tracking Table
+
+| ✅ | Phase | Step | Description |
+|---|-------|------|-------------|
+| ⬜ | 2. Backend | 2.1 | API endpoint implementation |
+
+### Phase 2: Backend
+
+#### 2.1 API Endpoint Implementation
+**Status:** ⬜ Not Started
+
+- Create API routes
+- Implement request handlers
+```
+
+**After:**
+```markdown
+## 📊 Progress Tracking Table
+
+| ✅ | Phase | Step | Description |
+|---|-------|------|-------------|
+| ✅ | 2. Backend | 2.1 | API endpoint implementation |
+
+### Phase 2: Backend
+
+#### 2.1 API Endpoint Implementation
+**Status:** ✅ Completed
+
+- Create API routes ✅
+- Implement request handlers ✅
+- Add validation ✅
+
+**Relevant Files:**
+- `app/api/feature/route.ts` - API endpoint with GET/POST handlers
+- `modules/feature/handlers/feature.handler.ts` - Request handlers
+
+**Implementation Notes:**
+- Used standard API response format
+- Added proper error handling
+- Implemented request validation using Zod
+```

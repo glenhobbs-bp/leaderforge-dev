@@ -1,17 +1,19 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./apps/web" },
-    { "path": "./apps/api" },
-    { "path": "./packages/agent-core" },
-    { "path": "./packages/asset-core" },
-    { "path": "./packages/env" }
-  ],
-  "include": [
-    "apps/web/**/*",
-    "apps/api/**/*",
-    "packages/agent-core/**/*",
-    "packages/asset-core/**/*",
-    "packages/env/**/*"
-  ]
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true
+  },
+  "exclude": ["node_modules", "_archive"]
 }
+

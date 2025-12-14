@@ -1,0 +1,5 @@
+packages:
+  - apps/web  # Only include web app since API routes moved to web
+  - packages/*
+  - 'agent'
+
