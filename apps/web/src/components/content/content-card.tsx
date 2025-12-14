@@ -8,16 +8,17 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Play, FileText, ExternalLink } from 'lucide-react';
+import { Play, FileText, ExternalLink, CheckCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
 
 interface ContentCardProps {
   item: ContentItem;
   progress?: number;
+  completed?: boolean;
 }
 
-export function ContentCard({ item, progress = 0 }: ContentCardProps) {
+export function ContentCard({ item, progress = 0, completed = false }: ContentCardProps) {
   const typeIcon = {
     video: Play,
     document: FileText,
@@ -52,10 +53,19 @@ export function ContentCard({ item, progress = 0 }: ContentCardProps) {
           )}
           
           {/* Play overlay for videos */}
-          {item.type === 'video' && (
+          {item.type === 'video' && !completed && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
               <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                 <Play className="h-6 w-6 text-primary ml-1" fill="currentColor" />
+              </div>
+            </div>
+          )}
+
+          {/* Completed overlay */}
+          {completed && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
+                <CheckCircle className="h-8 w-8 text-white" />
               </div>
             </div>
           )}
@@ -72,6 +82,14 @@ export function ContentCard({ item, progress = 0 }: ContentCardProps) {
             <Icon className="h-3 w-3" />
             {item.type}
           </div>
+
+          {/* Completed badge */}
+          {completed && (
+            <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
+              <CheckCircle className="h-3 w-3" />
+              Done
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -86,7 +104,7 @@ export function ContentCard({ item, progress = 0 }: ContentCardProps) {
           )}
 
           {/* Progress bar */}
-          {progress > 0 && (
+          {progress > 0 && !completed && (
             <div className="mt-3">
               <div className="flex justify-between text-xs text-muted-foreground mb-1">
                 <span>Progress</span>
@@ -105,4 +123,3 @@ export function ContentCard({ item, progress = 0 }: ContentCardProps) {
     </Link>
   );
 }
-

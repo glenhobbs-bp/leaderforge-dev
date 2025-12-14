@@ -6,9 +6,9 @@
 
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Play, Clock, Calendar, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Play, Clock, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import { VideoPlayer } from './video-player';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -18,10 +18,83 @@ interface ContentViewerProps {
   content: ContentItem;
 }
 
+interface ProgressData {
+  progress_percentage: number;
+  completed_at: string | null;
+  started_at: string | null;
+}
+
 export function ContentViewer({ content }: ContentViewerProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const lastSavedProgress = useRef(0);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Load existing progress on mount
+  useEffect(() => {
+    const loadProgress = async () => {
+      try {
+        const response = await fetch(`/api/progress/${content.id}`);
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          const data: ProgressData = result.data;
+          setProgress(data.progress_percentage || 0);
+          setIsCompleted(!!data.completed_at);
+          lastSavedProgress.current = data.progress_percentage || 0;
+        }
+      } catch (error) {
+        console.error('Failed to load progress:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProgress();
+  }, [content.id]);
+
+  // Save progress to database (debounced)
+  const saveProgress = useCallback(async (progressPercent: number, completed: boolean) => {
+    // Only save if progress increased significantly (5% increments) or completed
+    const shouldSave = 
+      completed || 
+      progressPercent >= 100 ||
+      progressPercent - lastSavedProgress.current >= 5;
+
+    if (!shouldSave) return;
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/progress/${content.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          progressPercentage: progressPercent,
+          completed,
+        }),
+      });
+
+      if (response.ok) {
+        lastSavedProgress.current = progressPercent;
+      }
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [content.id]);
+
+  // Debounced save
+  const debouncedSave = useCallback((progressPercent: number, completed: boolean) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      saveProgress(progressPercent, completed);
+    }, 1000); // Save after 1 second of no updates
+  }, [saveProgress]);
 
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return null;
@@ -40,22 +113,23 @@ export function ContentViewer({ content }: ContentViewerProps) {
 
   const handleProgress = useCallback((newProgress: number) => {
     setProgress(newProgress);
-  }, []);
+    debouncedSave(newProgress, newProgress >= 90);
+  }, [debouncedSave]);
 
   const handleComplete = useCallback(() => {
     setIsCompleted(true);
-    // TODO: Save completion to database
-  }, []);
+    // Save immediately on completion
+    saveProgress(100, true);
+  }, [saveProgress]);
 
   const handleStartLearning = () => {
     // Scroll to video and play
     const videoContainer = document.querySelector('video');
     if (videoContainer) {
       videoContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Small delay to allow scroll to complete
       setTimeout(() => {
         videoContainer.play().catch(() => {
-          // Autoplay might be blocked, that's ok
+          // Autoplay might be blocked
         });
       }, 300);
     }
@@ -66,6 +140,15 @@ export function ContentViewer({ content }: ContentViewerProps) {
     if (progress === 0) return 'Not started';
     return `${progress}% complete`;
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="space-y-6 animate-page-enter">
@@ -144,28 +227,44 @@ export function ContentViewer({ content }: ContentViewerProps) {
           {/* Progress Card */}
           <Card>
             <CardContent className="pt-6">
-              <h3 className="font-semibold mb-4">Your Progress</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Your Progress</h3>
+                {isSaving && (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Saving...
+                  </span>
+                )}
+              </div>
               <div className="space-y-3">
-                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-secondary rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground flex items-center gap-2">
-                  {isCompleted && <CheckCircle className="h-4 w-4 text-green-500" />}
-                  {getProgressText()}
-                </p>
-                {content.videoUrl && (
-                  <Button 
-                    className="w-full" 
-                    size="lg"
-                    onClick={handleStartLearning}
-                    variant={isCompleted ? 'outline' : 'default'}
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    {isCompleted ? 'Watch Again' : progress > 0 ? 'Continue' : 'Start Learning'}
-                  </Button>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-secondary rounded-full transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                      {isCompleted && <CheckCircle className="h-4 w-4 text-green-500" />}
+                      {getProgressText()}
+                    </p>
+                    {content.videoUrl && (
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={handleStartLearning}
+                        variant={isCompleted ? 'outline' : 'default'}
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        {isCompleted ? 'Watch Again' : progress > 0 ? 'Continue' : 'Start Learning'}
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </CardContent>
@@ -175,4 +274,3 @@ export function ContentViewer({ content }: ContentViewerProps) {
     </div>
   );
 }
-

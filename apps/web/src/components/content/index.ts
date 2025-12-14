@@ -8,4 +8,5 @@ export { ContentGrid } from './content-grid';
 export { ContentCard } from './content-card';
 export { VideoPlayer } from './video-player';
 export { ContentViewer } from './content-viewer';
+export { ContentLibrary } from './content-library';
 

@@ -6,7 +6,8 @@
 
 import { Metadata } from 'next';
 import { fetchContentCollection } from '@/lib/tribe-social';
-import { ContentGrid } from '@/components/content/content-grid';
+import { createClient } from '@/lib/supabase/server';
+import { ContentLibrary } from '@/components/content/content-library';
 
 export const metadata: Metadata = {
   title: 'Content Library',
@@ -14,7 +15,30 @@ export const metadata: Metadata = {
 };
 
 export default async function ContentPage() {
-  const content = await fetchContentCollection();
+  const [content, supabase] = await Promise.all([
+    fetchContentCollection(),
+    createClient(),
+  ]);
+
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Fetch user progress
+  let progressMap: Record<string, { progress: number; completed: boolean }> = {};
+  
+  if (user) {
+    const { data: progress } = await supabase
+      .from('user_progress')
+      .select('content_id, progress_percentage, completed_at')
+      .eq('user_id', user.id);
+
+    for (const item of progress || []) {
+      progressMap[item.content_id] = {
+        progress: item.progress_percentage || 0,
+        completed: !!item.completed_at,
+      };
+    }
+  }
 
   return (
     <div className="space-y-6 animate-page-enter">
@@ -28,7 +52,7 @@ export default async function ContentPage() {
 
       {/* Content Grid */}
       {content.length > 0 ? (
-        <ContentGrid items={content} />
+        <ContentLibrary items={content} progressMap={progressMap} />
       ) : (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
@@ -55,4 +79,3 @@ export default async function ContentPage() {
     </div>
   );
 }
-
