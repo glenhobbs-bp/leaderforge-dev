@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     const { data: checkin, error } = await supabase
       .from('checkin_requests')
-      .select('*, leader:leader_id(id, full_name, email)')
+      .select('*')
       .eq('user_id', user.id)
       .eq('content_id', contentId)
       .single();
@@ -43,9 +43,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // If we have a check-in, fetch the leader details separately
+    let leader = null;
+    if (checkin?.leader_id) {
+      const { data: leaderData } = await supabase
+        .from('users')
+        .select('id, full_name, email')
+        .eq('id', checkin.leader_id)
+        .single();
+      leader = leaderData;
+    }
+
     return NextResponse.json({
       success: true,
-      data: checkin || null,
+      data: checkin ? { ...checkin, leader } : null,
     });
   } catch (error) {
     console.error('Check-in GET error:', error);
@@ -124,7 +135,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }, {
         onConflict: 'user_id,content_id',
       })
-      .select('*, leader:leader_id(id, full_name, email)')
+      .select('*')
       .single();
 
     if (checkinError) {
@@ -133,6 +144,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { success: false, error: 'Failed to create check-in request' },
         { status: 500 }
       );
+    }
+
+    // Fetch leader details separately
+    let leader = null;
+    if (checkin?.leader_id) {
+      const { data: leaderData } = await supabase
+        .from('users')
+        .select('id, full_name, email')
+        .eq('id', checkin.leader_id)
+        .single();
+      leader = leaderData;
     }
 
     // Update user_progress metadata
@@ -149,7 +171,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({
       success: true,
-      data: checkin,
+      data: { ...checkin, leader },
     });
   } catch (error) {
     console.error('Check-in POST error:', error);

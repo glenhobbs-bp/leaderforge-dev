@@ -28,10 +28,10 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 4. Build - Content | 4.1 | Content management backend (Tribe Social) |
 | ✅ | 4. Build - Content | 4.2 | Content delivery frontend |
 | ✅ | 4. Build - Content | 4.3 | Video progress tracking |
-| 🔄 | 4. Build - Content | 4.4 | Worksheet functionality (partial) |
-| ⬜ | 4. Build - Content | 4.5 | Bold action capture & tracking |
-| ⬜ | 4. Build - Content | 4.6 | Check-in request system |
-| ⬜ | 4. Build - Content | 4.7 | Bold action signoff |
+| ✅ | 4. Build - Content | 4.4 | Worksheet functionality |
+| ✅ | 4. Build - Content | 4.5 | Bold action capture & tracking |
+| ✅ | 4. Build - Content | 4.6 | Check-in request system |
+| 🔄 | 4. Build - Content | 4.7 | Bold action signoff UI |
 | ⬜ | 5. Build - Progress | 5.1 | 4-step progress calculation |
 | ⬜ | 5. Build - Progress | 5.2 | Team leader dashboard |
 | ⬜ | 5. Build - Progress | 5.3 | Org admin progress dashboard |
@@ -65,9 +65,9 @@ Each learning module follows a 4-step completion sequence:
 | Step | Action | Owner | Progress | Status |
 |------|--------|-------|----------|--------|
 | 1 | **Watch Video** | User | 25% | ✅ Implemented |
-| 2 | **Complete Worksheet** | User | 50% | 🔄 Partial |
-| 3 | **Team Leader Check-in** | User + Leader | 75% | ⬜ Pending |
-| 4 | **Bold Action Signoff** | User OR Leader | 100% | ⬜ Pending |
+| 2 | **Complete Worksheet** | User | 50% | ✅ Implemented |
+| 3 | **Team Leader Check-in** | User + Leader | 75% | ✅ Implemented |
+| 4 | **Bold Action Signoff** | User OR Leader | 100% | 🔄 In Progress |
 
 **Key Design Decisions:**
 - Team Leader = User's manager (with future coach override option)

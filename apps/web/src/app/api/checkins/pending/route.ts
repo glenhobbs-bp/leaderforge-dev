@@ -26,11 +26,7 @@ export async function GET(request: NextRequest) {
     // Get pending check-ins where current user is the leader
     const { data: checkins, error } = await supabase
       .from('checkin_requests')
-      .select(`
-        *,
-        requester:user_id(id, full_name, email, avatar_url),
-        bold_action:bold_action_id(id, action_text, status)
-      `)
+      .select('*')
       .eq('leader_id', user.id)
       .in('status', ['pending', 'scheduled'])
       .order('created_at', { ascending: true });
@@ -43,9 +39,37 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Enrich with requester and bold action details
+    const enrichedCheckins = await Promise.all(
+      (checkins || []).map(async (checkin) => {
+        let requester = null;
+        let boldAction = null;
+
+        if (checkin.user_id) {
+          const { data } = await supabase
+            .from('users')
+            .select('id, full_name, email, avatar_url')
+            .eq('id', checkin.user_id)
+            .single();
+          requester = data;
+        }
+
+        if (checkin.bold_action_id) {
+          const { data } = await supabase
+            .from('bold_actions')
+            .select('id, action_text, status')
+            .eq('id', checkin.bold_action_id)
+            .single();
+          boldAction = data;
+        }
+
+        return { ...checkin, requester, bold_action: boldAction };
+      })
+    );
+
     return NextResponse.json({
       success: true,
-      data: checkins || [],
+      data: enrichedCheckins,
     });
   } catch (error) {
     console.error('Pending check-ins GET error:', error);
