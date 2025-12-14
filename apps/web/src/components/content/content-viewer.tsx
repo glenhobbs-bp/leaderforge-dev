@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { VideoPlayer } from './video-player';
 import { WorksheetModal } from './worksheet-modal';
+import { ReflectionModal, type ReflectionData } from './reflection-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
@@ -37,6 +38,10 @@ interface BoldActionData {
   status: 'pending' | 'completed' | 'cancelled';
   action_description: string;
   completed_at: string | null;
+  completion_status?: 'fully' | 'partially' | 'blocked' | null;
+  reflection_text?: string | null;
+  challenge_level?: number | null;
+  would_repeat?: 'yes' | 'maybe' | 'no' | null;
 }
 
 interface CheckinData {
@@ -71,6 +76,9 @@ export function ContentViewer({ content }: ContentViewerProps) {
   const [checkin, setCheckin] = useState<CheckinData | null>(null);
   const [isRequestingCheckin, setIsRequestingCheckin] = useState(false);
   const [checkinError, setCheckinError] = useState<string | null>(null);
+
+  // Reflection modal state
+  const [isReflectionOpen, setIsReflectionOpen] = useState(false);
 
   // Computed check-in completed state
   const isCheckinCompleted = checkin?.status === 'completed';
@@ -214,21 +222,29 @@ export function ContentViewer({ content }: ContentViewerProps) {
     });
   };
 
-  const handleCompleteBoldAction = async () => {
-    try {
-      const response = await fetch(`/api/bold-actions/${content.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'completed' }),
-      });
+  const handleOpenReflection = () => {
+    setIsReflectionOpen(true);
+  };
 
-      if (response.ok) {
-        const result = await response.json();
-        setBoldAction(result.data);
-      }
-    } catch (error) {
-      console.error('Failed to complete bold action:', error);
+  const handleSubmitReflection = async (reflection: ReflectionData) => {
+    const response = await fetch(`/api/bold-actions/${content.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'completed',
+        completion_status: reflection.completionStatus,
+        reflection_text: reflection.reflectionText || null,
+        challenge_level: reflection.challengeLevel,
+        would_repeat: reflection.wouldRepeat,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to complete bold action');
     }
+
+    const result = await response.json();
+    setBoldAction(result.data);
   };
 
   const handleRequestCheckin = async () => {
@@ -582,10 +598,10 @@ export function ContentViewer({ content }: ContentViewerProps) {
                     {step3Complete && !step4Complete && boldAction && (
                       <Button 
                         className="w-full bg-green-600 hover:bg-green-700" 
-                        onClick={handleCompleteBoldAction}
+                        onClick={handleOpenReflection}
                       >
                         <Zap className="h-4 w-4 mr-2" />
-                        Mark Bold Action Complete
+                        Complete Bold Action
                       </Button>
                     )}
 
@@ -624,6 +640,16 @@ export function ContentViewer({ content }: ContentViewerProps) {
         contentTitle={content.title}
         onSubmit={handleWorksheetSubmit}
       />
+
+      {/* Reflection Modal */}
+      {boldAction && (
+        <ReflectionModal
+          isOpen={isReflectionOpen}
+          onClose={() => setIsReflectionOpen(false)}
+          boldActionText={boldAction.action_description}
+          onSubmit={handleSubmitReflection}
+        />
+      )}
     </div>
   );
 }

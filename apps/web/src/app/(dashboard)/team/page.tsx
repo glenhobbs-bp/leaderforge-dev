@@ -110,7 +110,7 @@ export default async function TeamPage() {
 
   const { data: allBoldActions } = await supabase
     .from('bold_actions')
-    .select('user_id, content_id, status, action_description, completion_notes')
+    .select('user_id, content_id, status, action_description, completion_notes, completion_status, reflection_text, challenge_level, would_repeat')
     .in('user_id', teamMemberIds.length > 0 ? teamMemberIds : ['none']);
 
   // Build module progress data
@@ -187,6 +187,13 @@ export default async function TeamPage() {
           boldActionStatus: boldActionRecord?.status || 'none',
           boldActionText: boldActionRecord?.action_description || null,
           completionFeedback: boldActionRecord?.completion_notes || null,
+          // Reflection data
+          reflectionData: boldActionRecord ? {
+            completionStatus: boldActionRecord.completion_status as 'fully' | 'partially' | 'blocked' | null,
+            reflectionText: boldActionRecord.reflection_text,
+            challengeLevel: boldActionRecord.challenge_level,
+            wouldRepeat: boldActionRecord.would_repeat as 'yes' | 'maybe' | 'no' | null,
+          } : null,
         };
       });
 

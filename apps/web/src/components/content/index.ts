@@ -10,4 +10,5 @@ export { VideoPlayer } from './video-player';
 export { ContentViewer } from './content-viewer';
 export { ContentLibrary } from './content-library';
 export { WorksheetModal } from './worksheet-modal';
+export { ReflectionModal, type ReflectionData } from './reflection-modal';
 

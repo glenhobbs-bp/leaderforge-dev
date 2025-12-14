@@ -140,7 +140,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
 /**
  * PATCH /api/bold-actions/[contentId]
- * Update bold action status (complete/cancel)
+ * Update bold action status (complete/cancel) with optional reflection data
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
@@ -156,7 +156,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     }
 
     const body = await request.json();
-    const { status, completionNotes } = body;
+    const { 
+      status, 
+      completionNotes,
+      // Reflection data
+      completion_status,
+      reflection_text,
+      challenge_level,
+      would_repeat,
+    } = body;
 
     if (!status || !['completed', 'cancelled'].includes(status)) {
       return NextResponse.json(
@@ -176,8 +184,24 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updateData.signoff_type = 'self'; // Self-certification by default
       updateData.signed_off_by = user.id;
       updateData.signed_off_at = now;
+      
+      // Legacy completion notes field
       if (completionNotes) {
         updateData.completion_notes = completionNotes;
+      }
+      
+      // New reflection fields
+      if (completion_status) {
+        updateData.completion_status = completion_status;
+      }
+      if (reflection_text !== undefined) {
+        updateData.reflection_text = reflection_text;
+      }
+      if (challenge_level !== undefined) {
+        updateData.challenge_level = challenge_level;
+      }
+      if (would_repeat !== undefined) {
+        updateData.would_repeat = would_repeat;
       }
     }
 

@@ -64,6 +64,12 @@ interface ModuleProgressItem {
   boldActionStatus: string;
   boldActionText: string | null;
   completionFeedback: string | null;
+  reflectionData: {
+    completionStatus: 'fully' | 'partially' | 'blocked' | null;
+    reflectionText: string | null;
+    challengeLevel: number | null;
+    wouldRepeat: 'yes' | 'maybe' | 'no' | null;
+  } | null;
 }
 
 interface TeamMember {
@@ -476,7 +482,7 @@ export function TeamDashboard({
                       module.boldActionCompleted,
                     ].filter(Boolean).length;
                     const isExpanded = expandedModules.has(module.moduleId);
-                    const hasDetails = module.worksheetResponses || module.boldActionText || module.completionFeedback;
+                    const hasDetails = module.worksheetResponses || module.boldActionText || module.completionFeedback || module.reflectionData;
 
                     return (
                       <div 
@@ -612,8 +618,8 @@ export function TeamDashboard({
                               </div>
                             )}
 
-                            {/* Completion Feedback */}
-                            {module.completionFeedback && (
+                            {/* Completion Feedback (Legacy) */}
+                            {module.completionFeedback && !module.reflectionData?.reflectionText && (
                               <div>
                                 <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
                                   <MessageSquare className="h-3 w-3 text-green-500" />
@@ -622,6 +628,64 @@ export function TeamDashboard({
                                 <p className="text-sm bg-green-50 p-2 rounded border-l-2 border-green-500">
                                   {module.completionFeedback}
                                 </p>
+                              </div>
+                            )}
+
+                            {/* New Reflection Data */}
+                            {module.reflectionData && (
+                              <div className="space-y-2 pt-2 border-t border-dashed">
+                                <p className="text-xs font-semibold text-green-600 uppercase">
+                                  Completion Reflection
+                                </p>
+                                
+                                {/* Completion Status */}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">How it went:</span>
+                                  <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                                    module.reflectionData.completionStatus === 'fully' 
+                                      ? 'bg-green-100 text-green-700'
+                                      : module.reflectionData.completionStatus === 'partially'
+                                        ? 'bg-amber-100 text-amber-700'
+                                        : 'bg-red-100 text-red-700'
+                                  }`}>
+                                    {module.reflectionData.completionStatus === 'fully' && '✅ Fully completed'}
+                                    {module.reflectionData.completionStatus === 'partially' && '🔄 Partially completed'}
+                                    {module.reflectionData.completionStatus === 'blocked' && '❌ Blocked'}
+                                  </span>
+                                </div>
+
+                                {/* Reflection Text */}
+                                {module.reflectionData.reflectionText && (
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Reflection:</p>
+                                    <p className="text-sm bg-green-50 p-2 rounded border-l-2 border-green-500">
+                                      {module.reflectionData.reflectionText}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Challenge & Would Repeat */}
+                                <div className="flex gap-4 text-xs">
+                                  {module.reflectionData.challengeLevel && (
+                                    <span className="text-muted-foreground">
+                                      Challenge: {
+                                        module.reflectionData.challengeLevel === 1 ? '😌 Easy' :
+                                        module.reflectionData.challengeLevel === 2 ? '💪 Moderate' :
+                                        module.reflectionData.challengeLevel === 3 ? '🔥 Hard' :
+                                        '🌋 Very Hard'
+                                      }
+                                    </span>
+                                  )}
+                                  {module.reflectionData.wouldRepeat && (
+                                    <span className="text-muted-foreground">
+                                      Would repeat: {
+                                        module.reflectionData.wouldRepeat === 'yes' ? '👍 Yes' :
+                                        module.reflectionData.wouldRepeat === 'maybe' ? '🤷 Maybe' :
+                                        '👎 No'
+                                      }
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             )}
                           </div>
