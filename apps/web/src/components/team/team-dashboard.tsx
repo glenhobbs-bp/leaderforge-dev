@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { 
   Users, CheckCircle, Clock, Video, FileText, 
   Handshake, Zap, ChevronRight, ChevronDown, Loader2, X,
-  BookOpen, Lightbulb, Target, HelpCircle
+  BookOpen, Lightbulb, Target, HelpCircle, MessageSquare
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,7 @@ interface ModuleProgressItem {
   boldActionCompleted: boolean;
   boldActionStatus: string;
   boldActionText: string | null;
+  completionFeedback: string | null;
 }
 
 interface TeamMember {
@@ -475,7 +476,7 @@ export function TeamDashboard({
                       module.boldActionCompleted,
                     ].filter(Boolean).length;
                     const isExpanded = expandedModules.has(module.moduleId);
-                    const hasDetails = module.worksheetResponses || module.boldActionText;
+                    const hasDetails = module.worksheetResponses || module.boldActionText || module.completionFeedback;
 
                     return (
                       <div 
@@ -607,6 +608,19 @@ export function TeamDashboard({
                                 </p>
                                 <p className="text-sm bg-white/50 p-2 rounded">
                                   {module.worksheetResponses.questions}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Completion Feedback */}
+                            {module.completionFeedback && (
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                                  <MessageSquare className="h-3 w-3 text-green-500" />
+                                  Completion Reflection
+                                </p>
+                                <p className="text-sm bg-green-50 p-2 rounded border-l-2 border-green-500">
+                                  {module.completionFeedback}
                                 </p>
                               </div>
                             )}
