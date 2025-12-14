@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'edge.tribesocial.io',
       },
+      {
+        protocol: 'https',
+        hostname: 'cdn.tribesocial.io',
+      },
     ],
   },
 
