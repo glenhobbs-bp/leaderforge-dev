@@ -22,22 +22,11 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  // Fetch user context for the shell (using core schema)
+  // Fetch user from core schema
   const { data: userData, error: userError } = await supabase
     .schema('core')
     .from('users')
-    .select(`
-      id,
-      email,
-      full_name,
-      avatar_url,
-      tenant_id,
-      tenants:tenant_id (
-        tenant_key,
-        display_name,
-        theme
-      )
-    `)
+    .select('id, email, full_name, avatar_url, tenant_id')
     .eq('id', user.id)
     .single();
 
@@ -45,20 +34,28 @@ export default async function DashboardLayout({
     console.error('Error fetching user:', userError);
   }
 
-  // Fetch membership with organization branding (using core schema)
+  // Fetch tenant separately (foreign key joins don't work well with .schema())
+  let tenant: { tenant_key: string; display_name: string; theme: TenantTheme } | null = null;
+  if (userData?.tenant_id) {
+    const { data: tenantData, error: tenantError } = await supabase
+      .schema('core')
+      .from('tenants')
+      .select('tenant_key, display_name, theme')
+      .eq('id', userData.tenant_id)
+      .single();
+    
+    if (tenantError) {
+      console.error('Error fetching tenant:', tenantError);
+    } else {
+      tenant = tenantData as { tenant_key: string; display_name: string; theme: TenantTheme };
+    }
+  }
+
+  // Fetch membership
   const { data: membership, error: membershipError } = await supabase
     .schema('core')
     .from('memberships')
-    .select(`
-      organization_id,
-      team_id,
-      role,
-      organizations:organization_id (
-        id,
-        name,
-        branding
-      )
-    `)
+    .select('organization_id, team_id, role')
     .eq('user_id', user.id)
     .eq('is_active', true)
     .single();
@@ -67,18 +64,22 @@ export default async function DashboardLayout({
     console.error('Error fetching membership:', membershipError);
   }
 
-  // Type assertions - Supabase returns single objects for foreign key joins
-  const tenant = userData?.tenants as unknown as { 
-    tenant_key: string; 
-    display_name: string; 
-    theme: TenantTheme;
-  } | null;
-  
-  const organization = membership?.organizations as unknown as { 
-    id: string; 
-    name: string;
-    branding: OrgBranding;
-  } | null;
+  // Fetch organization separately
+  let organization: { id: string; name: string; branding: OrgBranding } | null = null;
+  if (membership?.organization_id) {
+    const { data: orgData, error: orgError } = await supabase
+      .schema('core')
+      .from('organizations')
+      .select('id, name, branding')
+      .eq('id', membership.organization_id)
+      .single();
+    
+    if (orgError) {
+      console.error('Error fetching organization:', orgError);
+    } else {
+      organization = orgData as { id: string; name: string; branding: OrgBranding };
+    }
+  }
 
   const userContext = {
     id: userData?.id || user.id,

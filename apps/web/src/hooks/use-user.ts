@@ -42,22 +42,11 @@ async function fetchUserContext(): Promise<UserContext | null> {
     return null;
   }
 
-  // Fetch user details with related data (using core schema)
+  // Fetch user from core schema
   const { data: userData, error: userError } = await supabase
     .schema('core')
     .from('users')
-    .select(`
-      id,
-      email,
-      full_name,
-      avatar_url,
-      tenant_id,
-      tenants:tenant_id (
-        tenant_key,
-        display_name,
-        theme
-      )
-    `)
+    .select('id, email, full_name, avatar_url, tenant_id')
     .eq('id', user.id)
     .single();
 
@@ -66,31 +55,44 @@ async function fetchUserContext(): Promise<UserContext | null> {
     return null;
   }
 
-  // Fetch membership (using core schema)
-  const { data: membership, error: membershipError } = await supabase
+  // Fetch tenant separately
+  let tenant: { tenant_key: string; display_name: string; theme: Record<string, string> } | null = null;
+  if (userData.tenant_id) {
+    const { data: tenantData } = await supabase
+      .schema('core')
+      .from('tenants')
+      .select('tenant_key, display_name, theme')
+      .eq('id', userData.tenant_id)
+      .single();
+    
+    if (tenantData) {
+      tenant = tenantData as { tenant_key: string; display_name: string; theme: Record<string, string> };
+    }
+  }
+
+  // Fetch membership
+  const { data: membership } = await supabase
     .schema('core')
     .from('memberships')
-    .select(`
-      organization_id,
-      team_id,
-      role,
-      organizations:organization_id (
-        id,
-        name,
-        branding
-      )
-    `)
+    .select('organization_id, team_id, role')
     .eq('user_id', user.id)
     .eq('is_active', true)
     .single();
 
-  if (membershipError) {
-    console.error('Failed to fetch membership:', membershipError);
+  // Fetch organization separately
+  let organization: { id: string; name: string; branding: Record<string, unknown> } | null = null;
+  if (membership?.organization_id) {
+    const { data: orgData } = await supabase
+      .schema('core')
+      .from('organizations')
+      .select('id, name, branding')
+      .eq('id', membership.organization_id)
+      .single();
+    
+    if (orgData) {
+      organization = orgData as { id: string; name: string; branding: Record<string, unknown> };
+    }
   }
-
-  // Type assertions - Supabase returns single objects for foreign key joins
-  const tenant = userData.tenants as unknown as { tenant_key: string; display_name: string; theme: Record<string, string> } | null;
-  const organization = membership?.organizations as unknown as { id: string; name: string; branding: Record<string, unknown> } | null;
 
   return {
     id: userData.id,
@@ -139,4 +141,3 @@ export function hasRole(
 
   return roleHierarchy[userRole as keyof typeof roleHierarchy] >= roleHierarchy[requiredRole];
 }
-
