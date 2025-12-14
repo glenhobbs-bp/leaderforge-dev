@@ -22,8 +22,9 @@ export default async function DashboardLayout({
     redirect('/login');
   }
 
-  // Fetch user context for the shell
-  const { data: userData } = await supabase
+  // Fetch user context for the shell (using core schema)
+  const { data: userData, error: userError } = await supabase
+    .schema('core')
     .from('users')
     .select(`
       id,
@@ -40,8 +41,13 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single();
 
-  // Fetch membership with organization branding
-  const { data: membership } = await supabase
+  if (userError) {
+    console.error('Error fetching user:', userError);
+  }
+
+  // Fetch membership with organization branding (using core schema)
+  const { data: membership, error: membershipError } = await supabase
+    .schema('core')
     .from('memberships')
     .select(`
       organization_id,
@@ -56,6 +62,10 @@ export default async function DashboardLayout({
     .eq('user_id', user.id)
     .eq('is_active', true)
     .single();
+
+  if (membershipError) {
+    console.error('Error fetching membership:', membershipError);
+  }
 
   // Type assertions - Supabase returns single objects for foreign key joins
   const tenant = userData?.tenants as unknown as { 

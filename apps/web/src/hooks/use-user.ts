@@ -42,8 +42,9 @@ async function fetchUserContext(): Promise<UserContext | null> {
     return null;
   }
 
-  // Fetch user details with related data
+  // Fetch user details with related data (using core schema)
   const { data: userData, error: userError } = await supabase
+    .schema('core')
     .from('users')
     .select(`
       id,
@@ -65,8 +66,9 @@ async function fetchUserContext(): Promise<UserContext | null> {
     return null;
   }
 
-  // Fetch membership
+  // Fetch membership (using core schema)
   const { data: membership, error: membershipError } = await supabase
+    .schema('core')
     .from('memberships')
     .select(`
       organization_id,

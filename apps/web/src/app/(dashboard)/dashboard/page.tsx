@@ -18,8 +18,9 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch user's progress stats
+  // Fetch user's progress stats (using progress schema)
   const { data: progressStats } = await supabase
+    .schema('progress')
     .from('user_progress')
     .select('progress_percentage, completed_at')
     .eq('user_id', user?.id);
@@ -28,16 +29,18 @@ export default async function DashboardPage() {
   const completedItems = progressStats?.filter(p => p.completed_at)?.length || 0;
   const inProgressItems = progressStats?.filter(p => !p.completed_at && p.progress_percentage > 0)?.length || 0;
 
-  // Fetch streak
+  // Fetch streak (using progress schema)
   const { data: streak } = await supabase
+    .schema('progress')
     .from('user_streaks')
     .select('current_streak')
     .eq('user_id', user?.id)
     .eq('streak_type', 'daily')
     .single();
 
-  // Fetch total points
+  // Fetch total points (using progress schema)
   const { data: points } = await supabase
+    .schema('progress')
     .from('points_ledger')
     .select('points')
     .eq('user_id', user?.id);
