@@ -10,7 +10,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { X, Home, BookOpen, TrendingUp, Trophy, Settings, Users, Building, ScrollText } from 'lucide-react';
+import { X, Home, BookOpen, TrendingUp, Trophy, Settings, Users, Building, ScrollText, Route } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface UserContext {
@@ -42,6 +42,7 @@ const adminNavigation = [
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Teams', href: '/admin/teams', icon: Users },
   { name: 'Organization', href: '/admin/organization', icon: Building },
+  { name: 'Learning Path', href: '/admin/learning-path', icon: Route },
   { name: 'Audit Log', href: '/admin/audit', icon: ScrollText },
 ];
 

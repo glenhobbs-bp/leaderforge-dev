@@ -24,6 +24,7 @@ import {
   Handshake,
   Shield,
   BarChart3,
+  Route,
 } from 'lucide-react';
 
 interface UserContext {
@@ -62,6 +63,7 @@ const adminNavigation = [
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Teams', href: '/admin/teams', icon: Users },
   { name: 'Organization', href: '/admin/organization', icon: Building },
+  { name: 'Learning Path', href: '/admin/learning-path', icon: Route },
   { name: 'Audit Log', href: '/admin/audit', icon: ScrollText },
 ];
 
