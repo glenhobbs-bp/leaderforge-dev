@@ -22,6 +22,7 @@ import {
   ScrollText,
   Handshake,
   Shield,
+  BarChart3,
 } from 'lucide-react';
 
 interface UserContext {
@@ -55,6 +56,7 @@ const leaderNavigation = [
 ];
 
 const adminNavigation = [
+  { name: 'Org Progress', href: '/admin/progress', icon: BarChart3 },
   { name: 'Users', href: '/admin/users', icon: Users },
   { name: 'Teams', href: '/admin/teams', icon: Users },
   { name: 'Organization', href: '/admin/organization', icon: Building },
