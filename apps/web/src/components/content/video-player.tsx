@@ -15,15 +15,17 @@ interface VideoPlayerProps {
   src: string;
   poster?: string;
   title: string;
+  initialProgress?: number; // 0-100 percentage to resume from
   onProgress?: (progress: number) => void;
   onComplete?: () => void;
 }
 
-export function VideoPlayer({ src, poster, title, onProgress, onComplete }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, title, initialProgress = 0, onProgress, onComplete }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const hasResumed = useRef(false);
 
   const initializePlayer = useCallback(() => {
     const video = videoRef.current;
@@ -118,6 +120,32 @@ export function VideoPlayer({ src, poster, title, onProgress, onComplete }: Vide
       }
     };
   }, [initializePlayer]);
+
+  // Resume from saved position when video loads
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      // Only resume once and if we have a valid initial progress
+      if (!hasResumed.current && initialProgress > 0 && initialProgress < 100 && video.duration > 0) {
+        const targetTime = (initialProgress / 100) * video.duration;
+        console.log('[VideoPlayer] Resuming from', initialProgress, '% ->', targetTime, 'seconds');
+        video.currentTime = targetTime;
+        hasResumed.current = true;
+      }
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    
+    // Also try on canplay for HLS streams where duration might not be available immediately
+    video.addEventListener('canplay', handleLoadedMetadata);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('canplay', handleLoadedMetadata);
+    };
+  }, [initialProgress]);
 
   // Track progress
   useEffect(() => {

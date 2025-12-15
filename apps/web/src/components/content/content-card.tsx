@@ -9,18 +9,14 @@
  * │                        │
  * │      [Progress/✓]      │  ← Center: Overall progress or complete
  * │                        │
- * │ [Check-in]             │  ← Bottom left: Check-in status
- * │        [17:21]         │  ← Duration (bottom center)
+ * │ [Met]    [17:21] [Done]│  ← Bottom: Check-in, Duration, Signoff
  * └─────────────────────────┘
  * 
- * Top-left (Video) badge states:
- * - "▶ Video" (blue) - not started
- * - "▶ Video 30%" (amber) - in progress
- * - "✓ Video" (green) - complete
- * 
- * Top-right (Bold Action Goal) badge states:
- * - 🎯 (grey/muted) - bold action not complete
- * - 🎯 (green) - bold action complete
+ * All badges are always visible (grey when incomplete, colored when active/complete):
+ * - Top-left (Video): blue → amber+% → green+✓
+ * - Top-right (Goal): grey → green (target icon)
+ * - Bottom-left (Check-in): grey → amber/blue → green "Met"
+ * - Bottom-right (Signoff): grey → amber "Active" → green "Done"
  */
 
 'use client';
@@ -217,23 +213,31 @@ export function ContentCard({
             <Target className={`h-3 w-3 ${step4Complete ? '' : 'text-muted-foreground'}`} />
           </div>
 
-          {/* BOTTOM LEFT - Check-in status */}
-          {checkinStatus === 'completed' ? (
-            <div className="absolute bottom-2 left-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Handshake className="h-3 w-3" />
-              Met
-            </div>
-          ) : checkinStatus === 'scheduled' ? (
-            <div className="absolute bottom-2 left-2 px-2 py-1 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <CalendarCheck className="h-3 w-3" />
-              Scheduled
-            </div>
-          ) : checkinStatus === 'pending' ? (
-            <div className="absolute bottom-2 left-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <CalendarCheck className="h-3 w-3" />
-              Requested
-            </div>
-          ) : null}
+          {/* BOTTOM LEFT - Check-in status (always visible) */}
+          <div className={`absolute bottom-2 left-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
+            step3Complete 
+              ? 'bg-green-500 text-white' 
+              : checkinStatus === 'scheduled'
+                ? 'bg-blue-500 text-white'
+                : checkinStatus === 'pending'
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-white/90 text-muted-foreground'
+          }`}>
+            <Handshake className="h-3 w-3" />
+            {step3Complete ? 'Met' : checkinStatus === 'scheduled' ? 'Scheduled' : checkinStatus === 'pending' ? 'Requested' : ''}
+          </div>
+
+          {/* BOTTOM RIGHT - Bold Action Signoff status (always visible) */}
+          <div className={`absolute bottom-2 right-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
+            step4Complete 
+              ? 'bg-green-500 text-white' 
+              : boldActionStatus === 'pending'
+                ? 'bg-amber-500 text-white'
+                : 'bg-white/90 text-muted-foreground'
+          }`}>
+            <CheckCircle className="h-3 w-3" />
+            {step4Complete ? 'Done' : boldActionStatus === 'pending' ? 'Active' : ''}
+          </div>
 
           {/* Duration badge - bottom center */}
           {item.duration && (

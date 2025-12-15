@@ -400,11 +400,17 @@ export function ContentViewer({ content }: ContentViewerProps) {
 
       {/* Video Player or Placeholder */}
       <div className="rounded-xl overflow-hidden bg-black aspect-video">
-        {content.videoUrl ? (
+        {isLoading ? (
+          // Show loading while fetching saved progress
+          <div className="w-full h-full flex items-center justify-center bg-black">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          </div>
+        ) : content.videoUrl ? (
           <VideoPlayer 
             src={content.videoUrl} 
             poster={content.thumbnailUrl || undefined}
             title={content.title}
+            initialProgress={videoProgress}
             onProgress={handleVideoProgress}
             onComplete={handleVideoComplete}
           />
