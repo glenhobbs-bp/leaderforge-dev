@@ -109,7 +109,8 @@ export default async function ContentPage() {
             content_id,
             sequence_order,
             unlock_date,
-            is_optional
+            is_optional,
+            is_manually_unlocked
           )
         `)
         .eq('organization_id', membership.organization_id)
@@ -134,6 +135,7 @@ export default async function ContentPage() {
           sequence_order: number; 
           unlock_date: string | null;
           is_optional: boolean;
+          is_manually_unlocked?: boolean;
         }, index: number) => {
           // Check previous completion
           let previousComplete = true;
@@ -162,6 +164,10 @@ export default async function ContentPage() {
           
           if (index === 0) {
             isUnlocked = true;
+          } else if (learningPath.unlock_mode === 'manual') {
+            // Manual mode: admin explicitly unlocks each item
+            isUnlocked = item.is_manually_unlocked === true;
+            if (!isUnlocked) unlockReason = 'Awaiting admin unlock';
           } else if (learningPath.unlock_mode === 'time_based') {
             isUnlocked = today >= timeUnlockDate;
             if (!isUnlocked) unlockReason = `Unlocks ${timeUnlockDate.toLocaleDateString()}`;

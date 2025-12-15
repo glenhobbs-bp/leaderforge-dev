@@ -39,13 +39,14 @@ interface LearningPathItem {
   sequence_order: number;
   unlock_date: string | null;
   is_optional: boolean;
+  is_manually_unlocked?: boolean;
 }
 
 interface LearningPath {
   id: string;
   name: string;
   description: string | null;
-  unlock_mode: 'time_based' | 'completion_based' | 'hybrid';
+  unlock_mode: 'time_based' | 'completion_based' | 'hybrid' | 'manual';
   enrollment_date: string;
   unlock_interval_days: number;
   completion_requirement: 'video_only' | 'worksheet' | 'full';
@@ -64,11 +65,12 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
   // Form state
   const [name, setName] = useState('Leadership Foundations');
   const [description, setDescription] = useState('');
-  const [unlockMode, setUnlockMode] = useState<'time_based' | 'completion_based' | 'hybrid'>('hybrid');
+  const [unlockMode, setUnlockMode] = useState<'time_based' | 'completion_based' | 'hybrid' | 'manual'>('hybrid');
   const [enrollmentDate, setEnrollmentDate] = useState(new Date().toISOString().split('T')[0]);
   const [unlockInterval, setUnlockInterval] = useState(7);
   const [completionRequirement, setCompletionRequirement] = useState<'video_only' | 'worksheet' | 'full'>('full');
-  const [sequenceItems, setSequenceItems] = useState<{ content_id: string; is_optional: boolean }[]>([]);
+  const [sequenceItems, setSequenceItems] = useState<{ content_id: string; is_optional: boolean; id?: string; is_manually_unlocked?: boolean }[]>([]);
+  const [isTogglingUnlock, setIsTogglingUnlock] = useState<string | null>(null);
 
   // Load existing learning path
   const loadLearningPath = useCallback(async () => {
@@ -87,8 +89,10 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
         setCompletionRequirement(path.completion_requirement);
         setSequenceItems(
           path.items.map((item: LearningPathItem) => ({
+            id: item.id,
             content_id: item.content_id,
             is_optional: item.is_optional,
+            is_manually_unlocked: item.is_manually_unlocked,
           }))
         );
       }
@@ -201,6 +205,46 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
     return `Week ${weekNum}`;
   };
 
+  // Toggle manual unlock for an item
+  const handleToggleManualUnlock = async (itemId: string, currentlyUnlocked: boolean) => {
+    if (!learningPath || unlockMode !== 'manual') return;
+    
+    setIsTogglingUnlock(itemId);
+    try {
+      const response = await fetch('/api/admin/learning-path/items', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId,
+          unlock: !currentlyUnlocked,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        // Update local state
+        setSequenceItems(prev => prev.map(item => 
+          item.id === itemId 
+            ? { ...item, is_manually_unlocked: !currentlyUnlocked }
+            : item
+        ));
+        toast({ 
+          title: !currentlyUnlocked ? 'Module unlocked' : 'Module locked',
+          description: !currentlyUnlocked 
+            ? 'Users can now access this module.' 
+            : 'Module is now locked for users.',
+        });
+      } else {
+        toast({ title: 'Error', description: result.error || 'Failed to update', variant: 'destructive' });
+      }
+    } catch (error) {
+      console.error('Toggle unlock error:', error);
+      toast({ title: 'Error', description: 'Failed to update unlock status', variant: 'destructive' });
+    } finally {
+      setIsTogglingUnlock(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -265,29 +309,33 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
                   <SelectItem value="time_based">Time-based (Cohort)</SelectItem>
                   <SelectItem value="completion_based">Completion-based (Self-paced)</SelectItem>
                   <SelectItem value="hybrid">Hybrid (Recommended)</SelectItem>
+                  <SelectItem value="manual">Manual (Admin Controlled)</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
                 {unlockMode === 'time_based' && 'Modules unlock on a schedule for everyone'}
                 {unlockMode === 'completion_based' && 'Complete one module to unlock the next'}
                 {unlockMode === 'hybrid' && 'Schedule + completion required'}
+                {unlockMode === 'manual' && 'You control when each module unlocks'}
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label>Unlock Interval</Label>
-              <Select value={String(unlockInterval)} onValueChange={(v) => setUnlockInterval(Number(v))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7">Weekly (7 days)</SelectItem>
-                  <SelectItem value="14">Bi-weekly (14 days)</SelectItem>
-                  <SelectItem value="3">Every 3 days</SelectItem>
-                  <SelectItem value="1">Daily</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {unlockMode !== 'manual' && (
+              <div className="space-y-2">
+                <Label>Unlock Interval</Label>
+                <Select value={String(unlockInterval)} onValueChange={(v) => setUnlockInterval(Number(v))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">Weekly (7 days)</SelectItem>
+                    <SelectItem value="14">Bi-weekly (14 days)</SelectItem>
+                    <SelectItem value="3">Every 3 days</SelectItem>
+                    <SelectItem value="1">Daily</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Completion Requirement</Label>
@@ -319,65 +367,135 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
         <CardHeader>
           <CardTitle>Module Sequence</CardTitle>
           <CardDescription>
-            Drag to reorder. {sequenceItems.length} modules • 
-            {Math.ceil((sequenceItems.length * unlockInterval) / 7)} weeks total
+            {unlockMode === 'manual' ? (
+              <>
+                {sequenceItems.length} modules • Click lock/unlock to control access
+              </>
+            ) : (
+              <>
+                Drag to reorder. {sequenceItems.length} modules • 
+                {Math.ceil((sequenceItems.length * unlockInterval) / 7)} weeks total
+              </>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Manual mode info banner */}
+          {unlockMode === 'manual' && learningPath && (
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+              <strong>Manual Mode:</strong> Save the sequence first, then use the lock/unlock buttons to control which modules are available to users.
+            </div>
+          )}
+
           {/* Current Sequence */}
           {sequenceItems.length > 0 ? (
             <div className="space-y-2">
-              {sequenceItems.map((item, index) => (
-                <div 
-                  key={`${item.content_id}-${index}`}
-                  className="flex items-center gap-3 p-3 bg-muted rounded-lg group"
-                >
-                  <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-muted-foreground w-6">
-                        {index + 1}.
-                      </span>
-                      <span className="font-medium truncate">{getContentTitle(item.content_id)}</span>
+              {sequenceItems.map((item, index) => {
+                const isUnlocked = index === 0 || item.is_manually_unlocked === true;
+                const canToggle = unlockMode === 'manual' && index > 0 && item.id && learningPath;
+                
+                return (
+                  <div 
+                    key={`${item.content_id}-${index}`}
+                    className={`flex items-center gap-3 p-3 rounded-lg group ${
+                      unlockMode === 'manual' 
+                        ? isUnlocked ? 'bg-green-50 border border-green-200' : 'bg-muted'
+                        : 'bg-muted'
+                    }`}
+                  >
+                    <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-muted-foreground w-6">
+                          {index + 1}.
+                        </span>
+                        <span className="font-medium truncate">{getContentTitle(item.content_id)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        {unlockMode === 'manual' ? (
+                          <>
+                            {isUnlocked ? (
+                              <>
+                                <Unlock className="h-3 w-3 text-green-600" />
+                                <span className="text-xs text-green-600">
+                                  {index === 0 ? 'Always unlocked (first module)' : 'Unlocked'}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">Locked</span>
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <Calendar className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">{getUnlockWeek(index)}</span>
+                            {index === 0 ? (
+                              <Unlock className="h-3 w-3 text-green-500" />
+                            ) : (
+                              <Lock className="h-3 w-3 text-muted-foreground" />
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Calendar className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{getUnlockWeek(index)}</span>
-                      {index === 0 ? (
-                        <Unlock className="h-3 w-3 text-green-500" />
-                      ) : (
-                        <Lock className="h-3 w-3 text-muted-foreground" />
-                      )}
+
+                    {/* Manual unlock toggle button */}
+                    {canToggle && (
+                      <Button
+                        variant={isUnlocked ? 'outline' : 'default'}
+                        size="sm"
+                        onClick={() => handleToggleManualUnlock(item.id!, isUnlocked)}
+                        disabled={isTogglingUnlock === item.id}
+                        className={isUnlocked ? 'border-amber-500 text-amber-600 hover:bg-amber-50' : 'bg-green-600 hover:bg-green-700'}
+                      >
+                        {isTogglingUnlock === item.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : isUnlocked ? (
+                          <>
+                            <Lock className="h-4 w-4 mr-1" />
+                            Lock
+                          </>
+                        ) : (
+                          <>
+                            <Unlock className="h-4 w-4 mr-1" />
+                            Unlock
+                          </>
+                        )}
+                      </Button>
+                    )}
+
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleMoveItem(index, 'up')}
+                        disabled={index === 0}
+                      >
+                        ↑
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleMoveItem(index, 'down')}
+                        disabled={index === sequenceItems.length - 1}
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveContent(index)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleMoveItem(index, 'up')}
-                      disabled={index === 0}
-                    >
-                      ↑
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleMoveItem(index, 'down')}
-                      disabled={index === sequenceItems.length - 1}
-                    >
-                      ↓
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveContent(index)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8 text-muted-foreground">

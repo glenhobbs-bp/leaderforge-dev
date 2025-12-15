@@ -13,12 +13,13 @@ interface LearningPathItem {
   sequence_order: number;
   unlock_date: string | null;
   is_optional: boolean;
+  is_manually_unlocked: boolean;
 }
 
 interface LearningPath {
   id: string;
   name: string;
-  unlock_mode: 'time_based' | 'completion_based' | 'hybrid';
+  unlock_mode: 'time_based' | 'completion_based' | 'hybrid' | 'manual';
   enrollment_date: string;
   unlock_interval_days: number;
   completion_requirement: 'video_only' | 'worksheet' | 'full';
@@ -72,7 +73,8 @@ export async function GET() {
         content_id,
         sequence_order,
         unlock_date,
-        is_optional
+        is_optional,
+        is_manually_unlocked
       )
     `)
     .eq('organization_id', membership.organization_id)
@@ -169,6 +171,12 @@ export async function GET() {
     if (index === 0) {
       // First item is always unlocked
       isUnlocked = true;
+    } else if (path.unlock_mode === 'manual') {
+      // Manual mode: admin explicitly unlocks each item
+      isUnlocked = item.is_manually_unlocked === true;
+      if (!isUnlocked) {
+        unlockReason = 'Awaiting admin unlock';
+      }
     } else if (path.unlock_mode === 'time_based') {
       isUnlocked = today >= timeUnlockDate;
       if (!isUnlocked) {
