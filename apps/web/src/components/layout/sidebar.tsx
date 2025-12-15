@@ -75,7 +75,8 @@ const tenantAdminNavigation = [
 ];
 
 const platformAdminNavigation = [
-  { name: 'Platform Admin', href: '/platform-admin', icon: Shield },
+  { name: 'Overview', href: '/platform-admin', icon: Shield },
+  { name: 'Tenants', href: '/platform-admin/tenants', icon: Building2 },
 ];
 
 export function Sidebar({ className, userContext }: SidebarProps) {

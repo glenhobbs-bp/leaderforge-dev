@@ -10,6 +10,7 @@
  */
 
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { 
   Building2, 
@@ -43,13 +44,28 @@ export default async function PlatformAdminPage() {
     redirect('/dashboard');
   }
 
+  // Fetch real stats
+  const { count: tenantCount } = await supabase
+    .from('tenants')
+    .select('id', { count: 'exact', head: true });
+
+  const { count: orgCount } = await supabase
+    .from('organizations')
+    .select('id', { count: 'exact', head: true });
+
+  const { count: userCount } = await supabase
+    .from('memberships')
+    .select('id', { count: 'exact', head: true })
+    .eq('is_active', true);
+
   const upcomingFeatures = [
     {
       title: 'Tenant Management',
       description: 'Create, configure, and manage tenants. View usage and billing.',
       icon: Building2,
-      status: 'Coming Soon',
+      status: 'Available',
       color: 'text-primary',
+      href: '/platform-admin/tenants',
     },
     {
       title: 'AI Configuration',
@@ -75,10 +91,10 @@ export default async function PlatformAdminPage() {
   ];
 
   const quickStats = [
-    { label: 'Tenants', value: '2', icon: Building2 },
-    { label: 'Organizations', value: '2', icon: Users },
-    { label: 'Active Users', value: '3', icon: BarChart3 },
-    { label: 'AI Calls Today', value: '12', icon: Sparkles },
+    { label: 'Tenants', value: String(tenantCount || 0), icon: Building2 },
+    { label: 'Organizations', value: String(orgCount || 0), icon: Users },
+    { label: 'Active Users', value: String(userCount || 0), icon: BarChart3 },
+    { label: 'AI Calls Today', value: '—', icon: Sparkles },
   ];
 
   return (
@@ -121,15 +137,19 @@ export default async function PlatformAdminPage() {
         })}
       </div>
 
-      {/* Upcoming Features */}
+      {/* Platform Features */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Platform Features</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {upcomingFeatures.map((feature) => {
             const Icon = feature.icon;
-            return (
-              <Card key={feature.title} className="relative overflow-hidden">
-                <div className="absolute top-0 right-0 px-3 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-bl-lg">
+            const cardContent = (
+              <Card className={`relative overflow-hidden ${feature.href ? 'hover:border-primary/50 cursor-pointer transition-colors' : ''}`}>
+                <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-medium rounded-bl-lg ${
+                  feature.status === 'Available' 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-muted text-muted-foreground'
+                }`}>
                   {feature.status}
                 </div>
                 <CardHeader>
@@ -140,6 +160,14 @@ export default async function PlatformAdminPage() {
                   <CardDescription>{feature.description}</CardDescription>
                 </CardHeader>
               </Card>
+            );
+            
+            return feature.href ? (
+              <Link key={feature.title} href={feature.href}>
+                {cardContent}
+              </Link>
+            ) : (
+              <div key={feature.title}>{cardContent}</div>
             );
           })}
         </div>
