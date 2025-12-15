@@ -30,6 +30,7 @@ async function verifyAdminAndGetPath(supabase: Awaited<ReturnType<typeof createC
   }
 
   const { data: learningPath, error: pathError } = await supabase
+    .schema('content')
     .from('learning_paths')
     .select('id, unlock_mode')
     .eq('organization_id', membership.organization_id)
@@ -61,6 +62,7 @@ export async function PUT(request: NextRequest) {
 
   // Delete existing items
   const { error: deleteError } = await supabase
+    .schema('content')
     .from('learning_path_items')
     .delete()
     .eq('learning_path_id', learningPath.id);
@@ -83,6 +85,7 @@ export async function PUT(request: NextRequest) {
     }));
 
     const { error: insertError } = await supabase
+      .schema('content')
       .from('learning_path_items')
       .insert(itemsToInsert);
 
@@ -94,6 +97,7 @@ export async function PUT(request: NextRequest) {
 
   // Fetch updated items
   const { data: updatedItems, error: fetchError } = await supabase
+    .schema('content')
     .from('learning_path_items')
     .select('*')
     .eq('learning_path_id', learningPath.id)
@@ -138,6 +142,7 @@ export async function PATCH(request: NextRequest) {
 
   // Verify item belongs to this learning path
   const { data: item, error: itemError } = await supabase
+    .schema('content')
     .from('learning_path_items')
     .select('id, sequence_order')
     .eq('id', itemId)
@@ -158,6 +163,7 @@ export async function PATCH(request: NextRequest) {
 
   // Update the item
   const { data: updatedItem, error: updateError } = await supabase
+    .schema('content')
     .from('learning_path_items')
     .update({
       is_manually_unlocked: unlock,
