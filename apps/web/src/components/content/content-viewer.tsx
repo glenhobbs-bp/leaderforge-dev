@@ -106,42 +106,41 @@ export function ContentViewer({ content }: ContentViewerProps) {
 
   // Load existing progress on mount
   useEffect(() => {
+    let isMounted = true;
+    
     const loadProgress = async () => {
       try {
         // Fetch all data in parallel for better performance
-        const [progressRes, worksheetRes, boldActionRes, checkinRes] = await Promise.all([
-          fetch(`/api/progress/${content.id}`),
-          fetch(`/api/worksheet/${content.id}`),
-          fetch(`/api/bold-actions/${content.id}`),
-          fetch(`/api/checkins/${content.id}`),
+        // Using Promise.allSettled to handle individual failures gracefully
+        const results = await Promise.allSettled([
+          fetch(`/api/progress/${content.id}`).then(r => r.json()),
+          fetch(`/api/worksheet/${content.id}`).then(r => r.json()),
+          fetch(`/api/bold-actions/${content.id}`).then(r => r.json()),
+          fetch(`/api/checkins/${content.id}`).then(r => r.json()),
         ]);
 
-        // Parse responses
-        const [progressResult, worksheetResult, boldActionResult, checkinResult] = await Promise.all([
-          progressRes.json(),
-          worksheetRes.json(),
-          boldActionRes.json(),
-          checkinRes.json(),
-        ]);
+        if (!isMounted) return;
 
-        // Update state based on results
-        if (progressResult.success && progressResult.data) {
-          const data: ProgressData = progressResult.data;
+        // Process results - each can succeed or fail independently
+        const [progressResult, worksheetResult, boldActionResult, checkinResult] = results;
+
+        if (progressResult.status === 'fulfilled' && progressResult.value?.success && progressResult.value?.data) {
+          const data: ProgressData = progressResult.value.data;
           setVideoProgress(data.progress_percentage || 0);
           setIsVideoCompleted(data.progress_percentage >= 90);
           lastSavedProgress.current = data.progress_percentage || 0;
         }
 
-        if (worksheetResult.success && worksheetResult.data) {
+        if (worksheetResult.status === 'fulfilled' && worksheetResult.value?.success && worksheetResult.value?.data) {
           setIsWorksheetCompleted(true);
         }
 
-        if (boldActionResult.success && boldActionResult.data) {
-          setBoldAction(boldActionResult.data);
+        if (boldActionResult.status === 'fulfilled' && boldActionResult.value?.success && boldActionResult.value?.data) {
+          setBoldAction(boldActionResult.value.data);
         }
 
-        if (checkinResult.success && checkinResult.data) {
-          setCheckin(checkinResult.data);
+        if (checkinResult.status === 'fulfilled' && checkinResult.value?.success && checkinResult.value?.data) {
+          setCheckin(checkinResult.value.data);
         }
 
         // Load organization signoff mode (non-blocking, optional)
@@ -149,7 +148,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
           const settingsResponse = await fetch('/api/admin/organization/settings');
           if (settingsResponse.ok) {
             const settingsResult = await settingsResponse.json();
-            if (settingsResult.settings?.signoff_mode) {
+            if (isMounted && settingsResult.settings?.signoff_mode) {
               setSignoffMode(settingsResult.settings.signoff_mode);
             }
           }
@@ -159,11 +158,17 @@ export function ContentViewer({ content }: ContentViewerProps) {
       } catch (error) {
         console.error('Failed to load progress:', error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadProgress();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [content.id]);
 
   // Save video progress to database (debounced)
