@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { awardGamification } from '@/lib/gamification';
 
 interface RouteParams {
   params: Promise<{ contentId: string }>;
@@ -226,6 +227,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         { success: false, error: 'Failed to update bold action' },
         { status: 500 }
       );
+    }
+
+    // Award gamification points on bold action completion (self-certification)
+    if (status === 'completed') {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('tenant_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (userData?.tenant_id) {
+        await awardGamification(supabase, userData.tenant_id, user.id, 'bold_action_complete', contentId);
+      }
     }
 
     return NextResponse.json({

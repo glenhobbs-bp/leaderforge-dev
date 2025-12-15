@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { awardGamification } from '@/lib/gamification';
 
 interface RouteParams {
   params: Promise<{ contentId: string }>;
@@ -136,6 +137,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           { success: false, error: 'Failed to update progress' },
           { status: 500 }
         );
+      }
+
+      // Award points for first-time video completion
+      if (isNewCompletion) {
+        await awardGamification(supabase, userData.tenant_id, user.id, 'video_complete', contentId);
       }
 
       return NextResponse.json({

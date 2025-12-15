@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, TrendingUp, Trophy, Flame, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { StreakWidget, LeaderboardWidget } from '@/components/gamification';
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -91,14 +92,24 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Gamification Widgets + Continue Learning */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Streak Widget */}
+        <StreakWidget />
+        
+        {/* Leaderboard Widget */}
+        <LeaderboardWidget />
+        
+        {/* Continue Learning Card */}
         <Card className="border border-border bg-card hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Continue Learning</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <BookOpen className="h-4 w-4 text-primary" />
+              Continue Learning
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-sm mb-4">
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
               {inProgressItems > 0
                 ? `You have ${inProgressItems} item${inProgressItems > 1 ? 's' : ''} in progress.`
                 : 'Start your learning journey by exploring the content library.'}
@@ -108,24 +119,6 @@ export default async function DashboardPage() {
               className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
             >
               Browse content
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border bg-card hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-sm mb-4">
-              See how you rank against your teammates.
-            </p>
-            <Link
-              href="/leaderboard"
-              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
-            >
-              View leaderboard
               <ArrowRight className="h-4 w-4" />
             </Link>
           </CardContent>

@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { awardGamification } from '@/lib/gamification';
 
 type RouteParams = {
   params: Promise<{ contentId: string }>;
@@ -75,6 +76,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (updateError) {
       console.error('Error approving bold action:', updateError);
       return NextResponse.json({ error: 'Failed to approve bold action' }, { status: 500 });
+    }
+
+    // Award gamification points to the user whose bold action was approved
+    const { data: targetUserData } = await supabase
+      .from('users')
+      .select('tenant_id')
+      .eq('id', boldAction.user_id)
+      .single();
+    
+    if (targetUserData?.tenant_id) {
+      await awardGamification(supabase, targetUserData.tenant_id, boldAction.user_id, 'bold_action_complete', contentId);
     }
 
     return NextResponse.json({ 

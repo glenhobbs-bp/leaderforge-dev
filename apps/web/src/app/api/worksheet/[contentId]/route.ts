@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { awardGamification } from '@/lib/gamification';
 
 interface RouteParams {
   params: Promise<{ contentId: string }>;
@@ -103,6 +104,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const now = new Date().toISOString();
 
+    // Check if this is a new submission (for gamification)
+    const { data: existingSubmission } = await supabase
+      .from('worksheet_submissions')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('content_id', contentId)
+      .single();
+    
+    const isNewSubmission = !existingSubmission;
+
     // Upsert worksheet submission
     const { data: submission, error: worksheetError } = await supabase
       .from('worksheet_submissions')
@@ -124,6 +135,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { success: false, error: 'Failed to save worksheet' },
         { status: 500 }
       );
+    }
+
+    // Award points for first-time worksheet completion
+    if (isNewSubmission) {
+      await awardGamification(supabase, userData.tenant_id, user.id, 'worksheet_complete', contentId);
     }
 
     // If there's a bold action in the responses, create/update it too

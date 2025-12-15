@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { awardGamification } from '@/lib/gamification';
 
 interface RouteParams {
   params: Promise<{ contentId: string }>;
@@ -88,6 +89,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { success: false, error: 'Failed to complete check-in' },
         { status: 500 }
       );
+    }
+
+    // Award gamification points to the user who completed the check-in
+    const { data: targetUserData } = await supabase
+      .from('users')
+      .select('tenant_id')
+      .eq('id', targetUserId)
+      .single();
+    
+    if (targetUserData?.tenant_id) {
+      await awardGamification(supabase, targetUserData.tenant_id, targetUserId, 'checkin_complete', contentId);
     }
 
     // Update user_progress metadata
