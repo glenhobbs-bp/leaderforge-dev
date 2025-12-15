@@ -58,7 +58,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ⬜ | 7. Future | 7.6 | Voice input for reflections (mobile-friendly) |
 | ⬜ | 7. Future | 7.7 | Reflection pattern recognition & insights |
 | ⬜ | 7. Future | 7.8 | **Platform Admin** - System health & monitoring |
-| ⬜ | 7. Future | 7.9 | **AI Configuration** - Platform-level prompt management |
+| ✅ | 7. Future | 7.9 | **AI Configuration** - Platform-level prompt management |
 | ⬜ | 7. Future | 7.10 | **AI Configuration** - Tenant-level AI customization |
 | ⬜ | 7. Future | 7.11 | **AI Configuration** - A/B testing framework |
 | ⬜ | 7. Future | 7.12 | **Role-based access control** - Multiple admin roles per tier |
@@ -962,6 +962,53 @@ Output of org diagnostic:
 **Status:** ✅ Completed
 
 Context-aware reflection questions for bold action completion:
+
+---
+
+#### 7.9 AI Configuration - Platform-level Prompt Management
+**Status:** ✅ Completed
+
+Platform Admin can manage all AI prompts and settings from a central UI:
+
+**Database:**
+- ✅ `platform.ai_config` table for storing configurations
+- ✅ `platform.ai_config_history` for version tracking
+- ✅ Seeded default configs (reflection prompts, cheat sheet, terminology)
+
+**Configuration Types:**
+- **System Prompts** - Core AI personality and behavior
+- **Prompt Templates** - Dynamic templates with placeholders
+- **Settings** - Model parameters, rate limits
+- **Terminology** - Brand-specific term mappings
+
+**API Routes:**
+- ✅ `GET /api/platform-admin/ai-config` - List all configs
+- ✅ `POST /api/platform-admin/ai-config` - Create config
+- ✅ `PATCH /api/platform-admin/ai-config/[key]` - Update config
+- ✅ `DELETE /api/platform-admin/ai-config/[key]` - Soft delete
+
+**UI Features:**
+- ✅ Grouped view by config type
+- ✅ JSON editor for config values
+- ✅ Version history viewer
+- ✅ Create/Edit/Deactivate dialogs
+- ✅ Inline config preview
+- ✅ API key status warning
+
+**Utility Library:**
+- ✅ `lib/ai-config.ts` - Fetch configs with caching
+- ✅ `getAIConfig()` - Single config with fallback
+- ✅ `getAIConfigs()` - Batch fetch
+- ✅ `getTerminology()` - Term mappings
+
+**Files:**
+- `supabase/migrations/024_ai_config.sql`
+- `apps/web/src/app/(dashboard)/platform-admin/ai-config/page.tsx`
+- `apps/web/src/app/api/platform-admin/ai-config/route.ts`
+- `apps/web/src/app/api/platform-admin/ai-config/[key]/route.ts`
+- `apps/web/src/components/admin/ai-config-management.tsx`
+- `apps/web/src/lib/ai-config.ts`
+
 
 **Backend Features:**
 - ✅ API: `/api/reflection-prompts` - Generate personalized prompts
