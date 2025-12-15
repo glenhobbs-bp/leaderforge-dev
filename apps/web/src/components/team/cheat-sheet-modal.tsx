@@ -63,7 +63,7 @@ export function CheatSheetModal({
     setError(null);
 
     try {
-      const response = await fetch(`/api/checkins/${checkinId}/cheat-sheet`);
+      const response = await fetch(`/api/cheat-sheet/${checkinId}`);
       const result = await response.json();
 
       if (result.success) {

@@ -1,10 +1,13 @@
 /**
- * File: apps/web/src/app/api/checkins/[checkinId]/cheat-sheet/route.ts
+ * File: apps/web/src/app/api/cheat-sheet/[checkinId]/route.ts
  * Purpose: Generate AI-powered check-in cheat sheet for team leaders
  * Owner: LeaderForge Team
  * 
  * This is the first AI feature in LeaderForge MVP.
  * Provides team leaders with AI-generated insights before 5-minute check-ins.
+ * 
+ * Note: This route is at /api/cheat-sheet/[checkinId] instead of /api/checkins/[checkinId]
+ * to avoid Next.js App Router param name conflicts with /api/checkins/[contentId].
  */
 
 import { NextRequest, NextResponse } from 'next/server';
