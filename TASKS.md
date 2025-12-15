@@ -48,7 +48,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
 | ✅ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
 | ✅ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
-| ⬜ | 6. Build - Platform Admin | 6.10 | Tenant billing/subscription view |
+| ✅ | 6. Build - Platform Admin | 6.10 | Tenant billing/subscription view |
 | ✅ | 6. Build - Platform Admin | 6.11 | **Platform Admin placeholder** (role + route structure) |
 | ⬜ | 7. Future | 7.1 | Calendar integration (Google/Outlook) |
 | ⬜ | 7. Future | 7.2 | Manager/coach assignment override |
@@ -833,7 +833,31 @@ Platform Admin can now manage tenants on the LeaderForge platform:
 
 ---
 
-#### 6.13 Organization CRUD (Tenant Admin)
+#### 6.14 Tenant Billing View (Platform Admin)
+**Status:** ✅ Completed (Placeholder)
+
+Platform Admin can view billing and subscription status for tenants:
+
+**UI Features:**
+- ✅ Revenue stats (MRR, active subscriptions, seats, price/seat)
+- ✅ Tenant subscription list with status and pricing
+- ✅ Placeholder data with $25/seat/month model
+- ✅ Future features list for Stripe integration
+- ✅ Billing link in platform admin sidebar
+
+**Placeholder for Future:**
+- Stripe integration for payments
+- Invoice generation and history
+- Subscription plan management
+- Payment method management
+- Revenue analytics and forecasting
+
+**Files:**
+- `apps/web/src/app/(dashboard)/platform-admin/billing/page.tsx`
+
+---
+
+#### 6.15 Organization CRUD (Tenant Admin)
 **Status:** ✅ Completed
 
 Tenant Admin can now manage organizations within their tenant:
@@ -987,4 +1011,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-15
-**Current Phase:** 6. Build - Admin (6.10 Platform Admin - Billing View)
+**Current Phase:** Phase 6 Complete! Ready for Phase 7 (Future) or Phase 8 (Polish)
