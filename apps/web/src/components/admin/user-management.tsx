@@ -446,13 +446,13 @@ export function UserManagement({
             
             <div className="space-y-2">
               <Label htmlFor="invite-team">Team (Optional)</Label>
-              <Select value={inviteTeam} onValueChange={setInviteTeam}>
+              <Select value={inviteTeam || '__none__'} onValueChange={(v) => setInviteTeam(v === '__none__' ? '' : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select team..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Team</SelectItem>
-                  {teams.map(team => (
+                  <SelectItem value="__none__">No Team</SelectItem>
+                  {teams.filter(team => team.id).map(team => (
                     <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -506,13 +506,13 @@ export function UserManagement({
             
             <div className="space-y-2">
               <Label htmlFor="edit-team">Team</Label>
-              <Select value={editTeam} onValueChange={setEditTeam}>
+              <Select value={editTeam || '__none__'} onValueChange={(v) => setEditTeam(v === '__none__' ? '' : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select team..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Team</SelectItem>
-                  {teams.map(team => (
+                  <SelectItem value="__none__">No Team</SelectItem>
+                  {teams.filter(team => team.id).map(team => (
                     <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -521,13 +521,13 @@ export function UserManagement({
             
             <div className="space-y-2">
               <Label htmlFor="edit-manager">Manager</Label>
-              <Select value={editManager} onValueChange={setEditManager}>
+              <Select value={editManager || '__none__'} onValueChange={(v) => setEditManager(v === '__none__' ? '' : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select manager..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">No Manager</SelectItem>
-                  {potentialManagers.map(m => (
+                  <SelectItem value="__none__">No Manager</SelectItem>
+                  {potentialManagers.filter(m => m.userId).map(m => (
                     <SelectItem key={m.userId} value={m.userId}>
                       {m.fullName || m.email}
                     </SelectItem>
