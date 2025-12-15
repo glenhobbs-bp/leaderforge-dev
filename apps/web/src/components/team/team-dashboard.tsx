@@ -100,8 +100,26 @@ interface ModuleProgress {
   boldActions: { completed: number; total: number };
 }
 
+interface PendingApproval {
+  id: string;
+  content_id: string;
+  action_description: string;
+  completion_status: 'fully' | 'partially' | 'blocked' | null;
+  reflection_text: string | null;
+  challenge_level: number | null;
+  would_repeat: 'yes' | 'maybe' | 'no' | null;
+  updated_at: string;
+  requester: {
+    id: string;
+    full_name: string;
+    email: string;
+    avatar_url: string | null;
+  } | null;
+}
+
 interface TeamDashboardProps {
   pendingCheckins: CheckinRequest[];
+  pendingApprovals: PendingApproval[];
   teamMembers: TeamMember[];
   moduleProgress: ModuleProgress[];
   teamSize: number;
@@ -110,13 +128,16 @@ interface TeamDashboardProps {
 
 export function TeamDashboard({ 
   pendingCheckins, 
+  pendingApprovals,
   teamMembers,
   moduleProgress,
   teamSize,
   currentUserId 
 }: TeamDashboardProps) {
   const [completingId, setCompletingId] = useState<string | null>(null);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
   const [localCheckins, setLocalCheckins] = useState(pendingCheckins);
+  const [localApprovals, setLocalApprovals] = useState(pendingApprovals);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
   const [cheatSheetCheckin, setCheatSheetCheckin] = useState<CheckinRequest | null>(null);
@@ -166,6 +187,41 @@ export function TeamDashboard({
       });
     } finally {
       setCompletingId(null);
+    }
+  };
+
+  const handleApproveBoldAction = async (approval: PendingApproval) => {
+    setApprovingId(approval.id);
+    
+    try {
+      const response = await fetch(`/api/bold-actions/${approval.content_id}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          boldActionId: approval.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setLocalApprovals(prev => prev.filter(a => a.id !== approval.id));
+        toast({
+          title: 'Bold Action Approved',
+          description: `${approval.requester?.full_name}'s bold action has been approved.`,
+        });
+      } else {
+        throw new Error(result.error || 'Failed to approve bold action');
+      }
+    } catch (error: any) {
+      console.error('Failed to approve bold action:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to approve bold action',
+        variant: 'destructive',
+      });
+    } finally {
+      setApprovingId(null);
     }
   };
 
@@ -308,6 +364,101 @@ export function TeamDashboard({
           </CardContent>
         </Card>
 
+        {/* Pending Bold Action Approvals */}
+        {localApprovals.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-amber-500" />
+                Pending Approvals
+                <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-sm rounded-full">
+                  {localApprovals.length}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {localApprovals.map((approval) => (
+                  <div 
+                    key={approval.id}
+                    className="border rounded-lg p-4 hover:bg-muted/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={approval.requester?.avatar_url || undefined} />
+                          <AvatarFallback className="bg-amber-100 text-amber-700">
+                            {getInitials(approval.requester?.full_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{approval.requester?.full_name || 'Unknown'}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Submitted {formatDate(approval.updated_at)}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-1 text-xs font-medium rounded bg-amber-100 text-amber-700">
+                        Awaiting Approval
+                      </span>
+                    </div>
+
+                    <div className="mb-3 p-3 bg-secondary/10 rounded-lg">
+                      <p className="text-xs font-medium text-secondary mb-1 flex items-center gap-1">
+                        <Zap className="h-3 w-3" />
+                        Bold Action
+                      </p>
+                      <p className="text-sm">&quot;{approval.action_description}&quot;</p>
+                    </div>
+
+                    {approval.reflection_text && (
+                      <div className="mb-3 p-3 bg-muted/50 rounded-lg">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Reflection</p>
+                        <p className="text-sm line-clamp-3">{approval.reflection_text}</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-4 mb-3 text-sm">
+                      {approval.completion_status && (
+                        <span className={`flex items-center gap-1 ${
+                          approval.completion_status === 'fully' 
+                            ? 'text-green-600' 
+                            : approval.completion_status === 'partially'
+                            ? 'text-amber-600'
+                            : 'text-red-600'
+                        }`}>
+                          <CheckCircle className="h-4 w-4" />
+                          {approval.completion_status === 'fully' ? 'Fully completed' :
+                           approval.completion_status === 'partially' ? 'Partially completed' : 'Blocked'}
+                        </span>
+                      )}
+                      {approval.challenge_level && (
+                        <span className="text-muted-foreground">
+                          Challenge: {approval.challenge_level}/5
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={() => handleApproveBoldAction(approval)}
+                        disabled={approvingId === approval.id}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        {approvingId === approval.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                        )}
+                        Approve Completion
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Right Column - Team Members + Module Progress (2/3 width) */}

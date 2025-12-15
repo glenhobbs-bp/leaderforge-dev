@@ -35,7 +35,7 @@ interface ProgressData {
 }
 
 interface BoldActionData {
-  status: 'pending' | 'completed' | 'cancelled';
+  status: 'pending' | 'pending_approval' | 'completed' | 'signed_off' | 'cancelled';
   action_description: string;
   completed_at: string | null;
   completion_status?: 'fully' | 'partially' | 'blocked' | null;
@@ -43,6 +43,8 @@ interface BoldActionData {
   challenge_level?: number | null;
   would_repeat?: 'yes' | 'maybe' | 'no' | null;
 }
+
+type SignoffMode = 'self_certify' | 'leader_approval';
 
 interface CheckinData {
   id: string;
@@ -80,6 +82,9 @@ export function ContentViewer({ content }: ContentViewerProps) {
   // Reflection modal state
   const [isReflectionOpen, setIsReflectionOpen] = useState(false);
 
+  // Organization signoff mode
+  const [signoffMode, setSignoffMode] = useState<SignoffMode>('self_certify');
+
   // Computed check-in completed state
   const isCheckinCompleted = checkin?.status === 'completed';
 
@@ -87,7 +92,8 @@ export function ContentViewer({ content }: ContentViewerProps) {
   const step1Complete = isVideoCompleted;
   const step2Complete = isWorksheetCompleted && !!boldAction;
   const step3Complete = isCheckinCompleted;
-  const step4Complete = boldAction?.status === 'completed';
+  const step4Complete = boldAction?.status === 'completed' || boldAction?.status === 'signed_off';
+  const isPendingApproval = boldAction?.status === 'pending_approval';
 
   // Calculate overall progress (25% per step)
   const overallProgress = 
@@ -135,6 +141,14 @@ export function ContentViewer({ content }: ContentViewerProps) {
         
         if (checkinResult.success && checkinResult.data) {
           setCheckin(checkinResult.data);
+        }
+
+        // Load organization signoff mode
+        const settingsResponse = await fetch('/api/admin/organization/settings');
+        const settingsResult = await settingsResponse.json();
+        
+        if (settingsResult.settings?.signoff_mode) {
+          setSignoffMode(settingsResult.settings.signoff_mode);
         }
       } catch (error) {
         console.error('Failed to load progress:', error);
@@ -227,11 +241,14 @@ export function ContentViewer({ content }: ContentViewerProps) {
   };
 
   const handleSubmitReflection = async (reflection: ReflectionData) => {
+    // Determine status based on signoff mode
+    const newStatus = signoffMode === 'leader_approval' ? 'pending_approval' : 'completed';
+    
     const response = await fetch(`/api/bold-actions/${content.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        status: 'completed',
+        status: newStatus,
         completion_status: reflection.completionStatus,
         reflection_text: reflection.reflectionText || null,
         challenge_level: reflection.challengeLevel,
@@ -240,7 +257,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to complete bold action');
+      throw new Error('Failed to submit bold action');
     }
 
     const result = await response.json();
@@ -595,14 +612,25 @@ export function ContentViewer({ content }: ContentViewerProps) {
                     )}
 
                     {/* Step 4: Complete Bold Action */}
-                    {step3Complete && !step4Complete && boldAction && (
+                    {step3Complete && !step4Complete && boldAction && !isPendingApproval && (
                       <Button 
                         className="w-full bg-green-600 hover:bg-green-700" 
                         onClick={handleOpenReflection}
                       >
                         <Zap className="h-4 w-4 mr-2" />
-                        Complete Bold Action
+                        {signoffMode === 'leader_approval' ? 'Submit Bold Action for Review' : 'Complete Bold Action'}
                       </Button>
+                    )}
+
+                    {/* Pending Approval State */}
+                    {isPendingApproval && (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                        <Clock className="h-5 w-5 text-amber-600 mx-auto mb-2" />
+                        <p className="text-sm text-amber-700 font-medium">Awaiting Leader Approval</p>
+                        <p className="text-xs text-amber-600 mt-1">
+                          Your bold action reflection has been submitted for review
+                        </p>
+                      </div>
                     )}
 
                     {/* Already completed worksheet - can update */}

@@ -36,6 +36,39 @@ export default async function TeamPage() {
     console.error('Error fetching check-ins:', checkinsError);
   }
 
+  // Get team members (users where current user is their manager)
+  const { data: teamMembersForApproval } = await supabase
+    .from('memberships')
+    .select('user_id')
+    .eq('manager_id', user.id)
+    .eq('is_active', true);
+
+  const teamMemberIdsForApproval = teamMembersForApproval?.map(m => m.user_id) || [];
+
+  // Get pending bold action approvals for team members
+  const { data: pendingApprovals } = await supabase
+    .from('bold_actions')
+    .select('*')
+    .in('user_id', teamMemberIdsForApproval.length > 0 ? teamMemberIdsForApproval : ['none'])
+    .eq('status', 'pending_approval')
+    .order('updated_at', { ascending: true });
+
+  // Enrich pending approvals with user details
+  const enrichedApprovals = await Promise.all(
+    (pendingApprovals || []).map(async (approval) => {
+      const { data: requester } = await supabase
+        .from('users')
+        .select('id, full_name, email, avatar_url')
+        .eq('id', approval.user_id)
+        .single();
+
+      return {
+        ...approval,
+        requester,
+      };
+    })
+  );
+
   // Enrich check-ins with user details
   const enrichedCheckins = await Promise.all(
     (pendingCheckins || []).map(async (checkin) => {
@@ -226,6 +259,7 @@ export default async function TeamPage() {
 
       <TeamDashboard 
         pendingCheckins={enrichedCheckins}
+        pendingApprovals={enrichedApprovals}
         teamMembers={teamMemberDetails}
         moduleProgress={moduleProgress}
         teamSize={teamSize}
