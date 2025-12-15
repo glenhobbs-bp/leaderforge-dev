@@ -690,14 +690,24 @@ AI-powered preparation tool for team leaders:
 #### 6.4 Content Sequencing Backend
 **Status:** ✅ Completed
 
-- Learning path data model
-- Module sequence assignment
-- Unlock status calculation
+Learning path data model and unlock status calculation:
 
-**Database Tables:**
-- [ ] `content.learning_paths` - Path configuration per org
-- [ ] `content.learning_path_items` - Ordered modules in path
-- [ ] Unlock status view/function
+**Database Tables (in `core` schema):**
+- ✅ `core.learning_paths` - Path configuration per org with unlock_mode
+- ✅ `core.learning_path_items` - Ordered modules in path with manual unlock support
+
+**API Routes:**
+- ✅ `GET /api/admin/learning-path` - Fetch org's learning path
+- ✅ `POST /api/admin/learning-path` - Create/update learning path settings
+- ✅ `PUT /api/admin/learning-path/items` - Update module sequence
+- ✅ `PATCH /api/admin/learning-path/items` - Toggle manual unlock
+- ✅ `GET /api/content/sequence` - Get unlock status for content display
+
+**Unlock Modes:**
+- ✅ Time-based (Cohort): Modules unlock on schedule
+- ✅ Completion-based (Self-paced): Complete Module N to unlock N+1
+- ✅ Hybrid: Time schedule + completion requirement
+- ✅ **Manual (Admin Controlled)**: Admin explicitly unlocks each module
 
 **See:** PRD-009 for full specification
 
@@ -706,26 +716,38 @@ AI-powered preparation tool for team leaders:
 #### 6.5 Learning Path Configuration UI
 **Status:** ✅ Completed
 
-Admin interface for:
-- Creating/editing learning paths
-- Drag-and-drop module reordering
-- Setting unlock mode and timing
+Admin interface for learning path management:
+
+**Features:**
+- ✅ Learning Path settings (name, description, unlock mode)
+- ✅ Unlock interval configuration (days between modules)
+- ✅ Module sequence management with up/down reordering
+- ✅ Manual unlock mode with toggle buttons per module
+- ✅ Visual indicators for locked/unlocked status
+- ✅ Toast notifications for save actions
+- ✅ Sidebar menu item added (Org Admin > Learning Path)
+
+**Files:**
+- `apps/web/src/components/admin/learning-path-config.tsx`
+- `apps/web/src/app/(dashboard)/admin/learning-path/page.tsx`
 
 ---
 
 #### 6.6 Unlock Mode Settings
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed (Merged into 6.4/6.5)
 
 **Decisions Made:**
 - Sequencing is **Organization-wide** (all users follow same sequence)
 - Time is **relative to org enrollment** (Week 1, Week 2, etc.)
 - Default mode is **Hybrid** (time schedule + completion required)
 - Locked modules are **visible (grayed out)** with unlock info
+- **Manual mode** added: Admin explicitly controls module unlock
 
-Three unlock modes:
+Four unlock modes implemented:
 - **Time-based (Cohort)**: Modules unlock on schedule for everyone
 - **Completion-based (Self-paced)**: Complete Module N to unlock N+1
 - **Hybrid** (default): Time schedule + completion requirement
+- **Manual (Admin Controlled)**: Admin decides when each module unlocks
 
 ---
 
@@ -812,7 +834,7 @@ Output of org diagnostic:
 9. **Self-Certification Preferred** - Accountability without micromanaging
 10. **AI Check-in Cheat Sheet** - First AI feature, activating team leaders
 11. **Content Sequencing** - Org admin controls module order and unlock pacing
-12. **Three Unlock Modes** - Time-based, Completion-based, Hybrid
+12. **Four Unlock Modes** - Time-based, Completion-based, Hybrid, Manual
 
 ### Tribe Social CMS (MVP)
 
@@ -829,6 +851,22 @@ TRIBE_SOCIAL_API_URL=https://edge.tribesocial.io
 TRIBE_SOCIAL_TOKEN=<token>
 ```
 
+### Recent Updates (2024-12-15)
+
+**Content Sequencing & Learning Paths:**
+- ✅ Learning path tables moved from `content` to `core` schema
+- ✅ RLS disabled on learning path tables (auth handled at API layer)
+- ✅ Manual unlock mode implemented with admin toggle controls
+- ✅ Learning Path menu item added to Org Admin sidebar
+
+**UI/UX Improvements:**
+- ✅ Toast notifications implemented with colored icons (success/error/warning/info)
+- ✅ Sequence UI improved - replaced drag handles with numbered badges
+- ✅ Reorder buttons use chevron icons with tooltips
+- ✅ Logo display fixed (tenant theme override issue resolved)
+
+---
+
 ### Database Summary (23+ Tables)
 
 | Schema | Tables | Purpose |
@@ -839,5 +877,5 @@ TRIBE_SOCIAL_TOKEN=<token>
 
 ---
 
-**Last Updated:** 2024-12-14
-**Current Phase:** 5. Build - Progress (5.2 Team Leader Dashboard)
+**Last Updated:** 2024-12-15
+**Current Phase:** 6. Build - Admin (6.6 Tenant Admin - Organization CRUD)
