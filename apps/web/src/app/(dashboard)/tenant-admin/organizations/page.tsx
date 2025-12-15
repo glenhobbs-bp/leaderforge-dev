@@ -6,9 +6,8 @@
 
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { Building2, Plus, Users, BarChart3 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Building2 } from 'lucide-react';
+import { OrganizationManagement } from '@/components/admin/organization-management';
 
 export default async function TenantOrganizationsPage() {
   const supabase = await createClient();
@@ -30,25 +29,42 @@ export default async function TenantOrganizationsPage() {
     redirect('/dashboard');
   }
 
-  // Fetch organizations for this tenant
+  // Fetch organizations with stats via API (server-side)
   const { data: organizations } = await supabase
     .from('organizations')
-    .select('id, name, created_at')
+    .select('*')
     .eq('tenant_id', userData.tenant_id)
     .order('name');
 
-  // Get member counts per org
-  const orgStats = await Promise.all(
+  // Get stats for each org
+  const orgsWithStats = await Promise.all(
     (organizations || []).map(async (org) => {
-      const { count } = await supabase
+      // Member count
+      const { count: memberCount } = await supabase
+        .from('memberships')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', org.id);
+
+      // Active member count
+      const { count: activeMemberCount } = await supabase
         .from('memberships')
         .select('id', { count: 'exact', head: true })
         .eq('organization_id', org.id)
         .eq('is_active', true);
-      
+
+      // Team count
+      const { count: teamCount } = await supabase
+        .from('teams')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', org.id);
+
       return {
         ...org,
-        memberCount: count || 0,
+        stats: {
+          totalMembers: memberCount || 0,
+          activeMembers: activeMemberCount || 0,
+          teams: teamCount || 0,
+        },
       };
     })
   );
@@ -56,64 +72,21 @@ export default async function TenantOrganizationsPage() {
   return (
     <div className="space-y-6 animate-page-enter">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-secondary" />
-            Organizations
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage organizations within your tenant
-          </p>
-        </div>
-        <Button disabled className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Organization
-          <span className="text-xs bg-muted px-1.5 py-0.5 rounded ml-1">Coming Soon</span>
-        </Button>
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Building2 className="h-6 w-6 text-secondary" />
+          Organizations
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Manage organizations within your tenant
+        </p>
       </div>
 
-      {/* Organizations Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {orgStats.map((org) => (
-          <Card key={org.id} className="hover:border-primary/50 transition-colors cursor-pointer">
-            <CardHeader>
-              <CardTitle className="text-lg">{org.name}</CardTitle>
-              <CardDescription>
-                Created {new Date(org.created_at).toLocaleDateString()}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>{org.memberCount} members</span>
-                </div>
-                <Button variant="ghost" size="sm" disabled>
-                  <BarChart3 className="h-4 w-4 mr-1" />
-                  View
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {orgStats.length === 0 && (
-          <Card className="col-span-full">
-            <CardContent className="py-8 text-center text-muted-foreground">
-              <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No organizations yet</p>
-              <p className="text-sm">Create your first organization to get started</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Coming Soon Note */}
-      <div className="text-center py-4 text-sm text-muted-foreground">
-        Full organization management (create, edit, configure) coming in Phase 6.6
-      </div>
+      {/* Organization Management Component */}
+      <OrganizationManagement 
+        organizations={orgsWithStats}
+        tenantId={userData.tenant_id}
+      />
     </div>
   );
 }
-
