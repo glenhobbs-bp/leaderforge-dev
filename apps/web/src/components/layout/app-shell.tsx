@@ -17,6 +17,8 @@ interface UserContext {
   fullName: string | null;
   avatarUrl: string | null;
   role: string;
+  isTeamLeader?: boolean;
+  isPlatformAdmin?: boolean;
   tenant: {
     tenantKey: string;
     displayName: string;

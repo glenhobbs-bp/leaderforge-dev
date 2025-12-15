@@ -45,6 +45,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ⬜ | 6. Build - Admin | 6.4 | Content sequencing backend |
 | ⬜ | 6. Build - Admin | 6.5 | Learning path configuration UI |
 | ⬜ | 6. Build - Admin | 6.6 | Unlock mode settings |
+| ✅ | 6. Build - Platform | 6.7 | **Platform Admin placeholder** (role + route structure) |
 | ⬜ | 7. Future | 7.1 | Calendar integration (Google/Outlook) |
 | ⬜ | 7. Future | 7.2 | Manager/coach assignment override |
 | ⬜ | 7. Future | 7.3 | AI Organization Diagnostic |
@@ -52,6 +53,11 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ⬜ | 7. Future | 7.5 | **AI-Enhanced Reflection Prompts** (context-aware questions) |
 | ⬜ | 7. Future | 7.6 | Voice input for reflections (mobile-friendly) |
 | ⬜ | 7. Future | 7.7 | Reflection pattern recognition & insights |
+| ⬜ | 7. Future | 7.8 | **Platform Admin** - Tenant management dashboard |
+| ⬜ | 7. Future | 7.9 | **Platform Admin** - System health & monitoring |
+| ⬜ | 7. Future | 7.10 | **AI Configuration** - Platform-level prompt management |
+| ⬜ | 7. Future | 7.11 | **AI Configuration** - Tenant-level AI customization |
+| ⬜ | 7. Future | 7.12 | **AI Configuration** - A/B testing framework |
 | ⬜ | 8. Polish | 8.1 | Testing and QA |
 | ⬜ | 8. Polish | 8.2 | Documentation |
 

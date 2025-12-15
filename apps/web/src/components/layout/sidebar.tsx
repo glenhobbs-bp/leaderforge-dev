@@ -21,11 +21,13 @@ import {
   Building,
   ScrollText,
   Handshake,
+  Shield,
 } from 'lucide-react';
 
 interface UserContext {
   role: string;
   isTeamLeader?: boolean;
+  isPlatformAdmin?: boolean;
   tenant: {
     tenantKey: string;
     displayName: string;
@@ -59,10 +61,15 @@ const adminNavigation = [
   { name: 'Audit Log', href: '/admin/audit', icon: ScrollText },
 ];
 
+const platformAdminNavigation = [
+  { name: 'Platform Admin', href: '/platform-admin', icon: Shield },
+];
+
 export function Sidebar({ className, userContext }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = ['admin', 'owner'].includes(userContext.role);
   const isTeamLeader = userContext.isTeamLeader || isAdmin; // Admins can also see team view
+  const isPlatformAdmin = userContext.isPlatformAdmin || false;
   const { theme } = useTenantTheme();
 
   // Use dark logo for sidebar (navy background needs white text)
@@ -123,6 +130,14 @@ export function Sidebar({ className, userContext }: SidebarProps) {
           <NavSection
             title="Admin"
             items={adminNavigation}
+            pathname={pathname}
+          />
+        )}
+
+        {isPlatformAdmin && (
+          <NavSection
+            title="Platform"
+            items={platformAdminNavigation}
             pathname={pathname}
           />
         )}
