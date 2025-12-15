@@ -166,7 +166,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       would_repeat,
     } = body;
 
-    if (!status || !['completed', 'cancelled'].includes(status)) {
+    // Valid statuses: pending_approval (for leader approval mode), completed, cancelled
+    const validStatuses = ['pending_approval', 'completed', 'cancelled'];
+    if (!status || !validStatuses.includes(status)) {
       return NextResponse.json(
         { success: false, error: 'Invalid status' },
         { status: 400 }
@@ -179,18 +181,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updated_at: now,
     };
 
-    if (status === 'completed') {
-      updateData.completed_at = now;
-      updateData.signoff_type = 'self'; // Self-certification by default
-      updateData.signed_off_by = user.id;
-      updateData.signed_off_at = now;
+    // Handle completed or pending_approval status
+    if (status === 'completed' || status === 'pending_approval') {
+      // For completed, mark as done
+      if (status === 'completed') {
+        updateData.completed_at = now;
+        updateData.signoff_type = 'self'; // Self-certification
+        updateData.signed_off_by = user.id;
+        updateData.signed_off_at = now;
+      }
+      // For pending_approval, don't set completed_at yet - leader will approve
       
       // Legacy completion notes field
       if (completionNotes) {
         updateData.completion_notes = completionNotes;
       }
       
-      // New reflection fields
+      // New reflection fields (captured for both statuses)
       if (completion_status) {
         updateData.completion_status = completion_status;
       }
