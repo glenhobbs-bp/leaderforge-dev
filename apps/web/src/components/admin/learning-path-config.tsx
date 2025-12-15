@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import { 
-  GripVertical, 
   Plus, 
   Trash2, 
   Save, 
@@ -30,6 +29,8 @@ import {
   Lock,
   Unlock,
   CheckCircle,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import type { ContentItem } from '@/lib/tribe-social';
 
@@ -373,8 +374,9 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
               </>
             ) : (
               <>
-                Drag to reorder. {sequenceItems.length} modules • 
-                {Math.ceil((sequenceItems.length * unlockInterval) / 7)} weeks total
+                {sequenceItems.length} modules • 
+                {Math.ceil((sequenceItems.length * unlockInterval) / 7)} weeks total • 
+                Hover to reorder
               </>
             )}
           </CardDescription>
@@ -403,12 +405,11 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
                         : 'bg-muted'
                     }`}
                   >
-                    <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-primary">{index + 1}</span>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-muted-foreground w-6">
-                          {index + 1}.
-                        </span>
                         <span className="font-medium truncate">{getContentTitle(item.content_id)}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
@@ -470,25 +471,30 @@ export function LearningPathConfig({ availableContent }: LearningPathConfigProps
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => handleMoveItem(index, 'up')}
                         disabled={index === 0}
+                        title="Move up"
                       >
-                        ↑
+                        <ChevronUp className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => handleMoveItem(index, 'down')}
                         disabled={index === sequenceItems.length - 1}
+                        title="Move down"
                       >
-                        ↓
+                        <ChevronDown className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
                         onClick={() => handleRemoveContent(index)}
-                        className="text-destructive hover:text-destructive"
+                        title="Remove"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
