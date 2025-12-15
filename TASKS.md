@@ -47,7 +47,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
 | ✅ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
 | ✅ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
-| ⬜ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
+| ✅ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
 | ⬜ | 6. Build - Platform Admin | 6.10 | Tenant billing/subscription view |
 | ✅ | 6. Build - Platform Admin | 6.11 | **Platform Admin placeholder** (role + route structure) |
 | ⬜ | 7. Future | 7.1 | Calendar integration (Google/Outlook) |
@@ -803,7 +803,37 @@ Tenant Admin can view licensed content available to their tenant:
 
 ---
 
-#### 6.11 Organization CRUD (Tenant Admin)
+#### 6.12 Tenant CRUD (Platform Admin)
+**Status:** ✅ Completed
+
+Platform Admin can now manage tenants on the LeaderForge platform:
+
+**API Routes:**
+- ✅ `GET /api/platform-admin/tenants` - List all tenants with stats
+- ✅ `POST /api/platform-admin/tenants` - Create new tenant
+- ✅ `GET /api/platform-admin/tenants/[tenantId]` - Get tenant details
+- ✅ `PATCH /api/platform-admin/tenants/[tenantId]` - Update tenant
+- ✅ `DELETE /api/platform-admin/tenants/[tenantId]` - Suspend tenant
+
+**UI Features:**
+- ✅ Tenant list with organization and user counts
+- ✅ Create tenant modal (key, display name)
+- ✅ Edit tenant display name
+- ✅ Suspend/activate tenants
+- ✅ Protection for LeaderForge platform tenant
+- ✅ Search and filter by status
+- ✅ Platform admin dashboard with real stats
+
+**Files:**
+- `apps/web/src/app/api/platform-admin/tenants/route.ts`
+- `apps/web/src/app/api/platform-admin/tenants/[tenantId]/route.ts`
+- `apps/web/src/components/admin/tenant-management.tsx`
+- `apps/web/src/app/(dashboard)/platform-admin/tenants/page.tsx`
+- `apps/web/src/app/(dashboard)/platform-admin/page.tsx` (updated)
+
+---
+
+#### 6.13 Organization CRUD (Tenant Admin)
 **Status:** ✅ Completed
 
 Tenant Admin can now manage organizations within their tenant:
@@ -957,4 +987,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-15
-**Current Phase:** 6. Build - Admin (6.9 Platform Admin - Tenant CRUD)
+**Current Phase:** 6. Build - Admin (6.10 Platform Admin - Billing View)
