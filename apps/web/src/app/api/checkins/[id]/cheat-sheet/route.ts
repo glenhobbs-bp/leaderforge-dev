@@ -9,7 +9,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import Anthropic from '@anthropic-ai/sdk';
+// Note: Anthropic SDK is dynamically imported only when needed to avoid
+// blocking other API routes during cold starts
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -272,6 +273,8 @@ async function generateAICheatSheet(
   context: CheatSheetContext,
   apiKey: string
 ): Promise<CheatSheetResponse> {
+  // Dynamic import to avoid blocking other API routes during cold starts
+  const { default: Anthropic } = await import('@anthropic-ai/sdk');
   const anthropic = new Anthropic({ apiKey });
 
   const prompt = buildCheatSheetPrompt(context);
