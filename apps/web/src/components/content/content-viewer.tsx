@@ -351,40 +351,51 @@ export function ContentViewer({ content }: ContentViewerProps) {
     };
   }, []);
 
-  // Step indicator component
+  // Step indicator component - clickable when current and has an action
   const StepIndicator = ({ 
     step, 
     title, 
     isComplete, 
     isCurrent,
-    icon: Icon 
+    icon: Icon,
+    onClick 
   }: { 
     step: number; 
     title: string; 
     isComplete: boolean; 
     isCurrent: boolean;
     icon: React.ElementType;
-  }) => (
-    <div className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-      isComplete ? 'bg-green-50' : isCurrent ? 'bg-secondary/10' : 'bg-muted/30'
-    }`}>
-      <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
-        isComplete ? 'bg-green-500 text-white' : isCurrent ? 'bg-secondary text-white' : 'bg-muted text-muted-foreground'
-      }`}>
-        {isComplete ? (
-          <CheckCircle className="h-5 w-5" />
-        ) : (
-          <span className="text-sm font-bold">{step}</span>
-        )}
-      </div>
-      <div className="flex-1">
-        <div className={`text-sm font-medium ${isComplete ? 'text-green-700' : isCurrent ? 'text-foreground' : 'text-muted-foreground'}`}>
-          {title}
+    onClick?: () => void;
+  }) => {
+    const isClickable = isCurrent && onClick;
+    const Component = isClickable ? 'button' : 'div';
+    
+    return (
+      <Component 
+        className={`flex items-center gap-3 p-3 rounded-lg transition-colors w-full text-left ${
+          isComplete ? 'bg-green-50' : isCurrent ? 'bg-secondary/10' : 'bg-muted/30'
+        } ${isClickable ? 'cursor-pointer hover:bg-secondary/20 active:bg-secondary/30' : ''}`}
+        onClick={onClick}
+        type={isClickable ? 'button' : undefined}
+      >
+        <div className={`flex items-center justify-center w-8 h-8 rounded-full ${
+          isComplete ? 'bg-green-500 text-white' : isCurrent ? 'bg-secondary text-white' : 'bg-muted text-muted-foreground'
+        }`}>
+          {isComplete ? (
+            <CheckCircle className="h-5 w-5" />
+          ) : (
+            <span className="text-sm font-bold">{step}</span>
+          )}
         </div>
-      </div>
-      <Icon className={`h-4 w-4 ${isComplete ? 'text-green-500' : isCurrent ? 'text-secondary' : 'text-muted-foreground'}`} />
-    </div>
-  );
+        <div className="flex-1">
+          <div className={`text-sm font-medium ${isComplete ? 'text-green-700' : isCurrent ? 'text-foreground' : 'text-muted-foreground'}`}>
+            {title}
+          </div>
+        </div>
+        <Icon className={`h-4 w-4 ${isComplete ? 'text-green-500' : isCurrent ? 'text-secondary' : 'text-muted-foreground'}`} />
+      </Component>
+    );
+  };
 
   return (
     <div className="space-y-6 animate-page-enter">
@@ -521,7 +532,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
                     </div>
                   </div>
 
-                  {/* 4 Steps */}
+                  {/* 4 Steps - Tiles are clickable when they're the current action */}
                   <div className="space-y-2 pt-2">
                     <StepIndicator 
                       step={1} 
@@ -529,6 +540,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
                       isComplete={step1Complete}
                       isCurrent={!step1Complete}
                       icon={Video}
+                      onClick={!step1Complete && content.videoUrl ? handleStartLearning : undefined}
                     />
                     <StepIndicator 
                       step={2} 
@@ -536,6 +548,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
                       isComplete={step2Complete}
                       isCurrent={step1Complete && !step2Complete}
                       icon={FileText}
+                      onClick={step1Complete && !step2Complete ? () => setIsWorksheetOpen(true) : undefined}
                     />
                     <StepIndicator 
                       step={3} 
@@ -543,6 +556,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
                       isComplete={step3Complete}
                       isCurrent={step2Complete && !step3Complete}
                       icon={Users}
+                      onClick={step2Complete && !step3Complete && !checkin ? handleRequestCheckin : undefined}
                     />
                     <StepIndicator 
                       step={4} 
@@ -550,6 +564,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
                       isComplete={step4Complete}
                       isCurrent={step3Complete && !step4Complete}
                       icon={Zap}
+                      onClick={step3Complete && !step4Complete && boldAction && !isPendingApproval ? handleOpenReflection : undefined}
                     />
                   </div>
 

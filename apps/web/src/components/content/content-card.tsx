@@ -204,13 +204,13 @@ export function ContentCard({
             )}
           </div>
 
-          {/* TOP RIGHT - Bold Action (Goal) status */}
+          {/* TOP RIGHT - Bold Action (Goal) status - Green when goal is SET */}
           <div className={`absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
-            step4Complete 
+            boldActionStatus !== 'none'
               ? 'bg-green-500 text-white' 
               : 'bg-white/90 text-muted-foreground'
           }`}>
-            <Target className={`h-3 w-3 ${step4Complete ? '' : 'text-muted-foreground'}`} />
+            <Target className={`h-3 w-3 ${boldActionStatus !== 'none' ? '' : 'text-muted-foreground'}`} />
           </div>
 
           {/* BOTTOM LEFT - Check-in status (always visible) */}

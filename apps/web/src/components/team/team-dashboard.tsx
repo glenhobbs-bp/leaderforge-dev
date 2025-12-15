@@ -22,6 +22,7 @@ import { CheatSheetModal } from './cheat-sheet-modal';
 interface CheckinRequest {
   id: string;
   content_id: string;
+  content_title?: string;
   status: string;
   created_at: string;
   requester: {
@@ -868,7 +869,7 @@ export function TeamDashboard({
           onClose={() => setCheatSheetCheckin(null)}
           checkinId={cheatSheetCheckin.id}
           userName={cheatSheetCheckin.requester?.full_name || 'Team Member'}
-          moduleTitle={`Module ${cheatSheetCheckin.content_id}`}
+          moduleTitle={cheatSheetCheckin.content_title || `Module ${cheatSheetCheckin.content_id}`}
         />
       )}
     </div>

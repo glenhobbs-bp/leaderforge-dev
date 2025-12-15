@@ -69,7 +69,13 @@ export default async function TeamPage() {
     })
   );
 
-  // Enrich check-ins with user details
+  // Fetch all content modules early so we can use titles for check-ins
+  const contentModules = await fetchContentCollection();
+  
+  // Create a lookup map for content titles
+  const contentTitleMap = new Map(contentModules.map(m => [m.id, m.title]));
+
+  // Enrich check-ins with user details and content title
   const enrichedCheckins = await Promise.all(
     (pendingCheckins || []).map(async (checkin) => {
       const { data: requester } = await supabase
@@ -102,12 +108,16 @@ export default async function TeamPage() {
         .eq('content_id', checkin.content_id)
         .single();
 
+      // Get the content title from the lookup map
+      const contentTitle = contentTitleMap.get(checkin.content_id) || `Module ${checkin.content_id}`;
+
       return {
         ...checkin,
         requester,
         bold_action: boldAction,
         progress,
         worksheet,
+        content_title: contentTitle,
       };
     })
   );
@@ -121,9 +131,6 @@ export default async function TeamPage() {
 
   const teamMemberIds = teamMembers?.map(m => m.user_id) || [];
   const teamSize = teamMemberIds.length;
-
-  // Fetch all content modules
-  const contentModules = await fetchContentCollection();
 
   // Get all progress data for team members
   const { data: allProgress } = await supabase
