@@ -26,6 +26,7 @@ import {
   BarChart3,
   Route,
   Library,
+  CreditCard,
 } from 'lucide-react';
 
 interface UserContext {
@@ -77,6 +78,7 @@ const tenantAdminNavigation = [
 const platformAdminNavigation = [
   { name: 'Overview', href: '/platform-admin', icon: Shield },
   { name: 'Tenants', href: '/platform-admin/tenants', icon: Building2 },
+  { name: 'Billing', href: '/platform-admin/billing', icon: CreditCard },
 ];
 
 export function Sidebar({ className, userContext }: SidebarProps) {
