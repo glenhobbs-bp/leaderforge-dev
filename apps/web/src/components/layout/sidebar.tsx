@@ -90,15 +90,15 @@ export function Sidebar({ className, userContext }: SidebarProps) {
   return (
     <nav className={cn('flex flex-col bg-sidebar', className)}>
       {/* Logo */}
-      <div className="h-24 flex items-center px-4 border-b border-sidebar-border">
+      <div className="h-20 flex items-center px-4 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center w-full">
           {logoUrl ? (
             <Image
               src={logoUrl}
               alt={userContext.tenant?.displayName || 'LeaderForge'}
-              width={280}
-              height={70}
-              className="h-16 w-auto max-w-full object-contain"
+              width={400}
+              height={80}
+              className="w-full h-auto max-h-12 object-contain object-left"
               priority
             />
           ) : (
