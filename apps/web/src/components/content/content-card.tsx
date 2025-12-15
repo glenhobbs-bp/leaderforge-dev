@@ -5,13 +5,22 @@
  * 
  * 4-Step Visual Layout:
  * ┌─────────────────────────┐
- * │ [Video]      [✓ Video] │  ← Top corners: Type + Video status
+ * │ [Video 30%]       [🎯] │  ← Top: Video+progress, Bold Action goal
  * │                        │
  * │      [Progress/✓]      │  ← Center: Overall progress or complete
  * │                        │
- * │ [Check-in]    [Bold]   │  ← Bottom corners: Check-in + Bold Action
- * │            [17:21]     │  ← Duration (bottom right, below Bold)
+ * │ [Check-in]             │  ← Bottom left: Check-in status
+ * │        [17:21]         │  ← Duration (bottom center)
  * └─────────────────────────┘
+ * 
+ * Top-left (Video) badge states:
+ * - "▶ Video" (blue) - not started
+ * - "▶ Video 30%" (amber) - in progress
+ * - "✓ Video" (green) - complete
+ * 
+ * Top-right (Bold Action Goal) badge states:
+ * - 🎯 (grey/muted) - bold action not complete
+ * - 🎯 (green) - bold action complete
  */
 
 'use client';
@@ -19,8 +28,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  Play, FileText, ExternalLink, CheckCircle, Video, 
-  Handshake, Zap, Clock, Target, CalendarCheck
+  Play, FileText, ExternalLink, CheckCircle, 
+  Handshake, Target, CalendarCheck
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
@@ -173,33 +182,40 @@ export function ContentCard({
             )
           )}
 
-          {/* TOP LEFT - Type badge (green when video watched) */}
+          {/* TOP LEFT - Video badge with progress */}
           <div className={`absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded capitalize flex items-center gap-1 ${
             step1Complete 
               ? 'bg-green-500 text-white' 
-              : 'bg-primary text-primary-foreground'
+              : videoProgress > 0
+                ? 'bg-amber-500 text-white'
+                : 'bg-primary text-primary-foreground'
           }`}>
-            {step1Complete ? <CheckCircle className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
-            {item.type}
+            {step1Complete ? (
+              <>
+                <CheckCircle className="h-3 w-3" />
+                {item.type}
+              </>
+            ) : videoProgress > 0 ? (
+              <>
+                <Icon className="h-3 w-3" />
+                {item.type} {Math.round(videoProgress)}%
+              </>
+            ) : (
+              <>
+                <Icon className="h-3 w-3" />
+                {item.type}
+              </>
+            )}
           </div>
 
-          {/* TOP RIGHT - Video/Worksheet (Goal) status */}
-          {step1Complete && step2Complete ? (
-            <div className="absolute top-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Target className="h-3 w-3" />
-              Goal
-            </div>
-          ) : step1Complete ? (
-            <div className="absolute top-2 right-2 px-2 py-1 bg-green-500/80 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Video className="h-3 w-3" />
-              Watched
-            </div>
-          ) : videoProgress > 0 ? (
-            <div className="absolute top-2 right-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {Math.round(videoProgress)}%
-            </div>
-          ) : null}
+          {/* TOP RIGHT - Bold Action (Goal) status */}
+          <div className={`absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
+            step4Complete 
+              ? 'bg-green-500 text-white' 
+              : 'bg-white/90 text-muted-foreground'
+          }`}>
+            <Target className={`h-3 w-3 ${step4Complete ? '' : 'text-muted-foreground'}`} />
+          </div>
 
           {/* BOTTOM LEFT - Check-in status */}
           {checkinStatus === 'completed' ? (
@@ -216,24 +232,6 @@ export function ContentCard({
             <div className="absolute bottom-2 left-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
               <CalendarCheck className="h-3 w-3" />
               Requested
-            </div>
-          ) : null}
-
-          {/* BOTTOM RIGHT - Bold Action status */}
-          {boldActionStatus === 'signed_off' ? (
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              Signed
-            </div>
-          ) : boldActionStatus === 'completed' ? (
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <CheckCircle className="h-3 w-3" />
-              Done
-            </div>
-          ) : boldActionStatus === 'pending' ? (
-            <div className="absolute bottom-2 right-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded flex items-center gap-1">
-              <Zap className="h-3 w-3" />
-              Active
             </div>
           ) : null}
 
