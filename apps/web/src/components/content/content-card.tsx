@@ -25,7 +25,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   Play, FileText, ExternalLink, CheckCircle, 
-  Handshake, Target, CalendarCheck
+  Handshake, Target, Lock
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { ContentItem } from '@/lib/tribe-social';
@@ -37,6 +37,9 @@ interface ContentCardProps {
   worksheetCompleted?: boolean;
   checkinStatus?: 'none' | 'pending' | 'scheduled' | 'completed';
   boldActionStatus?: 'none' | 'pending' | 'completed' | 'signed_off';
+  isLocked?: boolean;
+  unlockReason?: string | null;
+  sequenceOrder?: number | null;
 }
 
 export function ContentCard({ 
@@ -46,6 +49,9 @@ export function ContentCard({
   worksheetCompleted = false,
   checkinStatus = 'none',
   boldActionStatus = 'none',
+  isLocked = false,
+  unlockReason = null,
+  sequenceOrder = null,
 }: ContentCardProps) {
   const typeIcon = {
     video: Play,
@@ -109,76 +115,97 @@ export function ContentCard({
     return null;
   };
 
-  return (
-    <Link href={`/content/${item.id}`}>
-      <Card className="group overflow-hidden border border-border bg-card hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-        {/* Thumbnail */}
-        <div className="relative aspect-video bg-muted">
-          {item.thumbnailUrl ? (
-            <Image
-              src={item.thumbnailUrl}
-              alt={item.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
-              <Icon className="h-12 w-12 text-muted-foreground/50" />
-            </div>
-          )}
-          
-          {/* Center overlay - Progress ring or completion check */}
-          {isFullyCompleted ? (
-            // Fully completed - big green check
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
-                <CheckCircle className="h-8 w-8 text-white" />
+  // Card content (shared between locked and unlocked states)
+  const cardContent = (
+    <Card className={`group overflow-hidden border bg-card transition-all duration-200 ${
+      isLocked 
+        ? 'border-muted opacity-75 cursor-not-allowed' 
+        : 'border-border hover:shadow-lg hover:-translate-y-1'
+    }`}>
+      {/* Thumbnail */}
+      <div className="relative aspect-video bg-muted">
+        {item.thumbnailUrl ? (
+          <Image
+            src={item.thumbnailUrl}
+            alt={item.title}
+            fill
+            className={`object-cover ${isLocked ? 'grayscale' : ''}`}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10">
+            <Icon className="h-12 w-12 text-muted-foreground/50" />
+          </div>
+        )}
+        
+        {/* LOCKED OVERLAY */}
+        {isLocked ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <div className="text-center">
+              <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shadow-lg mx-auto">
+                <Lock className="h-7 w-7 text-muted-foreground" />
               </div>
+              {unlockReason && (
+                <p className="text-white text-xs mt-2 px-2 max-w-[150px]">{unlockReason}</p>
+              )}
             </div>
-          ) : isInProgress ? (
-            // In progress - show progress ring
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
-              <div className="relative w-14 h-14">
-                {/* Background ring */}
-                <svg className="w-14 h-14 transform -rotate-90">
-                  <circle
-                    cx="28"
-                    cy="28"
-                    r="24"
-                    fill="white"
-                    stroke="#e5e7eb"
-                    strokeWidth="4"
-                  />
-                  <circle
-                    cx="28"
-                    cy="28"
-                    r="24"
-                    fill="transparent"
-                    stroke="#22c55e"
-                    strokeWidth="4"
-                    strokeDasharray={`${overallProgress * 1.5} 150`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {/* Center text */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm font-bold text-gray-700">{completedSteps}/4</span>
+          </div>
+        ) : (
+          <>
+            {/* Center overlay - Progress ring or completion check */}
+            {isFullyCompleted ? (
+              // Fully completed - big green check
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg">
+                  <CheckCircle className="h-8 w-8 text-white" />
                 </div>
               </div>
-            </div>
-          ) : (
-            // Not started - play overlay on hover
-            item.type === 'video' && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
-                <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                  <Play className="h-6 w-6 text-primary ml-1" fill="currentColor" />
+            ) : isInProgress ? (
+              // In progress - show progress ring
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                <div className="relative w-14 h-14">
+                  {/* Background ring */}
+                  <svg className="w-14 h-14 transform -rotate-90">
+                    <circle
+                      cx="28"
+                      cy="28"
+                      r="24"
+                      fill="white"
+                      stroke="#e5e7eb"
+                      strokeWidth="4"
+                    />
+                    <circle
+                      cx="28"
+                      cy="28"
+                      r="24"
+                      fill="transparent"
+                      stroke="#22c55e"
+                      strokeWidth="4"
+                      strokeDasharray={`${overallProgress * 1.5} 150`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  {/* Center text */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-bold text-gray-700">{completedSteps}/4</span>
+                  </div>
                 </div>
               </div>
-            )
-          )}
+            ) : (
+              // Not started - play overlay on hover
+              item.type === 'video' && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-colors">
+                  <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                    <Play className="h-6 w-6 text-primary ml-1" fill="currentColor" />
+                  </div>
+                </div>
+              )
+            )}
+          </>
+        )}
 
-          {/* TOP LEFT - Video badge with progress */}
+        {/* TOP LEFT - Sequence order badge (if in sequence) or Video badge */}
+        {!isLocked && (
           <div className={`absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded capitalize flex items-center gap-1 ${
             step1Complete 
               ? 'bg-green-500 text-white' 
@@ -203,8 +230,17 @@ export function ContentCard({
               </>
             )}
           </div>
+        )}
 
-          {/* TOP RIGHT - Bold Action (Goal) status - Green when goal is SET */}
+        {/* Sequence order badge for locked items */}
+        {isLocked && sequenceOrder && (
+          <div className="absolute top-2 left-2 px-2 py-1 text-xs font-medium rounded bg-muted text-muted-foreground flex items-center gap-1">
+            <span className="font-bold">#{sequenceOrder}</span>
+          </div>
+        )}
+
+        {/* TOP RIGHT - Bold Action (Goal) status - Green when goal is SET */}
+        {!isLocked && (
           <div className={`absolute top-2 right-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
             boldActionStatus !== 'none'
               ? 'bg-green-500 text-white' 
@@ -212,8 +248,10 @@ export function ContentCard({
           }`}>
             <Target className={`h-3 w-3 ${boldActionStatus !== 'none' ? '' : 'text-muted-foreground'}`} />
           </div>
+        )}
 
-          {/* BOTTOM LEFT - Check-in status (always visible) */}
+        {/* BOTTOM LEFT - Check-in status (always visible, only when not locked) */}
+        {!isLocked && (
           <div className={`absolute bottom-2 left-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
             step3Complete 
               ? 'bg-green-500 text-white' 
@@ -226,8 +264,10 @@ export function ContentCard({
             <Handshake className="h-3 w-3" />
             {step3Complete ? 'Met' : checkinStatus === 'scheduled' ? 'Scheduled' : checkinStatus === 'pending' ? 'Requested' : ''}
           </div>
+        )}
 
-          {/* BOTTOM RIGHT - Bold Action Signoff status (always visible) */}
+        {/* BOTTOM RIGHT - Bold Action Signoff status (only when not locked) */}
+        {!isLocked && (
           <div className={`absolute bottom-2 right-2 px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
             step4Complete 
               ? 'bg-green-500 text-white' 
@@ -238,41 +278,69 @@ export function ContentCard({
             <CheckCircle className="h-3 w-3" />
             {step4Complete ? 'Done' : boldActionStatus === 'pending' ? 'Active' : ''}
           </div>
+        )}
 
-          {/* Duration badge - bottom center */}
-          {item.duration && (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/75 text-white text-xs font-medium rounded">
-              {formatDuration(item.duration)}
-            </div>
+        {/* Duration badge - bottom center (only when not locked) */}
+        {!isLocked && item.duration && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-black/75 text-white text-xs font-medium rounded">
+            {formatDuration(item.duration)}
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <CardContent className="p-4">
+        <div className="flex items-start gap-2">
+          {sequenceOrder && (
+            <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+              isLocked ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'
+            }`}>
+              {sequenceOrder}
+            </span>
           )}
-        </div>
-
-        {/* Content */}
-        <CardContent className="p-4">
-          <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className={`font-semibold line-clamp-2 transition-colors ${
+            isLocked ? 'text-muted-foreground' : 'text-foreground group-hover:text-primary'
+          }`}>
             {item.title}
           </h3>
-          {item.description && (
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {item.description}
-            </p>
-          )}
+        </div>
+        {item.description && !isLocked && (
+          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+            {item.description}
+          </p>
+        )}
+        {isLocked && unlockReason && (
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+            <Lock className="h-3 w-3" />
+            {unlockReason}
+          </p>
+        )}
 
-          {/* 4-Step Progress indicators (below title) */}
-          {isInProgress && (
-            <div className="mt-3 flex items-center gap-1">
-              {/* Step 1: Video */}
-              <div className={`flex-1 h-1.5 rounded-full ${step1Complete ? 'bg-green-500' : 'bg-muted'}`} title="Video" />
-              {/* Step 2: Worksheet */}
-              <div className={`flex-1 h-1.5 rounded-full ${step2Complete ? 'bg-green-500' : 'bg-muted'}`} title="Worksheet" />
-              {/* Step 3: Check-in */}
-              <div className={`flex-1 h-1.5 rounded-full ${step3Complete ? 'bg-green-500' : checkinStatus !== 'none' ? 'bg-amber-400' : 'bg-muted'}`} title="Check-in" />
-              {/* Step 4: Bold Action */}
-              <div className={`flex-1 h-1.5 rounded-full ${step4Complete ? 'bg-green-500' : boldActionStatus !== 'none' ? 'bg-amber-400' : 'bg-muted'}`} title="Bold Action" />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        {/* 4-Step Progress indicators (below title) - only when not locked */}
+        {!isLocked && isInProgress && (
+          <div className="mt-3 flex items-center gap-1">
+            {/* Step 1: Video */}
+            <div className={`flex-1 h-1.5 rounded-full ${step1Complete ? 'bg-green-500' : 'bg-muted'}`} title="Video" />
+            {/* Step 2: Worksheet */}
+            <div className={`flex-1 h-1.5 rounded-full ${step2Complete ? 'bg-green-500' : 'bg-muted'}`} title="Worksheet" />
+            {/* Step 3: Check-in */}
+            <div className={`flex-1 h-1.5 rounded-full ${step3Complete ? 'bg-green-500' : checkinStatus !== 'none' ? 'bg-amber-400' : 'bg-muted'}`} title="Check-in" />
+            {/* Step 4: Bold Action */}
+            <div className={`flex-1 h-1.5 rounded-full ${step4Complete ? 'bg-green-500' : boldActionStatus !== 'none' ? 'bg-amber-400' : 'bg-muted'}`} title="Bold Action" />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+
+  // If locked, don't wrap in Link
+  if (isLocked) {
+    return cardContent;
+  }
+
+  return (
+    <Link href={`/content/${item.id}`}>
+      {cardContent}
     </Link>
   );
 }
