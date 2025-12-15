@@ -58,25 +58,10 @@ export async function GET() {
     return NextResponse.json({ success: false, error: 'No membership found' }, { status: 404 });
   }
 
-  // Fetch learning path with items
+  // Fetch learning path
   const { data: learningPath, error: pathError } = await supabase
     .from('learning_paths')
-    .select(`
-      id,
-      name,
-      unlock_mode,
-      enrollment_date,
-      unlock_interval_days,
-      completion_requirement,
-      items:learning_path_items(
-        id,
-        content_id,
-        sequence_order,
-        unlock_date,
-        is_optional,
-        is_manually_unlocked
-      )
-    `)
+    .select('id, name, unlock_mode, enrollment_date, unlock_interval_days, completion_requirement')
     .eq('organization_id', membership.organization_id)
     .eq('is_active', true)
     .single();
@@ -90,10 +75,25 @@ export async function GET() {
     });
   }
 
-  const path = learningPath as LearningPath;
+  // Fetch items separately
+  const { data: pathItems, error: itemsError } = await supabase
+    .from('learning_path_items')
+    .select('id, content_id, sequence_order, unlock_date, is_optional, is_manually_unlocked')
+    .eq('learning_path_id', learningPath.id)
+    .order('sequence_order');
 
-  // Sort items by sequence_order
-  path.items.sort((a, b) => a.sequence_order - b.sequence_order);
+  if (itemsError || !pathItems || pathItems.length === 0) {
+    return NextResponse.json({
+      success: true,
+      hasSequence: false,
+      sequence: [],
+    });
+  }
+
+  const path: LearningPath = {
+    ...learningPath,
+    items: pathItems,
+  };
 
   // Fetch user's progress for all content in the path
   const contentIds = path.items.map((item) => item.content_id);

@@ -28,19 +28,10 @@ export async function GET() {
     return NextResponse.json({ success: false, error: 'No membership found' }, { status: 404 });
   }
 
-  // Fetch learning path with items
+  // Fetch learning path
   const { data: learningPath, error: pathError } = await supabase
     .from('learning_paths')
-    .select(`
-      *,
-      items:learning_path_items(
-        id,
-        content_id,
-        sequence_order,
-        unlock_date,
-        is_optional
-      )
-    `)
+    .select('*')
     .eq('organization_id', membership.organization_id)
     .eq('is_active', true)
     .single();
@@ -50,16 +41,33 @@ export async function GET() {
     return NextResponse.json({ success: false, error: 'Failed to fetch learning path' }, { status: 500 });
   }
 
-  // Sort items by sequence_order
-  if (learningPath?.items) {
-    learningPath.items.sort((a: { sequence_order: number }, b: { sequence_order: number }) => 
-      a.sequence_order - b.sequence_order
-    );
+  // Fetch items separately if path exists
+  let items: Array<{
+    id: string;
+    content_id: string;
+    sequence_order: number;
+    unlock_date: string | null;
+    is_optional: boolean;
+    is_manually_unlocked: boolean;
+  }> = [];
+  
+  if (learningPath) {
+    const { data: pathItems, error: itemsError } = await supabase
+      .from('learning_path_items')
+      .select('id, content_id, sequence_order, unlock_date, is_optional, is_manually_unlocked')
+      .eq('learning_path_id', learningPath.id)
+      .order('sequence_order');
+
+    if (itemsError) {
+      console.error('Error fetching learning path items:', itemsError);
+    } else {
+      items = pathItems || [];
+    }
   }
 
   return NextResponse.json({
     success: true,
-    learningPath: learningPath || null,
+    learningPath: learningPath ? { ...learningPath, items } : null,
   });
 }
 

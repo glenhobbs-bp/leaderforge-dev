@@ -99,44 +99,43 @@ export default async function ContentPage() {
       // Get org's learning path
       const { data: learningPath } = await supabase
         .from('learning_paths')
-        .select(`
-          id,
-          unlock_mode,
-          enrollment_date,
-          unlock_interval_days,
-          completion_requirement,
-          items:learning_path_items(
-            content_id,
-            sequence_order,
-            unlock_date,
-            is_optional,
-            is_manually_unlocked
-          )
-        `)
+        .select('id, unlock_mode, enrollment_date, unlock_interval_days, completion_requirement')
         .eq('organization_id', membership.organization_id)
         .eq('is_active', true)
         .single();
       
-      if (learningPath?.items && learningPath.items.length > 0) {
+      // Fetch items separately if path exists
+      let pathItems: Array<{
+        content_id: string;
+        sequence_order: number;
+        unlock_date: string | null;
+        is_optional: boolean;
+        is_manually_unlocked?: boolean;
+      }> = [];
+      
+      if (learningPath) {
+        const { data: items } = await supabase
+          .from('learning_path_items')
+          .select('content_id, sequence_order, unlock_date, is_optional, is_manually_unlocked')
+          .eq('learning_path_id', learningPath.id)
+          .order('sequence_order');
+        
+        pathItems = items || [];
+      }
+      
+      if (learningPath && pathItems.length > 0) {
         hasSequence = true;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const enrollmentDate = new Date(learningPath.enrollment_date);
         
-        // Sort items by sequence order
-        const sortedItems = [...learningPath.items].sort(
-          (a: { sequence_order: number }, b: { sequence_order: number }) => 
-            a.sequence_order - b.sequence_order
+        // Sort items by sequence order (already sorted by query, but ensure)
+        const sortedItems = [...pathItems].sort(
+          (a, b) => a.sequence_order - b.sequence_order
         );
         
         // Calculate unlock status for each item
-        sortedItems.forEach((item: { 
-          content_id: string; 
-          sequence_order: number; 
-          unlock_date: string | null;
-          is_optional: boolean;
-          is_manually_unlocked?: boolean;
-        }, index: number) => {
+        sortedItems.forEach((item, index) => {
           // Check previous completion
           let previousComplete = true;
           if (index > 0) {
