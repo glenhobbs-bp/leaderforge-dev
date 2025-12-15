@@ -131,18 +131,18 @@ export function ContentViewer({ content }: ContentViewerProps) {
       }
     };
 
-    // First test if API routes work at all
-    console.log('[ContentViewer] Testing health endpoint...');
-    try {
-      const healthResponse = await fetch('/api/health', { signal: controller.signal, cache: 'no-store' });
-      console.log('[ContentViewer] Health response:', healthResponse.status);
-      const healthData = await healthResponse.json();
-      console.log('[ContentViewer] Health data:', healthData);
-    } catch (healthErr) {
-      console.error('[ContentViewer] Health check failed:', healthErr);
-    }
-
     const loadProgress = async () => {
+      // First test if API routes work at all
+      console.log('[ContentViewer] Testing health endpoint...');
+      try {
+        const healthResponse = await fetch('/api/health', { signal: controller.signal, cache: 'no-store' });
+        console.log('[ContentViewer] Health response:', healthResponse.status);
+        const healthData = await healthResponse.json();
+        console.log('[ContentViewer] Health data:', healthData);
+      } catch (healthErr) {
+        console.error('[ContentViewer] Health check failed:', healthErr);
+      }
+
       console.log('[ContentViewer] Starting loadProgress for content:', content.id);
       
       try {
