@@ -143,12 +143,18 @@ export function ContentViewer({ content }: ContentViewerProps) {
           setCheckin(checkinResult.data);
         }
 
-        // Load organization signoff mode
-        const settingsResponse = await fetch('/api/admin/organization/settings');
-        const settingsResult = await settingsResponse.json();
-        
-        if (settingsResult.settings?.signoff_mode) {
-          setSignoffMode(settingsResult.settings.signoff_mode);
+        // Load organization signoff mode (non-blocking)
+        try {
+          const settingsResponse = await fetch('/api/admin/organization/settings');
+          if (settingsResponse.ok) {
+            const settingsResult = await settingsResponse.json();
+            if (settingsResult.settings?.signoff_mode) {
+              setSignoffMode(settingsResult.settings.signoff_mode);
+            }
+          }
+        } catch (settingsError) {
+          // Settings fetch is optional, default to self_certify
+          console.log('Settings fetch failed, using default signoff mode');
         }
       } catch (error) {
         console.error('Failed to load progress:', error);
