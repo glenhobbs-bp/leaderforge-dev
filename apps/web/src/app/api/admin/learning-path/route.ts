@@ -30,7 +30,7 @@ export async function GET() {
 
   // Fetch learning path (from content schema)
   const { data: learningPath, error: pathError } = await supabase
-    .schema('content')
+    .schema('core')
     .from('learning_paths')
     .select('*')
     .eq('organization_id', membership.organization_id)
@@ -54,7 +54,7 @@ export async function GET() {
   
   if (learningPath) {
     const { data: pathItems, error: itemsError } = await supabase
-      .schema('content')
+      .schema('core')
       .from('learning_path_items')
       .select('id, content_id, sequence_order, unlock_date, is_optional, is_manually_unlocked')
       .eq('learning_path_id', learningPath.id)
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
 
   // Check if learning path already exists for this org
   const { data: existingPath } = await supabase
-    .schema('content')
+    .schema('core')
     .from('learning_paths')
     .select('id')
     .eq('organization_id', membership.organization_id)
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
   if (existingPath) {
     // Update existing path
     const { data: updatedPath, error: updateError } = await supabase
-      .schema('content')
+      .schema('core')
       .from('learning_paths')
       .update({
         name,
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
   } else {
     // Create new path
     const { data: newPath, error: createError } = await supabase
-      .schema('content')
+      .schema('core')
       .from('learning_paths')
       .insert({
         tenant_id: membership.tenant_id,

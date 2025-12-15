@@ -60,7 +60,7 @@ export async function GET() {
 
   // Fetch learning path (from content schema)
   const { data: learningPath, error: pathError } = await supabase
-    .schema('content')
+    .schema('core')
     .from('learning_paths')
     .select('id, name, unlock_mode, enrollment_date, unlock_interval_days, completion_requirement')
     .eq('organization_id', membership.organization_id)
@@ -78,7 +78,7 @@ export async function GET() {
 
   // Fetch items separately (from content schema)
   const { data: pathItems, error: itemsError } = await supabase
-    .schema('content')
+    .schema('core')
     .from('learning_path_items')
     .select('id, content_id, sequence_order, unlock_date, is_optional, is_manually_unlocked')
     .eq('learning_path_id', learningPath.id)

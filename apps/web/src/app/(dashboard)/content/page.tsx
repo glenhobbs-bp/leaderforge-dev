@@ -98,7 +98,7 @@ export default async function ContentPage() {
     if (membership) {
       // Get org's learning path (from content schema)
       const { data: learningPath } = await supabase
-        .schema('content')
+        .schema('core')
         .from('learning_paths')
         .select('id, unlock_mode, enrollment_date, unlock_interval_days, completion_requirement')
         .eq('organization_id', membership.organization_id)
@@ -116,7 +116,7 @@ export default async function ContentPage() {
       
       if (learningPath) {
         const { data: items } = await supabase
-          .schema('content')
+          .schema('core')
           .from('learning_path_items')
           .select('content_id, sequence_order, unlock_date, is_optional, is_manually_unlocked')
           .eq('learning_path_id', learningPath.id)
