@@ -19,6 +19,7 @@ import {
   Settings,
   Users,
   Building,
+  Building2,
   ScrollText,
   Handshake,
   Shield,
@@ -29,6 +30,7 @@ interface UserContext {
   role: string;
   isTeamLeader?: boolean;
   isPlatformAdmin?: boolean;
+  isTenantAdmin?: boolean;
   tenant: {
     tenantKey: string;
     displayName: string;
@@ -63,6 +65,11 @@ const adminNavigation = [
   { name: 'Audit Log', href: '/admin/audit', icon: ScrollText },
 ];
 
+const tenantAdminNavigation = [
+  { name: 'Organizations', href: '/tenant-admin/organizations', icon: Building2 },
+  { name: 'Tenant Settings', href: '/tenant-admin/settings', icon: Settings },
+];
+
 const platformAdminNavigation = [
   { name: 'Platform Admin', href: '/platform-admin', icon: Shield },
 ];
@@ -71,6 +78,7 @@ export function Sidebar({ className, userContext }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = ['admin', 'owner'].includes(userContext.role);
   const isTeamLeader = userContext.isTeamLeader || isAdmin; // Admins can also see team view
+  const isTenantAdmin = userContext.isTenantAdmin || false;
   const isPlatformAdmin = userContext.isPlatformAdmin || false;
   const { theme } = useTenantTheme();
 
@@ -130,8 +138,16 @@ export function Sidebar({ className, userContext }: SidebarProps) {
 
         {isAdmin && (
           <NavSection
-            title="Admin"
+            title="Org Admin"
             items={adminNavigation}
+            pathname={pathname}
+          />
+        )}
+
+        {isTenantAdmin && (
+          <NavSection
+            title="Tenant Admin"
+            items={tenantAdminNavigation}
             pathname={pathname}
           />
         )}

@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   // Fetch user (using public views that reference core schema)
   const { data: userData, error: userError } = await supabase
     .from('users')
-    .select('id, email, full_name, avatar_url, tenant_id, is_platform_admin')
+    .select('id, email, full_name, avatar_url, tenant_id, is_platform_admin, is_tenant_admin')
     .eq('id', user.id)
     .single();
 
@@ -94,6 +94,7 @@ export default async function DashboardLayout({
     role: membership?.role || 'member',
     isTeamLeader,
     isPlatformAdmin: userData?.is_platform_admin || false,
+    isTenantAdmin: userData?.is_tenant_admin || false,
     tenant: tenant ? {
       tenantKey: tenant.tenant_key,
       displayName: tenant.display_name,

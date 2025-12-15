@@ -19,6 +19,7 @@ interface UserContext {
   role: string;
   isTeamLeader?: boolean;
   isPlatformAdmin?: boolean;
+  isTenantAdmin?: boolean;
   tenant: {
     tenantKey: string;
     displayName: string;

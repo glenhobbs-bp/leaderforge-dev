@@ -39,13 +39,17 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 5. Build - AI | 5.4 | **AI Check-in Cheat Sheet** (first AI feature!) |
 | ⬜ | 5. Build - Gamification | 5.5 | Gamification backend (streaks, points) |
 | ⬜ | 5. Build - Gamification | 5.6 | Gamification frontend (leaderboards) |
-| ⬜ | 6. Build - Admin | 6.1 | Organization admin backend |
-| ⬜ | 6. Build - Admin | 6.2 | Organization admin frontend |
-| ⬜ | 6. Build - Admin | 6.3 | Signoff mode configuration |
-| ⬜ | 6. Build - Admin | 6.4 | Content sequencing backend |
-| ⬜ | 6. Build - Admin | 6.5 | Learning path configuration UI |
-| ⬜ | 6. Build - Admin | 6.6 | Unlock mode settings |
-| ✅ | 6. Build - Platform | 6.7 | **Platform Admin placeholder** (role + route structure) |
+| ⬜ | 6. Build - Org Admin | 6.1 | User management (invite, edit, deactivate) |
+| ⬜ | 6. Build - Org Admin | 6.2 | Team management (create teams, assign managers) |
+| ⬜ | 6. Build - Org Admin | 6.3 | Signoff mode configuration (self-certify vs approval) |
+| ⬜ | 6. Build - Org Admin | 6.4 | Content sequencing backend (time/completion/hybrid) |
+| ⬜ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
+| ⬜ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
+| ⬜ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
+| ⬜ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
+| ⬜ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
+| ⬜ | 6. Build - Platform Admin | 6.10 | Tenant billing/subscription view |
+| ✅ | 6. Build - Platform Admin | 6.11 | **Platform Admin placeholder** (role + route structure) |
 | ⬜ | 7. Future | 7.1 | Calendar integration (Google/Outlook) |
 | ⬜ | 7. Future | 7.2 | Manager/coach assignment override |
 | ⬜ | 7. Future | 7.3 | AI Organization Diagnostic |
@@ -53,11 +57,11 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ⬜ | 7. Future | 7.5 | **AI-Enhanced Reflection Prompts** (context-aware questions) |
 | ⬜ | 7. Future | 7.6 | Voice input for reflections (mobile-friendly) |
 | ⬜ | 7. Future | 7.7 | Reflection pattern recognition & insights |
-| ⬜ | 7. Future | 7.8 | **Platform Admin** - Tenant management dashboard |
-| ⬜ | 7. Future | 7.9 | **Platform Admin** - System health & monitoring |
-| ⬜ | 7. Future | 7.10 | **AI Configuration** - Platform-level prompt management |
-| ⬜ | 7. Future | 7.11 | **AI Configuration** - Tenant-level AI customization |
-| ⬜ | 7. Future | 7.12 | **AI Configuration** - A/B testing framework |
+| ⬜ | 7. Future | 7.8 | **Platform Admin** - System health & monitoring |
+| ⬜ | 7. Future | 7.9 | **AI Configuration** - Platform-level prompt management |
+| ⬜ | 7. Future | 7.10 | **AI Configuration** - Tenant-level AI customization |
+| ⬜ | 7. Future | 7.11 | **AI Configuration** - A/B testing framework |
+| ⬜ | 7. Future | 7.12 | **Role-based access control** - Multiple admin roles per tier |
 | ⬜ | 8. Polish | 8.1 | Testing and QA |
 | ⬜ | 8. Polish | 8.2 | Documentation |
 

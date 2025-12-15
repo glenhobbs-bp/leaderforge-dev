@@ -2,35 +2,57 @@
 
 ## Overview
 
-LeaderForge requires two levels of administrative access beyond Organization Admin:
+LeaderForge is a **B2B2B SaaS platform** with a multi-tier hierarchy:
 
-1. **Platform Admin** - LeaderForge team managing the multi-tenant platform
-2. **AI Configuration** - Ability to tune and customize AI-powered features
+```
+Platform (LeaderForge SaaS)
+└── Tenant (Partner/Reseller - e.g., i49 Group, Brilliant Perspectives)
+    └── Organization (Tenant's customers - companies they onboard)
+        └── Team (Departments/groups within organization)
+            └── User (Individual learners)
+```
 
-This PRD defines the platform admin role and the AI configuration system.
+This PRD defines the admin roles at each tier and the AI configuration system.
 
 ## Admin Hierarchy
 
 ```
 Platform Admin (LeaderForge Team)
-├── Manage Tenants (create, configure, billing)
-├── Configure AI Prompts & Context
-├── Platform-wide Settings
+├── Create & manage Tenants
+├── Configure AI Prompts & Context (platform defaults)
+├── Platform-wide Settings & Feature Flags
 ├── System Health & Monitoring
-└── Feature Flags
+├── Billing & Subscription Management
+└── Content Library Management (base content)
 
 Tenant Admin (e.g., i49 Group Admin)
-├── Manage Organizations within Tenant
-├── Tenant-level Theming
-├── Tenant AI Customization (Phase 3)
+├── Create & manage Organizations (their customers)
+├── Tenant-level Theming & Branding
+├── Content Licensing (assign content to orgs)
+├── Tenant AI Customization (override platform defaults)
+├── View tenant-wide analytics
 └── Tenant Feature Configuration
 
 Org Admin (Customer Company Admin)
 ├── Manage Users & Teams
-├── Content Sequencing
-├── Signoff Configuration
-└── Org AI Customization (Phase 4)
+├── Assign Managers (team leader relationships)
+├── Content Sequencing (unlock modes, learning paths)
+├── Signoff Configuration (self-certify vs approval)
+├── Org-level Branding (logo, primary color override)
+└── View org-wide progress analytics
 ```
+
+### Role Architecture (Future)
+
+Each admin tier can support multiple roles:
+
+| Tier | Current | Future Roles |
+|------|---------|--------------|
+| Platform | `is_platform_admin` flag | super_admin, admin, support, viewer |
+| Tenant | `tenant_admin` role | owner, admin, content_manager, viewer |
+| Org | `admin`/`owner` membership role | owner, admin, hr_admin, viewer |
+
+**MVP**: Single admin flag/role per tier. **Future**: Role-based access control (RBAC).
 
 ## Problem Statement
 
