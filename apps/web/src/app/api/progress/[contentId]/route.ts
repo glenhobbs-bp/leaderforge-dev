@@ -16,13 +16,22 @@ interface RouteParams {
  * Get user's progress for a specific content item
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  console.log('[API Progress GET] Starting...');
+  // TEMPORARY DEBUG: Return immediately to test if API routes work at all
+  console.log('[API Progress GET] Starting (debug mode)...');
   
   try {
-    console.log('[API Progress GET] Awaiting params...');
     const { contentId } = await params;
     console.log('[API Progress GET] ContentId:', contentId);
     
+    // TEMPORARY: Skip database entirely to test
+    console.log('[API Progress GET] Returning mock response (debug)');
+    return NextResponse.json({
+      success: true,
+      data: null,
+      _debug: 'Bypassed database query for debugging'
+    });
+    
+    /* COMMENTED OUT FOR DEBUGGING
     console.log('[API Progress GET] Creating Supabase client...');
     const supabase = await createClient();
     console.log('[API Progress GET] Supabase client created');
@@ -63,6 +72,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       success: true,
       data: progress || null,
     });
+    */
   } catch (error) {
     console.error('[API Progress GET] Error:', error);
     return NextResponse.json(

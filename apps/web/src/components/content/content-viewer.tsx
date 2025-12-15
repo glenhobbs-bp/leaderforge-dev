@@ -106,14 +106,34 @@ export function ContentViewer({ content }: ContentViewerProps) {
 
   // Load existing progress on mount
   useEffect(() => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.log('[ContentViewer] Fetch timeout after 10s - aborting');
+      controller.abort();
+    }, 10000);
+
+    const fetchWithTimeout = async (url: string, label: string) => {
+      console.log(`[ContentViewer] ${label}: Fetching ${url}...`);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        console.log(`[ContentViewer] ${label}: Response status:`, response.status);
+        return response;
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          console.log(`[ContentViewer] ${label}: Request aborted (timeout)`);
+        } else {
+          console.error(`[ContentViewer] ${label}: Fetch error:`, err);
+        }
+        throw err;
+      }
+    };
+
     const loadProgress = async () => {
       console.log('[ContentViewer] Starting loadProgress for content:', content.id);
       
       try {
         // Load video progress
-        console.log('[ContentViewer] Step 1: Fetching video progress...');
-        const progressResponse = await fetch(`/api/progress/${content.id}`);
-        console.log('[ContentViewer] Step 1: Response status:', progressResponse.status);
+        const progressResponse = await fetchWithTimeout(`/api/progress/${content.id}`, 'Step 1');
         const progressResult = await progressResponse.json();
         console.log('[ContentViewer] Step 1: Complete', progressResult.success);
         
@@ -125,9 +145,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
         }
 
         // Load worksheet status
-        console.log('[ContentViewer] Step 2: Fetching worksheet...');
-        const worksheetResponse = await fetch(`/api/worksheet/${content.id}`);
-        console.log('[ContentViewer] Step 2: Response status:', worksheetResponse.status);
+        const worksheetResponse = await fetchWithTimeout(`/api/worksheet/${content.id}`, 'Step 2');
         const worksheetResult = await worksheetResponse.json();
         console.log('[ContentViewer] Step 2: Complete', worksheetResult.success);
         
@@ -136,9 +154,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
         }
 
         // Load bold action status
-        console.log('[ContentViewer] Step 3: Fetching bold action...');
-        const boldActionResponse = await fetch(`/api/bold-actions/${content.id}`);
-        console.log('[ContentViewer] Step 3: Response status:', boldActionResponse.status);
+        const boldActionResponse = await fetchWithTimeout(`/api/bold-actions/${content.id}`, 'Step 3');
         const boldActionResult = await boldActionResponse.json();
         console.log('[ContentViewer] Step 3: Complete', boldActionResult.success);
         
@@ -147,9 +163,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
         }
 
         // Load check-in status
-        console.log('[ContentViewer] Step 4: Fetching check-in...');
-        const checkinResponse = await fetch(`/api/checkins/${content.id}`);
-        console.log('[ContentViewer] Step 4: Response status:', checkinResponse.status);
+        const checkinResponse = await fetchWithTimeout(`/api/checkins/${content.id}`, 'Step 4');
         const checkinResult = await checkinResponse.json();
         console.log('[ContentViewer] Step 4: Complete', checkinResult.success);
         
@@ -160,7 +174,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
         // Load organization signoff mode (non-blocking)
         console.log('[ContentViewer] Step 5: Fetching settings (non-blocking)...');
         try {
-          const settingsResponse = await fetch('/api/admin/organization/settings');
+          const settingsResponse = await fetch('/api/admin/organization/settings', { signal: controller.signal });
           console.log('[ContentViewer] Step 5: Response status:', settingsResponse.status);
           if (settingsResponse.ok) {
             const settingsResult = await settingsResponse.json();
@@ -177,12 +191,18 @@ export function ContentViewer({ content }: ContentViewerProps) {
       } catch (error) {
         console.error('[ContentViewer] Failed to load progress:', error);
       } finally {
+        clearTimeout(timeoutId);
         console.log('[ContentViewer] Setting isLoading to false');
         setIsLoading(false);
       }
     };
 
     loadProgress();
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [content.id]);
 
   // Save video progress to database (debounced)
