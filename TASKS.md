@@ -44,7 +44,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 6. Build - Org Admin | 6.3 | Signoff mode configuration (self-certify vs approval) |
 | ✅ | 6. Build - Org Admin | 6.4 | Content sequencing backend (time/completion/hybrid) |
 | ✅ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
-| ⬜ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
+| ✅ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
 | ⬜ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
 | ⬜ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
 | ⬜ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
@@ -751,6 +751,33 @@ Four unlock modes implemented:
 
 ---
 
+#### 6.7 Organization CRUD (Tenant Admin)
+**Status:** ✅ Completed
+
+Tenant Admin can now manage organizations within their tenant:
+
+**API Routes:**
+- ✅ `GET /api/tenant-admin/organizations` - List all orgs with stats
+- ✅ `POST /api/tenant-admin/organizations` - Create new organization
+- ✅ `GET /api/tenant-admin/organizations/[orgId]` - Get org details
+- ✅ `PATCH /api/tenant-admin/organizations/[orgId]` - Update org
+- ✅ `DELETE /api/tenant-admin/organizations/[orgId]` - Soft delete (deactivate)
+
+**UI Features:**
+- ✅ Organization list with member/team counts
+- ✅ Create organization modal (name, primary color, signoff mode)
+- ✅ Edit organization settings
+- ✅ Activate/deactivate organizations
+- ✅ Search and filter by status
+
+**Files:**
+- `apps/web/src/app/api/tenant-admin/organizations/route.ts`
+- `apps/web/src/app/api/tenant-admin/organizations/[orgId]/route.ts`
+- `apps/web/src/components/admin/organization-management.tsx`
+- `apps/web/src/app/(dashboard)/tenant-admin/organizations/page.tsx`
+
+---
+
 ### Phase 7: Future Enhancements
 
 #### 7.1 Calendar Integration
@@ -878,4 +905,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-15
-**Current Phase:** 6. Build - Admin (6.6 Tenant Admin - Organization CRUD)
+**Current Phase:** 6. Build - Admin (6.7 Tenant Admin - Settings & Theming)
