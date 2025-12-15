@@ -108,15 +108,24 @@ export function ContentViewer({ content }: ContentViewerProps) {
   useEffect(() => {
     let isMounted = true;
     
+    // Helper to fetch with timeout
+    const fetchWithTimeout = (url: string, timeoutMs = 30000) => {
+      return Promise.race([
+        fetch(url).then(r => r.json()),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error(`Timeout: ${url}`)), timeoutMs)
+        )
+      ]);
+    };
+    
     const loadProgress = async () => {
       try {
-        // Fetch all data in parallel for better performance
-        // Using Promise.allSettled to handle individual failures gracefully
+        // Fetch all data in parallel with individual timeouts
         const results = await Promise.allSettled([
-          fetch(`/api/progress/${content.id}`).then(r => r.json()),
-          fetch(`/api/worksheet/${content.id}`).then(r => r.json()),
-          fetch(`/api/bold-actions/${content.id}`).then(r => r.json()),
-          fetch(`/api/checkins/${content.id}`).then(r => r.json()),
+          fetchWithTimeout(`/api/progress/${content.id}`),
+          fetchWithTimeout(`/api/worksheet/${content.id}`),
+          fetchWithTimeout(`/api/bold-actions/${content.id}`),
+          fetchWithTimeout(`/api/checkins/${content.id}`),
         ]);
 
         if (!isMounted) return;
