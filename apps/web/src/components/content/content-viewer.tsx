@@ -107,10 +107,15 @@ export function ContentViewer({ content }: ContentViewerProps) {
   // Load existing progress on mount
   useEffect(() => {
     const loadProgress = async () => {
+      console.log('[ContentViewer] Starting loadProgress for content:', content.id);
+      
       try {
         // Load video progress
+        console.log('[ContentViewer] Step 1: Fetching video progress...');
         const progressResponse = await fetch(`/api/progress/${content.id}`);
+        console.log('[ContentViewer] Step 1: Response status:', progressResponse.status);
         const progressResult = await progressResponse.json();
+        console.log('[ContentViewer] Step 1: Complete', progressResult.success);
         
         if (progressResult.success && progressResult.data) {
           const data: ProgressData = progressResult.data;
@@ -120,45 +125,59 @@ export function ContentViewer({ content }: ContentViewerProps) {
         }
 
         // Load worksheet status
+        console.log('[ContentViewer] Step 2: Fetching worksheet...');
         const worksheetResponse = await fetch(`/api/worksheet/${content.id}`);
+        console.log('[ContentViewer] Step 2: Response status:', worksheetResponse.status);
         const worksheetResult = await worksheetResponse.json();
+        console.log('[ContentViewer] Step 2: Complete', worksheetResult.success);
         
         if (worksheetResult.success && worksheetResult.data) {
           setIsWorksheetCompleted(true);
         }
 
         // Load bold action status
+        console.log('[ContentViewer] Step 3: Fetching bold action...');
         const boldActionResponse = await fetch(`/api/bold-actions/${content.id}`);
+        console.log('[ContentViewer] Step 3: Response status:', boldActionResponse.status);
         const boldActionResult = await boldActionResponse.json();
+        console.log('[ContentViewer] Step 3: Complete', boldActionResult.success);
         
         if (boldActionResult.success && boldActionResult.data) {
           setBoldAction(boldActionResult.data);
         }
 
         // Load check-in status
+        console.log('[ContentViewer] Step 4: Fetching check-in...');
         const checkinResponse = await fetch(`/api/checkins/${content.id}`);
+        console.log('[ContentViewer] Step 4: Response status:', checkinResponse.status);
         const checkinResult = await checkinResponse.json();
+        console.log('[ContentViewer] Step 4: Complete', checkinResult.success);
         
         if (checkinResult.success && checkinResult.data) {
           setCheckin(checkinResult.data);
         }
 
         // Load organization signoff mode (non-blocking)
+        console.log('[ContentViewer] Step 5: Fetching settings (non-blocking)...');
         try {
           const settingsResponse = await fetch('/api/admin/organization/settings');
+          console.log('[ContentViewer] Step 5: Response status:', settingsResponse.status);
           if (settingsResponse.ok) {
             const settingsResult = await settingsResponse.json();
             if (settingsResult.settings?.signoff_mode) {
               setSignoffMode(settingsResult.settings.signoff_mode);
             }
           }
+          console.log('[ContentViewer] Step 5: Complete');
         } catch (settingsError) {
-          // Settings fetch is optional, default to self_certify
-          console.log('Settings fetch failed, using default signoff mode');
+          console.log('[ContentViewer] Step 5: Settings fetch failed, using default signoff mode');
         }
+        
+        console.log('[ContentViewer] All steps complete!');
       } catch (error) {
-        console.error('Failed to load progress:', error);
+        console.error('[ContentViewer] Failed to load progress:', error);
       } finally {
+        console.log('[ContentViewer] Setting isLoading to false');
         setIsLoading(false);
       }
     };
