@@ -45,7 +45,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 6. Build - Org Admin | 6.4 | Content sequencing backend (time/completion/hybrid) |
 | ✅ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
 | ✅ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
-| ⬜ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
+| ✅ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
 | ⬜ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
 | ⬜ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
 | ⬜ | 6. Build - Platform Admin | 6.10 | Tenant billing/subscription view |
@@ -751,7 +751,34 @@ Four unlock modes implemented:
 
 ---
 
-#### 6.7 Organization CRUD (Tenant Admin)
+#### 6.8 Tenant Settings & Theming
+**Status:** ✅ Completed
+
+Tenant Admin can now configure their tenant's branding and theme:
+
+**API Routes:**
+- ✅ `GET /api/tenant-admin/settings` - Get tenant settings
+- ✅ `PATCH /api/tenant-admin/settings` - Update tenant settings and theme
+
+**UI Features:**
+- ✅ General settings (display name)
+- ✅ Logo configuration (light/dark/icon/favicon URLs)
+- ✅ Color palette editor with live preview
+  - Primary, secondary, accent colors
+  - Background and surface colors
+  - Text colors (primary/secondary)
+- ✅ Typography settings (font family, border radius)
+- ✅ Unsaved changes warning
+- ✅ Reset to defaults option
+
+**Files:**
+- `apps/web/src/app/api/tenant-admin/settings/route.ts`
+- `apps/web/src/components/admin/tenant-settings.tsx`
+- `apps/web/src/app/(dashboard)/tenant-admin/settings/page.tsx`
+
+---
+
+#### 6.9 Organization CRUD (Tenant Admin)
 **Status:** ✅ Completed
 
 Tenant Admin can now manage organizations within their tenant:
@@ -905,4 +932,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-15
-**Current Phase:** 6. Build - Admin (6.7 Tenant Admin - Settings & Theming)
+**Current Phase:** 6. Build - Admin (6.8 Content Licensing)
