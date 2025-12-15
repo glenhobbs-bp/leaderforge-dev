@@ -1,15 +1,13 @@
 /**
  * File: src/app/(dashboard)/admin/organization/page.tsx
- * Purpose: Organization Admin - Organization settings including signoff mode and learning path
+ * Purpose: Organization Admin - Organization settings (branding, signoff mode)
  * Owner: Core Team
  */
 
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { fetchContentCollection } from '@/lib/tribe-social';
 import { OrganizationSettings } from '@/components/admin/organization-settings';
-import { LearningPathConfig } from '@/components/admin/learning-path-config';
 
 export const metadata: Metadata = {
   title: 'Organization Settings',
@@ -63,9 +61,6 @@ export default async function AdminOrganizationPage() {
     .eq('organization_id', organizationId)
     .eq('is_active', true);
 
-  // Fetch available content for learning path configuration
-  const contentModules = await fetchContentCollection();
-
   return (
     <div className="space-y-6 animate-page-enter">
       {/* Header */}
@@ -95,9 +90,6 @@ export default async function AdminOrganizationPage() {
           teamCount: teamCount || 0,
         }}
       />
-
-      {/* Learning Path Configuration */}
-      <LearningPathConfig availableContent={contentModules} />
     </div>
   );
 }
