@@ -85,7 +85,7 @@ export function Sidebar({ className, userContext }: SidebarProps) {
   const { theme } = useTenantTheme();
 
   // Use dark logo for sidebar (navy background needs white text)
-  const logoUrl = theme?.logo_dark_url || theme?.logo_url || '/logos/LF_White_Text_Blue_Dots.png';
+  const logoUrl = theme?.logo_dark_url || theme?.logo_url || '/logos/lf_white_text_np.png';
 
   return (
     <nav className={cn('flex flex-col bg-sidebar', className)}>
