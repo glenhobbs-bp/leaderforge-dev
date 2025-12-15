@@ -27,6 +27,7 @@ import {
   Route,
   Library,
   CreditCard,
+  Sparkles,
 } from 'lucide-react';
 
 interface UserContext {
@@ -78,6 +79,7 @@ const tenantAdminNavigation = [
 const platformAdminNavigation = [
   { name: 'Overview', href: '/platform-admin', icon: Shield },
   { name: 'Tenants', href: '/platform-admin/tenants', icon: Building2 },
+  { name: 'AI Config', href: '/platform-admin/ai-config', icon: Sparkles },
   { name: 'Billing', href: '/platform-admin/billing', icon: CreditCard },
 ];
 
