@@ -54,7 +54,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ⬜ | 7. Future | 7.2 | Manager/coach assignment override |
 | ⬜ | 7. Future | 7.3 | AI Organization Diagnostic |
 | ⬜ | 7. Future | 7.4 | AI-recommended content sequence |
-| ⬜ | 7. Future | 7.5 | **AI-Enhanced Reflection Prompts** (context-aware questions) |
+| ✅ | 7. Future | 7.5 | **AI-Enhanced Reflection Prompts** (context-aware questions) |
 | ⬜ | 7. Future | 7.6 | Voice input for reflections (mobile-friendly) |
 | ⬜ | 7. Future | 7.7 | Reflection pattern recognition & insights |
 | ⬜ | 7. Future | 7.8 | **Platform Admin** - System health & monitoring |
@@ -955,6 +955,37 @@ Output of org diagnostic:
 - Prioritized module order
 - Expected outcomes
 - Launch talking points
+
+---
+
+#### 7.5 AI-Enhanced Reflection Prompts
+**Status:** ✅ Completed
+
+Context-aware reflection questions for bold action completion:
+
+**Backend Features:**
+- ✅ API: `/api/reflection-prompts` - Generate personalized prompts
+- ✅ Context gathering: user history, bold action history, recent reflections
+- ✅ Claude AI integration for generating questions
+- ✅ Fallback prompts when AI unavailable
+- ✅ Different prompts based on completion status (fully/partially/blocked)
+
+**Frontend Features:**
+- ✅ AI prompts integrated into ReflectionModal
+- ✅ Sparkles icon indicates AI-generated prompts
+- ✅ Loading state while generating prompts
+- ✅ Follow-up prompt suggestions
+- ✅ Personalized encouragement messages
+
+**Prompt Personalization:**
+- Specific to the user's bold action text
+- Considers completion history (success rate)
+- Average challenge level from past actions
+- Tone matches completion status (celebratory/supportive/compassionate)
+
+**Files:**
+- `apps/web/src/app/api/reflection-prompts/route.ts`
+- `apps/web/src/components/content/reflection-modal.tsx`
 
 ---
 

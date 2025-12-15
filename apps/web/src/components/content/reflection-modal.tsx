@@ -2,12 +2,14 @@
  * File: apps/web/src/components/content/reflection-modal.tsx
  * Purpose: Modal for capturing reflection when completing a bold action
  * Owner: LeaderForge Team
+ * 
+ * Enhanced with AI-powered context-aware reflection prompts (7.5)
  */
 
 'use client';
 
-import { useState } from 'react';
-import { CheckCircle2, AlertCircle, XCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CheckCircle2, AlertCircle, XCircle, Loader2, Sparkles } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +25,15 @@ interface ReflectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   boldActionText: string;
+  contentId: string;
   onSubmit: (reflection: ReflectionData) => Promise<void>;
+}
+
+interface AIPrompts {
+  primaryPrompt: string;
+  followUpPrompts: string[];
+  encouragement: string;
+  isAIGenerated: boolean;
 }
 
 export interface ReflectionData {
@@ -73,10 +83,42 @@ const wouldRepeatOptions = [
   { value: 'no' as const, emoji: '👎', label: 'Not worth it' },
 ];
 
+// Default prompts (fallback)
+const DEFAULT_PROMPTS: Record<string, AIPrompts> = {
+  fully: {
+    primaryPrompt: "What did you learn about yourself while completing this bold action?",
+    followUpPrompts: [
+      "What was the most surprising or unexpected part?",
+      "How might you apply what you learned elsewhere?",
+    ],
+    encouragement: "Great job completing your bold action!",
+    isAIGenerated: false,
+  },
+  partially: {
+    primaryPrompt: "What progress did you make, and what held you back?",
+    followUpPrompts: [
+      "What would need to change for full completion next time?",
+      "What did you learn from the parts you did complete?",
+    ],
+    encouragement: "Partial progress is still progress!",
+    isAIGenerated: false,
+  },
+  blocked: {
+    primaryPrompt: "What obstacles prevented you from taking action?",
+    followUpPrompts: [
+      "Were these obstacles within your control?",
+      "Is there a smaller version that might be more achievable?",
+    ],
+    encouragement: "Understanding what blocks us helps us grow.",
+    isAIGenerated: false,
+  },
+};
+
 export function ReflectionModal({
   isOpen,
   onClose,
   boldActionText,
+  contentId,
   onSubmit,
 }: ReflectionModalProps) {
   const [completionStatus, setCompletionStatus] = useState<'fully' | 'partially' | 'blocked' | null>(null);
@@ -84,6 +126,51 @@ export function ReflectionModal({
   const [challengeLevel, setChallengeLevel] = useState<number | null>(null);
   const [wouldRepeat, setWouldRepeat] = useState<'yes' | 'maybe' | 'no' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // AI Prompts state
+  const [aiPrompts, setAiPrompts] = useState<AIPrompts | null>(null);
+  const [isLoadingPrompts, setIsLoadingPrompts] = useState(false);
+
+  // Fetch AI prompts when completion status changes
+  useEffect(() => {
+    if (!completionStatus || !isOpen) {
+      setAiPrompts(null);
+      return;
+    }
+
+    // Capture the status value for use in async function
+    const status = completionStatus;
+
+    async function fetchPrompts() {
+      setIsLoadingPrompts(true);
+      try {
+        const response = await fetch('/api/reflection-prompts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contentId,
+            boldActionText,
+            completionStatus: status,
+          }),
+        });
+        
+        const result = await response.json();
+        if (result.success && result.data) {
+          setAiPrompts(result.data);
+        } else {
+          // Use fallback prompts
+          setAiPrompts(DEFAULT_PROMPTS[status]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch AI prompts:', error);
+        setAiPrompts(DEFAULT_PROMPTS[status]);
+      } finally {
+        setIsLoadingPrompts(false);
+      }
+    }
+
+    fetchPrompts();
+  }, [completionStatus, isOpen, contentId, boldActionText]);
 
   const handleSubmit = async () => {
     if (!completionStatus) return;
@@ -162,18 +249,69 @@ export function ReflectionModal({
             </div>
           </div>
 
-          {/* Quick Reflection (Optional) */}
-          <div className="space-y-2">
-            <Label className="text-base font-semibold">
-              Quick reflection <span className="text-muted-foreground font-normal">(optional)</span>
-            </Label>
-            <Textarea
-              placeholder="What did you learn from doing this? Any insights or surprises?"
-              value={reflectionText}
-              onChange={(e) => setReflectionText(e.target.value)}
-              className="min-h-[80px] resize-none"
-            />
-          </div>
+          {/* AI-Enhanced Reflection Section */}
+          {completionStatus && (
+            <div className="space-y-3 bg-gradient-to-br from-primary/5 to-primary/10 p-4 rounded-lg border border-primary/20">
+              {/* Encouragement */}
+              {isLoadingPrompts ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Generating personalized prompts...</span>
+                </div>
+              ) : aiPrompts && (
+                <>
+                  <div className="flex items-center gap-2 text-sm text-primary">
+                    {aiPrompts.isAIGenerated && <Sparkles className="h-4 w-4" />}
+                    <span className="font-medium">{aiPrompts.encouragement}</span>
+                  </div>
+                  
+                  {/* Primary Prompt */}
+                  <div className="space-y-2">
+                    <Label className="text-base font-semibold flex items-center gap-2">
+                      {aiPrompts.isAIGenerated && (
+                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">AI</span>
+                      )}
+                      {aiPrompts.primaryPrompt}
+                    </Label>
+                    <Textarea
+                      placeholder="Share your thoughts..."
+                      value={reflectionText}
+                      onChange={(e) => setReflectionText(e.target.value)}
+                      className="min-h-[80px] resize-none bg-background"
+                    />
+                  </div>
+
+                  {/* Follow-up prompts as hints */}
+                  {aiPrompts.followUpPrompts.length > 0 && (
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p className="font-medium">Consider also:</p>
+                      <ul className="list-disc list-inside space-y-0.5 pl-1">
+                        {aiPrompts.followUpPrompts.map((prompt, i) => (
+                          <li key={i}>{prompt}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Fallback when no status selected */}
+          {!completionStatus && (
+            <div className="space-y-2">
+              <Label className="text-base font-semibold">
+                Quick reflection <span className="text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              <Textarea
+                placeholder="Select a completion status above to get personalized reflection prompts..."
+                value={reflectionText}
+                onChange={(e) => setReflectionText(e.target.value)}
+                className="min-h-[80px] resize-none"
+                disabled
+              />
+            </div>
+          )}
 
           {/* Challenge Level (Optional) */}
           <div className="space-y-2">

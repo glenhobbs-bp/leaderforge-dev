@@ -716,6 +716,7 @@ export function ContentViewer({ content }: ContentViewerProps) {
           isOpen={isReflectionOpen}
           onClose={() => setIsReflectionOpen(false)}
           boldActionText={boldAction.action_description}
+          contentId={content.id}
           onSubmit={handleSubmitReflection}
         />
       )}
