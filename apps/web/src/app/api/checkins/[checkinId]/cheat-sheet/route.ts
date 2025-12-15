@@ -1,5 +1,5 @@
 /**
- * File: apps/web/src/app/api/checkins/[id]/cheat-sheet/route.ts
+ * File: apps/web/src/app/api/checkins/[checkinId]/cheat-sheet/route.ts
  * Purpose: Generate AI-powered check-in cheat sheet for team leaders
  * Owner: LeaderForge Team
  * 
@@ -13,7 +13,7 @@ import { createClient } from '@/lib/supabase/server';
 // blocking other API routes during cold starts
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  params: Promise<{ checkinId: string }>;
 }
 
 interface CheatSheetContext {
@@ -64,12 +64,12 @@ interface CheatSheetResponse {
 }
 
 /**
- * GET /api/checkins/[id]/cheat-sheet
+ * GET /api/checkins/[checkinId]/cheat-sheet
  * Generate AI-powered cheat sheet for a pending check-in
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id: checkinId } = await params;
+    const { checkinId } = await params;
     const supabase = await createClient();
     
     // Verify the current user is authenticated and is the leader for this check-in
