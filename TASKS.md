@@ -46,7 +46,7 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
 | ✅ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
 | ✅ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
-| ⬜ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
+| ✅ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
 | ⬜ | 6. Build - Platform Admin | 6.9 | Tenant CRUD (create, configure, suspend tenants) |
 | ⬜ | 6. Build - Platform Admin | 6.10 | Tenant billing/subscription view |
 | ✅ | 6. Build - Platform Admin | 6.11 | **Platform Admin placeholder** (role + route structure) |
@@ -778,7 +778,32 @@ Tenant Admin can now configure their tenant's branding and theme:
 
 ---
 
-#### 6.9 Organization CRUD (Tenant Admin)
+#### 6.10 Content Licensing (Tenant Admin)
+**Status:** ✅ Completed (Read-only view with placeholder)
+
+Tenant Admin can view licensed content available to their tenant:
+
+**UI Features:**
+- ✅ Content Library page at `/tenant-admin/content`
+- ✅ Stats: total modules, duration, organizations, packages
+- ✅ Active license status display
+- ✅ List of all content modules with thumbnails
+- ✅ Placeholder for future entitlement management
+- ✅ Navigation link in tenant admin sidebar
+
+**Future Capabilities (Placeholder):**
+- Create custom content packages
+- Assign packages to specific organizations
+- Set access expiration dates
+- Track content usage per organization
+- License additional content from marketplace
+
+**Files:**
+- `apps/web/src/app/(dashboard)/tenant-admin/content/page.tsx`
+
+---
+
+#### 6.11 Organization CRUD (Tenant Admin)
 **Status:** ✅ Completed
 
 Tenant Admin can now manage organizations within their tenant:
@@ -932,4 +957,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-15
-**Current Phase:** 6. Build - Admin (6.8 Content Licensing)
+**Current Phase:** 6. Build - Admin (6.9 Platform Admin - Tenant CRUD)
