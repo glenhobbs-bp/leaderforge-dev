@@ -25,6 +25,7 @@ import {
   Shield,
   BarChart3,
   Route,
+  Library,
 } from 'lucide-react';
 
 interface UserContext {
@@ -69,6 +70,7 @@ const adminNavigation = [
 
 const tenantAdminNavigation = [
   { name: 'Organizations', href: '/tenant-admin/organizations', icon: Building2 },
+  { name: 'Content Library', href: '/tenant-admin/content', icon: Library },
   { name: 'Tenant Settings', href: '/tenant-admin/settings', icon: Settings },
 ];
 
