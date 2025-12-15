@@ -39,8 +39,8 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 5. Build - AI | 5.4 | **AI Check-in Cheat Sheet** (first AI feature!) |
 | ⬜ | 5. Build - Gamification | 5.5 | Gamification backend (streaks, points) |
 | ⬜ | 5. Build - Gamification | 5.6 | Gamification frontend (leaderboards) |
-| ⬜ | 6. Build - Org Admin | 6.1 | User management (invite, edit, deactivate) |
-| ⬜ | 6. Build - Org Admin | 6.2 | Team management (create teams, assign managers) |
+| ✅ | 6. Build - Org Admin | 6.1 | User management (invite, edit, deactivate) |
+| ✅ | 6. Build - Org Admin | 6.2 | Team management (create teams, assign managers) |
 | ⬜ | 6. Build - Org Admin | 6.3 | Signoff mode configuration (self-certify vs approval) |
 | ⬜ | 6. Build - Org Admin | 6.4 | Content sequencing backend (time/completion/hybrid) |
 | ⬜ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
