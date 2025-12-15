@@ -48,7 +48,7 @@ export async function getAIConfig(
     const supabase = await createClient();
     
     const { data: config, error } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('config_key, config_value, model, max_tokens, temperature, is_active')
       .eq('config_key', configKey)
@@ -100,7 +100,7 @@ export async function getAIConfigs(configKeys: string[]): Promise<Map<string, AI
     const supabase = await createClient();
     
     const { data: configs, error } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('config_key, config_value, model, max_tokens, temperature, is_active')
       .in('config_key', configKeys)

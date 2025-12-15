@@ -64,7 +64,7 @@ export async function GET() {
 
     // Fetch all AI configs
     const { data: configs, error } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('*')
       .order('config_type')
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     // Check for duplicate key
     const { data: existing } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('id')
       .eq('config_key', config_key)
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     // Create config
     const { data: config, error } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .insert({
         config_key,

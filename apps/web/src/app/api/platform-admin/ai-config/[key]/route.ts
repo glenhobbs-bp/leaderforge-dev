@@ -52,7 +52,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Fetch config
     const { data: config, error } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('*')
       .eq('config_key', key)
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Fetch history
     const { data: history } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config_history')
       .select('*')
       .eq('config_id', config.id)
@@ -109,7 +109,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Get existing config
     const { data: existing, error: fetchError } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('*')
       .eq('config_key', key)
@@ -148,7 +148,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
       // Save to history
       await supabase
-        .schema('platform')
+        .schema('core')
         .from('ai_config_history')
         .insert({
           config_id: existing.id,
@@ -162,7 +162,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Update config
     const { data: config, error: updateError } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .update(updates)
       .eq('id', existing.id)
@@ -210,7 +210,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     // Get existing config
     const { data: existing, error: fetchError } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .select('id, config_key')
       .eq('config_key', key)
@@ -225,7 +225,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     // Soft delete by setting is_active = false
     const { error: updateError } = await supabase
-      .schema('platform')
+      .schema('core')
       .from('ai_config')
       .update({
         is_active: false,
