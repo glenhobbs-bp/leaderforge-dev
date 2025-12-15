@@ -42,8 +42,8 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 6. Build - Org Admin | 6.1 | User management (invite, edit, deactivate) |
 | ✅ | 6. Build - Org Admin | 6.2 | Team management (create teams, assign managers) |
 | ✅ | 6. Build - Org Admin | 6.3 | Signoff mode configuration (self-certify vs approval) |
-| ⬜ | 6. Build - Org Admin | 6.4 | Content sequencing backend (time/completion/hybrid) |
-| ⬜ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
+| ✅ | 6. Build - Org Admin | 6.4 | Content sequencing backend (time/completion/hybrid) |
+| ✅ | 6. Build - Org Admin | 6.5 | Content sequencing UI (learning path config) |
 | ⬜ | 6. Build - Tenant Admin | 6.6 | Organization CRUD (create/edit orgs for tenant) |
 | ⬜ | 6. Build - Tenant Admin | 6.7 | Tenant settings & theming configuration |
 | ⬜ | 6. Build - Tenant Admin | 6.8 | Content licensing for tenant (assign content to orgs) |
@@ -688,7 +688,7 @@ AI-powered preparation tool for team leaders:
 ---
 
 #### 6.4 Content Sequencing Backend
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
 - Learning path data model
 - Module sequence assignment
@@ -704,7 +704,7 @@ AI-powered preparation tool for team leaders:
 ---
 
 #### 6.5 Learning Path Configuration UI
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
 Admin interface for:
 - Creating/editing learning paths
