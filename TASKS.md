@@ -37,8 +37,8 @@ A multi-tenant Learning Management System supporting Platform > Organization > T
 | ✅ | 5. Build - Progress | 5.2 | Team leader dashboard |
 | ✅ | 5. Build - Progress | 5.3 | Org admin progress dashboard |
 | ✅ | 5. Build - AI | 5.4 | **AI Check-in Cheat Sheet** (first AI feature!) |
-| ⬜ | 5. Build - Gamification | 5.5 | Gamification backend (streaks, points) |
-| ⬜ | 5. Build - Gamification | 5.6 | Gamification frontend (leaderboards) |
+| ✅ | 5. Build - Gamification | 5.5 | Gamification backend (streaks, points) |
+| ✅ | 5. Build - Gamification | 5.6 | Gamification frontend (leaderboards) |
 | ✅ | 6. Build - Org Admin | 6.1 | User management (invite, edit, deactivate) |
 | ✅ | 6. Build - Org Admin | 6.2 | Team management (create teams, assign managers) |
 | ✅ | 6. Build - Org Admin | 6.3 | Signoff mode configuration (self-certify vs approval) |
@@ -650,20 +650,51 @@ AI-powered preparation tool for team leaders:
 ---
 
 #### 5.5 Gamification Backend
-**Status:** ⬜ Not Started
+**Status:** ✅ Completed
 
-- Streak tracking service
-- Points awarding on completion
-- Leaderboard calculation
+Streak and points tracking system:
+
+**Backend Features:**
+- ✅ Shared gamification utility (`lib/gamification.ts`)
+- ✅ Points awarded on video completion (10 pts)
+- ✅ Points awarded on worksheet completion (5 pts)
+- ✅ Points awarded on check-in completion (10 pts)
+- ✅ Points awarded on bold action completion (15 pts)
+- ✅ Daily streak updated on each activity
+- ✅ API: `/api/gamification/streak` - Get user streak data
+- ✅ API: `/api/gamification/leaderboard` - Get leaderboard with filters
+- ✅ API: `/api/gamification/points` - Get points summary
+
+**Files:**
+- `apps/web/src/lib/gamification.ts`
+- `apps/web/src/app/api/gamification/streak/route.ts`
+- `apps/web/src/app/api/gamification/leaderboard/route.ts`
+- `apps/web/src/app/api/gamification/points/route.ts`
 
 ---
 
-#### 5.5 Gamification Frontend
-**Status:** ⬜ Not Started
+#### 5.6 Gamification Frontend
+**Status:** ✅ Completed
 
-- Streak widget
-- Leaderboard display
-- Points display
+UI components for streaks and leaderboards:
+
+**Frontend Features:**
+- ✅ StreakWidget - Current streak, longest streak, milestones, at-risk warning
+- ✅ LeaderboardWidget - Top 5 weekly, points display, streaks indicator
+- ✅ Full Leaderboard page with filters (weekly/all-time, team/org)
+- ✅ Widgets integrated into dashboard
+- ✅ Points guide explaining how to earn points
+
+**UI Elements:**
+- 🔥 Streak milestones (3, 7, 14, 30, 100 days)
+- 🥇🥈🥉 Medal rankings for top 3
+- Progress bar toward 30-day goal
+- "At risk" warning when no activity today
+
+**Files:**
+- `apps/web/src/components/gamification/streak-widget.tsx`
+- `apps/web/src/components/gamification/leaderboard-widget.tsx`
+- `apps/web/src/app/(dashboard)/leaderboard/page.tsx`
 
 ---
 
@@ -1011,4 +1042,4 @@ TRIBE_SOCIAL_TOKEN=<token>
 ---
 
 **Last Updated:** 2024-12-15
-**Current Phase:** Phase 6 Complete! Ready for Phase 7 (Future) or Phase 8 (Polish)
+**Current Phase:** MVP Complete! Phases 1-6 done. Ready for Phase 7 (Future) or Phase 8 (Polish)
