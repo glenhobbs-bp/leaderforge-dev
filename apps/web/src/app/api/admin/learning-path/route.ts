@@ -75,11 +75,9 @@ export async function GET() {
 
 // POST - Create or update learning path
 export async function POST(request: NextRequest) {
-  console.log('[Learning Path POST] Starting...');
   const supabase = await createClient();
   
   const { data: { user }, error: authError } = await supabase.auth.getUser();
-  console.log('[Learning Path POST] User:', user?.id, 'Auth error:', authError?.message);
   if (authError || !user) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
@@ -92,7 +90,6 @@ export async function POST(request: NextRequest) {
     .eq('is_active', true)
     .single();
 
-  console.log('[Learning Path POST] Membership:', membership, 'Error:', membershipError?.message);
   if (membershipError || !membership) {
     return NextResponse.json({ success: false, error: 'No membership found' }, { status: 404 });
   }
@@ -112,19 +109,15 @@ export async function POST(request: NextRequest) {
   } = body;
 
   // Check if learning path already exists for this org
-  console.log('[Learning Path POST] Checking for existing path for org:', membership.organization_id);
-  const { data: existingPath, error: existingError } = await supabase
+  const { data: existingPath } = await supabase
     .schema('core')
     .from('learning_paths')
     .select('id')
     .eq('organization_id', membership.organization_id)
     .single();
 
-  console.log('[Learning Path POST] Existing path:', existingPath, 'Error:', existingError?.message);
-
   if (existingPath) {
     // Update existing path
-    console.log('[Learning Path POST] Updating existing path:', existingPath.id);
     const { data: updatedPath, error: updateError } = await supabase
       .schema('core')
       .from('learning_paths')
@@ -141,15 +134,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (updateError) {
-      console.error('[Learning Path POST] Error updating learning path:', updateError);
+      console.error('Error updating learning path:', updateError);
       return NextResponse.json({ success: false, error: 'Failed to update learning path' }, { status: 500 });
     }
 
-    console.log('[Learning Path POST] Updated successfully:', updatedPath);
     return NextResponse.json({ success: true, learningPath: updatedPath });
   } else {
     // Create new path
-    console.log('[Learning Path POST] Creating new path for org:', membership.organization_id);
     const { data: newPath, error: createError } = await supabase
       .schema('core')
       .from('learning_paths')
@@ -167,11 +158,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (createError) {
-      console.error('[Learning Path POST] Error creating learning path:', createError);
+      console.error('Error creating learning path:', createError);
       return NextResponse.json({ success: false, error: 'Failed to create learning path' }, { status: 500 });
     }
-
-    console.log('[Learning Path POST] Created successfully:', newPath);
 
     return NextResponse.json({ success: true, learningPath: newPath }, { status: 201 });
   }
