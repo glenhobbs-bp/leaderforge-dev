@@ -106,51 +106,25 @@ export function ContentViewer({ content }: ContentViewerProps) {
 
   // Load existing progress on mount
   useEffect(() => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log('[ContentViewer] Fetch timeout after 10s - aborting');
-      controller.abort();
-    }, 10000);
-
-    const fetchWithTimeout = async (url: string, label: string) => {
-      console.log(`[ContentViewer] ${label}: Fetching ${url}...`);
-      try {
-        const response = await fetch(url, { 
-          signal: controller.signal,
-          cache: 'no-store',  // Disable caching
-        });
-        console.log(`[ContentViewer] ${label}: Response status:`, response.status);
-        return response;
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          console.log(`[ContentViewer] ${label}: Request aborted (timeout)`);
-        } else {
-          console.error(`[ContentViewer] ${label}: Fetch error:`, err);
-        }
-        throw err;
-      }
-    };
-
     const loadProgress = async () => {
-      // First test if API routes work at all
-      console.log('[ContentViewer] Testing health endpoint...');
       try {
-        const healthResponse = await fetch('/api/health', { signal: controller.signal, cache: 'no-store' });
-        console.log('[ContentViewer] Health response:', healthResponse.status);
-        const healthData = await healthResponse.json();
-        console.log('[ContentViewer] Health data:', healthData);
-      } catch (healthErr) {
-        console.error('[ContentViewer] Health check failed:', healthErr);
-      }
+        // Fetch all data in parallel for better performance
+        const [progressRes, worksheetRes, boldActionRes, checkinRes] = await Promise.all([
+          fetch(`/api/progress/${content.id}`),
+          fetch(`/api/worksheet/${content.id}`),
+          fetch(`/api/bold-actions/${content.id}`),
+          fetch(`/api/checkins/${content.id}`),
+        ]);
 
-      console.log('[ContentViewer] Starting loadProgress for content:', content.id);
-      
-      try {
-        // Load video progress
-        const progressResponse = await fetchWithTimeout(`/api/progress/${content.id}`, 'Step 1');
-        const progressResult = await progressResponse.json();
-        console.log('[ContentViewer] Step 1: Complete', progressResult.success);
-        
+        // Parse responses
+        const [progressResult, worksheetResult, boldActionResult, checkinResult] = await Promise.all([
+          progressRes.json(),
+          worksheetRes.json(),
+          boldActionRes.json(),
+          checkinRes.json(),
+        ]);
+
+        // Update state based on results
         if (progressResult.success && progressResult.data) {
           const data: ProgressData = progressResult.data;
           setVideoProgress(data.progress_percentage || 0);
@@ -158,65 +132,38 @@ export function ContentViewer({ content }: ContentViewerProps) {
           lastSavedProgress.current = data.progress_percentage || 0;
         }
 
-        // Load worksheet status
-        const worksheetResponse = await fetchWithTimeout(`/api/worksheet/${content.id}`, 'Step 2');
-        const worksheetResult = await worksheetResponse.json();
-        console.log('[ContentViewer] Step 2: Complete', worksheetResult.success);
-        
         if (worksheetResult.success && worksheetResult.data) {
           setIsWorksheetCompleted(true);
         }
 
-        // Load bold action status
-        const boldActionResponse = await fetchWithTimeout(`/api/bold-actions/${content.id}`, 'Step 3');
-        const boldActionResult = await boldActionResponse.json();
-        console.log('[ContentViewer] Step 3: Complete', boldActionResult.success);
-        
         if (boldActionResult.success && boldActionResult.data) {
           setBoldAction(boldActionResult.data);
         }
 
-        // Load check-in status
-        const checkinResponse = await fetchWithTimeout(`/api/checkins/${content.id}`, 'Step 4');
-        const checkinResult = await checkinResponse.json();
-        console.log('[ContentViewer] Step 4: Complete', checkinResult.success);
-        
         if (checkinResult.success && checkinResult.data) {
           setCheckin(checkinResult.data);
         }
 
-        // Load organization signoff mode (non-blocking)
-        console.log('[ContentViewer] Step 5: Fetching settings (non-blocking)...');
+        // Load organization signoff mode (non-blocking, optional)
         try {
-          const settingsResponse = await fetch('/api/admin/organization/settings', { signal: controller.signal });
-          console.log('[ContentViewer] Step 5: Response status:', settingsResponse.status);
+          const settingsResponse = await fetch('/api/admin/organization/settings');
           if (settingsResponse.ok) {
             const settingsResult = await settingsResponse.json();
             if (settingsResult.settings?.signoff_mode) {
               setSignoffMode(settingsResult.settings.signoff_mode);
             }
           }
-          console.log('[ContentViewer] Step 5: Complete');
-        } catch (settingsError) {
-          console.log('[ContentViewer] Step 5: Settings fetch failed, using default signoff mode');
+        } catch {
+          // Settings fetch is optional, use default signoff mode
         }
-        
-        console.log('[ContentViewer] All steps complete!');
       } catch (error) {
-        console.error('[ContentViewer] Failed to load progress:', error);
+        console.error('Failed to load progress:', error);
       } finally {
-        clearTimeout(timeoutId);
-        console.log('[ContentViewer] Setting isLoading to false');
         setIsLoading(false);
       }
     };
 
     loadProgress();
-
-    return () => {
-      clearTimeout(timeoutId);
-      controller.abort();
-    };
   }, [content.id]);
 
   // Save video progress to database (debounced)

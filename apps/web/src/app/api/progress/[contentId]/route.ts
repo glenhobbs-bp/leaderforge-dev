@@ -16,33 +16,13 @@ interface RouteParams {
  * Get user's progress for a specific content item
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  // TEMPORARY DEBUG: Return immediately to test if API routes work at all
-  console.log('[API Progress GET] Starting (debug mode)...');
-  
   try {
     const { contentId } = await params;
-    console.log('[API Progress GET] ContentId:', contentId);
-    
-    // TEMPORARY: Skip database entirely to test
-    console.log('[API Progress GET] Returning mock response (debug)');
-    return NextResponse.json({
-      success: true,
-      data: null,
-      _debug: 'Bypassed database query for debugging'
-    });
-    
-    /* COMMENTED OUT FOR DEBUGGING
-    console.log('[API Progress GET] Creating Supabase client...');
     const supabase = await createClient();
-    console.log('[API Progress GET] Supabase client created');
     
     // Get current user
-    console.log('[API Progress GET] Getting user...');
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    console.log('[API Progress GET] User:', user?.id, 'Auth error:', authError?.message);
-    
     if (authError || !user) {
-      console.log('[API Progress GET] Unauthorized');
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
@@ -50,14 +30,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Get progress
-    console.log('[API Progress GET] Querying progress...');
     const { data: progress, error } = await supabase
       .from('user_progress')
       .select('*')
       .eq('user_id', user.id)
       .eq('content_id', contentId)
       .single();
-    console.log('[API Progress GET] Query complete, error:', error?.code);
 
     if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
       console.error('Error fetching progress:', error);
@@ -67,14 +45,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    console.log('[API Progress GET] Returning success');
     return NextResponse.json({
       success: true,
       data: progress || null,
     });
-    */
   } catch (error) {
-    console.error('[API Progress GET] Error:', error);
+    console.error('Progress GET error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
