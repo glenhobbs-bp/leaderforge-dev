@@ -480,7 +480,7 @@ export function OrganizationSettings({
           </div>
           <Button 
             onClick={handleSaveBranding} 
-            disabled={!hasBrandingChanges || isSavingBranding || (!useTenantTheme && primaryColor && !isValidHexColor(primaryColor))}
+            disabled={!hasBrandingChanges || isSavingBranding || (!useTenantTheme && !!primaryColor && !isValidHexColor(primaryColor))}
             className="gap-2"
           >
             {isSavingBranding ? (
