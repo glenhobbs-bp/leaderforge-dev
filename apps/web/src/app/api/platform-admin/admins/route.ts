@@ -45,12 +45,10 @@ export async function GET() {
       );
     }
 
-    // Fetch all platform admins
+    // Fetch all platform admins using function that joins with auth.users
     const { data: admins, error } = await supabase
-      .from('users')
-      .select('id, email, full_name, avatar_url, is_platform_admin, created_at, last_sign_in_at')
-      .eq('is_platform_admin', true)
-      .order('created_at', { ascending: true });
+      .schema('core')
+      .rpc('get_platform_admins');
 
     if (error) {
       console.error('Error fetching platform admins:', error);

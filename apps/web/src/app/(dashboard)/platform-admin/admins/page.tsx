@@ -27,12 +27,10 @@ export default async function PlatformAdminsPage() {
     redirect('/dashboard');
   }
 
-  // Fetch platform admins
+  // Fetch platform admins using function that joins with auth.users for last_sign_in_at
   const { data: admins } = await supabase
-    .from('users')
-    .select('id, email, full_name, avatar_url, is_platform_admin, created_at, last_sign_in_at')
-    .eq('is_platform_admin', true)
-    .order('created_at', { ascending: true });
+    .schema('core')
+    .rpc('get_platform_admins');
 
   return (
     <PlatformAdminManagement 
