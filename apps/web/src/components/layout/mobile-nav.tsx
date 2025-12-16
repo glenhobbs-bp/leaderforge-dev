@@ -10,7 +10,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { X, Home, BookOpen, TrendingUp, Trophy, Settings, Users, Building, Building2, ScrollText, Route, Library } from 'lucide-react';
+import { X, Home, BookOpen, TrendingUp, Trophy, Settings, Users, Building, Building2, ScrollText, Route, Library, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface UserContext {
@@ -197,25 +197,28 @@ export function MobileNav({ open, onClose, userContext }: MobileNavProps) {
         </div>
 
         {/* Legal Links */}
-        <div className="border-t border-sidebar-border px-4 py-3">
-          <div className="flex items-center justify-center gap-2 text-xs text-sidebar-foreground/50">
-            <a
-              href="https://www.myleaderforge.com/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-sidebar-foreground hover:underline"
-            >
-              Privacy
-            </a>
-            <span>•</span>
-            <a
-              href="https://www.myleaderforge.com/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-sidebar-foreground hover:underline"
-            >
-              Terms
-            </a>
+        <div className="border-t border-sidebar-border px-3 py-3">
+          <div className="flex items-center gap-3 px-3 py-2 text-sm text-sidebar-foreground/60">
+            <Scale className="h-4 w-4" />
+            <div className="flex items-center gap-2">
+              <a
+                href="https://www.myleaderforge.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sidebar-foreground hover:underline"
+              >
+                Privacy
+              </a>
+              <span>•</span>
+              <a
+                href="https://www.myleaderforge.com/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sidebar-foreground hover:underline"
+              >
+                Terms
+              </a>
+            </div>
           </div>
         </div>
       </div>

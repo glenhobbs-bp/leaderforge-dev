@@ -27,6 +27,7 @@ import {
   Library,
   CreditCard,
   Sparkles,
+  Scale,
 } from 'lucide-react';
 
 interface UserContext {
@@ -176,25 +177,28 @@ export function Sidebar({ className, userContext }: SidebarProps) {
       </div>
 
       {/* Legal Links */}
-      <div className="border-t border-sidebar-border px-4 py-3">
-        <div className="flex items-center justify-center gap-2 text-xs text-sidebar-foreground/50">
-          <a
-            href="https://www.myleaderforge.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-sidebar-foreground hover:underline"
-          >
-            Privacy
-          </a>
-          <span>•</span>
-          <a
-            href="https://www.myleaderforge.com/terms"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-sidebar-foreground hover:underline"
-          >
-            Terms
-          </a>
+      <div className="border-t border-sidebar-border px-3 py-3">
+        <div className="flex items-center gap-3 px-3 py-2 text-sm text-sidebar-foreground/60">
+          <Scale className="h-4 w-4" />
+          <div className="flex items-center gap-2">
+            <a
+              href="https://www.myleaderforge.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-sidebar-foreground hover:underline"
+            >
+              Privacy
+            </a>
+            <span>•</span>
+            <a
+              href="https://www.myleaderforge.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-sidebar-foreground hover:underline"
+            >
+              Terms
+            </a>
+          </div>
         </div>
       </div>
     </nav>
