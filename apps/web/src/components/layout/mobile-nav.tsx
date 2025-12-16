@@ -200,7 +200,7 @@ export function MobileNav({ open, onClose, userContext }: MobileNavProps) {
         <div className="border-t border-sidebar-border px-4 py-3">
           <div className="flex items-center justify-center gap-2 text-xs text-sidebar-foreground/50">
             <a
-              href="https://www.myleaderforge.com/privacy-policy"
+              href="https://www.myleaderforge.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-sidebar-foreground hover:underline"
@@ -209,7 +209,7 @@ export function MobileNav({ open, onClose, userContext }: MobileNavProps) {
             </a>
             <span>•</span>
             <a
-              href="https://www.myleaderforge.com/terms-of-service"
+              href="https://www.myleaderforge.com/terms"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-sidebar-foreground hover:underline"

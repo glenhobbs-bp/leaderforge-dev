@@ -48,7 +48,7 @@ export default async function AuthLayout({
         </p>
         <div className="mt-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
           <a
-            href="https://www.myleaderforge.com/privacy-policy"
+            href="https://www.myleaderforge.com/privacy"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary hover:underline"
@@ -57,7 +57,7 @@ export default async function AuthLayout({
           </a>
           <span>•</span>
           <a
-            href="https://www.myleaderforge.com/terms-of-service"
+            href="https://www.myleaderforge.com/terms"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-primary hover:underline"
