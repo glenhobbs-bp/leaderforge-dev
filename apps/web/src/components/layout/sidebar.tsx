@@ -78,6 +78,7 @@ const tenantAdminNavigation = [
 const platformAdminNavigation = [
   { name: 'Overview', href: '/platform-admin', icon: Shield, exact: true },
   { name: 'Tenants', href: '/platform-admin/tenants', icon: Building2 },
+  { name: 'Admins', href: '/platform-admin/admins', icon: Users },
   { name: 'AI Config', href: '/platform-admin/ai-config', icon: Sparkles },
   { name: 'Billing', href: '/platform-admin/billing', icon: CreditCard },
 ];
