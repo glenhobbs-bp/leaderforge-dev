@@ -5,6 +5,7 @@
  */
 
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AuthLayout({
@@ -24,7 +25,13 @@ export default async function AuthLayout({
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
       {/* Logo */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary">LeaderForge</h1>
+        <Image
+          src="/logos/LF_Navy_Text_Blue_Dots.png"
+          alt="LeaderForge"
+          width={200}
+          height={60}
+          priority
+        />
       </div>
 
       {/* Auth Card */}
