@@ -20,7 +20,6 @@ import {
   Users,
   Building,
   Building2,
-  ScrollText,
   Handshake,
   Shield,
   BarChart3,
@@ -67,7 +66,7 @@ const adminNavigation = [
   { name: 'Teams', href: '/admin/teams', icon: Users },
   { name: 'Organization', href: '/admin/organization', icon: Building },
   { name: 'Learning Path', href: '/admin/learning-path', icon: Route },
-  { name: 'Audit Log', href: '/admin/audit', icon: ScrollText },
+  // Audit Log - future feature (see TASKS.md)
 ];
 
 const tenantAdminNavigation = [
@@ -77,7 +76,7 @@ const tenantAdminNavigation = [
 ];
 
 const platformAdminNavigation = [
-  { name: 'Overview', href: '/platform-admin', icon: Shield },
+  { name: 'Overview', href: '/platform-admin', icon: Shield, exact: true },
   { name: 'Tenants', href: '/platform-admin/tenants', icon: Building2 },
   { name: 'AI Config', href: '/platform-admin/ai-config', icon: Sparkles },
   { name: 'Billing', href: '/platform-admin/billing', icon: CreditCard },
@@ -180,7 +179,7 @@ export function Sidebar({ className, userContext }: SidebarProps) {
 
 interface NavSectionProps {
   title: string;
-  items: Array<{ name: string; href: string; icon: React.ComponentType<{ className?: string }> }>;
+  items: Array<{ name: string; href: string; icon: React.ComponentType<{ className?: string }>; exact?: boolean }>;
   pathname: string;
 }
 
@@ -196,8 +195,8 @@ function NavSection({ title, items, pathname }: NavSectionProps) {
             <NavItem
               item={item}
               isActive={
-                item.href === '/dashboard'
-                  ? pathname === '/dashboard'
+                item.href === '/dashboard' || item.exact
+                  ? pathname === item.href
                   : pathname.startsWith(item.href)
               }
             />
