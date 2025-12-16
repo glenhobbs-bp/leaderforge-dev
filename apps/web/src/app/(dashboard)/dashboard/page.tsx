@@ -30,15 +30,83 @@ export default async function DashboardPage() {
   // Extract first name from full name
   const firstName = userProfile?.full_name?.split(' ')[0] || 'there';
 
-  // Fetch user's progress stats (using public views)
-  const { data: progressStats } = await supabase
+  // Fetch user's video progress
+  const { data: videoProgress } = await supabase
     .from('user_progress')
-    .select('progress_percentage, completed_at')
+    .select('content_id, progress_percentage, completed_at')
     .eq('user_id', user?.id);
 
-  const totalItems = progressStats?.length || 0;
-  const completedItems = progressStats?.filter(p => p.completed_at)?.length || 0;
-  const inProgressItems = progressStats?.filter(p => !p.completed_at && p.progress_percentage > 0)?.length || 0;
+  // Fetch user's worksheet submissions
+  const { data: worksheetSubmissions } = await supabase
+    .from('worksheet_submissions')
+    .select('content_id')
+    .eq('user_id', user?.id);
+
+  // Fetch user's bold actions (signoff = completion)
+  const { data: boldActions } = await supabase
+    .from('bold_actions')
+    .select('content_id, status')
+    .eq('user_id', user?.id);
+
+  // Build a map of content IDs to their step completion status
+  const contentStepsMap = new Map<string, { 
+    videoStarted: boolean;
+    videoComplete: boolean;
+    worksheetComplete: boolean;
+    signedOff: boolean;
+  }>();
+
+  // Add video progress
+  for (const p of videoProgress || []) {
+    contentStepsMap.set(p.content_id, {
+      videoStarted: p.progress_percentage > 0,
+      videoComplete: p.progress_percentage >= 90 || !!p.completed_at,
+      worksheetComplete: false,
+      signedOff: false,
+    });
+  }
+
+  // Add worksheet completions
+  for (const ws of worksheetSubmissions || []) {
+    const existing = contentStepsMap.get(ws.content_id);
+    if (existing) {
+      existing.worksheetComplete = true;
+    } else {
+      contentStepsMap.set(ws.content_id, {
+        videoStarted: false,
+        videoComplete: false,
+        worksheetComplete: true,
+        signedOff: false,
+      });
+    }
+  }
+
+  // Add bold action signoffs
+  for (const ba of boldActions || []) {
+    const existing = contentStepsMap.get(ba.content_id);
+    const isSignedOff = ba.status === 'completed' || ba.status === 'signed_off';
+    if (existing) {
+      existing.signedOff = isSignedOff;
+    } else {
+      contentStepsMap.set(ba.content_id, {
+        videoStarted: false,
+        videoComplete: false,
+        worksheetComplete: false,
+        signedOff: isSignedOff,
+      });
+    }
+  }
+
+  // Calculate stats:
+  // - Total: content items the user has interacted with
+  // - Completed: fully signed off (all 4 steps done)
+  // - In Progress: started but not signed off
+  const allContent = Array.from(contentStepsMap.values());
+  const totalItems = allContent.length;
+  const completedItems = allContent.filter(c => c.signedOff).length;
+  const inProgressItems = allContent.filter(c => 
+    (c.videoStarted || c.worksheetComplete) && !c.signedOff
+  ).length;
 
   // Fetch streak (using public views)
   const { data: streak } = await supabase
@@ -69,9 +137,9 @@ export default async function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          title="Content Items"
+          title="Modules Started"
           value={totalItems}
-          description={`${completedItems} completed`}
+          description={`${completedItems} fully completed`}
           icon={BookOpen}
           iconBg="bg-blue-50"
           iconColor="text-blue-600"
@@ -79,7 +147,7 @@ export default async function DashboardPage() {
         <StatsCard
           title="In Progress"
           value={inProgressItems}
-          description="Continue learning"
+          description="Steps remaining"
           icon={TrendingUp}
           iconBg="bg-green-50"
           iconColor="text-green-600"
@@ -121,7 +189,7 @@ export default async function DashboardPage() {
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
               {inProgressItems > 0
-                ? `You have ${inProgressItems} item${inProgressItems > 1 ? 's' : ''} in progress.`
+                ? `You have ${inProgressItems} module${inProgressItems > 1 ? 's' : ''} with steps remaining.`
                 : 'Start your learning journey by exploring the content library.'}
             </p>
             <Link
