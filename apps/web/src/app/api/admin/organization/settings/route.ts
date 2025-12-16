@@ -30,43 +30,74 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { organizationId, settings } = body;
+    const { organizationId, settings, branding } = body;
 
     // Verify the admin belongs to this org
     if (membership.organization_id !== organizationId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Validate settings
-    if (settings.signoff_mode && !['self_certify', 'leader_approval'].includes(settings.signoff_mode)) {
-      return NextResponse.json({ error: 'Invalid signoff mode' }, { status: 400 });
-    }
-
-    // Get current settings
+    // Get current org data
     const { data: currentOrg } = await supabase
       .from('organizations')
-      .select('settings')
+      .select('settings, branding')
       .eq('id', organizationId)
       .single();
 
-    // Merge new settings with existing
-    const mergedSettings = {
-      ...(currentOrg?.settings || {}),
-      ...settings,
+    // Build update object
+    const updateData: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
     };
 
-    // Update organization settings
+    // Handle settings update
+    if (settings) {
+      // Validate settings
+      if (settings.signoff_mode && !['self_certify', 'leader_approval'].includes(settings.signoff_mode)) {
+        return NextResponse.json({ error: 'Invalid signoff mode' }, { status: 400 });
+      }
+
+      // Merge new settings with existing
+      updateData.settings = {
+        ...(currentOrg?.settings || {}),
+        ...settings,
+      };
+    }
+
+    // Handle branding update
+    if (branding) {
+      // Validate primary color if provided
+      if (branding.primary_color && !/^#[0-9A-Fa-f]{6}$/.test(branding.primary_color)) {
+        return NextResponse.json({ error: 'Invalid primary color format' }, { status: 400 });
+      }
+
+      // Validate logo URL if provided
+      if (branding.logo_url) {
+        try {
+          new URL(branding.logo_url);
+        } catch {
+          return NextResponse.json({ error: 'Invalid logo URL' }, { status: 400 });
+        }
+      }
+
+      // Merge new branding with existing
+      updateData.branding = {
+        ...(currentOrg?.branding || {}),
+        logo_url: branding.logo_url,
+        primary_color: branding.primary_color,
+        display_name: branding.display_name,
+        use_tenant_theme: branding.use_tenant_theme,
+      };
+    }
+
+    // Update organization
     const { error: updateError } = await supabase
       .from('organizations')
-      .update({
-        settings: mergedSettings,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('id', organizationId);
 
     if (updateError) {
-      console.error('Error updating organization settings:', updateError);
-      return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
+      console.error('Error updating organization:', updateError);
+      return NextResponse.json({ error: 'Failed to update organization' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
