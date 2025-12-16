@@ -72,16 +72,23 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Failed to update sequence' }, { status: 500 });
   }
 
-  // Insert new items (first item auto-unlocked for manual mode)
+  // Insert new items (preserve is_manually_unlocked, but first item always unlocked in manual mode)
   if (items.length > 0) {
-    const itemsToInsert = items.map((item: { content_id: string; unlock_date?: string; is_optional?: boolean }, index: number) => ({
+    const itemsToInsert = items.map((item: { 
+      content_id: string; 
+      unlock_date?: string; 
+      is_optional?: boolean;
+      is_manually_unlocked?: boolean;
+    }, index: number) => ({
       learning_path_id: learningPath.id,
       content_id: item.content_id,
       sequence_order: index + 1,
       unlock_date: item.unlock_date || null,
       is_optional: item.is_optional || false,
-      // For manual mode, first item is auto-unlocked
-      is_manually_unlocked: learningPath.unlock_mode === 'manual' && index === 0,
+      // Preserve existing unlock state, but first item always unlocked in manual mode
+      is_manually_unlocked: learningPath.unlock_mode === 'manual' 
+        ? (index === 0 ? true : item.is_manually_unlocked === true)
+        : false,
     }));
 
     const { error: insertError } = await supabase
@@ -177,6 +184,12 @@ export async function PATCH(request: NextRequest) {
   if (updateError) {
     console.error('Error updating item:', updateError);
     return NextResponse.json({ success: false, error: 'Failed to update item' }, { status: 500 });
+  }
+
+  // Verify update actually happened (could fail silently due to RLS)
+  if (!updatedItem) {
+    console.error('Update returned no data - possible RLS issue');
+    return NextResponse.json({ success: false, error: 'Failed to update item - no data returned' }, { status: 500 });
   }
 
   return NextResponse.json({ 
