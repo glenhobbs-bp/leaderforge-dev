@@ -71,8 +71,9 @@ export default async function PlatformAdminPage() {
       title: 'AI Configuration',
       description: 'Tune AI prompts, conversation starters, and tone. Version control for configs.',
       icon: Brain,
-      status: 'Coming Soon',
+      status: 'Available',
       color: 'text-secondary',
+      href: '/platform-admin/ai-config',
     },
     {
       title: 'System Health',
@@ -172,37 +173,6 @@ export default async function PlatformAdminPage() {
           })}
         </div>
       </div>
-
-      {/* AI Configuration Preview */}
-      <Card className="border-secondary/30">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-secondary" />
-            AI Configuration Preview
-          </CardTitle>
-          <CardDescription>
-            Future: Configure AI behavior across the platform
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted/50 rounded-lg p-4 font-mono text-sm">
-            <p className="text-muted-foreground mb-2">// Current AI Config (hardcoded)</p>
-            <pre className="text-xs overflow-x-auto">
-{`{
-  "cheat_sheet": {
-    "model": "claude-sonnet-4-20250514",
-    "tone": "coaching",
-    "focus": ["progress", "stretch", "activation"],
-    "conversation_starters": 3
-  }
-}`}
-            </pre>
-          </div>
-          <p className="text-sm text-muted-foreground mt-3">
-            Coming soon: Edit prompts, customize tone, A/B test variations
-          </p>
-        </CardContent>
-      </Card>
 
       {/* See PRD Note */}
       <div className="text-center py-4 text-sm text-muted-foreground">
