@@ -174,6 +174,29 @@ export function Sidebar({ className, userContext }: SidebarProps) {
           isActive={pathname.startsWith('/settings')}
         />
       </div>
+
+      {/* Legal Links */}
+      <div className="border-t border-sidebar-border px-4 py-3">
+        <div className="flex items-center justify-center gap-2 text-xs text-sidebar-foreground/50">
+          <a
+            href="https://www.myleaderforge.com/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-sidebar-foreground hover:underline"
+          >
+            Privacy
+          </a>
+          <span>•</span>
+          <a
+            href="https://www.myleaderforge.com/terms-of-service"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-sidebar-foreground hover:underline"
+          >
+            Terms
+          </a>
+        </div>
+      </div>
     </nav>
   );
 }

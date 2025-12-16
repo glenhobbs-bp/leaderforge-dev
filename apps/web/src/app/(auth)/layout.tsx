@@ -42,9 +42,30 @@ export default async function AuthLayout({
       </div>
 
       {/* Footer */}
-      <p className="mt-8 text-sm text-muted-foreground">
-        © {new Date().getFullYear()} LeaderForge. All rights reserved.
-      </p>
+      <div className="mt-8 text-center">
+        <p className="text-sm text-muted-foreground">
+          © {new Date().getFullYear()} i49 Group, Inc. All rights reserved.
+        </p>
+        <div className="mt-2 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <a
+            href="https://www.myleaderforge.com/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary hover:underline"
+          >
+            Privacy Policy
+          </a>
+          <span>•</span>
+          <a
+            href="https://www.myleaderforge.com/terms-of-service"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary hover:underline"
+          >
+            Terms of Service
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
