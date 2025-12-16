@@ -90,10 +90,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get all users in the org/team
+    // Get all members in the org/team
     let membersQuery = supabase
       .from('memberships')
-      .select('user_id, users!inner(id, full_name)')
+      .select('user_id')
       .eq('organization_id', membership.organization_id)
       .eq('is_active', true);
 
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
       membersQuery = membersQuery.eq('team_id', membership.team_id);
     }
 
-    const { data: members, error: membersError } = await membersQuery;
+    const { data: membersData, error: membersError } = await membersQuery;
 
     if (membersError) {
       console.error('Error fetching members:', membersError);
@@ -112,6 +112,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Get user details separately to avoid join ambiguity
+    const memberUserIds = membersData?.map(m => m.user_id) || [];
+    const { data: usersData, error: usersError } = await supabase
+      .from('users')
+      .select('id, full_name')
+      .in('id', memberUserIds.length > 0 ? memberUserIds : ['none']);
+
+    if (usersError) {
+      console.error('Error fetching users:', usersError);
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch leaderboard data' },
+        { status: 500 }
+      );
+    }
+
+    // Create a map for quick user lookup
+    const usersMap = new Map<string, { id: string; full_name: string | null }>();
+    for (const u of usersData || []) {
+      usersMap.set(u.id, u);
+    }
+
+    // Combine members with user data
+    const members = membersData?.map(m => ({
+      user_id: m.user_id,
+      users: usersMap.get(m.user_id) || { id: m.user_id, full_name: null },
+    })) || [];
+
     // Aggregate points per user
     const userPointsMap = new Map<string, number>();
     for (const entry of pointsData || []) {
@@ -120,11 +147,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Get streak data for each user
-    const userIds = members?.map(m => m.user_id) || [];
     const { data: streakData } = await supabase
       .from('user_streaks')
       .select('user_id, current_streak')
-      .in('user_id', userIds)
+      .in('user_id', memberUserIds.length > 0 ? memberUserIds : ['none'])
       .eq('streak_type', 'daily');
 
     const streakMap = new Map<string, number>();
@@ -133,12 +159,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Build leaderboard entries
-    const entries: LeaderboardEntry[] = (members || []).map(member => {
-      const userData = member.users as unknown as { id: string; full_name: string };
+    const entries: LeaderboardEntry[] = members.map(member => {
       return {
         rank: 0, // Will be set after sorting
         userId: member.user_id,
-        displayName: formatDisplayName(userData?.full_name || 'Unknown'),
+        displayName: formatDisplayName(member.users?.full_name || 'Unknown'),
         points: userPointsMap.get(member.user_id) || 0,
         currentStreak: streakMap.get(member.user_id) || 0,
         isCurrentUser: member.user_id === user.id,

@@ -20,6 +20,16 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Fetch user's profile for first name
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('full_name')
+    .eq('id', user?.id)
+    .single();
+
+  // Extract first name from full name
+  const firstName = userProfile?.full_name?.split(' ')[0] || 'there';
+
   // Fetch user's progress stats (using public views)
   const { data: progressStats } = await supabase
     .from('user_progress')
@@ -50,7 +60,7 @@ export default async function DashboardPage() {
     <div className="space-y-8 animate-page-enter">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Welcome back!</h1>
+        <h1 className="text-3xl font-bold text-foreground">Welcome back, {firstName}!</h1>
         <p className="text-muted-foreground mt-1">
           Continue your learning journey
         </p>
