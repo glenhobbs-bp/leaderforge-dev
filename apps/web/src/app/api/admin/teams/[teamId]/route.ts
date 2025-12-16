@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteParams = {
@@ -67,6 +68,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       console.error('Error updating team:', updateError);
       return NextResponse.json({ error: 'Failed to update team' }, { status: 500 });
     }
+
+    // Revalidate the teams page cache
+    revalidatePath('/admin/teams');
 
     return NextResponse.json({ success: true });
 
@@ -134,6 +138,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       console.error('Error deleting team:', deleteError);
       return NextResponse.json({ error: 'Failed to delete team' }, { status: 500 });
     }
+
+    // Revalidate the teams page cache
+    revalidatePath('/admin/teams');
 
     return NextResponse.json({ success: true });
 

@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
@@ -59,6 +60,9 @@ export async function POST(request: NextRequest) {
       console.error('Error creating team:', createError);
       return NextResponse.json({ error: 'Failed to create team' }, { status: 500 });
     }
+
+    // Revalidate the teams page cache
+    revalidatePath('/admin/teams');
 
     return NextResponse.json({ success: true, team });
 

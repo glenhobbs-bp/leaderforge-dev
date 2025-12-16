@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteParams = {
@@ -83,6 +84,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       console.error('Error assigning member to team:', updateError);
       return NextResponse.json({ error: 'Failed to assign member' }, { status: 500 });
     }
+
+    // Revalidate the teams page cache
+    revalidatePath('/admin/teams');
 
     return NextResponse.json({ success: true });
 

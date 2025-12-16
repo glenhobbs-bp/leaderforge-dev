@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 
 type RouteParams = {
@@ -81,6 +82,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       console.error('Error removing member from team:', updateError);
       return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 });
     }
+
+    // Revalidate the teams page cache
+    revalidatePath('/admin/teams');
 
     return NextResponse.json({ success: true });
 
